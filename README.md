@@ -100,6 +100,7 @@ It prints out all the information in a table format so you can easily copy and p
 iot groupings get-all --facility_id <facility_id>
 iot groupings get-fields --id <grouping_id>
 iot groupings get-data-for-fields --id <grouping_id> --start_date <iso8601 Date> --end_date <iso8601 Date> --window <0, 60, 900, 3600>
+iot feeds get-all --facility_id <facility_id>
 ```
 
 #### Auth CLI:
@@ -108,8 +109,24 @@ auth login
 auth reset
 ```
 
+### Contxt CLI:
+```
+contxt organizations get-all
+```
 
-### Exporting Data
+### EMS CLI:
+```
+ems utilities get-spend --facility_id <facility_id> --interval <monthly, daily> --resource_type <electric> --start_date <YYYY-MM> --end_date <YYYY-MM>
+ems utilities get-organization-spend --organization_id <organization_id> --interval <monthly> --resource_type <electric> --start_date <YYYY-MM> --end_date <YYYY-MM>
+```
+
+### Assets CLI:
+```
+assets facilities get-all --organization_id <organization_id> --organization_name <organization_name>
+
+```
+
+### Exporting IOT Data
 
 In order to export some data from the IOT service, you will need an ID of a field grouping you want to extract data for. For example, given the output above,
 I want to pull data for February 2019 so far from the "Fermentation Tank #1" grouping. The command to do so would be the following:

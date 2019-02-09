@@ -39,8 +39,9 @@ class IOT:
         iot groupings get-all --facility_id <facility_id>
         iot groupings get-fields --id <grouping_id>
         iot groupings get-data-for-fields --id <grouping_id> --start_date <iso8601 Date> --end_date <iso8601 Date> --window <0, 60, 900, 3600>
+        iot feeds get-all --facility_id <facility_id>
         iot fields get-all --facility_id <facility_id>
-        iot fields get-data --id <field_id>
+
     '''
     def parse_command(self, command, args):
 
