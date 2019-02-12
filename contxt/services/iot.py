@@ -103,6 +103,24 @@ class IOTService(Service):
         else:
             return None
 
+    def get_all_fields(self, facility_id):
+
+        params = {}
+
+        response = PagedResponse(PagedEndpoint(base_url=self.base_url,
+                                               client=self.client,
+                                               request=GET(uri='facilities/{}/fields'.format(facility_id)),
+                                               parameters=params))
+
+        fields = []
+        if response:
+            for record in response:
+                fields.append(Field(record))
+
+            return APIObjectCollection(fields)
+        else:
+            return None
+
 
 class FieldGrouping(APIObject):
 

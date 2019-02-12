@@ -104,6 +104,19 @@ class IOT:
             else:
                 logger.critical("Invalid subcommand. Must be one of {get-all}")
                 return
+        elif args.command == 'fields':
+
+            if args.subcommand == 'get-all':
+
+                if args.facility_id is None:
+                    logger.critical("--facility_id required for groupings get-all call")
+                    return
+
+                print(self.iot_service.get_all_fields(facility_id=args.facility_id))
+
+            else:
+                logger.critical("Invalid subcommand. Must be one of {get-all}")
+                return
         else:
             logger.critical('Unrecognized command: {}'.format(args.command))
 

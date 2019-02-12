@@ -12,7 +12,6 @@ from contxt.utils import make_logger
 
 logger = make_logger(__name__)
 
-
 class EMS:
 
     def __init__(self, cli_module, arg_parser):

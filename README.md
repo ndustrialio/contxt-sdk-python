@@ -109,18 +109,21 @@ auth login
 auth reset
 ```
 
-### Contxt CLI:
+#### Contxt CLI:
 ```
 contxt organizations get-all
+contxt organizations create --organization_name "<name>"
+contxt organizations add-user --organization_id <organization_id> --user_id <user_id>
+contxt organizations get-users (--organization_id <organization_id OR --organization_name <organization_name>)
 ```
 
-### EMS CLI:
+#### EMS CLI:
 ```
 ems utilities get-spend --facility_id <facility_id> --interval <monthly, daily> --resource_type <electric> --start_date <YYYY-MM> --end_date <YYYY-MM>
 ems utilities get-organization-spend --organization_id <organization_id> --interval <monthly> --resource_type <electric> --start_date <YYYY-MM> --end_date <YYYY-MM>
 ```
 
-### Assets CLI:
+#### Assets CLI:
 ```
 assets facilities get-all --organization_id <organization_id> --organization_name <organization_name>
 

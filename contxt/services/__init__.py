@@ -1,11 +1,10 @@
 import requests
-import os
 import json
 from datetime import datetime
 import pytz
 from tzlocal import get_localzone
 from tabulate import tabulate
-
+import jwt
 
 API_VERSION = 'v1'
 
@@ -23,6 +22,10 @@ def get_epoch_time(dt_object):
     utc_1970 = datetime(1970, 1, 1).replace(tzinfo=pytz.utc)
 
     return int((dt_object.astimezone(pytz.utc) - utc_1970).total_seconds())
+
+
+class UnauthorizedException(Exception):
+    pass
 
 
 class ApiClient(object):
@@ -71,7 +74,7 @@ class ApiClient(object):
 
         if 400 <= response.status_code < 500:
             msg = json.loads(response.text)['message']
-            http_error_msg = '%s Client Error: %s - %s' % (response.status_code, response.reason, msg)
+            raise UnauthorizedException('{} - {}'.format(response.reason, msg))
 
         elif response.status_code == 500:
             msg = json.loads(response.text)['message']
@@ -138,7 +141,6 @@ class PagedResponse(object):
             for record in self.records:
                 yield record
 
-            print(self.retrieved_record_count, self.total_records)
             if self.retrieved_record_count < self.total_records:
 
                 # go get more records
@@ -397,6 +399,10 @@ class Service(ApiService):
         super(Service, self).__init__(base_url)
 
         self.client = ApiClient(access_token=access_token)
+
+    def get_logged_in_user_id(self):
+        decoded_token = jwt.decode(self.client.access_token, verify=False)
+        return decoded_token['sub']
 
 
 class APIObject:

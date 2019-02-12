@@ -1,471 +1,411 @@
+import inflect
 from datetime import datetime
+from contxt.services import Service, GET, POST, PUT, PagedResponse, PagedEndpoint, APIObject
+import json
 
-import pytz
-from ndustrialio.apiservices import DELETE, GET, POST, PUT, PagedResponse
-from ndustrialio.apiservices.assets import (Asset, AssetAttributeValue,
-                                            AssetMetric, Assets, AssetType,
-                                            InvalidAttributeException)
+p = inflect.engine()
 
-from contxt.utils import Environments, get_config, get_environ_var, make_logger
-
-logger = make_logger(__name__)
-
-
-def datetime_zulu_format(dt):
-    assert dt.tzinfo == pytz.UTC
-    return dt.strftime('%Y-%m-%dT%H:%M:%S.%fZ')
-
-
-def datetime_zulu_parse(timestamp):
-    return datetime.strptime(timestamp, '%Y-%m-%dT%H:%M:%S.%fZ').replace(tzinfo=pytz.UTC)
+CONFIGS_BY_ENVIRONMENT = {
+    'production': {
+        'base_url': 'https://facilities.api.ndustrial.io/',
+        'audience': 'SgbCopArnGMa9PsRlCVUCVRwxocntlg0'
+    },
+    'staging': {
+        'base_url': 'https://facilities-staging.api.ndustrial.io/',
+        'audience': 'xG775XHIOZVUn84seNeHXi0Qe55YuR5w'
+    }
+}
 
 
-def normalize_label(raw_label):
-    return raw_label.lower().replace(' ', '_')
+class InvalidAttributeException(Exception):
+    pass
 
 
-normalize_field_label = normalize_label
+class AssetConfigurationException(Exception):
+    pass
 
 
-def datetime_zulu_now():
-    return datetime_zulu_format(datetime.now(tz=pytz.UTC))
+class InvalidAssetException(Exception):
+    pass
 
 
-def default_effective_date():
-    return str(datetime(year=2018, month=1, day=1)),  # set this for now until FM-200 is fixed
+class AssetMetric:
+
+    def __init__(self, asset_type_obj, api_object):
+        self.asset_type = asset_type_obj
+        for key, value in api_object.items():
+            setattr(self, key, value)
+
+        self.is_global = True if self.organization_id is None else False
+
+    def get_values(self):
+        return [self.id, self.label, self.units, self.description, self.time_interval, self.is_global]
+
+    def get_keys(self):
+        return ['id', 'label', 'units', 'description', 'time_interval', 'is_global']
 
 
-asset_core_fields = ['id', 'label', 'parent_id', 'description']
+class AssetAttribute:
+
+    def __init__(self, asset_type_obj, api_object):
+        self.asset_type = asset_type_obj
+        for key, value in api_object.items():
+            setattr(self, key, value)
+
+        self.is_global = True if self.organization_id is None else False
+
+    def get_values(self):
+        return [self.id, self.label, self.data_type, self.units, self.description, self.is_required]
+
+    def get_keys(self):
+        return ['id','label', 'data_type', 'units', 'description', 'is_required']
 
 
-class AssetMetricValue(object):
-    def __init__(self,
-                 id,
-                 asset_id,
-                 asset_metric_id,
-                 effective_start_date,
-                 effective_end_date,
-                 value,
-                 **kwargs
-                 ):
-        self.id = id
-        self.asset_id = asset_id
-        self.asset_metric_id = asset_metric_id
-        self.effective_start_date = effective_start_date
-        self.effective_end_date = effective_end_date
+class AssetAttributeValue:
+
+    def __init__(self, assets_instance, asset_obj, asset_attribute_obj, api_object):
+        self.assets_instance = assets_instance
+        self.asset_obj = asset_obj
+        self.asset_attribute_obj = asset_attribute_obj
+        for key, value in api_object.items():
+            if not isinstance(value, dict):
+                setattr(self, key, value)
+            if key == 'asset_attribute':
+                for attribute_key, attribute_value in value.items():
+                    setattr(self, attribute_key, attribute_value)
+
+    '''
+        Update the value of an asset attribute value
+    '''
+
+    def set(self, value, effective_date=None):
+        print('Setting new value for Attribute {} of Asset {} as {} with effective_date {}'
+              .format(self.asset_attribute_obj.label, self.asset_obj.label, value, effective_date))
+
+        body = {
+            'value': value,
+            'effective_date': effective_date if not None else str(datetime.today())
+        }
+
+        self.assets_instance.update_attribute_value(asset_attribute_value_obj=self, api_body=body)
+
+        # update the values in this instance
         self.value = value
-        for k, v in kwargs.items():
-            setattr(self, k, v)
+        self.effective_date = body['effective_date']
+
+        return self
+
+    def __str__(self):
+        return str('{} -> {}'.format(self.label, self.value))
+
+    def __repr__(self):
+        return str('{} -> {}'.format(self.label, self.value))
+
+    def __call__(self, value=None, effective_date=None):
+
+        if value is not None:
+            self.set(value, effective_date)
+
+        return self
 
 
-class AssetTree:
+class Asset:
 
-    def __init__(self, root):
-        self.root = root
+    def __init__(self, assets_instance, asset_type_obj, api_object):
+        self.assets_instance = assets_instance
+        self.asset_type = asset_type_obj
+        for key, value in api_object.items():
+            setattr(self, key, value)
+
+        self.attribute_values = {}
+
+    def withAttributes(self, **kwargs):
+        print('Creating with attributes')
+        print(kwargs)
+        for key, value in kwargs.items():
+            if key not in self.asset_type.attributes:
+                raise InvalidAttributeException(
+                    "Attribute {} does not exist for type {}".format(key, self.asset_type.label))
+            body = {'value': value,
+                    'effective_date': str(datetime(year=2018, month=1, day=1))
+                    ## set this for now until FM-200 is fixed
+                    }
+            # returns an AssetAttributeValue object
+            self.attribute_values[key] = self.assets_instance.create_attribute_value(asset_obj=self,
+                                                                                     asset_attribute_obj=
+                                                                                     self.asset_type.attributes[key],
+                                                                                     api_body=body)
+            setattr(self, key, value)
+            setattr(self, key, self.attribute_values[key].value)
+
+        return self
+
+    def attributes(self, force_fetch=False):
+        if force_fetch or len(self.attribute_values) == 0:
+            print('Getting all attributes for asset {}'.format(self.label))
+            attribute_values = self.assets_instance.get_attribute_values_for_asset(self, asset_type_obj=self.asset_type)
+            # store as a map to self
+            for item in attribute_values:
+                self.attribute_values[item.label] = item
+                setattr(self, item.label, item.value)
+
+            # Set None for attributes not populated
+            for key in self.asset_type.attributes:
+                if key not in self.attribute_values:
+                    setattr(self, key, None)
+        return self.attribute_values
+
+    def __str__(self):
+        return "<Asset: asset_id: '{}', label: '{}', description: '{}', attributes: {}>".format(
+            self.id, self.label, self.description, self.attribute_values)
+
+    def __repr__(self):
+        return "<Asset: asset_id: '{}', label: '{}', description: '{}', attributes: {}>".format(
+            self.id, self.label, self.description, self.attribute_values)
+
+    def toJSON(self):
+        print(self.__dict__)
+        return self.__dict__
 
 
-class AssetNode:
+class AssetList:
 
-    def __init__(self, attributes=None, children=None, meta=None, type_label=None):
-        self.attributes = attributes
-        self.children = children or []
-        self._meta = meta or {}
-        self.type_label = type_label
-
-        self.id = meta.get('id')
-        self.parent_id = meta.get('parent_id')
-        self.label = meta.get('label')
-        self.description = meta.get('description')
-
-        # intersection validation
-        intersect = set(asset_core_fields).intersection(set(self.attributes.iterkeys()))
-        if intersect:
-            logger.warn(
-                "Non empty intersection between core fields and attributes: {}."
-                " Attributes will be overwritten by core fields".format(intersect))
-
-    def add_child(self, child):
-        self.children.append(child)
-
-    def add_meta_data(self, meta_data):
-        self._meta = meta_data
-
-    def all_fields(self):
-        fields = self.attributes.copy()
-        for k in asset_core_fields:
-            v = getattr(self, k)
-            if v:
-                fields[k] = v
-        return fields
+    def __init__(self, asset_type_obj):
+        pass
 
 
-class LazyAssetsService(Assets):
+class AssetType(APIObject):
+    valid_asset_create_fields = ['label', 'description']
 
-    def __init__(self, organization_id, client_id, env=None):
-        self.types_by_label = {}
-        self.types_by_uid = {}  # NOTE: Assets clears types_by_id
-        self.env = env or get_environ_var('WORKER_ENV', Environments.staging)
-        self.config = get_config(self.env)
-        logger.info("Initializing {} for organization {} targeting {}".format(
-            type(self).__name__, organization_id, self.config.base_url))
-        Assets.__init__(self, organization_id=organization_id, client_id=client_id)
-        logger.info("Loaded asset types {}".format(self.types_by_label.keys()))
-        self._facility = None
+    def __init__(self, assets_instance, organization_id, type_obj):
+
+        super(AssetType, self).__init__()
+
+        self.id = type_obj['id']
+        self.organization_id = organization_id
+        self.label = type_obj['label']
+        self.parent_id = type_obj['parent_id']
+        self.label_plural = p.plural(self.label)
+        self.description = type_obj['description']
+        self.is_global = True if self.organization_id is None else False
+        self.assets_instance = assets_instance
+        self.attributes = {}
+        self.metrics = {}
+        self.assets = []
+
+        '''
+        # Set attributes
+        self.attributes = {}
+        for key, value in config['attributes'].items():
+            self.attributes[key] = AssetAttribute(id=value['id'], asset_type_obj=self, type=value['type'], label=key,
+                                                  description=None, is_required=False)
+        '''
+
+    def set_attributes(self, attribute_objs):
+        for attribute in attribute_objs:
+            self.attributes[attribute.label] = attribute
+
+    def set_metrics(self, metric_objs):
+        for metric in metric_objs:
+            self.metrics[metric.label] = metric
+
+    def create(self, label, description=None):
+        asset_obj = self.assets_instance.create_asset(asset_type_obj=self, api_body={
+            'label': label,
+            'description': description,
+            'asset_type_id': self.id,
+            'organization_id': self.assets_instance.organization_id
+        })
+        self.assets.append(asset_obj)
+        return asset_obj
+
+    def getAll(self, force_fetch=False):
+        if force_fetch or len(self.assets) == 0:
+            print('Getting all {} for organization_id {}'.format(self.label_plural, self.organization_id))
+            self.assets = self.assets_instance.get_assets_for_type(self)
+        return self.assets
+
+    # TODO cleanup
+    def toJSON(self):
+        obj = []
+        if len(self.assets) == 0:
+            self.getAll()
+
+        for asset in self.assets:
+            obj.append(asset.toJSON())
+
+    # TODO - implement me
+    def get(self, asset_label):
+        print('Getting asset with type {} and label {}'.format(self.label, asset_label))
+
+    def get_values(self):
+        return [self.id, self.label ,self.description, self.organization_id, self.parent_id, self.is_global]
+
+    def get_keys(self):
+        return ['id', 'label', 'description', 'organization_id', 'parent_type_id', 'is_global']
+
+    def __call__(self):
+        return self
+
+
+class Assets(Service):
+
+    def __init__(self, auth_module, organization_id, environment='production'):
+
+        if environment not in CONFIGS_BY_ENVIRONMENT:
+            raise Exception('Invalid environment specified')
+
+        self.env = CONFIGS_BY_ENVIRONMENT[environment]
+
+        super(Assets, self).__init__(base_url=self.env['base_url'],
+                                     access_token=auth_module.get_token_for_client(self.env['audience']))
+
+        self.organization_id = organization_id
+        self.load_configuration()
+        self.types_by_id = {}
+
+        '''
+        self.asset_config = self.load_org_asset_configuration()
+
+        for type_label, type_config in self.asset_config[self.organization_id]['AssetTypes'].items():
+            print(type_label)
+            type_class_obj = AssetType(organization_id, type_label, type_config)
+            setattr(self, type_label, type_class_obj)
+            setattr(self, type_label.capitalize(), type_class_obj)
+        '''
 
     def baseURL(self):
-        return self.config.base_url
+        return 'https://facilities.api.ndustrial.io'
 
     def audience(self):
-        return self.config.audience
+        return 'SgbCopArnGMa9PsRlCVUCVRwxocntlg0'
 
     def load_configuration(self):
-        # BUG: Assets class loads all asset types, rather than organization-specific
-        # types. This leads to asset types with the same label (i.e. globals)
-        # being overwritten.
-        asset_types = PagedResponse(
-            self.execute(
-                GET(uri='organizations/{}/assets/types'.format(self.organization_id)), execute=True))
+        print('Loading Asset Configuration for Organization')
+        asset_types = PagedResponse(self.execute(GET(uri='assets/types'), execute=True))
         for asset_type in asset_types:
             self._load_configuration_for_type(asset_type)
 
     def _load_configuration_for_type(self, asset_type_obj):
-        # making 'lazy' trick to skip loading attributes and metrics
         type_class_obj = AssetType(assets_instance=self,
                                    organization_id=self.organization_id,
                                    type_obj=asset_type_obj)
-        # store asset type object by label (raw and normalized)
-        raw_label = type_class_obj.label
-        normalized_label = type_class_obj.label.replace(' ', '')
-        type_class_obj.label = normalized_label
-        for label in [raw_label, normalized_label]:
-            self.types_by_label[label] = type_class_obj
-        # store asset type object by id
-        self.types_by_uid[type_class_obj.id] = type_class_obj
+        setattr(self, type_class_obj.label.replace(' ', ''), type_class_obj)
+        setattr(self, type_class_obj.label.capitalize().replace(' ', ''), type_class_obj)
 
-    def load_type_attributes(self, type_class_obj):
-        if not type_class_obj.attributes:
-            logger.info("LazyAssetsService fetching attributes for type '{}'".format(type_class_obj.label))
-            type_class_obj.set_attributes(self.get_attributes_for_type(type_class_obj))
-            type_class_obj.attributes_by_id = {attr.id: attr for label, attr in type_class_obj.attributes.items()}
+        type_class_obj.set_attributes(self.get_attributes_for_type(type_class_obj))
+        type_class_obj.set_metrics(self.get_metrics_for_type(type_class_obj))
 
-    def load_type_metrics(self, type_class_obj):
-        if not type_class_obj.metrics:
-            logger.info("LazyAssetsService fetching metrics for type '{}'".format(type_class_obj.label))
-            type_class_obj.set_metrics(self.get_metrics_for_type(type_class_obj))
-            type_class_obj.metrics_by_id = {attr.id: attr for label, attr in type_class_obj.metrics.items()}
+    def get_attributes_for_type(self, asset_type_obj):
+        attributes = PagedResponse(PagedEndpoint(base_url=self.base_url,
+                                                 client=self.client,
+                                                 request=GET(uri='assets/types/{}/attributes'.format(asset_type_obj.id)),
+                                                 parameters={}))
+        return [AssetAttribute(asset_type_obj=asset_type_obj, api_object=record) for record in attributes]
 
-    def load_type_full(self, type_class_obj):
-        self.load_type_attributes(type_class_obj)
-        self.load_type_metrics(type_class_obj)
-        return type_class_obj
+    def get_metrics_for_type(self, asset_type_obj):
+        metrics = PagedResponse(PagedEndpoint(base_url=self.base_url,
+                                              client=self.client,
+                                              request=GET(uri='assets/types/{}/metrics'.format(asset_type_obj.id)),
+                                              parameters={}))
+        return [AssetMetric(asset_type_obj=asset_type_obj, api_object=record) for record in metrics]
 
-    def asset_type_with_id(self, asset_type_id):
-        if asset_type_id not in self.types_by_uid:
-            raise AssertionError("Asset Type with id '{}' not found. Was it loaded?".format(asset_type_id))
-        return self.types_by_uid[asset_type_id]
-
-    def asset_type_with_label(self, label):
-        if label not in self.types_by_label:
-            raise AssertionError("Asset Type with label '{}' not found".format(label))
-        return self.types_by_label[label]
-
-    def asset_attribute_with_id(self, asset_type, asset_attribute_id):
-        if asset_attribute_id not in asset_type.attributes_by_id:
-            raise AssertionError("Asset Attribute with id '{}' not found. Was it loaded?".format(asset_attribute_id))
-        return asset_type.attributes_by_id[asset_attribute_id]
-
-    def asset_attribute_with_label(self, asset_type, asset_attribute_label):
-        if asset_attribute_label not in asset_type.attributes:
-            raise AssertionError(
-                "Asset Attribute with label '{}' not found. Was it loaded?".format(asset_attribute_label))
-        return asset_type.attributes[asset_attribute_label]
-
-    def asset_metric_with_id(self, asset_type, asset_metric_id):
-        if asset_metric_id not in asset_type.metrics_by_id:
-            raise AssertionError("Asset Metric with id '{}' not found. Was it loaded?".format(asset_metric_id))
-        return asset_type.metrics_by_id[asset_metric_id]
-
-    def asset_metric_with_label(self, asset_type, asset_metric_label):
-        if asset_metric_label not in asset_type.metrics:
-            raise AssertionError("Asset Metric with label '{}' not found. Was it loaded?".format(asset_metric_label))
-        return asset_type.metrics[asset_metric_label]
-
-    def create_asset_by_object_reflection(self, obj):
-        type_name = type(obj).__name__
-        at = self.asset_type_with_label(type_name)
-        logger.debug("Saving '{}' asset".format(type_name))
-        clean_attrs = {k: v for k, v in obj.__dict__.items() if v is not None and k not in asset_core_fields}
-
-        return self.create_asset_with_attribute_values(at, clean_attrs,
-                                                       parent_id=getattr(obj, 'parent_id', None),
-                                                       asset_label=obj.label,
-                                                       description=getattr(obj, 'description', obj.label))
-
-    def create_asset_with_attribute_values(self, asset_type, attr_values_dict, parent_id=None, asset_label=None,
-                                           description=None):
-
-        def create_attr_value_dict(label, value):
-            return {
-                'asset_attribute_id': self.asset_attribute_with_label(asset_type, label).id,
-                'effective_date': default_effective_date(),
-                'value': value
-            }
-
-        clean_attr_values_dict = {k: v for k, v in attr_values_dict.items() if v is not None}
-        api_body = {
-            'label': asset_label or '{} @ {}'.format(asset_type.label, datetime_zulu_now()),
-            'description': description,
-            'asset_type_id': asset_type.id,
-            'organization_id': self.organization_id,
-            'parent_id': parent_id,
-            'asset_attribute_values_to_create': [create_attr_value_dict(k, v) for k, v in
-                                                 clean_attr_values_dict.items()]
-        }
-        # TODO: there is a bug in the ApiServices class, where .params doesn't cast boolean types to json (thus ignoring parameter)
-        response = self.execute(POST(uri='assets?with_attribute_values=true').body(api_body), execute=True)
-        asset = Asset(assets_instance=self, asset_type_obj=asset_type, api_object=response)
-        # Attach the attributes to the asset (replacing call to Asset.attributes())
-        for (k, v), body in zip(clean_attr_values_dict.items(), api_body['asset_attribute_values_to_create']):
-            asset_attr_obj = self.asset_attribute_with_id(asset_type, body['asset_attribute_id'])
-            # TODO: each attr value body is missing id, since the api doesn't return it
-            asset.attribute_values[k] = AssetAttributeValue(assets_instance=self, asset_obj=asset,
-                                                            asset_attribute_obj=asset_attr_obj, api_object=body)
-            setattr(asset, k, v)
-        for k in asset.asset_type.attributes.keys():
-            if k not in asset.attribute_values:
-                setattr(asset, k, None)
-        return asset
-
-    def create_asset_metric(self, asset_type_obj, label, description, time_interval='hourly', units=None, is_global=False):
-        api_body = {
-            'label': label,
-            'description': description,
-            'organization_id': self.organization_id if not is_global else None,
-            'time_interval': time_interval,
-            'units': units
-        }
-        uri = '/assets/types/{}/metrics'.format(asset_type_obj.id)
-        response = self.execute(POST(uri=uri).body(api_body), execute=True)
-        return AssetMetric(asset_type_obj=asset_type_obj, api_object=response)
-
-    def delete_asset_metric(self, asset_type_obj, label):
-        asset_metric = self.asset_metric_with_label(asset_type_obj, label)
-        uri = '/assets/metrics/{}'.format(asset_metric.id)
-        response = self.execute(DELETE(uri=uri), execute=True)
-        return response
-
-    def fetch_asset_by_id(self, asset_id):
-        # TODO: throw an error here when asset_id is not found
-        asset_json = self.execute(GET(uri='assets/{}'.format(asset_id)), execute=True)
-        asset_type = self.asset_type_with_id(asset_json['asset_type_id'])
-        asset = Asset(self, asset_type, asset_json)
-        # pre fetch attributes
-        # todo: revisit this attr prefetching, may be replaced by the attributes coming in the asset_json
-        asset.attributes()
-        return asset
-
-    @staticmethod
-    def normalized_attr_pair(asset_attribute, raw_val):
-        value = raw_val
-        label = normalize_field_label(asset_attribute.label)
-        try:
-            if asset_attribute.data_type == 'number':
-                value = float(value)
-            elif asset_attribute.data_type == 'boolean':
-                value = str(value).lower() == 'true'
-        except ValueError:
-            pass
-        return label, value
-
-    def get_asset_tree_by_id(self, asset_id):
-
-        def create_node(asset_dict):
-            attr_values_dicts = asset_dict.get('asset_attribute_values', [])
-            children_asset_dicts = asset_dict.get('children', [])
-            asset_type = self.asset_type_with_id(asset_dict['asset_type_id'])
-            attr_values_by_label = dict(
-                self.normalized_attr_pair(self.asset_attribute_with_id(asset_type, d['asset_attribute_id']), d['value'])
-                for d in attr_values_dicts)
-            children_nodes = [create_node(d) for d in children_asset_dicts]
-            return AssetNode(attributes=attr_values_by_label, children=children_nodes, meta=asset_dict,
-                             type_label=asset_type.label)
-
-        asset_json = self.execute(GET(uri='assets/{}'.format(asset_id)), execute=True)
-        root = create_node(asset_json)
-        asset_tree = AssetTree(root)
-        return asset_tree
-
-    def get_assets_by_attribute_value(self, asset_type, attr_label, attr_value):
-        if attr_label not in asset_type.attributes:
-            raise InvalidAttributeException(
-                "Attribute {} does not exist for type {}".format(attr_label, asset_type.label))
-        attr = asset_type.attributes[attr_label]
-        assets = PagedResponse(self.execute(
-            GET(uri='organizations/{}/assets?asset_attribute_id={}&asset_attribute_value={}'.format(
-                self.organization_id, attr.id, attr_value)),
-            execute=True))
-        return [Asset(assets_instance=self, asset_type_obj=asset_type, api_object=record) for record in assets]
-
-    def get_latest_assets_for_type(self, asset_type_obj, limit=1):
+    def get_assets_for_type(self, asset_type_obj):
         parameters = {
-            'asset_type_id': asset_type_obj.id,
-            'orderBy': 'created_at',
-            'reverseOrder': True,
-            'limit': limit
+            'asset_type_id': asset_type_obj.id
         }
         assets = PagedResponse(self.execute(
             GET(uri='organizations/{}/assets'.format(self.organization_id)).params(parameters),
             execute=True))
         return [Asset(assets_instance=self, asset_type_obj=asset_type_obj, api_object=record) for record in assets]
 
-    def get_assets_for_type(self, asset_type_obj):
-        parameters = {
-            'asset_type_id': asset_type_obj.id,
-            # 'orderBy': 'created_at',
-            # 'reverseOrder': True
-        }
-        assets = PagedResponse(
-            self.execute(
-                GET(uri='organizations/{}/assets'.format(
-                    self.organization_id)).params(parameters),
-                execute=True))
-        return [
-            Asset(
-                assets_instance=self,
-                asset_type_obj=asset_type_obj,
-                api_object=record) for record in assets
-        ]
+    def get_attribute_values_for_asset(self, asset_obj, asset_type_obj):
+        values = self.execute(GET(uri='assets/{}/attributes/values'.format(asset_obj.id)), execute=True)
+        attribute_value_objects = []
+        for record in values:
+            # parse numeric types
+            try:
+                data_type = record['asset_attribute']['data_type']
+                if data_type == 'number':
+                    record['value'] = float(record['value'])
+                elif data_type == 'boolean':
+                    record['value'] = str(record['value']).lower() == 'true'
+            except Exception:
+                pass
 
-    def create_metric_value(self, asset, asset_type, metric_label, metric_start_date,
-                            metric_end_date, metric_value):
-        # /assets/:asset_id/metrics/:asset_metric_id/values
-        if metric_label not in asset_type.metrics:
-            raise AssertionError(
-                "Metric {} does not exist for type {}".format(metric_label, asset_type.label))
-        metric = asset_type.metrics[metric_label]
-        api_body = {
-            'effective_start_date': datetime_zulu_format(metric_start_date),
-            'effective_end_date': datetime_zulu_format(metric_end_date),
-            'value': metric_value,
-        }
-        self.execute(
-            POST(uri='/assets/{}/metrics/{}/values'.format(asset.id, metric.id)).body(api_body),
-            execute=True)
+            attribute_obj = asset_type_obj.attributes[record['asset_attribute']['label']]
+            attribute_value_objects.append(AssetAttributeValue(assets_instance=self,
+                                                               asset_obj=asset_obj,
+                                                               asset_attribute_obj=attribute_obj,
+                                                               api_object=record)
+                                           )
+        return attribute_value_objects
 
-    def upsert_metric_value(self, asset, asset_type, metric_label,
-                            metric_start_date, metric_end_date, metric_value):
-        if metric_label not in asset_type.metrics:
-            raise AssertionError("Metric {} does not exist for type {}".format(
-                metric_label, asset_type.label))
-        metric = asset_type.metrics[metric_label]
-        # Fetch metric values
-        self.fetch_and_set_metric_values_for_asset(asset)
-        curr_metric_value = asset.metric_values.get(metric_label)
-        if curr_metric_value:
-            # Update existing metric value
-            if curr_metric_value != metric_value:
-                # TODO: bug when passing dates here
-                api_body = {
-                    # 'effective_start_date': datetime_zulu_format(metric_start_date),
-                    # 'effective_end_date': datetime_zulu_format(metric_end_date),
-                    'value': metric_value
-                }
-                self.execute(
-                    PUT(uri='/assets/metrics/values/{}'.format(curr_metric_value.id)).body(api_body),
-                    execute=True)
-        else:
-            # Create new metric value
-            api_body = {
-                'effective_start_date': datetime_zulu_format(metric_start_date),
-                'effective_end_date': datetime_zulu_format(metric_end_date),
-                'value': metric_value,
-            }
-            self.execute(
-                POST(uri='/assets/{}/metrics/{}/values'.format(
-                    asset.id, metric.id)).body(api_body),
-                execute=True)
-
-    def fetch_all_metric_values_for_asset(self, asset):
-        resp = PagedResponse(self.execute(GET(uri='assets/{}/metrics/values'.format(asset.id)), execute=True))
-        return [AssetMetricValue(**rec) for rec in resp.records]
-
-    def fetch_all_metric_values_for_asset_metric(self, asset, metric):
-        resp = PagedResponse(self.execute(GET(uri='assets/{}/metrics/{}/values'.format(asset.id, metric.id)), execute=True))
-        return [AssetMetricValue(**rec) for rec in resp.records]
-
-    def fetch_and_set_metric_values_for_asset(self, asset, force=False):
-        if getattr(asset, 'metric_values', None) and not force:
-            # Already fetched and not forced
-            return
-        # Either not yet fetched or forced
-        asset_type = self.asset_type_with_id(asset.asset_type_id)
-        metric_values = self.fetch_all_metric_values_for_asset(asset)
-        asset.metric_values = {
-            self.asset_metric_with_id(asset_type, mv.asset_metric_id).label: mv
-            for mv in metric_values
-        }
-
-    def create_asset_type_with_parent(self, type_name, description, parent_id):
+    def create_asset_type(self, type_name, description):
         asset_type_response = self.execute(
             POST(uri='/assets/types').body({
                 'label': type_name,
                 'description': description,
-                'organization_id': self.organization_id,
-                'parent_id': parent_id
+                'organization_id': self.organization_id
             }), execute=True)
         return AssetType(assets_instance=self, organization_id=self.organization_id, type_obj=asset_type_response)
 
-    def update_asset_type_parent(self, type_name, parent_id):
-        at = self.asset_type_with_label(type_name)
-        assert at
-        self.execute(
-            PUT(uri='/assets/types/{}'.format(at.id)).body({
-                'parent_id': parent_id
-            }), execute=True)
-        at.parent_id = parent_id
-        return at
-
-    def create_asset_with_parent(self, asset_type, asset):
-        return self.create_asset(asset_type_obj=asset_type, api_body={
-            'label': asset.label,
-            'description': asset.description,
-            'asset_type_id': asset_type.id,
+    def create_asset_attribute(self, asset_type_obj, label, description, data_type="string", is_required=False,
+                               units=None):
+        api_body = {
+            'label': label,
+            'description': description,
             'organization_id': self.organization_id,
-            'parent_id': asset.parent_id
-        })
+            'data_type': data_type,
+            'units': units,
+            'is_required': is_required
+        }
+        uri = '/assets/types/{}/attributes'.format(asset_type_obj.id)
+        response = self.execute(POST(uri=uri).body(api_body), execute=True)
+        return AssetAttribute(asset_type_obj=asset_type_obj, api_object=response)
 
-    @staticmethod
-    def upsert_attribute_value(asset, attr, value):
-        """Create or update an attribute value"""
-        if attr in asset.attributes():
-            # -- updating existing attribute value
-            attr_value = asset.attribute_values[attr]
-            if attr_value.value != value:
-                attr_value.set(value)
-        else:
-            # attribute does not exits: create
-            asset.withAttributes(**{attr: value})
+    def create_asset(self, asset_type_obj, api_body):
+        asset_response = self.execute(POST(uri='/assets').body(api_body), execute=True)
+        return Asset(assets_instance=self, asset_type_obj=asset_type_obj, api_object=asset_response)
 
-    def update_asset(self, asset):
-        fields = (
-            'description',
-            'parent_id'
-        )
-        vrs = asset if asset is dict else vars(asset)
-        api_body = {k: vrs[k] for k in fields if k in vrs}
-        uri = '/assets/{}'.format(asset.id)
-        self.execute(PUT(uri=uri).body(api_body), execute=True)
-        return asset
+    def create_attribute_value(self, asset_obj, asset_attribute_obj, api_body):
+        # /assets/:asset_id/attributes/:asset_attribute_id/values
+        api_body['asset_attribute_id'] = asset_attribute_obj.id
+        attribute_value_response = self.execute(
+            POST(uri='/assets/{}/attributes/{}/values'.format(asset_obj.id, asset_attribute_obj.id)).body(api_body),
+            execute=True)
+        return AssetAttributeValue(assets_instance=self,
+                                   asset_obj=asset_obj,
+                                   asset_attribute_obj=asset_attribute_obj,
+                                   api_object=attribute_value_response)
 
-    def facility(self, facility_id, force_fetch=False):
-        if not self._facility:
-            fat = self.asset_type_with_label('Facility')
-            self.load_type_attributes(fat)
-            self._facility = self.fetch_asset_by_id(facility_id)
-        elif force_fetch:
-            self._facility.attributes(force_fetch=force_fetch)
-        return self._facility
+    def update_attribute_value(self, asset_attribute_value_obj, api_body):
+        # /assets/attributes/values/:asset_attribute_value_id
+        self.execute(
+            PUT(uri='/assets/attributes/values/{}'.format(asset_attribute_value_obj.id)).body(api_body),
+            execute=True)
+        return True
 
-    def get(self, uri):
-        api_call = GET(uri=uri)
-        return self.execute(api_call, execute=True)
+    def load_org_asset_configuration(self):
+        with open('./ndustrialio/apiservices/asset_fixture.json') as config_file:
+            asset_config = json.load(config_file)
+
+        asset_config_by_org = {}
+        for organization_config in asset_config:
+            asset_config_by_org[organization_config['organization_id']] = organization_config
+
+        if self.organization_id not in asset_config_by_org:
+            raise AssetConfigurationException('Error! Organization ID not in asset configuration')
+
+        return asset_config_by_org
+
+    def _get_all_assets(self):
+        parameters = {'organization_id': self.organization_id}
+        assets = PagedResponse(self.execute(GET(uri='assets').params(parameters), execute=True))
+        return [Asset]
+
+    def hasType(self, type_name):
+        return hasattr(self, type_name)
+
+    def newType(self, type_name, description):
+        type = AssetType(assets_instance=self, organization_id=self.organization_id, )

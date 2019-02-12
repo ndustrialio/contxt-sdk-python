@@ -41,6 +41,12 @@ class FacilitiesService(Service):
 
         return APIObjectCollection(facilities)
 
+    def get_facility_by_id(self, facility_id):
+
+        assert isinstance(facility_id, int)
+
+        return Facility(self.execute(GET(uri='facilities/{}'.format(facility_id))))
+
 
 class Facility(APIObject):
 

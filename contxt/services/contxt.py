@@ -1,5 +1,4 @@
-from contxt.services import Service, GET, APIObject, APIObjectCollection
-from datetime import datetime
+from contxt.services import Service, GET, POST, APIObject, APIObjectCollection
 
 CONFIGS_BY_ENVIRONMENT = {
     'production': {
@@ -34,6 +33,32 @@ class ContxtService(Service):
             organizations.append(Organization(org))
         return APIObjectCollection(organizations)
 
+    def create_organization(self, organization_name):
+
+        assert isinstance(organization_name, str)
+
+        body = {
+            'name': organization_name
+        }
+
+        return Organization(self.execute(POST(uri='organizations').body(body)))
+
+    def add_user_to_organization(self, user_id, organization_id):
+
+        assert isinstance(organization_id, str)
+        assert isinstance(user_id, str)
+
+        return OrganizationUser(self.execute(POST(uri='organizations/{}/users/{}'.format(organization_id, user_id))))
+
+    def get_organization_users(self, organization_id):
+
+        assert isinstance(organization_id, str)
+
+        users = []
+        for user in self.execute(GET(uri='organizations/{}/users'.format(organization_id))):
+            users.append(User(user))
+        return APIObjectCollection(users)
+
 
 class Organization(APIObject):
 
@@ -56,3 +81,59 @@ class Organization(APIObject):
     def get_keys(self):
         return ['id', 'name', 'legacy_organization_id', 'created_at']
 
+
+class OrganizationUser(APIObject):
+
+    def __init__(self, organization_user_api_object):
+
+        super(OrganizationUser, self).__init__()
+
+        self.id = organization_user_api_object['id']
+        self.organization_id = organization_user_api_object['organization_id']
+        self.user_id = organization_user_api_object['user_id']
+
+    def get_values(self):
+        return [self.id, self.user_id, self.organization_id]
+
+    def get_keys(self):
+        return ['id', 'user_id', 'organization_id']
+
+
+class User(APIObject):
+
+    def __init__(self, user_api_object):
+
+        super(User, self).__init__()
+
+        self.id = user_api_object['id']
+        self.first_name = user_api_object['first_name']
+        self.last_name = user_api_object['last_name']
+        self.email = user_api_object['email']
+        self.is_activated = user_api_object['is_activated']
+        self.Roles = [Role(role) for role in user_api_object['Roles']]
+
+    def get_values(self):
+        return [self.id, self.first_name, self.last_name, self.is_activated, ','.join([role.name for role in self.Roles])]
+
+    def get_keys(self):
+        return ['id', 'first_name', 'last_name', 'is_activated', 'roles']
+
+
+class Role(APIObject):
+
+    def __init__(self, role_api_object):
+
+        super(Role, self).__init__()
+
+        self.id = role_api_object['id']
+        self.name = role_api_object['name']
+        self.description = role_api_object['description']
+        self.organization_id = role_api_object['organization_id']
+        self.created_at = role_api_object['created_at']
+        self.updated_at = role_api_object['updated_at']
+
+    def get_values(self):
+        return [self.id, self.name, self.description, self.organization_id]
+
+    def get_keys(self):
+        return ['id','name','description','organization_id']
