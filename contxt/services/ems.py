@@ -40,8 +40,6 @@ class EMSService(Service):
             'exclude_account_charges': 'true' if exclude_account_charges else 'false'
         }
 
-        print(params)
-
         response = self.execute(GET(uri='facilities/{}/utility/spend/monthly'.format(facility_id)).params(params),
                                 execute=True)
 

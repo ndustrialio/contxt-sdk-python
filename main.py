@@ -34,14 +34,14 @@ ems_subparser = stack_subparser.add_parser("ems", help="EMS CLI Module Commands"
 cli_auth = CLIAuth()
 
 # initialize the overall cli instance
-cli = ContxtCLI(cli_auth)
+#cli = ContxtCLI(cli_auth)
 
 # initialize the iot cli module
 #iot_cli = IOT(cli, iot_arg_parser)
 
 # initialize the ems cli module
 #ems_cli = EMS(cli, ems_arg_parser)
-ems_cli = EMS(cli, ems_subparser)
+ems_cli = EMS(ems_subparser)
 
 # initialize the assets cli module
 #assets_cli = Assets(cli, assets_arg_parser)
