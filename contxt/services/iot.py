@@ -1,5 +1,6 @@
-from contxt.services import Service, GET, get_epoch_time, DataResponse, PagedResponse, PagedEndpoint, \
+from contxt.services import Service, GET, DataResponse, PagedResponse, PagedEndpoint, \
     APIObjectCollection, APIObject
+from contxt.utils import get_epoch_time
 from datetime import datetime
 
 CONFIGS_BY_ENVIRONMENT = {

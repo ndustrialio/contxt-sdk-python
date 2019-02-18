@@ -1,4 +1,7 @@
 from os import environ
+from datetime import datetime
+from tzlocal import get_localzone
+import pytz
 
 import logging
 import os
@@ -26,6 +29,22 @@ COLORS = {
 }
 
 
+def delocalize_datetime(dt_object):
+    localized_dt = get_localzone().localize(dt_object)
+    return localized_dt.astimezone(pytz.utc)
+
+
+def get_epoch_time(dt_object):
+    if dt_object.tzinfo is None:
+        # assuming an naive datetime is in the callers timezone
+        # as set on the system,
+        dt_object = get_localzone().localize(dt_object)
+
+    utc_1970 = datetime(1970, 1, 1).replace(tzinfo=pytz.utc)
+
+    return int((dt_object.astimezone(pytz.utc) - utc_1970).total_seconds())
+
+
 def get_environ_var(var, default=None):
     if var not in environ:
         if default is None:
@@ -33,6 +52,7 @@ def get_environ_var(var, default=None):
                                    "and no default value has been provided".format(var))
         return default
     return environ[var]
+
 
 def formatter_message(message, use_color=True):
     if use_color:

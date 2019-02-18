@@ -3,9 +3,11 @@ from getpass import getpass
 from pathlib import Path
 import json
 import os
+import jwt
+from datetime import datetime
 
 from contxt.services.authentication import ContxtAuthService
-from contxt.utils import Configuration, make_logger
+from contxt.utils import Configuration, make_logger, get_epoch_time
 
 logger = make_logger(__name__)
 
@@ -77,12 +79,31 @@ class BaseAuth:
                 raise NotImplementedError('Need to implement client_id/client_secret authentication')
         '''
 
+        # check to see if we've gotten a token for this service or not
         if client_id not in self.tokens:
-            # try to get a token
+            # try to get a token, whether it's a refresh or not
+            self.authenticate_to_service(client_id)
+
+        # check to see if have the token, but needs to be refreshed
+        if self.token_is_expired_for_client(client_id):
+            logger.warn('Token expired for client {} -- Refreshing'.format(client_id))
             self.authenticate_to_service(client_id)
 
         access_token = self.tokens[client_id]['token']
         return access_token
+
+    def token_is_expired_for_client(self, client_id):
+
+        access_token = self.tokens[client_id]['token']
+
+        decoded_token = jwt.decode(access_token, verify=False)
+
+        token_expiration_epoch = decoded_token['exp']
+
+        if token_expiration_epoch <= get_epoch_time(datetime.now()):
+            return True
+
+        return False
 
     def load_tokens(self):
         os.makedirs(self.contxt_config_dir, exist_ok=True)

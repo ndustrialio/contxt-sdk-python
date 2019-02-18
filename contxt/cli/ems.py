@@ -1,7 +1,7 @@
 from datetime import datetime
 from tqdm import tqdm
 import csv
-import argparse
+from importlib import import_module
 
 from contxt.services.ems import EMSService
 from contxt.services.contxt import ContxtService
@@ -22,7 +22,11 @@ COMMANDS = {
                 {
                     # ./contxt.py ems utilities get-spend -h
                     'command': 'get-spend',
-                    'function': 'get_spend',
+                    'method_call_info': {
+                        'module': 'contxt.func.ems',
+                        'class': 'EMS',
+                        'method': 'get_facility_spend',
+                    },
                     'args': [
                         {
                             'arg': 'facility_id',
@@ -66,21 +70,25 @@ COMMANDS = {
                 },
                 {
                     'command': 'get-organization-spend',
-                    'function': 'get_organization_spend',
+                    'method_call_info': {
+                        'module': 'contxt.func.ems',
+                        'class': 'EMS',
+                        'method': 'get_organization_spend'
+                    },
                     'args': [
                         {
                             'arg': 'organization_id',
-                            'required': True,
+                            'required': False,
                             'type': int,
                             'help': 'Provide the organization_id (uuid, str) as a filter when possible',
-                            'not_required_if': 'organization_name'
+                            'required_if_not': 'organization_name'
                         },
                         {
                             'arg': 'organization_name',
-                            'required': True,
+                            'required': False,
                             'type': int,
                             'help': 'Provide the organization_name (str) as a filter when possible',
-                            'not_required_if': 'organization_id'
+                            'required_if_not': 'organization_id'
                         },
                         {
                             'arg': 'interval',
@@ -117,34 +125,20 @@ COMMANDS = {
 
 def init_cli_commands(subparser):
 
-    ems_subparser = subparser.add_subparsers(dest='subcommand')
+    function_call_map = {}
 
-    # OLD CODE
-    '''
-    ems_parser = ems_subparser.add_parser('utilities')
-
-    utilities_subparser = ems_parser.add_subparsers(dest="utilities-cmd")
-    spend_parser = utilities_subparser.add_parser('get-spend')
-    spend_parser.add_argument("--facility_id")
-    spend_parser.add_argument("--interval")
-    spend_parser.add_argument("--resource_type")
-    spend_parser.add_argument("--start_date")
-    spend_parser.add_argument("--end_date")
-
-    org_spend_parser = utilities_subparser.add_parser('get-org-spend')
-    org_spend_parser.add_argument("--organization_id")
-    org_spend_parser.add_argument("--resource_type")
-    '''
-
-    # NEW CODE
+    ems_subparser = subparser.add_subparsers(dest='module_command')
 
     for command, command_info in COMMANDS.items():
 
+        function_call_map[command] = {}
         ems_cmd_parser = ems_subparser.add_parser(command, help=command_info['info'])
 
-        ems_subcommand_subparser = ems_cmd_parser.add_subparsers(dest="{}-cmd".format(command))
+        ems_subcommand_subparser = ems_cmd_parser.add_subparsers(dest="module_subcommand".format(command))
 
         for func in command_info['functions']:
+
+            function_call_map[command][func['command']] = func
 
             func_cmd_parser = ems_subcommand_subparser.add_parser(func['command'])
 
@@ -158,8 +152,50 @@ def init_cli_commands(subparser):
                     func_cmd_parser.add_argument("--{}".format(arg_dict['arg']),
                                                  required=arg_dict['required'],
                                                  dest=arg_dict['arg'],
+                                                 choices=arg_dict['valid_values'] if 'valid_values' in arg_dict else None,
                                                  type=arg_dict['type'],
                                                  help=arg_dict['help'])
+
+    return function_call_map
+
+
+def form_method_arguments(func_definition, args):
+
+    method_arguments = {}
+
+    for arg_config in func_definition['args']:
+        arg_name = arg_config['arg']
+
+        method_arguments[arg_name] = args.__getattribute__(arg_name)
+
+    return method_arguments
+
+
+def call_function(func_map, args, auth_module):
+
+    if args.module_command not in func_map:
+        logger.critical("Cannot locate function for command")
+        return
+
+    if args.module_subcommand not in func_map[args.module_command]:
+        logger.critical("Cannot locate function for command")
+        return
+
+    func_definition = func_map[args.module_command][args.module_subcommand]
+
+    method_info = func_definition['method_call_info']
+
+    func_module = import_module(method_info['module'])
+    module_class = getattr(func_module, method_info['class'])
+
+    instance = module_class(auth_module)
+
+    module_method = getattr(instance, method_info['method'])
+
+    method_args = form_method_arguments(func_definition, args)
+
+    # call the method
+    module_method(**method_args)
 
 
 class EMS:
@@ -167,40 +203,7 @@ class EMS:
     def __init__(self, cli_module, arg_parser):
         self.cli = cli_module
 
-        init_cli_commands(arg_parser)
-        '''
-        arg_parser.add_argument("command", type=str, help="The primary command to run within this EMS module")
-        arg_parser.add_argument("subcommand", type=str, help="Subcommand for an action in a module")
-
-        arg_parser.add_argument("--facility_id", required=False, dest="facility_id", type=int,
-                                help="Provide the facility_id (integer) as a filter when possible")
-        arg_parser.add_argument("--organization_id", required=False, dest="organization_id", type=str,
-                                help="Provide the organization_id (uuid, str) as a filter when possible")
-        arg_parser.add_argument("--organization_name", required=False, dest="organization_name", type=str,
-                                help="Provide the organization name (str) as a filter when possible")
-        arg_parser.add_argument("--interval", required=False, dest="interval", type=str,
-                                help="Provide the interval ('monthly', 'daily') as a filter when possible")
-        arg_parser.add_argument("--resource_type", required=False, dest="resource_type", type=str,
-                                help="Provide the resource type (electric, gas, combined)")
-        arg_parser.add_argument("--metric", required=False, dest="metric", type=str,
-                                help="Provide the metric name")
-        arg_parser.add_argument("--month", required=False, dest="month", type=int,
-                                help="Provide the Month as a filter when possible")
-        arg_parser.add_argument("--year", required=False, dest="month", type=int,
-                                help="Provide the Month as a filter when possible")
-        arg_parser.add_argument("--proforma", action="store_true",
-                                help="Include proforma logic for applicable commands")
-        arg_parser.add_argument("--exclude_account_charges", action="store_true",
-                                help="Exclude account charges from applicable commands")
-        arg_parser.add_argument("--start_date", required=False, dest="start_date", type=str,
-                                help="When querying for spend data, this is a required field. Needs to be in YYYY-DD "
-                                     "format")
-        arg_parser.add_argument("--end_date", required=False, dest="end_date", type=str,
-                                help="When querying for spend data, this is an required field. Needs to be in YYYY-DD "
-                                     "format")
-        arg_parser.add_argument("--to_csv", required=False, dest="to_csv", type=str,
-                                help="Name of CSV to export results to")
-        '''
+        self.func_map = init_cli_commands(arg_parser)
 
         self.ems_service = EMSService(self.cli.auth)
         self.contxt_service = ContxtService(self.cli.auth)
@@ -214,48 +217,7 @@ class EMS:
     '''
     def parse_command(self, args):
 
-        if args.command == 'utilities':
-
-            if args.subcommand == 'get-spend':
-
-                if args.facility_id is None or args.interval is None or args.resource_type is None or args.start_date is None or args.end_date is None:
-                    logger.critical("--facility_id, --interval, --type, --start_date, --end_date is required for "
-                                    "utilities get-spend command")
-                    return
-
-                start_date = datetime.strptime(args.start_date, "%Y-%m")
-                end_date = datetime.strptime(args.end_date, "%Y-%m")
-
-                if args.resource_type not in ['electric', 'gas', 'combined']:
-                    logger.critical("--resource_type must be one of 'electrical','gas','combined'")
-                    return
-
-                if args.interval == 'monthly':
-
-                    print(args.proforma)
-
-                    print(self.ems_service.get_monthly_utility_spend(facility_id=args.facility_id,
-                                                                     type=args.resource_type,
-                                                                     date_start=start_date,
-                                                                     date_end=end_date,
-                                                                     proforma=args.proforma))
-
-                elif args.interval == 'daily':
-                    pass
-
-                else:
-                    print("Invalid interval provided: {}. Must be 'monthly' or 'daily'")
-
-            elif args.subcommand == 'get-organization-spend':
-
-                self.get_organization_spend(args)
-
-            else:
-                logger.critical("Invalid subcommand. Must be one of {get-spend}")
-                return
-
-        else:
-            logger.critical('Unrecognized command: {}'.format(args.command))
+        call_function(self.func_map, args, self.cli.auth)
 
     def get_organization_spend(self, args):
 

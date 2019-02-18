@@ -15,7 +15,7 @@ logger = make_logger(__name__)
 
 parser = argparse.ArgumentParser(description='Contxt CLI')
 
-stack_subparser = parser.add_subparsers(help="Action SubCommand Help", dest="cmd")
+stack_subparser = parser.add_subparsers(help="Action SubCommand Help", dest="cli_cmd")
 '''
 auth_args = sub_parsers.add_parser("auth", help="Authentication CLI Module Commands")
 auth_args.add_argument("subcommand")
@@ -54,7 +54,7 @@ ems_cli = EMS(cli, ems_subparser)
 
 args = parser.parse_args()
 
-if args.cmd == "auth":
+if args.cli_cmd == "auth":
 
     if args.subcommand == "login":
         cli_auth.login()
@@ -67,21 +67,21 @@ if args.cmd == "auth":
     else:
         print('Unknown command: {}'.format(args.subcommand))
 
-elif args.cmd == "iot":
+elif args.cli_cmd == "iot":
 
     iot_cli.parse_command(args.subcommand, args)
 
-elif args.cmd == "ems":
+elif args.cli_cmd == "ems":
 
     ems_cli.parse_command(args)
     #ems_cli.parse_command(args.subcommand, args)
 
-elif args.cmd == 'assets':
+elif args.cli_cmd == 'assets':
 
     assets_cli.parse_command(args.subcommand, args)
 
-elif args.cmd == "contxt":
+elif args.cli_cmd == "contxt":
     contxt_cli.parse_command(args.subcommand, args)
 
-elif args.cmd == "bus":
+elif args.cli_cmd == "bus":
     bus_cli.parse_command(args.subcommand, args)
