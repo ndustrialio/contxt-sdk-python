@@ -15,7 +15,7 @@ CONFIGS_BY_ENVIRONMENT = {
 
 class EMSService(Service):
 
-    def __init__(self, auth_module, environment='production'):
+    def __init__(self, auth_module, environment='staging'):
 
         if environment not in CONFIGS_BY_ENVIRONMENT:
             raise Exception('Invalid environment specified')
@@ -35,10 +35,12 @@ class EMSService(Service):
         params = {
             'type': type,
             'date_start': date_start.strftime('%Y-%m'),
-            'date_end': date_end.strftime('%Y-%m')
-            #'proforma': proforma,
-            #'exclude_account_charges': exclude_account_charges
+            'date_end': date_end.strftime('%Y-%m'),
+            'proforma': 'true' if proforma else 'false',
+            'exclude_account_charges': 'true' if exclude_account_charges else 'false'
         }
+
+        print(params)
 
         response = self.execute(GET(uri='facilities/{}/utility/spend/monthly'.format(facility_id)).params(params),
                                 execute=True)
@@ -80,12 +82,10 @@ class UtilitySpendPeriod(APIObject):
 
         self.date = spend_api_object['date']
         self.spend = spend_api_object['value']
-        #self.proforma_date = spend_api_object['proforma_date']
+        self.proforma_date = spend_api_object['proforma_date']
 
     def get_values(self):
-        #return [self.date, self.value, self.proforma_date]
-        return [self.date, self.spend]
+        return [self.date, self.spend, self.proforma_date]
 
     def get_keys(self):
-        #return ['date', 'value', 'proforma_date']
-        return ['date', 'value']
+        return ['date', 'spend', 'proforma_date']

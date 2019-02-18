@@ -28,6 +28,10 @@ class Assets:
                                 help="Provide the organization_name (str) as a filter when possible")
         arg_parser.add_argument("--type_name", required=False, dest="type_name", type=str,
                                 help="Provide the name of the asset type as a filter when possible")
+        arg_parser.add_argument("--asset_id", required=False, dest="asset_id", type=str,
+                                help="Provide the ID of an asset as a filter when possible")
+        arg_parser.add_argument("--metric", required=False, dest="metric", type=str,
+                                help="Provide the metric (label) as a filter when possible")
 
         self.facilities_service = FacilitiesService(self.cli.auth)
         self.contxt_service = ContxtService(self.cli.auth)
@@ -79,7 +83,8 @@ class Assets:
 
                 organization_id = get_organization_id_from_arguments(self.contxt_service, args)
 
-                asset_service = LazyAssetsService(auth_module=self.cli.auth, organization_id=organization_id)
+                asset_service = LazyAssetsService(auth_module=self.cli.auth, organization_id=organization_id,
+                                                  environment='staging')
 
                 if args.type_name not in asset_service.types_by_label:
                     logger.critical("Type not found: {}".format(args.type_name))
@@ -94,10 +99,73 @@ class Assets:
                 print('\nMetrics: \n')
                 print(APIObjectCollection(list(type_object.metrics.values())))
 
+            elif args.subcommand == 'get-assets':
+
+                if args.type_name is None:
+                    logger.critical("--type_name argument is required")
+                    return
+
+                check_required_organization_args(args, org_is_required=True)
+
+                organization_id = get_organization_id_from_arguments(self.contxt_service, args)
+
+                asset_service = LazyAssetsService(auth_module=self.cli.auth, organization_id=organization_id,
+                                                  environment='staging')
+
+                if args.type_name not in asset_service.types_by_label:
+                    logger.critical("Type not found: {}".format(args.type_name))
+                    return
+
+                type_object = asset_service.types_by_label[args.type_name]
+
+                assets = asset_service.get_assets_for_type(type_object)
+
+                print(APIObjectCollection(list(assets)))
+
             else:
                 logger.critical("Invalid subcommand. Must be one of {get-spend}")
+                return
+
+        elif args.command == 'assets':
+
+            if args.subcommand == 'get-metric':
+
+                self.get_metric_values_for_asset(args)
+
+            else:
+                logger.critical("Invalid subcommand. Must be one of {}")
                 return
 
         else:
             logger.critical('Unrecognized command: {}'.format(args.command))
 
+    def get_metric_values_for_asset(self, args):
+
+        if args.metric is None:
+            logger.critical("--metric must be provided")
+            return
+
+        if args.asset_id is None:
+            logger.critical("--asset_id must be provided")
+            return
+
+        check_required_organization_args(args, org_is_required=True)
+
+        organization_id = get_organization_id_from_arguments(self.contxt_service, args)
+
+        asset_service = LazyAssetsService(auth_module=self.cli.auth, organization_id=organization_id,
+                                          environment='staging')
+
+        asset_object = asset_service.fetch_asset_by_id(args.asset_id)
+
+        asset_service.load_type_metrics(asset_object.asset_type)
+
+        if args.metric not in asset_object.asset_type.metrics:
+            logger.critical("No such metric for asset type")
+            return
+
+        metric_object = asset_object.asset_type.metrics[args.metric]
+
+        metrics = asset_service.fetch_all_metric_values_for_asset_metric(asset_object, metric_object)
+
+        print(metrics)

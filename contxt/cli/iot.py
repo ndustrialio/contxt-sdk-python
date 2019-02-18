@@ -15,7 +15,8 @@ class IOT:
     def __init__(self, cli_module, arg_parser):
         self.cli = cli_module
 
-        arg_parser.add_argument("command", type=str, help="The primary command to run within this IOT module")
+        arg_parser.add_argument("command", choices=['groupings', 'fields', 'feeds'], type=str,
+                                help="The primary command to run within this IOT module")
         arg_parser.add_argument("subcommand")
 
         arg_parser.add_argument("--facility_id", required=False, dest="facility_id", type=int,

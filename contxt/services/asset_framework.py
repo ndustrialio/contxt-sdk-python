@@ -328,11 +328,12 @@ class LazyAssetsService(Assets):
             # 'orderBy': 'created_at',
             # 'reverseOrder': True
         }
-        assets = PagedResponse(
-            self.execute(
-                GET(uri='organizations/{}/assets'.format(
-                    self.organization_id)).params(parameters),
-                execute=True))
+
+        assets = PagedResponse(PagedEndpoint(base_url=self.base_url,
+                                             client=self.client,
+                                             request=GET(uri='organizations/{}/assets'.format(self.organization_id)),
+                                             parameters=parameters))
+
         return [
             Asset(
                 assets_instance=self,

@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import argparse
 
 from contxt.cli import ContxtCLI
@@ -5,23 +7,28 @@ from contxt.cli.iot import IOT
 from contxt.cli.ems import EMS
 from contxt.cli.assets import Assets
 from contxt.cli.contxt import Contxt
+from contxt.cli.bus import Bus
 from contxt.utils import make_logger
 from contxt.utils.auth import CLIAuth
 
 logger = make_logger(__name__)
 
-parser = argparse.ArgumentParser(description='Novozymes Data Science CLI')
+parser = argparse.ArgumentParser(description='Contxt CLI')
 
-sub_parsers = parser.add_subparsers(help="Sub-Command Help", dest="cmd")
-
+stack_subparser = parser.add_subparsers(help="Action SubCommand Help", dest="cmd")
+'''
 auth_args = sub_parsers.add_parser("auth", help="Authentication CLI Module Commands")
 auth_args.add_argument("subcommand")
+'''
 
 # iot arg parser
-iot_arg_parser = sub_parsers.add_parser("iot", help="IOT CLI Module Commands")
-ems_arg_parser = sub_parsers.add_parser("ems", help="EMS CLI Module Commands")
-assets_arg_parser = sub_parsers.add_parser("assets", help="Assets CLI Module Commands")
-contxt_arg_parser = sub_parsers.add_parser("contxt", help="Contxt CLI Module Commands")
+#iot_arg_parser = sub_parsers.add_parser("iot", help="IOT CLI Module Commands")
+
+
+ems_subparser = stack_subparser.add_parser("ems", help="EMS CLI Module Commands")
+#assets_arg_parser = sub_parsers.add_parser("assets", help="Assets CLI Module Commands")
+#contxt_arg_parser = sub_parsers.add_parser("contxt", help="Contxt CLI Module Commands")
+#bus_arg_parser = sub_parsers.add_parser("bus", help="Bus CLI Module Commands")
 
 # initialize the auth module for clis
 cli_auth = CLIAuth()
@@ -30,16 +37,20 @@ cli_auth = CLIAuth()
 cli = ContxtCLI(cli_auth)
 
 # initialize the iot cli module
-iot_cli = IOT(cli, iot_arg_parser)
+#iot_cli = IOT(cli, iot_arg_parser)
 
 # initialize the ems cli module
-ems_cli = EMS(cli, ems_arg_parser)
+#ems_cli = EMS(cli, ems_arg_parser)
+ems_cli = EMS(cli, ems_subparser)
 
 # initialize the assets cli module
-assets_cli = Assets(cli, assets_arg_parser)
+#assets_cli = Assets(cli, assets_arg_parser)
 
 # initialize the contxt cli module
-contxt_cli = Contxt(cli, contxt_arg_parser)
+#contxt_cli = Contxt(cli, contxt_arg_parser)
+
+# initialize the message bus cli module
+#bus_cli = Bus(cli, bus_arg_parser)
 
 args = parser.parse_args()
 
@@ -62,7 +73,8 @@ elif args.cmd == "iot":
 
 elif args.cmd == "ems":
 
-    ems_cli.parse_command(args.subcommand, args)
+    ems_cli.parse_command(args)
+    #ems_cli.parse_command(args.subcommand, args)
 
 elif args.cmd == 'assets':
 
@@ -70,3 +82,6 @@ elif args.cmd == 'assets':
 
 elif args.cmd == "contxt":
     contxt_cli.parse_command(args.subcommand, args)
+
+elif args.cmd == "bus":
+    bus_cli.parse_command(args.subcommand, args)

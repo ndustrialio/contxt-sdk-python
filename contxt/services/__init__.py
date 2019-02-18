@@ -411,10 +411,10 @@ class APIObject:
         pass
 
     def get_values(self):
-        return []
+        return self.__dict__.values()
 
     def get_keys(self):
-        return []
+        return self.__dict__.keys()
 
     def __str__(self):
         return tabulate([self.get_values()], headers=self.get_keys())

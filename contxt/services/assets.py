@@ -163,6 +163,13 @@ class Asset:
         return "<Asset: asset_id: '{}', label: '{}', description: '{}', attributes: {}>".format(
             self.id, self.label, self.description, self.attribute_values)
 
+    def get_values(self):
+        return [self.id, self.label, self.description]
+
+    def get_keys(self):
+        return ['id', 'label', 'description']
+
+
     def toJSON(self):
         print(self.__dict__)
         return self.__dict__
@@ -322,6 +329,11 @@ class Assets(Service):
     def get_attribute_values_for_asset(self, asset_obj, asset_type_obj):
         values = self.execute(GET(uri='assets/{}/attributes/values'.format(asset_obj.id)), execute=True)
         attribute_value_objects = []
+
+        # if this is true, then the attributes for the type haven't been loaded yet
+        if len(values) and len(asset_type_obj.attributes) == 0:
+            self.get_attributes_for_type(asset_type_obj)
+
         for record in values:
             # parse numeric types
             try:
