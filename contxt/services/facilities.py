@@ -1,4 +1,4 @@
-from contxt.services import Service, GET, APIObject, APIObjectCollection
+from contxt.services import GET, APIObject, APIObjectCollection, Service
 from contxt.services.contxt import Organization
 
 CONFIGS_BY_ENVIRONMENT = {
@@ -52,11 +52,13 @@ class Facility(APIObject):
 
     def __init__(self, facility_api_object):
 
-        super(Facility, self).__init__()
+        super().__init__(keys_to_ignore=[
+            'address1', 'address2', 'geometry_id', 'asset_id', 'tags',
+            'Organization', 'Info'
+        ])
 
         self.id = facility_api_object['id']
         self.name = facility_api_object['name']
-        self.organization_id = facility_api_object['organization_id']
         self.address1 = facility_api_object['address1']
         self.address2 = facility_api_object['address2']
         self.city = facility_api_object['city']
@@ -66,13 +68,13 @@ class Facility(APIObject):
         self.geometry_id = facility_api_object['geometry_id']
         self.asset_id = facility_api_object['asset_id']
         self.tags = facility_api_object['tags']
-        self.created_at = facility_api_object['created_at']
+        self.organization_id = facility_api_object['organization_id']
         self.Organization = Organization(facility_api_object['Organization'])
+        self.created_at = facility_api_object['created_at']
         self.Info = facility_api_object['Info']
 
-    def get_values(self):
-        return [self.id, self.name, self.city, self.state, self.zip, self.timezone, self.organization_id, self.Organization.name, self.created_at]
-
-    def get_keys(self):
-        return ['id', 'name', 'city', 'state', 'zip', 'timezone', 'organization_id', 'organization_name', 'created_at']
-
+    def get_dict(self):
+        return {
+            **super().get_dict(),
+            'organization_name': self.Organization.name
+        }

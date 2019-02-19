@@ -442,15 +442,17 @@ class APIObjectCollection:
         self.list_of_objects = obj_list
 
     def __repr__(self):
-        vals = [obj.get_values() for obj in self.list_of_objects]
-        if not len(self.list_of_objects):
+        if not self.list_of_objects:
             return 'None'
-
+        vals = [obj.get_values() for obj in self.list_of_objects]
         return tabulate(vals, headers=self.list_of_objects[0].get_keys())
 
     def __iter__(self):
         for item in self.list_of_objects:
             yield item
+
+    def __getitem__(self, key):
+        return self.list_of_objects[key]
 
     def __len__(self):
         return len(self.list_of_objects)
