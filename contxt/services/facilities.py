@@ -22,8 +22,10 @@ class FacilitiesService(Service):
 
         self.env = CONFIGS_BY_ENVIRONMENT[environment]
 
-        super(FacilitiesService, self).__init__(base_url=self.env['base_url'],
-                                                access_token=auth_module.get_token_for_client(self.env['audience']))
+        super().__init__(
+            base_url=self.env['base_url'],
+            access_token=auth_module.get_token_for_client(
+                self.env['audience']))
 
     def get_facilities(self, organization_id=None):
 

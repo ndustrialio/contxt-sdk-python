@@ -348,7 +348,7 @@ class ApiRequest(object):
 
 class GET(ApiRequest):
     def __init__(self, uri, authorize=True):
-        super(GET, self).__init__(uri, authorize)
+        super().__init__(uri, authorize)
 
     def method(self, method=None):
         return 'GET'
@@ -356,7 +356,7 @@ class GET(ApiRequest):
 
 class POST(ApiRequest):
     def __init__(self, uri, authorize=True):
-        super(POST, self).__init__(uri, authorize)
+        super().__init__(uri, authorize)
 
     def method(self, method=None):
         return 'POST'
@@ -364,7 +364,7 @@ class POST(ApiRequest):
 
 class PUT(ApiRequest):
     def __init__(self, uri, authorize=True):
-        super(PUT, self).__init__(uri, authorize)
+        super().__init__(uri, authorize)
 
     def method(self, method=None):
         return 'PUT'
@@ -372,7 +372,7 @@ class PUT(ApiRequest):
 
 class DELETE(ApiRequest):
     def __init__(self, uri, authorize=True):
-        super(DELETE, self).__init__(uri, authorize)
+        super().__init__(uri, authorize)
 
     def method(self, method=None):
         return 'DELETE'
@@ -399,7 +399,7 @@ class ApiService(object):
 class Service(ApiService):
     def __init__(self, base_url, access_token):
 
-        super(Service, self).__init__(base_url)
+        super().__init__(base_url)
 
         self.client = ApiClient(access_token=access_token)
 

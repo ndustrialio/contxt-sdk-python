@@ -22,8 +22,10 @@ class EMSService(Service):
 
         self.env = CONFIGS_BY_ENVIRONMENT[environment]
 
-        super(EMSService, self).__init__(base_url=self.env['base_url'],
-                                         access_token=auth_module.get_token_for_client(self.env['audience']))
+        super().__init__(
+            base_url=self.env['base_url'],
+            access_token=auth_module.get_token_for_client(
+                self.env['audience']))
 
     def get_monthly_utility_spend(self, facility_id, type, date_start, date_end, proforma=False, exclude_account_charges=False):
 
@@ -49,16 +51,12 @@ class EMSService(Service):
 class FacilityUtilitySpend(APIObject):
 
     def __init__(self, spend_api_object):
-
-        super(FacilityUtilitySpend, self).__init__()
+        super().__init__()
 
         self.type = spend_api_object['type']
         self.currency = spend_api_object['currency']
 
-        periods = []
-        for obj in spend_api_object['values']:
-            periods.append(UtilitySpendPeriod(obj))
-
+        periods = [UtilitySpendPeriod(s) for s in spend_api_object['values']]
         self.spend_periods = APIObjectCollection(periods)
 
     def __str__(self):
@@ -75,8 +73,7 @@ class FacilityUtilitySpend(APIObject):
 class UtilitySpendPeriod(APIObject):
 
     def __init__(self, spend_api_object):
-
-        super(UtilitySpendPeriod, self).__init__()
+        super().__init__()
 
         self.date = spend_api_object['date']
         self.spend = spend_api_object['value']

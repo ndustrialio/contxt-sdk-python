@@ -1,8 +1,9 @@
-from auth0.v3.authentication.get_token import GetToken
-from getpass import getpass
-from pathlib import Path
 import json
 import os
+from getpass import getpass
+from pathlib import Path
+
+from auth0.v3.authentication.get_token import GetToken
 
 from contxt.services.authentication import ContxtAuthService
 from contxt.utils import Configuration, make_logger
@@ -114,8 +115,7 @@ class BaseAuth:
 class CLIAuth(BaseAuth):
 
     def __init__(self):
-        super(CLIAuth, self).__init__(client_id=Configuration.CLI_CLIENT_ID,
-                                      cli_mode=True)
+        super().__init__(client_id=Configuration.CLI_CLIENT_ID, cli_mode=True)
 
         if self.get_auth_token() is None:
             logger.info("Token doesn't exist or can't be refreshed. Please re-authenticate")
