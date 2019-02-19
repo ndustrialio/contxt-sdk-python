@@ -1,12 +1,15 @@
-import requests
 import json
 from datetime import datetime
-import pytz
-from tzlocal import get_localzone
-from tabulate import tabulate
+
 import jwt
+import pandas as pd
+import pytz
+import requests
+from tabulate import tabulate
+from tzlocal import get_localzone
 
 API_VERSION = 'v1'
+
 
 def delocalize_datetime(dt_object):
     localized_dt = get_localzone().localize(dt_object)
@@ -407,17 +410,28 @@ class Service(ApiService):
 
 class APIObject:
 
-    def __init__(self):
-        pass
+    def __init__(self, keys_to_ignore=None):
+        self._keys_to_ignore = {'_keys_to_ignore'} | set(keys_to_ignore or [])
 
-    def get_values(self):
-        return []
+    def get_dict(self):
+        return {
+            k: v
+            for k, v in self.__dict__.items() if k not in self._keys_to_ignore
+        }
 
     def get_keys(self):
-        return []
+        return self.get_dict().keys()
+
+    def get_values(self):
+        return self.get_dict().values()
+
+    def get_df(self):
+        d = self.get_dict()
+        return pd.DataFrame(data=d.values(), columns=d.keys())
 
     def __str__(self):
-        return tabulate([self.get_values()], headers=self.get_keys())
+        d = self.get_dict()
+        return tabulate([d.values()], headers=d.keys())
 
 
 class APIObjectCollection:
@@ -440,3 +454,17 @@ class APIObjectCollection:
 
     def __len__(self):
         return len(self.list_of_objects)
+
+    def get_dicts(self):
+        return [o.get_dict() for o in self.list_of_objects]
+
+    def get_keys(self):
+        dicts = self.get_dicts()
+        return dicts[0].keys() if dicts else []
+
+    def get_values(self):
+        dicts = self.get_dicts()
+        return [d.values() for d in dicts]
+
+    def get_df(self):
+        return pd.DataFrame(self.get_values(), columns=self.get_keys())
