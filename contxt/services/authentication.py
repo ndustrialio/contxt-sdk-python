@@ -1,4 +1,4 @@
-from contxt.services import Service, POST, ApiRequest
+from contxt.services import POST, ApiRequest, Service
 
 CONFIGS_BY_ENVIRONMENT = {
     'production': {
@@ -16,8 +16,8 @@ class ContxtAuthService(Service):
 
         self.env = CONFIGS_BY_ENVIRONMENT[environment]
 
-        super(ContxtAuthService, self).__init__(base_url=self.env['base_url'],
-                                                access_token=access_token)
+        super().__init__(
+            base_url=self.env['base_url'], access_token=access_token)
 
     def get_new_token_for_client_id(self, client_id):
 

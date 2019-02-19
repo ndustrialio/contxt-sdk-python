@@ -21,8 +21,10 @@ class ContxtService(Service):
 
         self.env = CONFIGS_BY_ENVIRONMENT[environment]
 
-        super(ContxtService, self).__init__(base_url=self.env['base_url'],
-                                            access_token=auth_module.get_token_for_client(self.env['audience']))
+        super().__init__(
+            base_url=self.env['base_url'],
+            access_token=auth_module.get_token_for_client(
+                self.env['audience']))
 
     def get_organizations(self):
 
