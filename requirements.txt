@@ -1,3 +1,4 @@
 git+https://git@github.com/ndustrialio/ndustrialio-python.git@SPIKE/assetsII#egg=ndustrialio-python
 tabulate
 dateutils
+tqdm
