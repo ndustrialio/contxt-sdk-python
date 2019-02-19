@@ -1,5 +1,6 @@
-from contxt.services import Service, GET, APIObject, APIObjectCollection
 from datetime import datetime
+
+from contxt.services import GET, APIObject, APIObjectCollection, Service
 
 CONFIGS_BY_ENVIRONMENT = {
     'production': {
@@ -38,8 +39,8 @@ class EMSService(Service):
             'type': type,
             'date_start': date_start.strftime('%Y-%m'),
             'date_end': date_end.strftime('%Y-%m')
-            #'proforma': proforma,
-            #'exclude_account_charges': exclude_account_charges
+            # 'proforma': proforma,
+            # 'exclude_account_charges': exclude_account_charges
         }
 
         response = self.execute(GET(uri='facilities/{}/utility/spend/monthly'.format(facility_id)).params(params),
@@ -63,11 +64,11 @@ class FacilityUtilitySpend(APIObject):
         print('Utility Spend -> Type: {} -- Currency: {}'.format(self.type, self.currency))
         return self.spend_periods.__str__()
 
-    def get_values(self):
-        return self.__dict__.values()
-
-    def get_keys(self):
-        return self.__dict__.keys()
+    def get_dict(self):
+        return {
+            **super().get_dict(),
+            'spend_periods': self.spend_periods.get_dicts()
+        }
 
 
 class UtilitySpendPeriod(APIObject):
@@ -77,12 +78,10 @@ class UtilitySpendPeriod(APIObject):
 
         self.date = spend_api_object['date']
         self.spend = spend_api_object['value']
-        #self.proforma_date = spend_api_object['proforma_date']
+        # self.proforma_date = spend_api_object['proforma_date']
 
-    def get_values(self):
-        #return [self.date, self.value, self.proforma_date]
-        return [self.date, self.spend]
-
-    def get_keys(self):
-        #return ['date', 'value', 'proforma_date']
-        return ['date', 'value']
+    def get_dict(self):
+        # TODO: may just want to rename spend to value
+        d = super().get_dict()
+        d['value'] = d.pop('spend')
+        return d
