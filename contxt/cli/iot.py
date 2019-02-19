@@ -1,11 +1,14 @@
-from contxt.services.iot import IOTService
-from datetime import datetime
-import dateutil.parser
 import csv
 import json
 import os
+from datetime import datetime
 
+import dateutil.parser
+import pandas as pd
+
+from contxt.services.iot import IOTService
 from contxt.utils import make_logger
+from contxt.utils.vis import run_plotly
 
 logger = make_logger(__name__)
 
@@ -71,22 +74,32 @@ class IOT:
                     return
 
                 iso_start_date = dateutil.parser.parse(args.start_date)
-
-                iso_end_date = None
-                if args.end_date:
-                    iso_end_date = dateutil.parser.parse(args.end_date)
-
+                iso_end_date = dateutil.parser.parse(args.end_date) if args.end_date else None
                 grouping = self.iot_service.get_single_grouping(args.entity_id)
 
                 if grouping is None:
                     logger.critical("Grouping Not Found")
                     return
 
-                export_directory = os.path.join("./", "export_{}_{}".format(grouping.slug,
-                                                                            datetime.now().strftime(
-                                                                                "%Y-%m-%d_%H:%M:%S")))
+                field_data = self.get_field_data(grouping.fields, iso_start_date, iso_end_date, args.window)
 
-                self.write_field_data_to_csv(export_directory, grouping.fields, iso_start_date, iso_end_date, args.window)
+                # TODO: add flag to plot
+                if False:
+                    # Plot
+                    title_to_df = {
+                        f.field_human_name: pd.DataFrame.from_dict(d.records)
+                        for f, d in zip(grouping.fields, field_data)
+                    }
+                    run_plotly(title_to_df, x_label='event_time', y_label='value')
+                else:
+                    # Export to csv
+                    export_directory = os.path.join(
+                        "./", "export_{}_{}".format(
+                            grouping.slug,
+                            datetime.now().strftime("%Y-%m-%d_%H:%M:%S")))
+                    self.write_field_data_to_csv(
+                        export_directory, grouping.fields, field_data,
+                        iso_start_date, iso_end_date, args.window)
 
             elif args.subcommand == 'get-all':
                 # General call to get groupings
@@ -120,35 +133,34 @@ class IOT:
         else:
             logger.critical('Unrecognized command: {}'.format(args.command))
 
-    def write_field_data_to_csv(self, export_dir, field_list, start_date, end_date=None, window=60):
-
-        parameter_meta = {
-            'field_list': [field.field_human_name for field in field_list],
-            'start_date': str(start_date),
-            'end_date': str(end_date) if end_date is not None else None,
-            'window': window
-        }
-        logger.info("Writing to files in directory: {}")
-        os.makedirs(export_dir, exist_ok=False)
-
+    def get_field_data(self, field_list, start_date, end_date=None, window=60):
         logger.info("Parameters: start_date -> {}, end_date -> {}, window -> {}"
                     .format(start_date, end_date, window))
 
         logger.info("Pulling data for the following fields:")
         print(field_list)
 
-        field_meta = {}
+        data_list = []
         for field in field_list:
-            # TODO go get the data for this field and write to a CSV
             logger.info("Pulling data for {}".format(field.field_human_name))
-            data = self.iot_service.get_data_for_field(output_id=field.output_id,
-                                                       field_human_name=field.field_human_name,
-                                                       start_time=start_date,
-                                                       window=window,
-                                                       end_time=end_date,
-                                                       limit=5000)
+            data_list.append(self.iot_service.get_data_for_field(
+                output_id=field.output_id,
+                field_human_name=field.field_human_name,
+                start_time=start_date,
+                window=window,
+                end_time=end_date,
+                limit=5000))
 
-            filename = os.path.join(export_dir, "{}.csv".format(field.field_descriptor))
+        return data_list
+
+    def write_field_data_to_csv(self, export_dir, field_list, data_list, start_date, end_date=None, window=60):
+        logger.info("Writing to files in directory: {}")
+        os.makedirs(export_dir, exist_ok=False)
+
+        field_meta = {}
+        for field, data in zip(field_list, data_list):
+            filename = os.path.join(export_dir,
+                                    "{}.csv".format(field.field_descriptor))
 
             row_counter = 0
             with open(filename, 'w') as f:
@@ -171,7 +183,12 @@ class IOT:
         # Write metadata file
         meta = {
             'fields': field_meta,
-            'parameters': parameter_meta
+            'parameters': {
+                'field_list': [field.field_human_name for field in field_list],
+                'start_date': str(start_date),
+                'end_date': str(end_date) if end_date is not None else None,
+                'window': window
+            }
         }
 
         with open(os.path.join(export_dir, 'meta.json'), 'w') as f:
