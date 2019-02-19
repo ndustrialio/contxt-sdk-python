@@ -22,9 +22,9 @@ auth_args.add_argument("subcommand")
 '''
 
 # iot arg parser
-#iot_arg_parser = sub_parsers.add_parser("iot", help="IOT CLI Module Commands")
 
 
+iot_subparser = stack_subparser.add_parser("iot", help="IOT CLI Module Commands")
 ems_subparser = stack_subparser.add_parser("ems", help="EMS CLI Module Commands")
 #assets_arg_parser = sub_parsers.add_parser("assets", help="Assets CLI Module Commands")
 #contxt_arg_parser = sub_parsers.add_parser("contxt", help="Contxt CLI Module Commands")
@@ -34,13 +34,12 @@ ems_subparser = stack_subparser.add_parser("ems", help="EMS CLI Module Commands"
 cli_auth = CLIAuth()
 
 # initialize the overall cli instance
-#cli = ContxtCLI(cli_auth)
+#cli = ContxtCLI(iot_arg_parser)
 
 # initialize the iot cli module
-#iot_cli = IOT(cli, iot_arg_parser)
+iot_cli = IOT(iot_subparser)
 
 # initialize the ems cli module
-#ems_cli = EMS(cli, ems_arg_parser)
 ems_cli = EMS(ems_subparser)
 
 # initialize the assets cli module
@@ -69,19 +68,18 @@ if args.cli_cmd == "auth":
 
 elif args.cli_cmd == "iot":
 
-    iot_cli.parse_command(args.subcommand, args)
+    iot_cli.parse_command(args)
 
 elif args.cli_cmd == "ems":
 
     ems_cli.parse_command(args)
-    #ems_cli.parse_command(args.subcommand, args)
 
 elif args.cli_cmd == 'assets':
 
-    assets_cli.parse_command(args.subcommand, args)
+    assets_cli.parse_command(args)
 
 elif args.cli_cmd == "contxt":
-    contxt_cli.parse_command(args.subcommand, args)
+    contxt_cli.parse_command(args)
 
 elif args.cli_cmd == "bus":
-    bus_cli.parse_command(args.subcommand, args)
+    bus_cli.parse_command(args)

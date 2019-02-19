@@ -89,7 +89,11 @@ class ContxtCLI:
         method_args = self.form_method_arguments(func_definition, args)
 
         # call the method
-        module_method(**method_args)
+        res = module_method(**method_args)
+
+        if 'print_result' in func_definition:
+            if func_definition['print_result'] == True:
+                print(res)
 
     def parse_command(self, args):
 

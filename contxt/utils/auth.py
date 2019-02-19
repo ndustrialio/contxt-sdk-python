@@ -45,11 +45,14 @@ class BaseAuth:
                                  access_token=access_token,
                                  refresh_token=refresh_token)
 
-    def get_new_token_from_refresh_token(self, refresh_token):
+    def refresh_contxt_auth_token(self):
+        refresh_token = self.tokens[AUTH_AUDIENCE]['refresh_token']
+        token = self.auth0.refresh_token(client_id=self.client_id,
+                                         client_secret=self.client_secret if self.client_secret else '',
+                                         refresh_token=refresh_token)
 
-        self.auth0.refresh_token(client_id=self.client_id,
-                                 client_secret='',
-                                 refresh_token=refresh_token)
+        # store the new access token and re-store the existing refresh token
+        self.store_service_token(AUTH_AUDIENCE, token['access_token'], refresh_token)
 
     def authenticate_to_service(self, service_audience):
         print("Getting new token for {}".format(service_audience))
@@ -87,7 +90,12 @@ class BaseAuth:
         # check to see if have the token, but needs to be refreshed
         if self.token_is_expired_for_client(client_id):
             logger.warn('Token expired for client {} -- Refreshing'.format(client_id))
-            self.authenticate_to_service(client_id)
+
+            # if it's the contxt auth client, we need to follow the other refresh route via Auth0
+            if client_id == AUTH_AUDIENCE:
+                self.refresh_contxt_auth_token()
+            else:
+                self.authenticate_to_service(client_id)
 
         access_token = self.tokens[client_id]['token']
         return access_token
@@ -126,7 +134,7 @@ class BaseAuth:
 
     def store_tokens(self):
         with open(self.token_file, 'w') as f:
-            json.dump(self.tokens, f)
+            json.dump(self.tokens, f, indent=4)
 
     def clear_tokens(self):
         os.remove(self.token_file)
