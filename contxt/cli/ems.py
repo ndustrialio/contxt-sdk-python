@@ -1,16 +1,17 @@
-from datetime import datetime
-from tqdm import tqdm
 import csv
+from datetime import datetime
 
-from contxt.services.ems import EMSService
-from contxt.services.contxt import ContxtService
-from contxt.services.facilities import FacilitiesService
+from tqdm import tqdm
 
 from contxt.func.organizations import find_organization_by_name
-
+from contxt.services.contxt import ContxtService
+from contxt.services.ems import EMSService
+from contxt.services.facilities import FacilitiesService
 from contxt.utils import make_logger
+from contxt.utils.vis import run_plotly
 
 logger = make_logger(__name__)
+
 
 class EMS:
 
@@ -75,10 +76,20 @@ class EMS:
 
                 if args.interval == 'monthly':
 
-                    print(self.ems_service.get_monthly_utility_spend(facility_id=args.facility_id,
-                                                                     type=args.resource_type,
-                                                                     date_start=start_date,
-                                                                     date_end=end_date))
+                    monthly_spend = self.ems_service.get_monthly_utility_spend(
+                        facility_id=args.facility_id,
+                        type=args.resource_type,
+                        date_start=start_date,
+                        date_end=end_date)
+
+                    # Plot or print
+                    # TODO: add plot flag
+                    if True:
+                        title = 'Monthly Utility Spend for Facility {}'.format(args.facility_id)
+                        title_to_df = {title: monthly_spend.spend_periods.get_df()}
+                        run_plotly(title_to_df, x_label='date', y_label='value')
+                    else:
+                        print(monthly_spend)
 
                 elif args.interval == 'daily':
                     pass
@@ -141,6 +152,7 @@ class EMS:
         facilities = self.facilities_service.get_facilities(organization_id)
 
         organization_spend = {}
+        facility_name_to_spends = {}
         logger.info("Loading data for facilities")
         for facility in tqdm(facilities):
             spend = self.ems_service.get_monthly_utility_spend(facility_id=facility.id,
@@ -148,18 +160,31 @@ class EMS:
                                                                date_start=start_date,
                                                                date_end=end_date)
             organization_spend[facility.name] = {}
+            facility_name_to_spends[facility.name] = spend
             for period in spend.spend_periods:
                 organization_spend[facility.name][period.date] = period.spend
 
-        # write this to the CSV file
-        field_names = ['facility']
-        field_names.extend(organization_spend[list(organization_spend.keys())[0]].keys())
-        with open(args.to_csv, 'w') as f:
-            csv_writer = csv.DictWriter(f, fieldnames=field_names)
+        # Plot or dump to csv
+        # TODO: add plot flag
+        if True:
+            def make_title(facility_name):
+                return 'Monthly Utility Spend for Facility {}'.format(facility_name)
 
-            csv_writer.writeheader()
+            title_to_df = {
+                make_title(f): s.spend_periods.get_df()
+                for f, s in facility_name_to_spends.items()
+            }
+            run_plotly(title_to_df, x_label='date', y_label='value')
+        else:
+            # write this to the CSV file
+            field_names = ['facility']
+            field_names.extend(organization_spend[list(organization_spend.keys())[0]].keys())
+            with open(args.to_csv, 'w') as f:
+                csv_writer = csv.DictWriter(f, fieldnames=field_names)
 
-            for facility_name, spend_dict in organization_spend.items():
-                row = spend_dict
-                row['facility'] = facility_name
-                csv_writer.writerow(row)
+                csv_writer.writeheader()
+
+                for facility_name, spend_dict in organization_spend.items():
+                    row = spend_dict
+                    row['facility'] = facility_name
+                    csv_writer.writerow(row)
