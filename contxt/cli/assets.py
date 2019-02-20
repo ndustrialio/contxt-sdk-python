@@ -45,6 +45,8 @@ class Assets:
         assets metrics get --type_name <name> --metric_name <name> (--organization_id <organization_id> OR --organization_name "Lineage Logistics")
     '''
     def parse_command(self, command, args):
+        # TODO: this should only handle parsing the args and call a
+        # dedicated function
 
         if args.command == 'facilities':
 
@@ -108,74 +110,13 @@ class Assets:
 
             if args.subcommand == 'get':
 
-                if args.type_name is None:
-                    logger.critical("--type_name argument is required")
-                    return
-                if args.metric_name is None:
-                    logger.critical("--metric_name argument is required")
-                    return
-
-                check_required_organization_args(args, org_is_required=True)
-
-                organization_id = get_organization_id_from_arguments(
-                    self.contxt_service, args)
-
-                asset_service = LazyAssetsService(
-                    auth_module=self.cli.auth, organization_id=organization_id)
-
-                # Validate asset type name
-                if args.type_name not in asset_service.types_by_label:
-                    logger.critical("Type not found: {}".format(
-                        args.type_name))
-                    return
-
-                type_object = asset_service.types_by_label[args.type_name]
-
-                # Validate metric name
-                asset_service.load_type_metrics(type_object)
-                if args.metric_name not in type_object.metrics:
-                    logger.critical("Metric not found: {}".format(
-                        args.metric_name))
-                    return
-
-                metric = asset_service.asset_metric_with_label(type_object, args.metric_name)
-
-                # Fetch all metric values for metric
-                # TODO: can be very slow
-                assets = asset_service.get_assets_for_type(type_object)
-                asset_label_to_metric_values = {
-                    a.label: [
-                        mv for mv in
-                        asset_service.fetch_all_metric_values_for_asset(a)
-                        if mv.asset_metric_id == metric.id
-                    ]
-                    for a in assets
-                }
+                asset_label_to_metric_values = self.get_metrics_for_type_and_metric_label(
+                    args)
 
                 # Plot or print
                 # TODO: create plot flag
                 if True:
-                    # Filter only specified metric name
-                    def make_title(asset_label):
-                        return '{} for {}'.format(args.metric_name, asset_label)
-
-                    def create_df(metric_values):
-                        filtered_dicts = []
-                        for mv in metric_values:
-                            filtered_dicts.extend([{
-                                'x': mv.effective_start_date,
-                                'y': mv.value
-                            }, {
-                                'x': mv.effective_end_date,
-                                'y': mv.value
-                            }])
-                        return pd.DataFrame(filtered_dicts)
-
-                    title_to_df = {
-                        make_title(k): create_df(v)
-                        for k, v in asset_label_to_metric_values.items()
-                    }
-                    run_plotly(title_to_df, x_label='x', y_label='y')
+                    self.plot_asset_metrics(asset_label_to_metric_values, args.metric_name)
                 else:
                     print(asset_label_to_metric_values)
 
@@ -185,3 +126,71 @@ class Assets:
 
         else:
             logger.critical('Unrecognized command: {}'.format(args.command))
+
+    def get_metrics_for_type_and_metric_label(self, args):
+        # Check for expected flags
+        if args.type_name is None:
+            logger.critical("--type_name argument is required")
+            return
+        if args.metric_name is None:
+            logger.critical("--metric_name argument is required")
+            return
+
+        check_required_organization_args(args, org_is_required=True)
+
+        organization_id = get_organization_id_from_arguments(
+            self.contxt_service, args)
+
+        asset_service = LazyAssetsService(
+            auth_module=self.cli.auth, organization_id=organization_id)
+
+        # Validate and get asset type name
+        if args.type_name not in asset_service.types_by_label:
+            logger.critical("Type not found: {}".format(args.type_name))
+            return
+
+        type_object = asset_service.types_by_label[args.type_name]
+
+        # Validate and get metric name
+        asset_service.load_type_metrics(type_object)
+        if args.metric_name not in type_object.metrics:
+            logger.critical("Metric not found: {}".format(args.metric_name))
+            return
+
+        metric = asset_service.asset_metric_with_label(type_object, args.metric_name)
+
+        # Fetch all metric values for metric
+        # TODO: can be very slow
+        assets = asset_service.get_assets_for_type(type_object)
+        asset_label_to_metric_values = {
+            a.label: [
+                mv for mv in
+                asset_service.fetch_all_metric_values_for_asset(a)
+                if mv.asset_metric_id == metric.id
+            ]
+            for a in assets
+        }
+
+        return asset_label_to_metric_values
+
+    def plot_asset_metrics(self, asset_label_to_metric_values, metric_label):
+        def make_title(asset_label):
+            return '{} for {}'.format(metric_label, asset_label)
+
+        def create_df(metric_values):
+            filtered_dicts = []
+            for mv in metric_values:
+                filtered_dicts.extend([{
+                    'x': mv.effective_start_date,
+                    'y': mv.value
+                }, {
+                    'x': mv.effective_end_date,
+                    'y': mv.value
+                }])
+            return pd.DataFrame(filtered_dicts)
+
+        title_to_df = {
+            make_title(k): create_df(v)
+            for k, v in asset_label_to_metric_values.items()
+        }
+        run_plotly(title_to_df, x_label='x', y_label='y')
