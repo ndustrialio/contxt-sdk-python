@@ -1,6 +1,7 @@
 from datetime import datetime
 
 import pandas as pd
+from tqdm import tqdm
 
 from contxt.func.organizations import (OrganizationArgumentException,
                                        check_required_organization_args,
@@ -161,14 +162,13 @@ class Assets:
 
         # Fetch all metric values for metric
         # TODO: can be very slow
+        logger.info(f'Fetching {args.type_name} asset types')
         assets = asset_service.get_assets_for_type(type_object)
+        logger.info(f'Fetching all {args.metric_name} metric values')
         asset_label_to_metric_values = {
-            a.label: [
-                mv for mv in
-                asset_service.fetch_all_metric_values_for_asset(a)
-                if mv.asset_metric_id == metric.id
-            ]
-            for a in assets
+            a.label: asset_service.fetch_all_metric_values_for_asset_metric(
+                a, metric)
+            for a in tqdm(assets)
         }
 
         return asset_label_to_metric_values
