@@ -85,9 +85,7 @@ class EMS:
                     # Plot or print
                     # TODO: add plot flag
                     if True:
-                        title = 'Monthly Utility Spend for Facility {}'.format(args.facility_id)
-                        title_to_df = {title: monthly_spend.spend_periods.get_df()}
-                        run_plotly(title_to_df, x_label='date', y_label='value')
+                        self.plot_monthly_utility_spend({args.facility_id: monthly_spend})
                     else:
                         print(monthly_spend)
 
@@ -113,6 +111,9 @@ class EMS:
                 return
         else:
             logger.critical('Unrecognized command: {}'.format(args.command))
+
+    def _make_plotly_title(self, facility_name):
+        return 'Monthly Utility Spend for Facility {}'.format(facility_name)
 
     def get_organization_spend(self, args):
 
@@ -166,25 +167,28 @@ class EMS:
 
         # Plot or dump to csv
         # TODO: add plot flag
+        # TODO: normalize spend format
         if True:
-            def make_title(facility_name):
-                return 'Monthly Utility Spend for Facility {}'.format(facility_name)
-
-            title_to_df = {
-                make_title(f): s.spend_periods.get_df()
-                for f, s in facility_name_to_spends.items()
-            }
-            run_plotly(title_to_df, x_label='date', y_label='value')
+            self.plot_monthly_utility_spend(facility_name_to_spends)
         else:
-            # write this to the CSV file
-            field_names = ['facility']
-            field_names.extend(organization_spend[list(organization_spend.keys())[0]].keys())
-            with open(args.to_csv, 'w') as f:
-                csv_writer = csv.DictWriter(f, fieldnames=field_names)
+            self.write_monthly_utility_spend_to_file(organization_spend,
+                                                     args.to_csv)
 
-                csv_writer.writeheader()
+    def plot_monthly_utility_spend(self, facility_name_to_spends):
+        title_to_df = {
+            self._make_plotly_title(f): s.spend_periods.get_df()
+            for f, s in facility_name_to_spends.items()
+        }
+        run_plotly(title_to_df, x_label='date', y_label='value')
 
-                for facility_name, spend_dict in organization_spend.items():
-                    row = spend_dict
-                    row['facility'] = facility_name
-                    csv_writer.writerow(row)
+    def write_monthly_utility_spend_to_file(self, organization_spend, filename):
+        field_names = ['facility']
+        field_names.extend(organization_spend[list(organization_spend.keys())[0]].keys())
+        with open(filename, 'w') as f:
+            csv_writer = csv.DictWriter(f, fieldnames=field_names)
+            csv_writer.writeheader()
+
+            for facility_name, spend_dict in organization_spend.items():
+                row = spend_dict
+                row['facility'] = facility_name
+                csv_writer.writerow(row)
