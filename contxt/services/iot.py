@@ -128,11 +128,12 @@ class IOTService(Service):
 
 class FieldGrouping(APIObject):
 
-    def __init__(self, grouping_api_object, owner_obj, category_obj, field_obj_list):
-        super().__init__(keys_to_ignore=[
-            'owner_id', 'is_public', 'created_at', 'updated_at', 'owner',
-            'category', 'fields'
-        ])
+    def __init__(self, grouping_api_object, owner_obj, category_obj, field_obj_list, keys_to_ignore=None):
+        super().__init__(
+            keys_to_ignore=keys_to_ignore if keys_to_ignore is not None else [
+                'owner_id', 'is_public', 'created_at', 'updated_at', 'owner',
+                'category', 'fields'
+            ])
 
         self.id = grouping_api_object['id']
         self.label = grouping_api_object['label']

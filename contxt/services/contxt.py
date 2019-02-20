@@ -64,8 +64,9 @@ class ContxtService(Service):
 
 class Organization(APIObject):
 
-    def __init__(self, organization_api_object):
-        super().__init__(keys_to_ignore=['updated_at'])
+    def __init__(self, organization_api_object, keys_to_ignore=None):
+        super().__init__(keys_to_ignore=keys_to_ignore
+                         if keys_to_ignore is not None else ['updated_at'])
 
         self.id = organization_api_object['id']
         self.name = organization_api_object['name']
@@ -77,8 +78,8 @@ class Organization(APIObject):
 
 class OrganizationUser(APIObject):
 
-    def __init__(self, organization_user_api_object):
-        super().__init__()
+    def __init__(self, organization_user_api_object, keys_to_ignore=None):
+        super().__init__(keys_to_ignore=keys_to_ignore)
         self.id = organization_user_api_object['id']
         self.user_id = organization_user_api_object['user_id']
         self.organization_id = organization_user_api_object['organization_id']
@@ -86,8 +87,9 @@ class OrganizationUser(APIObject):
 
 class User(APIObject):
 
-    def __init__(self, user_api_object):
-        super().__init__(keys_to_ignore=['email', 'Roles'])
+    def __init__(self, user_api_object, keys_to_ignore=None):
+        super().__init__(keys_to_ignore=keys_to_ignore
+                         if keys_to_ignore is not None else ['email', 'Roles'])
 
         self.id = user_api_object['id']
         self.first_name = user_api_object['first_name']
@@ -105,8 +107,10 @@ class User(APIObject):
 
 class Role(APIObject):
 
-    def __init__(self, role_api_object):
-        super().__init__(keys_to_ignore=['created_at', 'updated_at'])
+    def __init__(self, role_api_object, keys_to_ignore=None):
+        super().__init__(
+            keys_to_ignore=keys_to_ignore
+            if keys_to_ignore is not None else ['created_at', 'updated_at'])
 
         self.id = role_api_object['id']
         self.name = role_api_object['name']

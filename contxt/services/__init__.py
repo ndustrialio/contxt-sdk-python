@@ -411,6 +411,8 @@ class Service(ApiService):
 class APIObject:
 
     def __init__(self, keys_to_ignore=None):
+        # TODO: may want to following a naming pattern for ignored keys, like
+        # prefixed with _ instead of explicitly declaring the ignored keys
         self._keys_to_ignore = {'_keys_to_ignore'} | set(keys_to_ignore or [])
 
     def get_dict(self):

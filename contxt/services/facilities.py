@@ -52,12 +52,13 @@ class FacilitiesService(Service):
 
 class Facility(APIObject):
 
-    def __init__(self, facility_api_object):
+    def __init__(self, facility_api_object, keys_to_ignore=None):
 
-        super().__init__(keys_to_ignore=[
-            'address1', 'address2', 'geometry_id', 'asset_id', 'tags',
-            'Organization', 'Info'
-        ])
+        super().__init__(
+            keys_to_ignore=keys_to_ignore if keys_to_ignore is not None else [
+                'address1', 'address2', 'geometry_id', 'asset_id', 'tags',
+                'Organization', 'Info'
+            ])
 
         self.id = facility_api_object['id']
         self.name = facility_api_object['name']

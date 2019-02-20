@@ -51,8 +51,8 @@ class EMSService(Service):
 
 class FacilityUtilitySpend(APIObject):
 
-    def __init__(self, spend_api_object):
-        super().__init__()
+    def __init__(self, spend_api_object, keys_to_ignore=None):
+        super().__init__(keys_to_ignore=keys_to_ignore)
 
         self.type = spend_api_object['type']
         self.currency = spend_api_object['currency']
@@ -73,8 +73,8 @@ class FacilityUtilitySpend(APIObject):
 
 class UtilitySpendPeriod(APIObject):
 
-    def __init__(self, spend_api_object):
-        super().__init__()
+    def __init__(self, spend_api_object, keys_to_ignore=None):
+        super().__init__(keys_to_ignore=keys_to_ignore)
 
         self.date = spend_api_object['date']
         self.spend = spend_api_object['value']
