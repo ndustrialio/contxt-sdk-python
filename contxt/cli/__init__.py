@@ -30,14 +30,14 @@ class ContxtCLI:
 
         function_call_map = {}
 
-        ems_subparser = subparser.add_subparsers(dest='module_command')
+        module_subparser = subparser.add_subparsers(dest='module_command')
 
         for command, command_info in self.cli_config.items():
 
             function_call_map[command] = {}
-            ems_cmd_parser = ems_subparser.add_parser(command, help=command_info['info'])
+            ems_cmd_parser = module_subparser.add_parser(command, help=command_info['info'])
 
-            ems_subcommand_subparser = ems_cmd_parser.add_subparsers(dest="module_subcommand".format(command))
+            ems_subcommand_subparser = ems_cmd_parser.add_subparsers(dest="module_subcommand")
 
             for func in command_info['functions']:
 
@@ -92,8 +92,13 @@ class ContxtCLI:
         res = module_method(**method_args)
 
         if 'print_result' in func_definition:
-            if func_definition['print_result'] == True:
+            if func_definition['print_result']:
                 print(res)
+        elif 'print_handler' in func_definition:
+            print_handler = getattr(self, func_definition['print_handler'])
+            print_handler(res)
+        else:
+            print(res)
 
     def parse_command(self, args):
 

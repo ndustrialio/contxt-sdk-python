@@ -143,12 +143,27 @@ class BaseAuth:
 class CLIAuth(BaseAuth):
 
     def __init__(self):
-        super(CLIAuth, self).__init__(client_id=Configuration.CLI_CLIENT_ID,
-                                      cli_mode=True)
+        super().__init__(client_id=Configuration.CLI_CLIENT_ID,
+                         cli_mode=True)
 
         if self.get_auth_token() is None:
             logger.info("Token doesn't exist or can't be refreshed. Please re-authenticate")
             self.login()
+
+    def setup_parser(self, arg_parser):
+        auth_subparser = arg_parser.add_subparsers(dest="auth_subcommand")
+
+        auth_subparser.add_parser("login")
+        auth_subparser.add_parser("reset")
+
+    def parse_command(self, args):
+
+        if args.auth_subcommand == "login":
+            self.login()
+        elif args.auth_subcommand == "reset":
+            self.reset()
+        else:
+            print("Unrecognized subcommand {}".format(args.auth_subcommand))
 
     def login(self):
 

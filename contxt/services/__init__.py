@@ -384,6 +384,7 @@ class Service(ApiService):
         self.client = ApiClient(access_token=access_token)
 
     def get_logged_in_user_id(self):
+        # TODO do actual token verification
         decoded_token = jwt.decode(self.client.access_token, verify=False)
         return decoded_token['sub']
 
@@ -423,3 +424,7 @@ class APIObjectCollection:
 
     def __len__(self):
         return len(self.list_of_objects)
+
+    def __getitem__(self, item):
+        return self.list_of_objects.__getitem__(item)
+

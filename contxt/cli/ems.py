@@ -4,6 +4,12 @@ from contxt.utils import make_logger
 
 logger = make_logger(__name__)
 
+'''
+    ems utilities get-spend --facility_id <facility_id> --interval <monthly, daily> --resource_type <electric> --start_date <YYYY-MM> --end_date <YYYY-MM>
+    ems utilities get-organization-spend --organization_id <organization_id> --interval <monthly> --resource_type <electric> --start_date <YYYY-MM> --end_date <YYYY-MM>
+    -- ems utilities get-usage --facility_id <facility_id> --interval <monthly, daily> --resource_type <electric> --start_date <YYYY-MM> --end_date <YYYY-MM>
+    -- ems utilities get-monthly-metrics --metric <metric_name> --facility_id <facility_id> --month <month_int> --year <year_int>
+'''
 COMMANDS = {
     # ./contxt.py ems utilities -h
     'utilities':
@@ -13,8 +19,9 @@ COMMANDS = {
                 {
                     # ./contxt.py ems utilities get-spend -h
                     'command': 'get-spend',
+                    'print_result': True,
                     'method_call_info': {
-                        'module': 'contxt.func.ems',
+                        'module': 'contxt.functions.ems',
                         'class': 'EMS',
                         'method': 'get_facility_spend',
                     },
@@ -62,7 +69,7 @@ COMMANDS = {
                 {
                     'command': 'get-organization-spend',
                     'method_call_info': {
-                        'module': 'contxt.func.ems',
+                        'module': 'contxt.functions.ems',
                         'class': 'EMS',
                         'method': 'get_organization_spend'
                     },
@@ -125,12 +132,7 @@ COMMANDS = {
         }
 }
 
-'''
-    ems utilities get-spend --facility_id <facility_id> --interval <monthly, daily> --resource_type <electric> --start_date <YYYY-MM> --end_date <YYYY-MM>
-    ems utilities get-organization-spend --organization_id <organization_id> --interval <monthly> --resource_type <electric> --start_date <YYYY-MM> --end_date <YYYY-MM>
-    -- ems utilities get-usage --facility_id <facility_id> --interval <monthly, daily> --resource_type <electric> --start_date <YYYY-MM> --end_date <YYYY-MM>
-    -- ems utilities get-monthly-metrics --metric <metric_name> --facility_id <facility_id> --month <month_int> --year <year_int>
-'''
+
 class EMS(ContxtCLI):
 
     def __init__(self, arg_parser):

@@ -7,7 +7,7 @@ from contxt.services.contxt import ContxtService
 from contxt.services.facilities import FacilitiesService
 from contxt.services import UnauthorizedException
 
-from contxt.func.organizations import find_organization_by_name
+from contxt.functions.organizations import find_organization_by_name
 
 from contxt.utils import make_logger
 
@@ -35,13 +35,11 @@ class EMS:
 
         if interval == 'monthly':
 
-            print(proforma)
-
-            print(self.ems_service.get_monthly_utility_spend(facility_id=facility_id,
-                                                             type=resource_type,
-                                                             date_start=start_date,
-                                                             date_end=end_date,
-                                                             proforma=proforma))
+            return self.ems_service.get_monthly_utility_spend(facility_id=facility_id,
+                                                              type=resource_type,
+                                                              date_start=start_date,
+                                                              date_end=end_date,
+                                                              proforma=proforma)
 
         elif interval == 'daily':
             pass

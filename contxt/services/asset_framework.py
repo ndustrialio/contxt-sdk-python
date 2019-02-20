@@ -1,7 +1,7 @@
 from datetime import datetime
 import pytz
 
-from contxt.services import GET, POST, PUT, DELETE, PagedResponse, PagedEndpoint
+from contxt.services import GET, POST, PUT, DELETE, PagedResponse, PagedEndpoint, APIObjectCollection, APIObject
 
 from contxt.services.assets import (Asset, AssetAttributeValue,
                                     AssetMetric, Assets, AssetType,
@@ -39,7 +39,7 @@ def default_effective_date():
 asset_core_fields = ['id', 'label', 'parent_id', 'description']
 
 
-class AssetMetricValue(object):
+class AssetMetricValue(APIObject):
     def __init__(self,
                  id,
                  asset_id,
@@ -49,6 +49,8 @@ class AssetMetricValue(object):
                  value,
                  **kwargs
                  ):
+
+        super(AssetMetricValue, self).__init__()
         self.id = id
         self.asset_id = asset_id
         self.asset_metric_id = asset_metric_id
@@ -57,6 +59,12 @@ class AssetMetricValue(object):
         self.value = value
         for k, v in kwargs.items():
             setattr(self, k, v)
+
+    def get_keys(self):
+        return ['asset_name', 'effective_start_date', 'effective_end_date', 'value']
+
+    def get_values(self):
+        return [self.Asset['label'], self.effective_start_date, self.effective_end_date, self.value]
 
 
 class AssetTree:
@@ -105,10 +113,10 @@ class LazyAssetsService(Assets):
     def __init__(self, organization_id, auth_module, environment='production'):
         self.types_by_label = {}
         self.types_by_uid = {}  # NOTE: Assets clears types_by_id
-        logger.info("Initializing {} for organization {} targeting {}".format(
-            type(self).__name__, organization_id, environment))
+        #logger.info("Initializing {} for organization {} targeting {}".format(
+        #    type(self).__name__, organization_id, environment))
         Assets.__init__(self, auth_module=auth_module, organization_id=organization_id, environment=environment)
-        logger.info("Loaded asset types {}".format(self.types_by_label.keys()))
+        #logger.info("Loaded asset types {}".format(self.types_by_label.keys()))
         self._facility = None
 
     def baseURL(self):
@@ -262,6 +270,7 @@ class LazyAssetsService(Assets):
         # TODO: throw an error here when asset_id is not found
         asset_json = self.execute(GET(uri='assets/{}'.format(asset_id)), execute=True)
         asset_type = self.asset_type_with_id(asset_json['asset_type_id'])
+        self.load_type_full(asset_type)
         asset = Asset(self, asset_type, asset_json)
         # pre fetch attributes
         # todo: revisit this attr prefetching, may be replaced by the attributes coming in the asset_json
@@ -391,12 +400,18 @@ class LazyAssetsService(Assets):
                 execute=True)
 
     def fetch_all_metric_values_for_asset(self, asset):
-        resp = PagedResponse(self.execute(GET(uri='assets/{}/metrics/values'.format(asset.id)), execute=True))
-        return [AssetMetricValue(**rec) for rec in resp.records]
+        resp = PagedResponse(PagedEndpoint(base_url=self.base_url,
+                                           client=self.client,
+                                           request=GET(uri='assets/{}/metrics/values'.format(asset.id)),
+                                           parameters={}))
+        return APIObjectCollection([AssetMetricValue(**rec) for rec in resp.records])
 
     def fetch_all_metric_values_for_asset_metric(self, asset, metric):
-        resp = PagedResponse(self.execute(GET(uri='assets/{}/metrics/{}/values'.format(asset.id, metric.id)), execute=True))
-        return [AssetMetricValue(**rec) for rec in resp.records]
+        resp = PagedResponse(PagedEndpoint(base_url=self.base_url,
+                                           client=self.client,
+                                           request=GET(uri='assets/{}/metrics/{}/values'.format(asset.id, metric.id)),
+                                           parameters={}))
+        return APIObjectCollection([AssetMetricValue(**rec) for rec in resp.records])
 
     def fetch_and_set_metric_values_for_asset(self, asset, force=False):
         if getattr(asset, 'metric_values', None) and not force:

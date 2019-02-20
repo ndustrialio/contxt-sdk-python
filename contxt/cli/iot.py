@@ -28,7 +28,7 @@ COMMANDS = {
             {
                 'command': 'get-fields',
                 'method_call_info': {
-                    'module': 'contxt.func.iot',
+                    'module': 'contxt.functions.iot',
                     'class': 'IOT',
                     'method': 'get_fields_for_grouping'
                 },
@@ -45,7 +45,7 @@ COMMANDS = {
             {
                 'command': 'get-data-for-fields',
                 'method_call_info': {
-                    'module': 'contxt.func.iot',
+                    'module': 'contxt.functions.iot',
                     'class': 'IOT',
                     'method': 'get_data_for_fields'
                 },
