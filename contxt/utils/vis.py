@@ -24,10 +24,10 @@ dcc._js_dist[0][
 
 # Authorize plotly
 # TODO: this might not even be needed
-PLOTLY_USERNAME = get_environ_var('PLOTLY_USERNAME')
-PLOTLY_API_KEY = get_environ_var('PLOTLY_API_KEY')
-plotly.tools.set_credentials_file(
-    username=PLOTLY_USERNAME, api_key=PLOTLY_API_KEY)
+# PLOTLY_USERNAME = get_environ_var('PLOTLY_USERNAME')
+# PLOTLY_API_KEY = get_environ_var('PLOTLY_API_KEY')
+# plotly.tools.set_credentials_file(
+#     username=PLOTLY_USERNAME, api_key=PLOTLY_API_KEY)
 
 # Html
 app.layout = html.Div([

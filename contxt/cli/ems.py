@@ -113,7 +113,7 @@ class EMS:
             logger.critical('Unrecognized command: {}'.format(args.command))
 
     def _make_plotly_title(self, facility_name):
-        return 'Monthly Utility Spend for Facility {}'.format(facility_name)
+        return f'Monthly Utility Spend for Facility {facility_name}'
 
     def get_organization_spend(self, args):
 
