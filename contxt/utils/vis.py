@@ -1,12 +1,11 @@
-import logging
-
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
 import flask
+import plotly
 from dash.dependencies import Input, Output
 
-from contxt.utils import make_logger
+from contxt.utils import get_environ_var, make_logger
 
 logger = make_logger(__name__)
 
@@ -23,6 +22,13 @@ app.scripts.config.serve_locally = False
 dcc._js_dist[0][
     'external_url'] = 'https://cdn.plot.ly/plotly-basic-latest.min.js'
 
+# Authorize plotly
+# TODO: this might not even be needed
+PLOTLY_USERNAME = get_environ_var('PLOTLY_USERNAME')
+PLOTLY_API_KEY = get_environ_var('PLOTLY_API_KEY')
+plotly.tools.set_credentials_file(
+    username=PLOTLY_USERNAME, api_key=PLOTLY_API_KEY)
+
 # Html
 app.layout = html.Div([
     html.H1('Contxt'),
@@ -31,6 +37,8 @@ app.layout = html.Div([
 ], className="container")
 
 
+# TODO: may want to change the title_to_df arg to be more object-oriented as
+# opposed to a simple dict
 def run_plotly(title_to_df, x_label, y_label):
     # HACK: dont like to use globals, but seems necessary here since
     # update_graph needs access to the datasets
@@ -43,6 +51,12 @@ def run_plotly(title_to_df, x_label, y_label):
             y_label: 'y'
         })
         for k, v in title_to_df.items()
+    }
+
+    # Sort
+    label_to_df = {
+        k: v.sort_values('x')
+        for k, v in label_to_df.items() if not v.empty
     }
 
     # Update dropdown with all options
@@ -95,4 +109,9 @@ def update_graph(selected_dropdown_value):
 
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    import pandas as pd
+    df = pd.read_csv('https://gist.githubusercontent.com/chriddyp/'
+                     'c78bf172206ce24f77d6363a2d754b59/raw/'
+                     'c353e8ef842413cae56ae3920b8fd78468aa4cb2/'
+                     'usa-agricultural-exports-2011.csv')
+    run_plotly({'test': df}, 'beef', 'pork')
