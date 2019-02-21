@@ -1,12 +1,16 @@
 from datetime import datetime
-import pytz
 
+<<<<<<< HEAD
 from contxt.services import GET, POST, PUT, DELETE, PagedResponse, PagedEndpoint, APIObjectCollection, APIObject
+=======
+import pytz
+>>>>>>> feat/plotly
 
-from contxt.services.assets import (Asset, AssetAttributeValue,
-                                    AssetMetric, Assets, AssetType,
+from contxt.services import (DELETE, GET, POST, PUT, PagedEndpoint,
+                             PagedResponse)
+from contxt.services.assets import (Asset, AssetAttributeValue, AssetMetric,
+                                    Assets, AssetType,
                                     InvalidAttributeException)
-
 from contxt.utils import make_logger
 
 logger = make_logger(__name__)
@@ -313,10 +317,12 @@ class LazyAssetsService(Assets):
             raise InvalidAttributeException(
                 "Attribute {} does not exist for type {}".format(attr_label, asset_type.label))
         attr = asset_type.attributes[attr_label]
-        assets = PagedResponse(self.execute(
-            GET(uri='organizations/{}/assets?asset_attribute_id={}&asset_attribute_value={}'.format(
+        assets = PagedResponse(PagedEndpoint(
+            base_url=self.base_url,
+            client=self.client,
+            request=GET(uri='organizations/{}/assets?asset_attribute_id={}&asset_attribute_value={}'.format(
                 self.organization_id, attr.id, attr_value)),
-            execute=True))
+            parameters={}))
         return [Asset(assets_instance=self, asset_type_obj=asset_type, api_object=record) for record in assets]
 
     def get_latest_assets_for_type(self, asset_type_obj, limit=1):
@@ -326,9 +332,12 @@ class LazyAssetsService(Assets):
             'reverseOrder': True,
             'limit': limit
         }
-        assets = PagedResponse(self.execute(
-            GET(uri='organizations/{}/assets'.format(self.organization_id)).params(parameters),
-            execute=True))
+
+        assets = PagedResponse(PagedEndpoint(
+            base_url=self.base_url,
+            client=self.client,
+            request=GET(uri='organizations/{}/assets'.format(self.organization_id)),
+            parameters=parameters))
         return [Asset(assets_instance=self, asset_type_obj=asset_type_obj, api_object=record) for record in assets]
 
     def get_assets_for_type(self, asset_type_obj):
@@ -337,12 +346,20 @@ class LazyAssetsService(Assets):
             # 'orderBy': 'created_at',
             # 'reverseOrder': True
         }
+<<<<<<< HEAD
 
         assets = PagedResponse(PagedEndpoint(base_url=self.base_url,
                                              client=self.client,
                                              request=GET(uri='organizations/{}/assets'.format(self.organization_id)),
                                              parameters=parameters))
 
+=======
+        assets = PagedResponse(PagedEndpoint(
+            base_url=self.base_url,
+            client=self.client,
+            request=GET(uri='organizations/{}/assets'.format(self.organization_id)),
+            parameters=parameters))
+>>>>>>> feat/plotly
         return [
             Asset(
                 assets_instance=self,
@@ -400,6 +417,7 @@ class LazyAssetsService(Assets):
                 execute=True)
 
     def fetch_all_metric_values_for_asset(self, asset):
+<<<<<<< HEAD
         resp = PagedResponse(PagedEndpoint(base_url=self.base_url,
                                            client=self.client,
                                            request=GET(uri='assets/{}/metrics/values'.format(asset.id)),
@@ -412,6 +430,25 @@ class LazyAssetsService(Assets):
                                            request=GET(uri='assets/{}/metrics/{}/values'.format(asset.id, metric.id)),
                                            parameters={}))
         return APIObjectCollection([AssetMetricValue(**rec) for rec in resp.records])
+=======
+        resp = PagedResponse(
+            PagedEndpoint(
+                base_url=self.base_url,
+                client=self.client,
+                request=GET(uri='assets/{}/metrics/values'.format(asset.id)),
+                parameters={}))
+        return [AssetMetricValue(**rec) for rec in resp.records]
+
+    def fetch_all_metric_values_for_asset_metric(self, asset, metric):
+        resp = PagedResponse(
+            PagedEndpoint(
+                base_url=self.base_url,
+                client=self.client,
+                request=GET(uri='assets/{}/metrics/{}/values'.format(
+                    asset.id, metric.id)),
+                parameters={}))
+        return [AssetMetricValue(**rec) for rec in resp.records]
+>>>>>>> feat/plotly
 
     def fetch_and_set_metric_values_for_asset(self, asset, force=False):
         if getattr(asset, 'metric_values', None) and not force:

@@ -1,7 +1,10 @@
-import inflect
-from datetime import datetime
-from contxt.services import Service, GET, POST, PUT, PagedResponse, PagedEndpoint, APIObject
 import json
+from datetime import datetime
+
+import inflect
+
+from contxt.services import (GET, POST, PUT, APIObject, PagedEndpoint,
+                             PagedResponse, Service)
 
 p = inflect.engine()
 
@@ -186,7 +189,7 @@ class AssetType(APIObject):
 
     def __init__(self, assets_instance, organization_id, type_obj):
 
-        super(AssetType, self).__init__()
+        super().__init__()
 
         self.id = type_obj['id']
         self.organization_id = organization_id
@@ -264,8 +267,10 @@ class Assets(Service):
 
         self.env = CONFIGS_BY_ENVIRONMENT[environment]
 
-        super(Assets, self).__init__(base_url=self.env['base_url'],
-                                     access_token=auth_module.get_token_for_client(self.env['audience']))
+        super().__init__(
+            base_url=self.env['base_url'],
+            access_token=auth_module.get_token_for_client(
+                self.env['audience']))
 
         self.organization_id = organization_id
         self.load_configuration()

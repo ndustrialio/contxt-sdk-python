@@ -10,6 +10,8 @@ from contxt.services import UnauthorizedException
 from contxt.functions.organizations import find_organization_by_name
 
 from contxt.utils import make_logger
+from contxt.utils.vis import run_plotly
+
 
 logger = make_logger(__name__)
 
@@ -68,6 +70,7 @@ class EMS:
         facilities = self.facilities_service.get_facilities(organization_id)
 
         organization_spend = {}
+        facility_name_to_spends = {}
         logger.info("Loading data for facilities")
         for facility in tqdm(facilities):
             try:
@@ -81,13 +84,33 @@ class EMS:
                 continue
 
             organization_spend[facility.name] = {}
+            facility_name_to_spends[facility.name] = spend
             for period in spend.spend_periods:
                 organization_spend[facility.name][period.date] = period.spend
 
+        # Plot or dump to csv
+        # TODO: add plot flag
+        # TODO: normalize spend format
+        if False:
+            self.plot_monthly_utility_spend(facility_name_to_spends)
+        else:
+            self.write_monthly_utility_spend_to_file(organization_spend, to_csv)
+
+    def _make_plotly_title(self, facility_name):
+        return f'Monthly Utility Spend for Facility {facility_name}'
+
+    def plot_monthly_utility_spend(self, facility_name_to_spends):
+        title_to_df = {
+            self._make_plotly_title(f): s.spend_periods.get_df()
+            for f, s in facility_name_to_spends.items()
+        }
+        run_plotly(title_to_df, x_label='date', y_label='value')
+
+    def write_monthly_utility_spend_to_file(self, organization_spend, filename):
         # write this to the CSV file
         field_names = ['facility']
         field_names.extend(organization_spend[list(organization_spend.keys())[0]].keys())
-        with open(to_csv, 'w') as f:
+        with open(filename, 'w') as f:
             csv_writer = csv.DictWriter(f, fieldnames=field_names)
 
             csv_writer.writeheader()

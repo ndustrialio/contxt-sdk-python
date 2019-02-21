@@ -7,6 +7,7 @@ import os
 from contxt.services.iot import IOTService
 
 from contxt.utils import make_logger
+from contxt.utils.vis import run_plotly
 
 logger = make_logger(__name__)
 
@@ -37,11 +38,20 @@ class IOT:
             logger.critical("Grouping Not Found")
             return
 
-        export_directory = os.path.join("./", "export_{}_{}".format(grouping.slug,
-                                                                    datetime.now().strftime(
-                                                                        "%Y-%m-%d_%H:%M:%S")))
+        # TODO: add flag to plot
+        if False:
+            # Plot
+            title_to_df = {
+                f.field_human_name: pd.DataFrame.from_dict(d.records)
+                for f, d in zip(grouping.fields, field_data)
+            }
+            run_plotly(title_to_df, x_label='event_time', y_label='value')
+        else:
+            export_directory = os.path.join("./", "export_{}_{}".format(grouping.slug,
+                                                                        datetime.now().strftime(
+                                                                            "%Y-%m-%d_%H:%M:%S")))
 
-        self.write_field_data_to_csv(export_directory, grouping.fields, iso_start_date, iso_end_date, window)
+            self.write_field_data_to_csv(export_directory, grouping.fields, iso_start_date, iso_end_date, window)
 
     def write_field_data_to_csv(self, export_dir, field_list, start_date, end_date=None, window=60):
 

@@ -1,10 +1,11 @@
-from auth0.v3.authentication.get_token import GetToken
-from getpass import getpass
-from pathlib import Path
 import json
 import os
 import jwt
 from datetime import datetime
+from getpass import getpass
+from pathlib import Path
+
+from auth0.v3.authentication.get_token import GetToken
 
 from contxt.services.authentication import ContxtAuthService
 from contxt.utils import Configuration, make_logger, get_epoch_time
