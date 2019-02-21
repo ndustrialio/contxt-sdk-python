@@ -1,27 +1,11 @@
-import requests
 import json
 from datetime import datetime
-import pytz
-from tzlocal import get_localzone
-from tabulate import tabulate
 import jwt
+import pandas as pd
+import requests
+from tabulate import tabulate
 
 API_VERSION = 'v1'
-
-def delocalize_datetime(dt_object):
-    localized_dt = get_localzone().localize(dt_object)
-    return localized_dt.astimezone(pytz.utc)
-
-
-def get_epoch_time(dt_object):
-    if dt_object.tzinfo is None:
-        # assuming an naive datetime is in the callers timezone
-        # as set on the system,
-        dt_object = get_localzone().localize(dt_object)
-
-    utc_1970 = datetime(1970, 1, 1).replace(tzinfo=pytz.utc)
-
-    return int((dt_object.astimezone(pytz.utc) - utc_1970).total_seconds())
 
 
 class UnauthorizedException(Exception):
@@ -345,7 +329,7 @@ class ApiRequest(object):
 
 class GET(ApiRequest):
     def __init__(self, uri, authorize=True):
-        super(GET, self).__init__(uri, authorize)
+        super().__init__(uri, authorize)
 
     def method(self, method=None):
         return 'GET'
@@ -353,7 +337,7 @@ class GET(ApiRequest):
 
 class POST(ApiRequest):
     def __init__(self, uri, authorize=True):
-        super(POST, self).__init__(uri, authorize)
+        super().__init__(uri, authorize)
 
     def method(self, method=None):
         return 'POST'
@@ -361,7 +345,7 @@ class POST(ApiRequest):
 
 class PUT(ApiRequest):
     def __init__(self, uri, authorize=True):
-        super(PUT, self).__init__(uri, authorize)
+        super().__init__(uri, authorize)
 
     def method(self, method=None):
         return 'PUT'
@@ -369,7 +353,7 @@ class PUT(ApiRequest):
 
 class DELETE(ApiRequest):
     def __init__(self, uri, authorize=True):
-        super(DELETE, self).__init__(uri, authorize)
+        super().__init__(uri, authorize)
 
     def method(self, method=None):
         return 'DELETE'
@@ -396,28 +380,42 @@ class ApiService(object):
 class Service(ApiService):
     def __init__(self, base_url, access_token):
 
-        super(Service, self).__init__(base_url)
+        super().__init__(base_url)
 
         self.client = ApiClient(access_token=access_token)
 
     def get_logged_in_user_id(self):
+        # TODO do actual token verification
         decoded_token = jwt.decode(self.client.access_token, verify=False)
         return decoded_token['sub']
 
 
 class APIObject:
 
-    def __init__(self):
-        pass
+    def __init__(self, keys_to_ignore=None):
+        # TODO: may want to following a naming pattern for ignored keys, like
+        # prefixed with _ instead of explicitly declaring the ignored keys
+        self._keys_to_ignore = {'_keys_to_ignore'} | set(keys_to_ignore or [])
 
-    def get_values(self):
-        return []
+    def get_dict(self):
+        return {
+            k: v
+            for k, v in self.__dict__.items() if k not in self._keys_to_ignore
+        }
 
     def get_keys(self):
-        return []
+        return self.get_dict().keys()
+
+    def get_values(self):
+        return self.get_dict().values()
+
+    def get_df(self):
+        d = self.get_dict()
+        return pd.DataFrame(data=d.values(), columns=d.keys())
 
     def __str__(self):
-        return tabulate([self.get_values()], headers=self.get_keys())
+        d = self.get_dict()
+        return tabulate([d.values()], headers=d.keys())
 
 
 class APIObjectCollection:
@@ -428,10 +426,9 @@ class APIObjectCollection:
         self.list_of_objects = obj_list
 
     def __repr__(self):
-        vals = [obj.get_values() for obj in self.list_of_objects]
-        if not len(self.list_of_objects):
+        if not self.list_of_objects:
             return 'None'
-
+        vals = [obj.get_values() for obj in self.list_of_objects]
         return tabulate(vals, headers=self.list_of_objects[0].get_keys())
 
     def __iter__(self):
@@ -440,3 +437,20 @@ class APIObjectCollection:
 
     def __len__(self):
         return len(self.list_of_objects)
+
+    def __getitem__(self, item):
+        return self.list_of_objects.__getitem__(item)
+
+    def get_dicts(self):
+        return [o.get_dict() for o in self.list_of_objects]
+
+    def get_keys(self):
+        dicts = self.get_dicts()
+        return dicts[0].keys() if dicts else []
+
+    def get_values(self):
+        dicts = self.get_dicts()
+        return [d.values() for d in dicts]
+
+    def get_df(self):
+        return pd.DataFrame(self.get_values(), columns=self.get_keys())

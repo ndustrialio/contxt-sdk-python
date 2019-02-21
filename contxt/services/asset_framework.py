@@ -1,12 +1,12 @@
 from datetime import datetime
+
 import pytz
 
-from contxt.services import GET, POST, PUT, DELETE, PagedResponse, PagedEndpoint
-
-from contxt.services.assets import (Asset, AssetAttributeValue,
-                                    AssetMetric, Assets, AssetType,
+from contxt.services import (DELETE, GET, POST, PUT, APIObject,
+                             APIObjectCollection, PagedEndpoint, PagedResponse)
+from contxt.services.assets import (Asset, AssetAttributeValue, AssetMetric,
+                                    Assets, AssetType,
                                     InvalidAttributeException)
-
 from contxt.utils import make_logger
 
 logger = make_logger(__name__)
@@ -39,7 +39,7 @@ def default_effective_date():
 asset_core_fields = ['id', 'label', 'parent_id', 'description']
 
 
-class AssetMetricValue(object):
+class AssetMetricValue(APIObject):
     def __init__(self,
                  id,
                  asset_id,
@@ -49,6 +49,8 @@ class AssetMetricValue(object):
                  value,
                  **kwargs
                  ):
+
+        super(AssetMetricValue, self).__init__()
         self.id = id
         self.asset_id = asset_id
         self.asset_metric_id = asset_metric_id
@@ -57,6 +59,12 @@ class AssetMetricValue(object):
         self.value = value
         for k, v in kwargs.items():
             setattr(self, k, v)
+
+    def get_keys(self):
+        return ['asset_name', 'effective_start_date', 'effective_end_date', 'value']
+
+    def get_values(self):
+        return [self.Asset['label'], self.effective_start_date, self.effective_end_date, self.value]
 
 
 class AssetTree:
@@ -105,10 +113,9 @@ class LazyAssetsService(Assets):
     def __init__(self, organization_id, auth_module, environment='production'):
         self.types_by_label = {}
         self.types_by_uid = {}  # NOTE: Assets clears types_by_id
-        logger.info("Initializing {} for organization {} targeting {}".format(
-            type(self).__name__, organization_id, environment))
+        # logger.info(f"Initializing {type(self).__name__} for organization {organization_id} targeting {environment}")
         Assets.__init__(self, auth_module=auth_module, organization_id=organization_id, environment=environment)
-        logger.info("Loaded asset types {}".format(self.types_by_label.keys()))
+        logger.info(f"Loaded asset types {self.types_by_label.keys()}")
         self._facility = None
 
     def baseURL(self):
@@ -122,7 +129,8 @@ class LazyAssetsService(Assets):
         # types. This leads to asset types with the same label (i.e. globals)
         # being overwritten.
 
-        req = GET(uri='organizations/{}/assets/types'.format(self.organization_id))
+        req = GET(
+            uri=f'organizations/{self.organization_id}/assets/types')
 
         asset_types = PagedResponse(PagedEndpoint(base_url=self.base_url,
                                                   client=self.client,
@@ -148,13 +156,16 @@ class LazyAssetsService(Assets):
 
     def load_type_attributes(self, type_class_obj):
         if not type_class_obj.attributes:
-            logger.info("LazyAssetsService fetching attributes for type '{}'".format(type_class_obj.label))
+            logger.info(
+                f"LazyAssetsService fetching attributes for type '{type_class_obj.label}'"
+            )
             type_class_obj.set_attributes(self.get_attributes_for_type(type_class_obj))
             type_class_obj.attributes_by_id = {attr.id: attr for label, attr in type_class_obj.attributes.items()}
 
     def load_type_metrics(self, type_class_obj):
         if not type_class_obj.metrics:
-            logger.info("LazyAssetsService fetching metrics for type '{}'".format(type_class_obj.label))
+            logger.info(
+                f"LazyAssetsService fetching metrics for type '{type_class_obj.label}'")
             type_class_obj.set_metrics(self.get_metrics_for_type(type_class_obj))
             type_class_obj.metrics_by_id = {attr.id: attr for label, attr in type_class_obj.metrics.items()}
 
@@ -165,39 +176,45 @@ class LazyAssetsService(Assets):
 
     def asset_type_with_id(self, asset_type_id):
         if asset_type_id not in self.types_by_uid:
-            raise AssertionError("Asset Type with id '{}' not found. Was it loaded?".format(asset_type_id))
+            raise AssertionError(
+                f"Asset Type with id '{asset_type_id}' not found. Was it loaded?"
+            )
         return self.types_by_uid[asset_type_id]
 
     def asset_type_with_label(self, label):
         if label not in self.types_by_label:
-            raise AssertionError("Asset Type with label '{}' not found".format(label))
+            raise AssertionError(f"Asset Type with label '{label}' not found")
         return self.types_by_label[label]
 
     def asset_attribute_with_id(self, asset_type, asset_attribute_id):
         if asset_attribute_id not in asset_type.attributes_by_id:
-            raise AssertionError("Asset Attribute with id '{}' not found. Was it loaded?".format(asset_attribute_id))
+            raise AssertionError(
+                f"Asset Attribute with id '{asset_attribute_id}' not found. Was it loaded?"
+            )
         return asset_type.attributes_by_id[asset_attribute_id]
 
     def asset_attribute_with_label(self, asset_type, asset_attribute_label):
         if asset_attribute_label not in asset_type.attributes:
             raise AssertionError(
-                "Asset Attribute with label '{}' not found. Was it loaded?".format(asset_attribute_label))
+                f"Asset Attribute with label '{asset_attribute_label}' not found. Was it loaded?")
         return asset_type.attributes[asset_attribute_label]
 
     def asset_metric_with_id(self, asset_type, asset_metric_id):
         if asset_metric_id not in asset_type.metrics_by_id:
-            raise AssertionError("Asset Metric with id '{}' not found. Was it loaded?".format(asset_metric_id))
+            raise AssertionError(
+                f"Asset Metric with id '{asset_metric_id}' not found. Was it loaded?")
         return asset_type.metrics_by_id[asset_metric_id]
 
     def asset_metric_with_label(self, asset_type, asset_metric_label):
         if asset_metric_label not in asset_type.metrics:
-            raise AssertionError("Asset Metric with label '{}' not found. Was it loaded?".format(asset_metric_label))
+            raise AssertionError(
+                f"Asset Metric with label '{asset_metric_label}' not found. Was it loaded?")
         return asset_type.metrics[asset_metric_label]
 
     def create_asset_by_object_reflection(self, obj):
         type_name = type(obj).__name__
         at = self.asset_type_with_label(type_name)
-        logger.debug("Saving '{}' asset".format(type_name))
+        logger.debug(f"Saving '{type_name}' asset")
         clean_attrs = {k: v for k, v in obj.__dict__.items() if v is not None and k not in asset_core_fields}
 
         return self.create_asset_with_attribute_values(at, clean_attrs,
@@ -217,7 +234,7 @@ class LazyAssetsService(Assets):
 
         clean_attr_values_dict = {k: v for k, v in attr_values_dict.items() if v is not None}
         api_body = {
-            'label': asset_label or '{} @ {}'.format(asset_type.label, datetime_zulu_now()),
+            'label': asset_label or f'{asset_type.label} @ {datetime_zulu_now()}',
             'description': description,
             'asset_type_id': asset_type.id,
             'organization_id': self.organization_id,
@@ -248,20 +265,21 @@ class LazyAssetsService(Assets):
             'time_interval': time_interval,
             'units': units
         }
-        uri = '/assets/types/{}/metrics'.format(asset_type_obj.id)
+        uri = f'/assets/types/{asset_type_obj.id}/metrics'
         response = self.execute(POST(uri=uri).body(api_body), execute=True)
         return AssetMetric(asset_type_obj=asset_type_obj, api_object=response)
 
     def delete_asset_metric(self, asset_type_obj, label):
         asset_metric = self.asset_metric_with_label(asset_type_obj, label)
-        uri = '/assets/metrics/{}'.format(asset_metric.id)
+        uri = f'/assets/metrics/{asset_metric.id}'
         response = self.execute(DELETE(uri=uri), execute=True)
         return response
 
     def fetch_asset_by_id(self, asset_id):
         # TODO: throw an error here when asset_id is not found
-        asset_json = self.execute(GET(uri='assets/{}'.format(asset_id)), execute=True)
+        asset_json = self.execute(GET(uri=f'assets/{asset_id}'), execute=True)
         asset_type = self.asset_type_with_id(asset_json['asset_type_id'])
+        self.load_type_full(asset_type)
         asset = Asset(self, asset_type, asset_json)
         # pre fetch attributes
         # todo: revisit this attr prefetching, may be replaced by the attributes coming in the asset_json
@@ -294,7 +312,7 @@ class LazyAssetsService(Assets):
             return AssetNode(attributes=attr_values_by_label, children=children_nodes, meta=asset_dict,
                              type_label=asset_type.label)
 
-        asset_json = self.execute(GET(uri='assets/{}'.format(asset_id)), execute=True)
+        asset_json = self.execute(GET(uri=f'assets/{asset_id}', execute=True)
         root = create_node(asset_json)
         asset_tree = AssetTree(root)
         return asset_tree
@@ -302,12 +320,13 @@ class LazyAssetsService(Assets):
     def get_assets_by_attribute_value(self, asset_type, attr_label, attr_value):
         if attr_label not in asset_type.attributes:
             raise InvalidAttributeException(
-                "Attribute {} does not exist for type {}".format(attr_label, asset_type.label))
+                f"Attribute {attr_label} does not exist for type {asset_type.label}")
         attr = asset_type.attributes[attr_label]
-        assets = PagedResponse(self.execute(
-            GET(uri='organizations/{}/assets?asset_attribute_id={}&asset_attribute_value={}'.format(
-                self.organization_id, attr.id, attr_value)),
-            execute=True))
+        assets = PagedResponse(PagedEndpoint(
+            base_url=self.base_url,
+            client=self.client,
+            request=GET(uri=f'organizations/{self.organization_id}/assets?asset_attribute_id={attr.id}&asset_attribute_value={attr_value}',
+            parameters={}))
         return [Asset(assets_instance=self, asset_type_obj=asset_type, api_object=record) for record in assets]
 
     def get_latest_assets_for_type(self, asset_type_obj, limit=1):
@@ -317,9 +336,12 @@ class LazyAssetsService(Assets):
             'reverseOrder': True,
             'limit': limit
         }
-        assets = PagedResponse(self.execute(
-            GET(uri='organizations/{}/assets'.format(self.organization_id)).params(parameters),
-            execute=True))
+
+        assets = PagedResponse(PagedEndpoint(
+            base_url=self.base_url,
+            client=self.client,
+            request=GET(uri='organizations/{}/assets'.format(self.organization_id)),
+            parameters=parameters))
         return [Asset(assets_instance=self, asset_type_obj=asset_type_obj, api_object=record) for record in assets]
 
     def get_assets_for_type(self, asset_type_obj):
@@ -328,11 +350,11 @@ class LazyAssetsService(Assets):
             # 'orderBy': 'created_at',
             # 'reverseOrder': True
         }
-        assets = PagedResponse(
-            self.execute(
-                GET(uri='organizations/{}/assets'.format(
-                    self.organization_id)).params(parameters),
-                execute=True))
+        assets = PagedResponse(PagedEndpoint(
+            base_url=self.base_url,
+            client=self.client,
+            request=GET(uri='organizations/{}/assets'.format(self.organization_id)),
+            parameters=parameters))
         return [
             Asset(
                 assets_instance=self,
@@ -390,12 +412,18 @@ class LazyAssetsService(Assets):
                 execute=True)
 
     def fetch_all_metric_values_for_asset(self, asset):
-        resp = PagedResponse(self.execute(GET(uri='assets/{}/metrics/values'.format(asset.id)), execute=True))
-        return [AssetMetricValue(**rec) for rec in resp.records]
+        resp = PagedResponse(PagedEndpoint(base_url=self.base_url,
+                                           client=self.client,
+                                           request=GET(uri='assets/{}/metrics/values'.format(asset.id)),
+                                           parameters={}))
+        return APIObjectCollection([AssetMetricValue(**rec) for rec in resp.records])
 
     def fetch_all_metric_values_for_asset_metric(self, asset, metric):
-        resp = PagedResponse(self.execute(GET(uri='assets/{}/metrics/{}/values'.format(asset.id, metric.id)), execute=True))
-        return [AssetMetricValue(**rec) for rec in resp.records]
+        resp = PagedResponse(PagedEndpoint(base_url=self.base_url,
+                                           client=self.client,
+                                           request=GET(uri='assets/{}/metrics/{}/values'.format(asset.id, metric.id)),
+                                           parameters={}))
+        return APIObjectCollection([AssetMetricValue(**rec) for rec in resp.records])
 
     def fetch_and_set_metric_values_for_asset(self, asset, force=False):
         if getattr(asset, 'metric_values', None) and not force:

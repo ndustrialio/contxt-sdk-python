@@ -1,6 +1,10 @@
-from contxt.services import Service, GET, get_epoch_time, DataResponse, PagedResponse, PagedEndpoint, \
-    APIObjectCollection, APIObject
+from contxt.utils import get_epoch_time
+
 from datetime import datetime
+
+from contxt.services import (GET, APIObject, APIObjectCollection, DataResponse,
+                             PagedEndpoint, PagedResponse, Service,
+                             get_epoch_time)
 
 CONFIGS_BY_ENVIRONMENT = {
     'production': {
@@ -19,8 +23,10 @@ class IOTService(Service):
 
         self.env = CONFIGS_BY_ENVIRONMENT[environment]
 
-        super(IOTService, self).__init__(base_url=self.env['base_url'],
-                                         access_token=auth_module.get_token_for_client(self.env['audience']))
+        super().__init__(
+            base_url=self.env['base_url'],
+            access_token=auth_module.get_token_for_client(
+                self.env['audience']))
 
     def get_all_groupings(self, facility_id):
 
@@ -124,9 +130,12 @@ class IOTService(Service):
 
 class FieldGrouping(APIObject):
 
-    def __init__(self, grouping_api_object, owner_obj, category_obj, field_obj_list):
-
-        super(FieldGrouping, self).__init__()
+    def __init__(self, grouping_api_object, owner_obj, category_obj, field_obj_list, keys_to_ignore=None):
+        super().__init__(
+            keys_to_ignore=keys_to_ignore if keys_to_ignore is not None else [
+                'owner_id', 'is_public', 'created_at', 'updated_at', 'owner',
+                'category', 'fields'
+            ])
 
         self.id = grouping_api_object['id']
         self.label = grouping_api_object['label']
@@ -142,20 +151,18 @@ class FieldGrouping(APIObject):
         self.category = category_obj
         self.fields = APIObjectCollection(field_obj_list)
 
-    def get_values(self):
-        return [self.id, self.label, self.slug, self.description, self.facility_id, self.field_category_id,
-                self.category.name if self.category else None, len(self.fields)]
-
-    def get_keys(self):
-        return ['id', 'label', 'slug', 'description', 'facility_id', 'field_category_id', 'field_category_name',
-                'field_count']
+    def get_dict(self):
+        return {
+            **super().get_dict(),
+            'field_category_name': self.category.name if self.category else None,
+            'field_count': len(self.fields)
+        }
 
 
 class FieldCategory(APIObject):
 
     def __init__(self, category_api_object):
-
-        super(FieldCategory, self).__init__()
+        super().__init__()
 
         self.id = category_api_object['id']
         self.name = category_api_object['name']
@@ -169,8 +176,7 @@ class FieldCategory(APIObject):
 class FieldGroupingOwner(APIObject):
 
     def __init__(self, owner_api_object):
-
-        super(FieldGroupingOwner, self).__init__()
+        super().__init__()
 
         self.id = owner_api_object['id']
         self.first_name = owner_api_object['first_name']
@@ -180,8 +186,7 @@ class FieldGroupingOwner(APIObject):
 class Field(APIObject):
 
     def __init__(self, field_api_object):
-
-        super(Field, self).__init__()
+        super().__init__()
 
         self.id = field_api_object['id']
         self.label = field_api_object['label']
@@ -192,18 +197,11 @@ class Field(APIObject):
         self.status = field_api_object['status']
         self.units = field_api_object['units']
 
-    def get_values(self):
-        return self.__dict__.values()
-
-    def get_keys(self):
-        return self.__dict__.keys()
-
 
 class Feed(APIObject):
 
     def __init__(self, feed_api_object):
-
-        super(Feed, self).__init__()
+        super().__init__()
 
         self.id = feed_api_object['id']
         self.feed_type_id = feed_api_object['feed_type_id']
@@ -217,10 +215,3 @@ class Feed(APIObject):
         self.critical_threshold = feed_api_object['critical_threshold']
         self.status_event_id = feed_api_object['status_event_id']
         self.created_at = feed_api_object['created_at']
-
-    def get_values(self):
-        return self.__dict__.values()
-
-    def get_keys(self):
-        return self.__dict__.keys()
-

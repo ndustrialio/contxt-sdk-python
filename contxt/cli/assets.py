@@ -1,103 +1,275 @@
-from datetime import datetime
+import pandas as pd
+from tabulate import tabulate
+from tqdm import tqdm
 
-from contxt.services.facilities import FacilitiesService
-from contxt.services.contxt import ContxtService
-from contxt.services.asset_framework import LazyAssetsService
-from contxt.func.organizations import get_organization_id_from_arguments, \
-    check_required_organization_args, OrganizationArgumentException
+from contxt.cli import ContxtCLI
+from contxt.functions.organizations import (OrganizationArgumentException,
+                                            check_required_organization_args,
+                                            get_organization_id_from_arguments)
 from contxt.services import APIObjectCollection
-
+from contxt.services.asset_framework import LazyAssetsService
+from contxt.services.contxt import ContxtService
+from contxt.services.facilities import FacilitiesService
 from contxt.utils import make_logger
+from contxt.utils.vis import run_plotly
 
 logger = make_logger(__name__)
 
+COMMANDS = {
+    'facilities': {
+        'info': 'Facilities CLI',
+        'functions': [
+            {
+                'command': 'get-all',
+                'method_call_info': {
+                    'module': 'contxt.functions.facilities',
+                    'class': 'Facilities',
+                    'method': 'get_all_facilities'
+                },
+                'args': [
+                    {
+                        'arg': 'organization_id',
+                        'required': False,
+                        'type': int,
+                        'help': 'Provide the organization_id (uuid, str) as a filter'
+                    },
+                    {
+                        'arg': 'organization_name',
+                        'required': False,
+                        'type': str,
+                        'help': 'Provide the organization_name (str) as a filter'
+                    }
+                ],
+            }
+        ]
+    },
+    'types': {
+        'info': 'Asset Types CLI',
+        'functions': [
+            {
+                'command': 'get-all',
+                'method_call_info': {
+                    'module': 'contxt.functions.assets',
+                    'class': 'Assets',
+                    'method': 'get_asset_types'
+                },
+                'args': [
+                    {
+                        'arg': 'organization_id',
+                        'required': False,
+                        'type': int,
+                        'help': 'Provide the organization_id (uuid, str) as a filter'
+                    },
+                    {
+                        'arg': 'organization_name',
+                        'required': False,
+                        'type': str,
+                        'help': 'Provide the organization_name (str) as a filter'
+                    }
+                ],
+            },
+            {
+                'command': 'get',
+                'method_call_info': {
+                    'module': 'contxt.functions.assets',
+                    'class': 'Assets',
+                    'method': 'get_asset_type_info'
+                },
+                'args': [
+                    {
+                        'arg': 'organization_id',
+                        'required': False,
+                        'type': int,
+                        'help': 'Provide the organization_id (uuid, str) as a filter'
+                    },
+                    {
+                        'arg': 'organization_name',
+                        'required': False,
+                        'type': str,
+                        'help': 'Provide the organization_name (str) as a filter'
+                    },
+                    {
+                        'arg': 'type',
+                        'required': True,
+                        'type': str,
+                        'help': 'Provide the type label'
+                    }
+                ],
+                'print_handler': 'print_asset_type_handler'
+            },
+            {
+                'command': 'get-assets',
+                'method_call_info': {
+                    'module': 'contxt.functions.assets',
+                    'class': 'Assets',
+                    'method': 'get_assets_for_type'
+                },
+                'args': [
+                    {
+                        'arg': 'organization_id',
+                        'required': False,
+                        'type': int,
+                        'help': 'Provide the organization_id (uuid, str) as a filter'
+                    },
+                    {
+                        'arg': 'organization_name',
+                        'required': False,
+                        'type': str,
+                        'help': 'Provide the organization_name (str) as a filter'
+                    },
+                    {
+                        'arg': 'type',
+                        'required': True,
+                        'type': str,
+                        'help': 'Provide the type label'
+                    }
+                ],
+            }
+        ]
+    },
+    'assets': {
+        'info': 'Asset CLI',
+        'functions': [
+            {
+                'command': 'get-metric',
+                'method_call_info': {
+                    'module': 'contxt.functions.assets',
+                    'class': 'Assets',
+                    'method': 'get_metric_values_for_asset'
+                },
+                'args': [
+                    {
+                        'arg': 'organization_id',
+                        'required': False,
+                        'type': int,
+                        'help': 'Provide the organization_id (uuid, str) as a filter'
+                    },
+                    {
+                        'arg': 'organization_name',
+                        'required': False,
+                        'type': str,
+                        'help': 'Provide the organization_name (str) as a filter'
+                    },
+                    {
+                        'arg': 'asset_id',
+                        'required': True,
+                        'type': str,
+                        'help': 'Provide the organization_name (str) as a filter'
+                    },
+                    {
+                        'arg': 'metric',
+                        'required': True,
+                        'type': str,
+                        'help': 'Provide the organization_name (str) as a filter'
+                    }
+                ],
+                'print_handler': 'print_asset_metric_values'
+            },
+            {
+                'command': 'get-metric-for-type',
+                'method_call_info': {
+                    'module': 'contxt.functions.assets',
+                    'class': 'Assets',
+                    'method': 'get_metric_values_for_asset_type'
+                },
+                'args': [
+                    {
+                        'arg': 'organization_id',
+                        'required': False,
+                        'type': int,
+                        'help': 'Provide the organization_id (uuid, str) as a filter'
+                    },
+                    {
+                        'arg': 'organization_name',
+                        'required': False,
+                        'type': str,
+                        'help': 'Provide the organization_name (str) as a filter'
+                    },
+                    {
+                        'arg': 'asset_type_label',
+                        'required': True,
+                        'type': str,
+                        'help': 'Provide the organization_name (str) as a filter'
+                    },
+                    {
+                        'arg': 'metric_label',
+                        'required': True,
+                        'type': str,
+                        'help': 'Provide the organization_name (str) as a filter'
+                    },
+                    {
+                        'arg': 'plot',
+                        'required': False,
+                        'type': bool,
+                        'help': 'Provide the organization_name (str) as a filter'
+                    }
+                ]
+            }
+        ]
+    },
+    'metrics': {
+        'info': 'Metrics CLI',
+        'functions': [
+            {
+                'command': 'get',
+                'method_call_info': {
+                    'module': 'contxt.functions.facilities',
+                    'class': 'Facilities',
+                    'method': 'get_all_facilities'
+                },
+                'args': [
+                    {
+                        'arg': 'organization_id',
+                        'required': False,
+                        'type': int,
+                        'help': 'Provide the organization_id (uuid, str) as a filter'
+                    },
+                    {
+                        'arg': 'organization_name',
+                        'required': False,
+                        'type': str,
+                        'help': 'Provide the organization_name (str) as a filter'
+                    }
+                ],
+            }
+        ]
+    },
 
-class Assets:
-
-    def __init__(self, cli_module, arg_parser):
-        self.cli = cli_module
-
-        arg_parser.add_argument("command", type=str, help="The primary command to run within this Assets module")
-        arg_parser.add_argument("subcommand", type=str, help="Subcommand for an action in a module")
-
-        arg_parser.add_argument("--facility_id", required=False, dest="facility_id", type=int,
-                                help="Provide the facility_id (integer) as a filter when possible")
-        arg_parser.add_argument("--organization_id", required=False, dest="organization_id", type=str,
-                                help="Provide the organization_id (uuid, str) as a filter when possible")
-        arg_parser.add_argument("--organization_name", required=False, dest="organization_name", type=str,
-                                help="Provide the organization_name (str) as a filter when possible")
-        arg_parser.add_argument("--type_name", required=False, dest="type_name", type=str,
-                                help="Provide the name of the asset type as a filter when possible")
-
-        self.facilities_service = FacilitiesService(self.cli.auth)
-        self.contxt_service = ContxtService(self.cli.auth)
+}
 
 
-    '''
-        assets facilities get-all --organization_id <organization_id> --organization_name <organization_name>
-        assets types get-all (--organization_id <organization_id> OR --organization_name "Lineage Logistics")
-        assets types get --type_name <name> (--organization_id <organization_id> OR --organization_name "Lineage Logistics")
-    '''
-    def parse_command(self, command, args):
+class Assets(ContxtCLI):
 
-        if args.command == 'facilities':
+    def __init__(self, arg_parser):
 
-            if args.subcommand == 'get-all':
+        super(Assets, self).__init__(arg_parser, COMMANDS)
 
-                check_required_organization_args(args, org_is_required=False)
+    @staticmethod
+    def print_asset_type_handler(type_object):
 
-                if args.organization_id is not None or args.organization_name is not None:
+        print('Type Information:')
+        print(type_object)
+        print('\nAttributes: \n')
+        print(APIObjectCollection(list(type_object.attributes.values())))
+        print('\nMetrics: \n')
+        print(APIObjectCollection(list(type_object.metrics.values())))
 
-                    organization_id = get_organization_id_from_arguments(self.contxt_service, args)
+    @staticmethod
+    def print_asset_metric_values(result_tuple):
 
-                    print(self.facilities_service.get_facilities(organization_id=organization_id))
+        metric_obj = result_tuple[0]
+        values_collection = result_tuple[1]
 
-                else:
-                    print(self.facilities_service.get_facilities())
+        items = []
+        for val in values_collection:
+            values = val.get_values()
+            values.append(metric_obj.label)
+            values.append(metric_obj.units)
+            items.append(values)
 
-        elif args.command == 'types':
-
-            if args.subcommand == 'get-all':
-
-                check_required_organization_args(args, org_is_required=True)
-
-                organization_id = get_organization_id_from_arguments(self.contxt_service, args)
-
-                asset_service = LazyAssetsService(auth_module=self.cli.auth, organization_id=organization_id)
-
-                asset_service.load_configuration()
-
-                print(APIObjectCollection(list(asset_service.types_by_label.values())))
-
-            elif args.subcommand == 'get':
-
-                if args.type_name is None:
-                    logger.critical("--type_name argument is required")
-                    return
-
-                check_required_organization_args(args, org_is_required=True)
-
-                organization_id = get_organization_id_from_arguments(self.contxt_service, args)
-
-                asset_service = LazyAssetsService(auth_module=self.cli.auth, organization_id=organization_id)
-
-                if args.type_name not in asset_service.types_by_label:
-                    logger.critical("Type not found: {}".format(args.type_name))
-                    return
-
-                type_object = asset_service.types_by_label[args.type_name]
-
-                print('Type Information:')
-                print(asset_service.load_type_full(type_object))
-                print('\nAttributes: \n')
-                print(APIObjectCollection(list(type_object.attributes.values())))
-                print('\nMetrics: \n')
-                print(APIObjectCollection(list(type_object.metrics.values())))
-
-            else:
-                logger.critical("Invalid subcommand. Must be one of {get-spend}")
-                return
-
+        if len(values_collection) > 0:
+            keys = values_collection[0].get_keys()
+            keys.extend(['label', 'units'])
+            print(tabulate(items, headers=keys))
         else:
-            logger.critical('Unrecognized command: {}'.format(args.command))
-
+            print(values_collection)

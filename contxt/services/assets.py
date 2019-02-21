@@ -1,7 +1,10 @@
-import inflect
-from datetime import datetime
-from contxt.services import Service, GET, POST, PUT, PagedResponse, PagedEndpoint, APIObject
 import json
+from datetime import datetime
+
+import inflect
+
+from contxt.services import (GET, POST, PUT, APIObject, PagedEndpoint,
+                             PagedResponse, Service)
 
 p = inflect.engine()
 
@@ -163,6 +166,13 @@ class Asset:
         return "<Asset: asset_id: '{}', label: '{}', description: '{}', attributes: {}>".format(
             self.id, self.label, self.description, self.attribute_values)
 
+    def get_values(self):
+        return [self.id, self.label, self.description]
+
+    def get_keys(self):
+        return ['id', 'label', 'description']
+
+
     def toJSON(self):
         print(self.__dict__)
         return self.__dict__
@@ -179,7 +189,7 @@ class AssetType(APIObject):
 
     def __init__(self, assets_instance, organization_id, type_obj):
 
-        super(AssetType, self).__init__()
+        super().__init__()
 
         self.id = type_obj['id']
         self.organization_id = organization_id
@@ -257,8 +267,10 @@ class Assets(Service):
 
         self.env = CONFIGS_BY_ENVIRONMENT[environment]
 
-        super(Assets, self).__init__(base_url=self.env['base_url'],
-                                     access_token=auth_module.get_token_for_client(self.env['audience']))
+        super().__init__(
+            base_url=self.env['base_url'],
+            access_token=auth_module.get_token_for_client(
+                self.env['audience']))
 
         self.organization_id = organization_id
         self.load_configuration()
@@ -322,6 +334,11 @@ class Assets(Service):
     def get_attribute_values_for_asset(self, asset_obj, asset_type_obj):
         values = self.execute(GET(uri='assets/{}/attributes/values'.format(asset_obj.id)), execute=True)
         attribute_value_objects = []
+
+        # if this is true, then the attributes for the type haven't been loaded yet
+        if len(values) and len(asset_type_obj.attributes) == 0:
+            self.get_attributes_for_type(asset_type_obj)
+
         for record in values:
             # parse numeric types
             try:

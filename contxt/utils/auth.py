@@ -1,11 +1,14 @@
-from auth0.v3.authentication.get_token import GetToken
-from getpass import getpass
-from pathlib import Path
 import json
 import os
+from datetime import datetime
+from getpass import getpass
+from pathlib import Path
+
+import jwt
+from auth0.v3.authentication.get_token import GetToken
 
 from contxt.services.authentication import ContxtAuthService
-from contxt.utils import Configuration, make_logger
+from contxt.utils import Configuration, get_epoch_time, make_logger
 
 logger = make_logger(__name__)
 
@@ -43,11 +46,14 @@ class BaseAuth:
                                  access_token=access_token,
                                  refresh_token=refresh_token)
 
-    def get_new_token_from_refresh_token(self, refresh_token):
+    def refresh_contxt_auth_token(self):
+        refresh_token = self.tokens[AUTH_AUDIENCE]['refresh_token']
+        token = self.auth0.refresh_token(client_id=self.client_id,
+                                         client_secret=self.client_secret if self.client_secret else '',
+                                         refresh_token=refresh_token)
 
-        self.auth0.refresh_token(client_id=self.client_id,
-                                 client_secret='',
-                                 refresh_token=refresh_token)
+        # store the new access token and re-store the existing refresh token
+        self.store_service_token(AUTH_AUDIENCE, token['access_token'], refresh_token)
 
     def authenticate_to_service(self, service_audience):
         print("Getting new token for {}".format(service_audience))
@@ -77,12 +83,36 @@ class BaseAuth:
                 raise NotImplementedError('Need to implement client_id/client_secret authentication')
         '''
 
+        # check to see if we've gotten a token for this service or not
         if client_id not in self.tokens:
-            # try to get a token
+            # try to get a token, whether it's a refresh or not
             self.authenticate_to_service(client_id)
+
+        # check to see if have the token, but needs to be refreshed
+        if self.token_is_expired_for_client(client_id):
+            logger.warn(f'Token expired for client {client_id} -- Refreshing')
+
+            # if it's the contxt auth client, we need to follow the other refresh route via Auth0
+            if client_id == AUTH_AUDIENCE:
+                self.refresh_contxt_auth_token()
+            else:
+                self.authenticate_to_service(client_id)
 
         access_token = self.tokens[client_id]['token']
         return access_token
+
+    def token_is_expired_for_client(self, client_id):
+
+        access_token = self.tokens[client_id]['token']
+
+        decoded_token = jwt.decode(access_token, verify=False)
+
+        token_expiration_epoch = decoded_token['exp']
+
+        if token_expiration_epoch <= get_epoch_time(datetime.now()):
+            return True
+
+        return False
 
     def load_tokens(self):
         os.makedirs(self.contxt_config_dir, exist_ok=True)
@@ -105,7 +135,7 @@ class BaseAuth:
 
     def store_tokens(self):
         with open(self.token_file, 'w') as f:
-            json.dump(self.tokens, f)
+            json.dump(self.tokens, f, indent=4)
 
     def clear_tokens(self):
         os.remove(self.token_file)
@@ -114,12 +144,27 @@ class BaseAuth:
 class CLIAuth(BaseAuth):
 
     def __init__(self):
-        super(CLIAuth, self).__init__(client_id=Configuration.CLI_CLIENT_ID,
-                                      cli_mode=True)
+        super().__init__(client_id=Configuration.CLI_CLIENT_ID,
+                         cli_mode=True)
 
         if self.get_auth_token() is None:
             logger.info("Token doesn't exist or can't be refreshed. Please re-authenticate")
             self.login()
+
+    def setup_parser(self, arg_parser):
+        auth_subparser = arg_parser.add_subparsers(dest="auth_subcommand")
+
+        auth_subparser.add_parser("login")
+        auth_subparser.add_parser("reset")
+
+    def parse_command(self, args):
+
+        if args.auth_subcommand == "login":
+            self.login()
+        elif args.auth_subcommand == "reset":
+            self.reset()
+        else:
+            print("Unrecognized subcommand {}".format(args.auth_subcommand))
 
     def login(self):
 

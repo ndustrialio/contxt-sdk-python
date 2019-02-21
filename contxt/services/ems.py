@@ -1,5 +1,6 @@
-from contxt.services import Service, GET, APIObject, APIObjectCollection
 from datetime import datetime
+
+from contxt.services import GET, APIObject, APIObjectCollection, Service
 
 CONFIGS_BY_ENVIRONMENT = {
     'production': {
@@ -15,15 +16,17 @@ CONFIGS_BY_ENVIRONMENT = {
 
 class EMSService(Service):
 
-    def __init__(self, auth_module, environment='production'):
+    def __init__(self, auth_module, environment='staging'):
 
         if environment not in CONFIGS_BY_ENVIRONMENT:
             raise Exception('Invalid environment specified')
 
         self.env = CONFIGS_BY_ENVIRONMENT[environment]
 
-        super(EMSService, self).__init__(base_url=self.env['base_url'],
-                                         access_token=auth_module.get_token_for_client(self.env['audience']))
+        super().__init__(
+            base_url=self.env['base_url'],
+            access_token=auth_module.get_token_for_client(
+                self.env['audience']))
 
     def get_monthly_utility_spend(self, facility_id, type, date_start, date_end, proforma=False, exclude_account_charges=False):
 
@@ -35,9 +38,9 @@ class EMSService(Service):
         params = {
             'type': type,
             'date_start': date_start.strftime('%Y-%m'),
-            'date_end': date_end.strftime('%Y-%m')
-            #'proforma': proforma,
-            #'exclude_account_charges': exclude_account_charges
+            'date_end': date_end.strftime('%Y-%m'),
+            'proforma': 'true' if proforma else 'false',
+            'exclude_account_charges': 'true' if exclude_account_charges else 'false'
         }
 
         response = self.execute(GET(uri='facilities/{}/utility/spend/monthly'.format(facility_id)).params(params),
@@ -48,44 +51,38 @@ class EMSService(Service):
 
 class FacilityUtilitySpend(APIObject):
 
-    def __init__(self, spend_api_object):
-
-        super(FacilityUtilitySpend, self).__init__()
+    def __init__(self, spend_api_object, keys_to_ignore=None):
+        super().__init__(keys_to_ignore=keys_to_ignore)
 
         self.type = spend_api_object['type']
         self.currency = spend_api_object['currency']
 
-        periods = []
-        for obj in spend_api_object['values']:
-            periods.append(UtilitySpendPeriod(obj))
-
+        periods = [UtilitySpendPeriod(s) for s in spend_api_object['values']]
         self.spend_periods = APIObjectCollection(periods)
 
     def __str__(self):
         print('Utility Spend -> Type: {} -- Currency: {}'.format(self.type, self.currency))
         return self.spend_periods.__str__()
 
-    def get_values(self):
-        return self.__dict__.values()
-
-    def get_keys(self):
-        return self.__dict__.keys()
+    def get_dict(self):
+        return {
+            **super().get_dict(),
+            'spend_periods': self.spend_periods.get_dicts()
+        }
 
 
 class UtilitySpendPeriod(APIObject):
 
-    def __init__(self, spend_api_object):
-
-        super(UtilitySpendPeriod, self).__init__()
+    def __init__(self, spend_api_object, keys_to_ignore=None):
+        super().__init__(keys_to_ignore=keys_to_ignore)
 
         self.date = spend_api_object['date']
         self.spend = spend_api_object['value']
-        #self.proforma_date = spend_api_object['proforma_date']
+        self.proforma_date = spend_api_object['proforma_date']
 
     def get_values(self):
-        #return [self.date, self.value, self.proforma_date]
-        return [self.date, self.spend]
+        return [self.date, self.spend, self.proforma_date]
 
     def get_keys(self):
-        #return ['date', 'value', 'proforma_date']
-        return ['date', 'value']
+        return ['date', 'value', 'proforma_date']
+
