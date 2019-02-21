@@ -10,6 +10,7 @@ from contxt.utils.vis import run_plotly
 
 logger = make_logger(__name__)
 
+
 class Assets:
 
     def __init__(self, auth_module):

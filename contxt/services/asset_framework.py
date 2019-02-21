@@ -312,7 +312,7 @@ class LazyAssetsService(Assets):
             return AssetNode(attributes=attr_values_by_label, children=children_nodes, meta=asset_dict,
                              type_label=asset_type.label)
 
-        asset_json = self.execute(GET(uri=f'assets/{asset_id}', execute=True)
+        asset_json = self.execute(GET(uri=f'assets/{asset_id}', execute=True))
         root = create_node(asset_json)
         asset_tree = AssetTree(root)
         return asset_tree
@@ -325,7 +325,7 @@ class LazyAssetsService(Assets):
         assets = PagedResponse(PagedEndpoint(
             base_url=self.base_url,
             client=self.client,
-            request=GET(uri=f'organizations/{self.organization_id}/assets?asset_attribute_id={attr.id}&asset_attribute_value={attr_value}',
+            request=GET(uri=f'organizations/{self.organization_id}/assets?asset_attribute_id={attr.id}&asset_attribute_value={attr_value}'),
             parameters={}))
         return [Asset(assets_instance=self, asset_type_obj=asset_type, api_object=record) for record in assets]
 
