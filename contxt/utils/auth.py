@@ -1,14 +1,14 @@
 import json
 import os
-import jwt
 from datetime import datetime
 from getpass import getpass
 from pathlib import Path
 
+import jwt
 from auth0.v3.authentication.get_token import GetToken
 
 from contxt.services.authentication import ContxtAuthService
-from contxt.utils import Configuration, make_logger, get_epoch_time
+from contxt.utils import Configuration, get_epoch_time, make_logger
 
 logger = make_logger(__name__)
 
@@ -90,7 +90,7 @@ class BaseAuth:
 
         # check to see if have the token, but needs to be refreshed
         if self.token_is_expired_for_client(client_id):
-            logger.warn('Token expired for client {} -- Refreshing'.format(client_id))
+            logger.warn(f'Token expired for client {client_id} -- Refreshing')
 
             # if it's the contxt auth client, we need to follow the other refresh route via Auth0
             if client_id == AUTH_AUDIENCE:

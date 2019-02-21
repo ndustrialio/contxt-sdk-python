@@ -1,17 +1,15 @@
-from datetime import datetime
-from tqdm import tqdm
 import csv
+from datetime import datetime
 
-from contxt.services.ems import EMSService
-from contxt.services.contxt import ContxtService
-from contxt.services.facilities import FacilitiesService
-from contxt.services import UnauthorizedException
+from tqdm import tqdm
 
 from contxt.functions.organizations import find_organization_by_name
-
+from contxt.services import UnauthorizedException
+from contxt.services.contxt import ContxtService
+from contxt.services.ems import EMSService
+from contxt.services.facilities import FacilitiesService
 from contxt.utils import make_logger
 from contxt.utils.vis import run_plotly
-
 
 logger = make_logger(__name__)
 
@@ -80,7 +78,7 @@ class EMS:
                                                                    date_end=end_date,
                                                                    proforma=proforma)
             except UnauthorizedException as e:
-                logger.warning("Unauthorized for facility {}".format(facility.id))
+                logger.warning(f"Unauthorized for facility {facility.id}")
                 continue
 
             organization_spend[facility.name] = {}

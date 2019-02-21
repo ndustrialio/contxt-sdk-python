@@ -42,7 +42,7 @@ class Assets:
         asset_service, _ = self._initialize_asset_service(organization_id, organization_name)
 
         if type not in asset_service.types_by_label:
-            logger.critical('Type not found: {}'.format(type))
+            logger.critical(f'Type not found: {type}')
             return None
 
         type_object = asset_service.types_by_label[type]

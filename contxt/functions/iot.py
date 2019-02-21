@@ -1,11 +1,11 @@
-from datetime import datetime
-import dateutil.parser
 import csv
 import json
 import os
+from datetime import datetime
+
+import dateutil.parser
 
 from contxt.services.iot import IOTService
-
 from contxt.utils import make_logger
 from contxt.utils.vis import run_plotly
 
@@ -61,11 +61,10 @@ class IOT:
             'end_date': str(end_date) if end_date is not None else None,
             'window': window
         }
-        logger.info("Writing to files in directory: {}")
+        logger.info(f"Writing to files in directory: {export_dir}")
         os.makedirs(export_dir, exist_ok=False)
 
-        logger.info("Parameters: start_date -> {}, end_date -> {}, window -> {}"
-                    .format(start_date, end_date, window))
+        logger.info(f"Parameters: start_date -> {start_date}, end_date -> {end_date}, window -> {window}")
 
         logger.info("Pulling data for the following fields:")
         print(field_list)
@@ -73,7 +72,7 @@ class IOT:
         field_meta = {}
         for field in field_list:
             # TODO go get the data for this field and write to a CSV
-            logger.info("Pulling data for {}".format(field.field_human_name))
+            logger.info(f"Pulling data for {field.field_human_name}")
             data = self.iot_service.get_data_for_field(output_id=field.output_id,
                                                        field_human_name=field.field_human_name,
                                                        start_time=start_date,
@@ -81,7 +80,8 @@ class IOT:
                                                        end_time=end_date,
                                                        limit=5000)
 
-            filename = os.path.join(export_dir, "{}.csv".format(field.field_descriptor))
+            filename = os.path.join(export_dir,
+                                    f"{field.field_descriptor}.csv")
 
             row_counter = 0
             with open(filename, 'w') as f:
@@ -99,7 +99,7 @@ class IOT:
                 'field_id': field.id
             }
 
-            logger.info("Wrote {} rows to CSV".format(row_counter))
+            logger.info(f"Wrote {row_counter} rows to CSV")
 
         # Write metadata file
         meta = {
