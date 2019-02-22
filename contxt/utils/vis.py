@@ -1,111 +1,85 @@
+import logging
+
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
-import flask
-import plotly
+import plotly.graph_objs as go
 from dash.dependencies import Input, Output
 
-from contxt.utils import get_environ_var, make_logger
+from contxt.utils import make_logger
 
 logger = make_logger(__name__)
 
-# Mute flask logger
-# flask_logger = make_logger('werkzeug')
-# flask_logger.setLevel(logging.ERROR)
 
-# Flask
-server = flask.Flask(__name__)
+class DataVisualizer:
 
-# Dash
-app = dash.Dash(__name__, server=server)
-app.scripts.config.serve_locally = False
-dcc._js_dist[0][
-    'external_url'] = 'https://cdn.plot.ly/plotly-basic-latest.min.js'
+    def __init__(self, name='Contxt', multi_plots=True, quiet=False):
+        self.name = name
+        self.multi_plots = multi_plots
 
-# Authorize plotly
-# TODO: this might not even be needed
-# PLOTLY_USERNAME = get_environ_var('PLOTLY_USERNAME')
-# PLOTLY_API_KEY = get_environ_var('PLOTLY_API_KEY')
-# plotly.tools.set_credentials_file(
-#     username=PLOTLY_USERNAME, api_key=PLOTLY_API_KEY)
+        if quiet:
+            flask_logger = make_logger('werkzeug')
+            flask_logger.setLevel(logging.ERROR)
 
-# Html
-app.layout = html.Div([
-    html.H1('Contxt'),
-    dcc.Dropdown(id='my-dropdown', options=[], value=''),
-    dcc.Graph(id='my-graph')
-], className="container")
+    def run(self, labeled_graphs, title=None, x_label=None, y_label=None):
+        # Create dash app
+        app = dash.Dash(__name__)
 
+        # Update dropdown with options
+        options = [dict(label=k, value=k) for k in labeled_graphs.keys()]
+        value = options[0]['value'] if options else ''
+        if self.multi_plots:
+            value = [value]
+        app.layout = self.get_app_layout(options, value)
 
-# TODO: may want to change the title_to_df arg to be more object-oriented as
-# opposed to a simple dict
-def run_plotly(title_to_df, x_label, y_label):
-    # HACK: dont like to use globals, but seems necessary here since
-    # update_graph needs access to the datasets
-    global label_to_df, app
+        @app.callback(
+            Output('my-graph', 'figure'), [Input('my-dropdown', 'value')])
+        def update_graph(selected_labels):
+            # Handle single graph obj
+            if not isinstance(selected_labels, list):
+                selected_labels = [selected_labels]
 
-    # Rename dataframes to generic x, y
-    label_to_df = {
-        k: v.rename(index=str, columns={
-            x_label: 'x',
-            y_label: 'y'
-        })
-        for k, v in title_to_df.items()
-    }
+            # Create graph
+            return self.get_figure(
+                labeled_graphs={
+                    t: labeled_graphs.get(t)
+                    for t in selected_labels
+                },
+                title=title,
+                x_label=x_label,
+                y_label=y_label)
 
-    # Sort
-    label_to_df = {
-        k: v.sort_values('x')
-        for k, v in label_to_df.items() if not v.empty
-    }
+        # Run dash
+        app.run_server()
 
-    # Update dropdown with all options
-    options = [{'label': k, 'value': k} for k in label_to_df.keys()]
-    value = options[0]['value'] if options else ''
-    app.layout = html.Div([
-        html.H1('Contxt'),
-        dcc.Dropdown(id='my-dropdown', options=options, value=value),
-        dcc.Graph(id='my-graph')
-    ], className="container")
+    def get_app_layout(self, options, curr_value):
+        return html.Div([
+            html.H1(self.name),
+            dcc.Dropdown(
+                id='my-dropdown',
+                options=options,
+                value=curr_value,
+                multi=self.multi_plots),
+            dcc.Graph(id='my-graph')
+        ], className="container")
 
-    # Run dash
-    app.run_server()
+    def get_figure(self,
+                   labeled_graphs,
+                   title=None,
+                   x_label=None,
+                   y_label=None):
+        return go.Figure(
+            data=list(labeled_graphs.values()),
+            layout=self.get_figure_layout(
+                title=title, x_label=x_label, y_label=y_label))
 
-
-def define_graph(x, y, title, x_label=None, y_label=None):
-    return {
-        'data': [{
-            'x': x,
-            'y': y,
-            'line': {
-                'width': 3,
-                'shape': 'spline'
-            }
-        }],
-        'layout': {
-            'title': title,
-            'xaxis': {
-                'title': x_label or ''
-            },
-            'yaxis': {
-                'title': y_label or ''
-            },
-            'margin': {
-                'l': 80,
-                'r': 80,
-                'b': 80,
-                't': 80
-            }
-        }
-    }
-
-
-@app.callback(Output('my-graph', 'figure'), [Input('my-dropdown', 'value')])
-def update_graph(selected_dropdown_value):
-    df = label_to_df.get(selected_dropdown_value)
-    if df.empty:
-        return define_graph([], [], title=selected_dropdown_value)
-    return define_graph(df.x, df.y, title=selected_dropdown_value)
+    def get_figure_layout(self, title, x_label=None, y_label=None):
+        return go.Layout(
+            title=title,
+            xaxis=dict(title=x_label),
+            yaxis=dict(title=y_label),
+            showlegend=True,
+            margin=go.layout.Margin(l=80, r=80, t=80, b=80))
 
 
 if __name__ == '__main__':
@@ -114,4 +88,11 @@ if __name__ == '__main__':
                      'c78bf172206ce24f77d6363a2d754b59/raw/'
                      'c353e8ef842413cae56ae3920b8fd78468aa4cb2/'
                      'usa-agricultural-exports-2011.csv')
-    run_plotly({'test': df}, 'beef', 'pork')
+    s = go.Scatter(
+        x=df['beef'].sort_values(),
+        y=df['pork'],
+        name='pork vs beef',
+        line=dict(shape='spline', width=3)
+    )
+    # DashApp.run_static({'test1': s, 'test2': s})
+    DataVisualizer().run({'test1': s, 'test2': s})
