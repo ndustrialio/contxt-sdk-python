@@ -1,4 +1,3 @@
-
 from contxt.services.facilities import FacilitiesService
 from contxt.services.contxt import ContxtService
 
@@ -17,7 +16,8 @@ class Facilities:
     def get_all_facilities(self, organization_id=None, organization_name=None):
 
         if organization_id or organization_name:
-            organization_id = get_organization_id_from_arguments(organization_id=organization_id,
+            organization_id = get_organization_id_from_arguments(contxt_service=self.contxt_service,
+                                                                 organization_id=organization_id,
                                                                  organization_name=organization_name)
 
             return self.facilities_service.get_facilities(organization_id=organization_id)
