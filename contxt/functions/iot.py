@@ -4,10 +4,12 @@ import os
 from datetime import datetime
 
 import dateutil.parser
+import pandas as pd
+from plotly import graph_objs as go
 
 from contxt.services.iot import IOTService
 from contxt.utils import make_logger
-from contxt.utils.vis import run_plotly
+from contxt.utils.vis import DataVisualizer
 
 logger = make_logger(__name__)
 
@@ -24,7 +26,7 @@ class IOT:
 
         return self.iot_service.get_single_grouping(grouping_id).fields
 
-    def get_data_for_fields(self, grouping_id, start_date, window, end_date=None):
+    def get_data_for_fields(self, grouping_id, start_date, window, end_date=None, plot=False):
 
         iso_start_date = dateutil.parser.parse(start_date)
 
@@ -39,19 +41,39 @@ class IOT:
             return
 
         # TODO: add flag to plot
-        if False:
-            # Plot
-            title_to_df = {
-                f.field_human_name: pd.DataFrame.from_dict(d.records)
-                for f, d in zip(grouping.fields, field_data)
-            }
-            run_plotly(title_to_df, x_label='event_time', y_label='value')
+        # TODO: field_data is undefined, looks like we lost code in fixing 
+        # merge conflicts 
+        if plot:
+            self.plot_field_data(grouping.fields, field_data)
         else:
             export_directory = os.path.join("./", "export_{}_{}".format(grouping.slug,
                                                                         datetime.now().strftime(
                                                                             "%Y-%m-%d_%H:%M:%S")))
 
             self.write_field_data_to_csv(export_directory, grouping.fields, iso_start_date, iso_end_date, window)
+
+    def plot_field_data(self, fields, field_data):
+
+        def create_graph(field_name, field_data):
+            # TODO: need to parse datetime and value
+            df = pd.DataFrame.from_dict(field_data.records)
+            if not df.empty:
+                df = df.sort_values('event_time')
+            return go.Scatter(
+                x=df.get('event_time'),
+                y=df.get('value'),
+                name=field_name,
+                line=dict(shape='spline'))
+
+        # Create graphs
+        labeled_graphs = {
+            f.field_human_name: create_graph(f.field_human_name, d)
+            for f, d in zip(fields, field_data)
+        }
+
+        # Plot
+        data_vis = DataVisualizer(multi_plots=False)
+        data_vis.run(labeled_graphs, title='IOT Field Data')
 
     def write_field_data_to_csv(self, export_dir, field_list, start_date, end_date=None, window=60):
 

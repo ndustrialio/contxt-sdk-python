@@ -1,15 +1,18 @@
 import csv
 from datetime import datetime
 
+import pandas as pd
+from plotly import graph_objects as go
 from tqdm import tqdm
 
 from contxt.functions.organizations import find_organization_by_name
 from contxt.services import UnauthorizedException
+from contxt.services.asset_framework import datetime_zulu_parse
 from contxt.services.contxt import ContxtService
 from contxt.services.ems import EMSService
 from contxt.services.facilities import FacilitiesService
 from contxt.utils import make_logger
-from contxt.utils.vis import run_plotly
+from contxt.utils.vis import DataVisualizer
 
 logger = make_logger(__name__)
 
@@ -94,15 +97,28 @@ class EMS:
         else:
             self.write_monthly_utility_spend_to_file(organization_spend, to_csv)
 
-    def _make_plotly_title(self, facility_name):
-        return f'Monthly Utility Spend for Facility {facility_name}'
-
     def plot_monthly_utility_spend(self, facility_name_to_spends):
-        title_to_df = {
-            self._make_plotly_title(f): s.spend_periods.get_df()
+
+        def create_graph(facility_name, spend):
+            # TODO: need to parse datetime and value
+            df = spend.spend_periods.get_df()
+            if not df.emtpy:
+                df = df.sort_values('date')
+            return go.Scatter(
+                x=df.get('date'),
+                y=df.get('value'),
+                name=f"{facility_name}'s monthly utility spend",
+                line=dict(shape='spline'))
+
+        # Create graphs
+        labeled_graphs = {
+            f'Facility {f}': create_graph(f, s)
             for f, s in facility_name_to_spends.items()
         }
-        run_plotly(title_to_df, x_label='date', y_label='value')
+
+        # Plot
+        data_vis = DataVisualizer(multi_plots=False)
+        data_vis.run(labeled_graphs, title='Monthly Utility Spend')
 
     def write_monthly_utility_spend_to_file(self, organization_spend, filename):
         # write this to the CSV file
