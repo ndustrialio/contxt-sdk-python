@@ -1,10 +1,4 @@
-from contxt.functions.organizations import find_organization_by_name
-
 from contxt.cli import ContxtCLI
-
-from contxt.services.contxt import ContxtService
-from contxt.services import UnauthorizedException
-
 from contxt.utils import make_logger
 
 logger = make_logger(__name__)

@@ -1,14 +1,4 @@
 from contxt.cli import ContxtCLI
-
-import csv
-from datetime import datetime
-
-from tqdm import tqdm
-
-from contxt.functions.organizations import find_organization_by_name
-from contxt.services.contxt import ContxtService
-from contxt.services.ems import EMSService
-from contxt.services.facilities import FacilitiesService
 from contxt.utils import make_logger
 
 logger = make_logger(__name__)
@@ -42,7 +32,7 @@ COMMANDS = {
                             'help': 'Provide the facility_id (integer) as a filter when possible'
                         },
                         {
-                            'arg':'interval',
+                            'arg': 'interval',
                             'required': True,
                             'type': str,
                             'help': "Provide the interval ('monthly', 'daily') as a filter when possible",
@@ -56,13 +46,13 @@ COMMANDS = {
                             'valid_values': ['electric', 'gas', 'combined']
                         },
                         {
-                            'arg':'start_date',
+                            'arg': 'start_date',
                             'required': True,
                             'type': str,
                             'help': 'Provide the start month for spend in YYYY-MM format'
                         },
                         {
-                            'arg':'end_date',
+                            'arg': 'end_date',
                             'required': True,
                             'type': str,
                             'help': 'Provide the end month for spend in YYYY-MM format'
