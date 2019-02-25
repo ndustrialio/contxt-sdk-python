@@ -1,5 +1,6 @@
 import json
 from datetime import datetime
+
 import jwt
 import pandas as pd
 import requests
@@ -58,14 +59,14 @@ class ApiClient(object):
 
         if 400 <= response.status_code < 500:
             msg = json.loads(response.text)['message']
-            raise UnauthorizedException('{} - {}'.format(response.reason, msg))
+            raise UnauthorizedException(f'{response.reason} - {msg}')
 
         elif response.status_code == 500:
             msg = json.loads(response.text)['message']
-            http_error_msg = '%s Server Error: %s - %s' % (response.status_code, response.reason, msg)
+            http_error_msg = f'{response.status_code} Server Error: {response.reason} - {msg}'
 
         elif 500 < response.status_code < 600:
-            http_error_msg = '%s Server Error: %s - %s' % (response.status_code, response.reason, response.text)
+            http_error_msg = f'{response.status_code} Server Error: {response.reason} - {response.text}'
 
         if http_error_msg:
             raise requests.exceptions.HTTPError(http_error_msg, response=self)

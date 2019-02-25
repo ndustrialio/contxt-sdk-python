@@ -90,8 +90,8 @@ class AssetNode:
         intersect = set(asset_core_fields).intersection(set(self.attributes.iterkeys()))
         if intersect:
             logger.warn(
-                "Non empty intersection between core fields and attributes: {}."
-                " Attributes will be overwritten by core fields".format(intersect))
+                f"Non empty intersection between core fields and attributes: {intersect}."
+                " Attributes will be overwritten by core fields")
 
     def add_child(self, child):
         self.children.append(child)
@@ -337,11 +337,12 @@ class LazyAssetsService(Assets):
             'limit': limit
         }
 
-        assets = PagedResponse(PagedEndpoint(
-            base_url=self.base_url,
-            client=self.client,
-            request=GET(uri='organizations/{}/assets'.format(self.organization_id)),
-            parameters=parameters))
+        assets = PagedResponse(
+            PagedEndpoint(
+                base_url=self.base_url,
+                client=self.client,
+                request=GET(uri=f'organizations/{self.organization_id}/assets'),
+                parameters=parameters))
         return [Asset(assets_instance=self, asset_type_obj=asset_type_obj, api_object=record) for record in assets]
 
     def get_assets_for_type(self, asset_type_obj):
@@ -350,11 +351,13 @@ class LazyAssetsService(Assets):
             # 'orderBy': 'created_at',
             # 'reverseOrder': True
         }
-        assets = PagedResponse(PagedEndpoint(
-            base_url=self.base_url,
-            client=self.client,
-            request=GET(uri='organizations/{}/assets'.format(self.organization_id)),
-            parameters=parameters))
+        assets = PagedResponse(
+            PagedEndpoint(
+                base_url=self.base_url,
+                client=self.client,
+                request=GET(
+                    uri=f'organizations/{self.organization_id}/assets'),
+                parameters=parameters))
         return [
             Asset(
                 assets_instance=self,
@@ -367,7 +370,8 @@ class LazyAssetsService(Assets):
         # /assets/:asset_id/metrics/:asset_metric_id/values
         if metric_label not in asset_type.metrics:
             raise AssertionError(
-                "Metric {} does not exist for type {}".format(metric_label, asset_type.label))
+                f"Metric {metric_label} does not exist for type {asset_type.label}"
+            )
         metric = asset_type.metrics[metric_label]
         api_body = {
             'effective_start_date': datetime_zulu_format(metric_start_date),
@@ -375,14 +379,15 @@ class LazyAssetsService(Assets):
             'value': metric_value,
         }
         self.execute(
-            POST(uri='/assets/{}/metrics/{}/values'.format(asset.id, metric.id)).body(api_body),
+            POST(uri=f'/assets/{asset.id}/metrics/{metric.id}/values').body(api_body),
             execute=True)
 
     def upsert_metric_value(self, asset, asset_type, metric_label,
                             metric_start_date, metric_end_date, metric_value):
         if metric_label not in asset_type.metrics:
-            raise AssertionError("Metric {} does not exist for type {}".format(
-                metric_label, asset_type.label))
+            raise AssertionError(
+                f"Metric {metric_label} does not exist for type {asset_type.label}"
+            )
         metric = asset_type.metrics[metric_label]
         # Fetch metric values
         self.fetch_and_set_metric_values_for_asset(asset)
@@ -397,7 +402,7 @@ class LazyAssetsService(Assets):
                     'value': metric_value
                 }
                 self.execute(
-                    PUT(uri='/assets/metrics/values/{}'.format(curr_metric_value.id)).body(api_body),
+                    PUT(uri=f'/assets/metrics/values/{curr_metric_value.id}').body(api_body),
                     execute=True)
         else:
             # Create new metric value
@@ -407,21 +412,22 @@ class LazyAssetsService(Assets):
                 'value': metric_value,
             }
             self.execute(
-                POST(uri='/assets/{}/metrics/{}/values'.format(
-                    asset.id, metric.id)).body(api_body),
+                POST(uri=f'/assets/{asset.id}/metrics/{metric.id}/values').body(api_body),
                 execute=True)
 
     def fetch_all_metric_values_for_asset(self, asset):
-        resp = PagedResponse(PagedEndpoint(base_url=self.base_url,
-                                           client=self.client,
-                                           request=GET(uri='assets/{}/metrics/values'.format(asset.id)),
-                                           parameters={}))
+        resp = PagedResponse(
+            PagedEndpoint(
+                base_url=self.base_url,
+                client=self.client,
+                request=GET(uri=f'assets/{asset.id}/metrics/values'),
+                parameters={}))
         return APIObjectCollection([AssetMetricValue(**rec) for rec in resp.records])
 
     def fetch_all_metric_values_for_asset_metric(self, asset, metric):
         resp = PagedResponse(PagedEndpoint(base_url=self.base_url,
                                            client=self.client,
-                                           request=GET(uri='assets/{}/metrics/{}/values'.format(asset.id, metric.id)),
+                                           request=GET(uri=f'assets/{asset.id}/metrics/{metric.id}/values'),
                                            parameters={}))
         return APIObjectCollection([AssetMetricValue(**rec) for rec in resp.records])
 
@@ -451,9 +457,8 @@ class LazyAssetsService(Assets):
         at = self.asset_type_with_label(type_name)
         assert at
         self.execute(
-            PUT(uri='/assets/types/{}'.format(at.id)).body({
-                'parent_id': parent_id
-            }), execute=True)
+            PUT(uri=f'/assets/types/{at.id}').body({'parent_id': parent_id}),
+            execute=True)
         at.parent_id = parent_id
         return at
 
@@ -485,7 +490,7 @@ class LazyAssetsService(Assets):
         )
         vrs = asset if asset is dict else vars(asset)
         api_body = {k: vrs[k] for k in fields if k in vrs}
-        uri = '/assets/{}'.format(asset.id)
+        uri = f'/assets/{asset.id}'
         self.execute(PUT(uri=uri).body(api_body), execute=True)
         return asset
 

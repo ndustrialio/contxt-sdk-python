@@ -32,10 +32,12 @@ class IOTService(Service):
 
         params = {}
 
-        response = PagedResponse(PagedEndpoint(base_url=self.base_url,
-                                               client=self.client,
-                                               request=GET(uri='facilities/{}/groupings'.format(facility_id)),
-                                               parameters=params))
+        response = PagedResponse(
+            PagedEndpoint(
+                base_url=self.base_url,
+                client=self.client,
+                request=GET(uri=f'facilities/{facility_id}/groupings'),
+                parameters=params))
 
         groupings = []
         for record in response:
@@ -52,7 +54,8 @@ class IOTService(Service):
 
         assert isinstance(grouping_id, str)
 
-        response = self.execute(GET(uri='groupings/{}'.format(grouping_id)), execute=True)
+        response = self.execute(
+            GET(uri=f'groupings/{grouping_id}'), execute=True)
 
         if response:
             return FieldGrouping(response,
@@ -80,9 +83,12 @@ class IOTService(Service):
             assert isinstance(end_time, datetime)
             params['timeEnd'] = str(Utils.get_epoch_time(end_time))
 
-        data = DataResponse(data=self.execute(GET(uri='outputs/{}/fields/{}/data'.format(output_id, field_human_name))
-                                              .params(params), execute=True),
-                            client=self.client)
+        data = DataResponse(
+            data=self.execute(
+                GET(uri=f'outputs/{output_id}/fields/{field_human_name}/data').
+                params(params),
+                execute=True),
+            client=self.client)
         return data
 
     def get_all_feeds(self, facility_id=None):
@@ -111,10 +117,12 @@ class IOTService(Service):
 
         params = {}
 
-        response = PagedResponse(PagedEndpoint(base_url=self.base_url,
-                                               client=self.client,
-                                               request=GET(uri='facilities/{}/fields'.format(facility_id)),
-                                               parameters=params))
+        response = PagedResponse(
+            PagedEndpoint(
+                base_url=self.base_url,
+                client=self.client,
+                request=GET(uri=f'facilities/{facility_id}/fields'),
+                parameters=params))
 
         fields = []
         if response:

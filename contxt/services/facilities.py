@@ -33,7 +33,7 @@ class FacilitiesService(Service):
 
         if organization_id:
             assert isinstance(organization_id, str)
-            uri = 'organizations/{}/facilities'.format(organization_id)
+            uri = f'organizations/{organization_id}/facilities'
 
         response = self.execute(GET(uri=uri))
 
@@ -47,7 +47,7 @@ class FacilitiesService(Service):
 
         assert isinstance(facility_id, int)
 
-        return Facility(self.execute(GET(uri='facilities/{}'.format(facility_id))))
+        return Facility(self.execute(GET(uri=f'facilities/{facility_id}')))
 
 
 class Facility(APIObject):

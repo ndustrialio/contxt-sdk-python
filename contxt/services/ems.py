@@ -43,8 +43,10 @@ class EMSService(Service):
             'exclude_account_charges': 'true' if exclude_account_charges else 'false'
         }
 
-        response = self.execute(GET(uri='facilities/{}/utility/spend/monthly'.format(facility_id)).params(params),
-                                execute=True)
+        response = self.execute(
+            GET(uri=f'facilities/{facility_id}/utility/spend/monthly').params(
+                params),
+            execute=True)
 
         return FacilityUtilitySpend(response)
 
@@ -61,7 +63,7 @@ class FacilityUtilitySpend(APIObject):
         self.spend_periods = APIObjectCollection(periods)
 
     def __str__(self):
-        print('Utility Spend -> Type: {} -- Currency: {}'.format(self.type, self.currency))
+        print(f'Utility Spend -> Type: {self.type} -- Currency: {self.currency}')
         return self.spend_periods.__str__()
 
     def get_dict(self):
@@ -85,4 +87,3 @@ class UtilitySpendPeriod(APIObject):
 
     def get_keys(self):
         return ['date', 'value', 'proforma_date']
-

@@ -19,7 +19,7 @@ class Utils(object):
         if var not in environ:
             if default is Utils.__marker:
                 raise EnvironmentError(
-                    'Variable {} is missing from the environment'.format(var))
+                    f'Variable {var} is missing from the environment')
             return default
         return environ[var]
 

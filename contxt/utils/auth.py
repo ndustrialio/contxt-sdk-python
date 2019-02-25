@@ -56,7 +56,7 @@ class BaseAuth:
         self.store_service_token(AUTH_AUDIENCE, token['access_token'], refresh_token)
 
     def authenticate_to_service(self, service_audience):
-        print("Getting new token for {}".format(service_audience))
+        print(f"Getting new token for {service_audience}")
         token = self.contxt_auth.get_new_token_for_client_id(service_audience)
         self.store_service_token(service_audience, token)
 
@@ -163,7 +163,7 @@ class CLIAuth(BaseAuth):
         elif args.auth_subcommand == "reset":
             self.reset()
         else:
-            print("Unrecognized subcommand {}".format(args.auth_subcommand))
+            print(f"Unrecognized subcommand {args.auth_subcommand}")
 
     def login(self):
 
