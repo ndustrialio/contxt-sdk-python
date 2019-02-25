@@ -1,10 +1,8 @@
-from contxt.utils import get_epoch_time
-
 from datetime import datetime
 
 from contxt.services import (GET, APIObject, APIObjectCollection, DataResponse,
-                             PagedEndpoint, PagedResponse, Service,
-                             get_epoch_time)
+                             PagedEndpoint, PagedResponse, Service)
+from contxt.utils import get_epoch_time
 
 CONFIGS_BY_ENVIRONMENT = {
     'production': {
