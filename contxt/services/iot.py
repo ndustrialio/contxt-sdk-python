@@ -2,7 +2,7 @@ from datetime import datetime
 
 from contxt.services import (GET, APIObject, APIObjectCollection, DataResponse,
                              PagedEndpoint, PagedResponse, Service)
-from contxt.utils import get_epoch_time
+from contxt.utils import Utils
 
 CONFIGS_BY_ENVIRONMENT = {
     'production': {
@@ -71,14 +71,14 @@ class IOTService(Service):
         assert isinstance(window, int)
         assert isinstance(limit, int)
 
-        params = {'timeStart': str(get_epoch_time(start_time)),
+        params = {'timeStart': str(Utils.get_epoch_time(start_time)),
                   'window': str(window),
                   'limit': limit
                   }
 
         if end_time:
             assert isinstance(end_time, datetime)
-            params['timeEnd'] = str(get_epoch_time(end_time))
+            params['timeEnd'] = str(Utils.get_epoch_time(end_time))
 
         data = DataResponse(data=self.execute(GET(uri='outputs/{}/fields/{}/data'.format(output_id, field_human_name))
                                               .params(params), execute=True),

@@ -8,7 +8,7 @@ import jwt
 from auth0.v3.authentication.get_token import GetToken
 
 from contxt.services.authentication import ContxtAuthService
-from contxt.utils import Configuration, get_epoch_time, make_logger
+from contxt.utils import Config, Utils, make_logger
 
 logger = make_logger(__name__)
 
@@ -109,7 +109,7 @@ class BaseAuth:
 
         token_expiration_epoch = decoded_token['exp']
 
-        if token_expiration_epoch <= get_epoch_time(datetime.now()):
+        if token_expiration_epoch <= Utils.get_epoch_time(datetime.now()):
             return True
 
         return False
@@ -144,8 +144,7 @@ class BaseAuth:
 class CLIAuth(BaseAuth):
 
     def __init__(self):
-        super().__init__(client_id=Configuration.CLI_CLIENT_ID,
-                         cli_mode=True)
+        super().__init__(client_id=Config.CLI_CLIENT_ID, cli_mode=True)
 
         if self.get_auth_token() is None:
             logger.info("Token doesn't exist or can't be refreshed. Please re-authenticate")
@@ -171,16 +170,16 @@ class CLIAuth(BaseAuth):
         username = input("Contxt Username: ")
         password = getpass("Contxt Password: ")
 
-        token = self.auth0.login(client_id=Configuration.CLI_CLIENT_ID,
-                                 client_secret=Configuration.CLI_CLIENT_SECRET,
+        token = self.auth0.login(client_id=Config.CLI_CLIENT_ID,
+                                 client_secret=Config.CLI_CLIENT_SECRET,
                                  username=username,
                                  password=password,
                                  scope='offline_access',
-                                 audience=Configuration.AUTH_AUDIENCE_ID,
+                                 audience=Config.AUTH_AUDIENCE_ID,
                                  grant_type='password',
                                  realm='')
 
-        self.store_service_token(Configuration.AUTH_AUDIENCE_ID,
+        self.store_service_token(Config.AUTH_AUDIENCE_ID,
                                  access_token=token['access_token'],
                                  refresh_token=token['refresh_token'])
 
