@@ -1,11 +1,10 @@
 import csv
 import json
-import os
 from datetime import datetime
+from pathlib import Path
 
-import dateutil.parser
 import pandas as pd
-from plotly import graph_objs as go
+from tqdm import tqdm
 
 from contxt.services.iot import IOTService
 from contxt.utils import make_logger
@@ -16,118 +15,116 @@ logger = make_logger(__name__)
 
 class IOT:
 
-    def __init__(self, auth_module):
-
-        self.auth = auth_module
-
-        self.iot_service = IOTService(self.auth)
+    def __init__(self, auth):
+        self.iot_service = IOTService(auth)
 
     def get_fields_for_grouping(self, grouping_id):
-
         return self.iot_service.get_single_grouping(grouping_id).fields
 
-    def get_data_for_fields(self, grouping_id, start_date, window, end_date=None, plot=False):
+    def get_field_data_for_grouping(self,
+                                    grouping_id,
+                                    start_date,
+                                    window,
+                                    end_date=None,
+                                    plot=False):
 
-        iso_start_date = dateutil.parser.parse(start_date)
+        def parse_date_str(date_str):
+            return datetime.strptime(date_str, "%Y-%m")
 
-        iso_end_date = None
-        if end_date:
-            iso_end_date = dateutil.parser.parse(end_date)
-
+        # Get grouping
         grouping = self.iot_service.get_single_grouping(grouping_id)
 
         if grouping is None:
-            logger.critical("Grouping Not Found")
+            logger.critical(f"Grouping {grouping_id} not found")
             return
 
-        # TODO: add flag to plot
-        # TODO: field_data is undefined, looks like we lost code in fixing 
-        # merge conflicts 
-        if plot:
+        # Get data for fields in grouping
+        self.iot_service.get_all_feeds(2)
+        logger.info(f"Pulling data for fields: \n{grouping.fields}")
+        iso_start_date = parse_date_str(start_date)
+        iso_end_date = parse_date_str(end_date) if end_date else None
+        field_data = [
+            self.iot_service.get_data_for_field(
+                output_id=f.output_id,
+                field_human_name=f.field_human_name,
+                start_time=iso_start_date,
+                window=window,
+                end_time=iso_end_date,
+                limit=5000) for f in tqdm(grouping.fields[:2])
+        ]
+
+        # Plot or dump to csv
+        if not plot:
             self.plot_field_data(grouping.fields, field_data)
         else:
-            export_directory = os.path.join("./", "export_{}_{}".format(grouping.slug,
-                                                                        datetime.now().strftime(
-                                                                            "%Y-%m-%d_%H:%M:%S")))
+            curr_time = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
+            export_path = Path(f"export_{grouping.slug}_{curr_time}")
+            self.export_field_data(
+                export_path=export_path,
+                field_list=grouping.fields,
+                data_list=field_data,
+                start_date=start_date,
+                end_date=end_date,
+                window=window)
 
-            self.write_field_data_to_csv(export_directory, grouping.fields, iso_start_date, iso_end_date, window)
+    def export_field_data(self,
+                          export_path,
+                          field_list,
+                          data_list,
+                          start_date,
+                          end_date,
+                          window):
+        logger.info(f"Writing files to {export_path}")
+        export_path.mkdir(parents=True)
 
-    def plot_field_data(self, fields, field_data):
-
-        def create_graph(field_name, field_data):
-            # TODO: need to parse datetime and value
-            df = pd.DataFrame.from_dict(field_data.records)
-            if not df.empty:
-                df = df.sort_values('event_time')
-            return go.Scatter(
-                x=df.get('event_time'),
-                y=df.get('value'),
-                name=field_name,
-                line=dict(shape='spline'))
-
-        # Create graphs
-        labeled_graphs = {
-            f.field_human_name: create_graph(f.field_human_name, d)
-            for f, d in zip(fields, field_data)
-        }
-
-        # Plot
-        data_vis = DataVisualizer(multi_plots=False)
-        data_vis.run(labeled_graphs, title='IOT Field Data')
-
-    def write_field_data_to_csv(self, export_dir, field_list, start_date, end_date=None, window=60):
-
-        parameter_meta = {
-            'field_list': [field.field_human_name for field in field_list],
-            'start_date': str(start_date),
-            'end_date': str(end_date) if end_date is not None else None,
-            'window': window
-        }
-        logger.info(f"Writing to files in directory: {export_dir}")
-        os.makedirs(export_dir, exist_ok=False)
-
-        logger.info(f"Parameters: start_date -> {start_date}, end_date -> {end_date}, window -> {window}")
-
-        logger.info("Pulling data for the following fields:")
-        print(field_list)
-
+        # Write data
         field_meta = {}
-        for field in field_list:
-            # TODO go get the data for this field and write to a CSV
-            logger.info(f"Pulling data for {field.field_human_name}")
-            data = self.iot_service.get_data_for_field(output_id=field.output_id,
-                                                       field_human_name=field.field_human_name,
-                                                       start_time=start_date,
-                                                       window=window,
-                                                       end_time=end_date,
-                                                       limit=5000)
-
-            filename = os.path.join(export_dir,
-                                    f"{field.field_descriptor}.csv")
-
+        for field, data in zip(field_list, data_list):
+            filepath = export_path / f"{field.field_descriptor}.csv"
             row_counter = 0
-            with open(filename, 'w') as f:
+            with filepath.open('w') as f:
                 writer = csv.DictWriter(f, fieldnames=["event_time", "value"])
                 writer.writeheader()
-
                 for record in data:
                     writer.writerow(record)
                     row_counter += 1
 
+            logger.info(f"Wrote {row_counter} rows to csv")
             field_meta[field.field_human_name] = {
+                'filename': str(filepath),
                 'row_count': row_counter,
-                'filename': filename,
-                'units': field.units,
-                'field_id': field.id
+                'field_id': field.id,
+                'units': field.units
             }
-
-            logger.info(f"Wrote {row_counter} rows to CSV")
 
         # Write metadata file
         meta = {
             'fields': field_meta,
-            'parameters': parameter_meta
+            'parameters': {
+                'field_list': [field.field_human_name for field in field_list],
+                'start_date': str(start_date),
+                'end_date': str(end_date) if end_date is not None else None,
+                'window': window
+            }
         }
 
-        with open(os.path.join(export_dir, 'meta.json'), 'w') as f:
+        meta_filepath = export_path / 'meta.json'
+        with meta_filepath.open('w') as f:
             json.dump(meta, f, indent=4)
+
+    def plot_field_data(self, fields, field_data):
+        data_vis = DataVisualizer(multi_plots=False)
+
+        # Create graphs
+        labeled_graphs = {
+            f.field_human_name: data_vis._create_scatter_plot(
+                df=pd.DataFrame.from_dict(d.records),
+                x_label='event_time',
+                y_label='value',
+                name=f.field_human_name,
+                line=dict(shape='spline'))
+            for f, d in zip(fields, field_data)
+        }
+
+        # Plot
+        data_vis.run(labeled_graphs, title='IOT Field Data')

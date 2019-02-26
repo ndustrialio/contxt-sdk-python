@@ -98,26 +98,20 @@ class EMS:
             self.write_monthly_utility_spend_to_file(organization_spend, to_csv)
 
     def plot_monthly_utility_spend(self, facility_name_to_spends):
-
-        def create_graph(facility_name, spend):
-            # TODO: need to parse datetime and value
-            df = spend.spend_periods.get_df()
-            if not df.emtpy:
-                df = df.sort_values('date')
-            return go.Scatter(
-                x=df.get('date'),
-                y=df.get('value'),
-                name=f"{facility_name}'s monthly utility spend",
-                line=dict(shape='spline'))
+        data_vis = DataVisualizer(multi_plots=False)
 
         # Create graphs
         labeled_graphs = {
-            f'Facility {f}': create_graph(f, s)
+            f'Facility {f}': data_vis._create_scatter_plot(
+                df=s.spend_periods.get_df(),
+                x_label='date',
+                y_label='value',
+                name=f"{f}'s monthly utility spend",
+                line=dict(shape='spline'))
             for f, s in facility_name_to_spends.items()
         }
 
         # Plot
-        data_vis = DataVisualizer(multi_plots=False)
         data_vis.run(labeled_graphs, title='Monthly Utility Spend')
 
     def write_monthly_utility_spend_to_file(self, organization_spend, filename):

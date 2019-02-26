@@ -1,4 +1,6 @@
-import logging
+import io
+import webbrowser
+from contextlib import redirect_stdout
 
 import dash
 import dash_core_components as dcc
@@ -13,19 +15,33 @@ logger = make_logger(__name__)
 
 class DataVisualizer:
 
-    def __init__(self, name='Contxt', multi_plots=True, quiet=False):
+    def __init__(self, name='Contxt', multi_plots=True, quiet=True):
         self.name = name
         self.multi_plots = multi_plots
+        self.quiet = quiet
 
-        if quiet:
-            flask_logger = make_logger('werkzeug')
-            flask_logger.setLevel(logging.ERROR)
+    @staticmethod
+    def _create_scatter_plot(df, x_label, y_label, **kwargs):
+        # Sort dataframe
+        if df.index.contains(x_label):
+            df = df.sort_values(x_label)
+        # Create scatter plot
+        return go.Scatter(
+            x=df.get(x_label),
+            y=df.get(y_label),
+            **kwargs)
 
-    def run(self, labeled_graphs, title=None, x_label=None, y_label=None):
+    def run(self,
+            labeled_graphs,
+            title=None,
+            x_label=None,
+            y_label=None,
+            host="127.0.0.1",
+            port="8050"):
         # Create dash app
         app = dash.Dash(__name__)
 
-        # Update dropdown with options
+        # Populate dropdown with options
         options = [dict(label=k, value=k) for k in labeled_graphs.keys()]
         value = options[0]['value'] if options else ''
         if self.multi_plots:
@@ -49,8 +65,18 @@ class DataVisualizer:
                 x_label=x_label,
                 y_label=y_label)
 
+        # Configure and open url
+        uri = f"http://{host}:{port}"
+        webbrowser.open(uri)
+
         # Run dash
-        app.run_server()
+        if self.quiet:
+            logger.info(f'Running data server at {uri}...')
+            # Sent all output to dummy file, to not clutter the command line
+            with redirect_stdout(io.StringIO()):
+                app.run_server(host=host, port=port)
+        else:
+            app.run_server(host=host, port=port)
 
     def get_app_layout(self, options, curr_value):
         return html.Div([
@@ -94,5 +120,4 @@ if __name__ == '__main__':
         name='pork vs beef',
         line=dict(shape='spline', width=3)
     )
-    # DashApp.run_static({'test1': s, 'test2': s})
     DataVisualizer().run({'test1': s, 'test2': s})
