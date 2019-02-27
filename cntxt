@@ -1,333 +1,41 @@
 #!/usr/bin/env python3
+# PYTHON_ARGCOMPLETE_OK
 
-from argparse import ArgumentParser
+from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
+
+import argcomplete
+
+from contxt.cli_bare.parsers import (AssetsParser, AuthParser, BusParser,
+                                     ContxtParser, EmsParser, IotParser)
 
 # Setup main parser
-parser = ArgumentParser(description="Contxt CLI")
+parser = ArgumentParser(description="Contxt CLI", formatter_class=ArgumentDefaultsHelpFormatter)
 subparsers = parser.add_subparsers(title="subcommands", dest="command")
 
+# Setup all subparsers
+parsers = {
+    'auth': AuthParser(subparsers),
+    'iot': IotParser(subparsers),
+    'ems': EmsParser(subparsers),
+    'assets': AssetsParser(subparsers),
+    'contxt': ContxtParser(subparsers),
+    'bus': BusParser(subparsers)
+}
 
-# Setup auth parser
-auth_parser = subparsers.add_parser("auth", help="Authentication")
-auth_subparsers = auth_parser.add_subparsers(
-    title="subcommands", dest="subcommand")
-
-auth_subparsers.add_parser("login", help="Login to contxt")
-
-auth_subparsers.add_parser(
-    "logout", help="Logout by clearing local token file")
-
-
-# Setup iot parser
-iot_parser = subparsers.add_parser("iot", help="IOT service")
-iot_subparsers = iot_parser.add_subparsers(
-    title="subcommands", dest="subcommand")
-
-groupings_parser = iot_subparsers.add_parser("groupings", help="Get groupings")
-groupings_parser.add_argument("facility_id", type=int, help="Facility id")
-
-feeds_parser = iot_subparsers.add_parser("feeds", help="Get feeds")
-feeds_parser.add_argument("--facility_id", "-f", type=int, help="Facility id")
-
-fields_parser = iot_subparsers.add_parser("fields", help="Get fields")
-fields_group = fields_parser.add_mutually_exclusive_group(required=True)
-fields_group.add_argument("--facility_id", "-f", type=int, help="Facility id")
-fields_group.add_argument("--grouping_id", "-g", help="Grouping id")
-
-field_data_parser = iot_subparsers.add_parser(
-    "field-data", help="Get field data")
-field_data_parser.add_argument("grouping_id", help="Grouping id")
-field_data_parser.add_argument("start_date", help="Data's start date")
-field_data_parser.add_argument(
-    "window",
-    type=int,
-    choices=[0, 60, 900, 3600],
-    help="Data windowing period")
-field_data_parser.add_argument("--end_date", "-e", help="Data's end date")
-field_data_parser.add_argument(
-    "--plot", "-p", action="store_true", help="Plot data")
-
-
-# Setup ems parser
-ems_parser = subparsers.add_parser("ems", help="EMS service")
-ems_subparsers = ems_parser.add_subparsers(
-    title="subcommands", dest="subcommand")
-
-spend_parser = ems_subparsers.add_parser("util-spend", help="Utility spend")
-spend_group = spend_parser.add_mutually_exclusive_group(required=True)
-spend_group.add_argument("--facility_id", "-f", type=int, help="Facility id")
-spend_group.add_argument("--org_id", "-g", help="Organization id")
-spend_group.add_argument("--org_name", "-n", help="Organization name")
-spend_parser.add_argument(
-    "interval", choices=['daily', 'monthly'], help="Time interval")
-spend_parser.add_argument(
-    "resource_type",
-    choices=['electric', 'gas', 'combined'],
-    help="Type of resource")
-spend_parser.add_argument("start_date", help="Start month (YYYY-MM)")
-spend_parser.add_argument("end_date", help="End month (YYYY-MM)")
-spend_parser.add_argument(
-    "--output", "-o", help="Filename to save data as csv")
-spend_parser.add_argument(
-    "--proforma",
-    "-p",
-    action="store_true",
-    help="Include proforma calculations")
-
-
-# Setup assets parser
-assets_parser = subparsers.add_parser("assets", help="Assets service")
-assets_subparsers = assets_parser.add_subparsers(
-    title="subcommands", dest="subcommand")
-
-# TODO: this can probably merged with assets assets
-fac_parser = assets_subparsers.add_parser(
-    "facilities", help="Get facility assets")
-fac_group = fac_parser.add_mutually_exclusive_group(required=True)
-fac_group.add_argument("--org_id", "-i", help="Organization id")
-fac_group.add_argument("--org_name", "-n", help="Organization name")
-
-types_parser = assets_subparsers.add_parser("types", help="Get asset types")
-types_group = types_parser.add_mutually_exclusive_group(required=True)
-types_group.add_argument("--org_id", "-i", help="Organization id")
-types_group.add_argument("--org_name", "-n", help="Organization name")
-types_parser.add_argument("--type_label", "-t", help="Asset type label")
-
-assets_parser2 = assets_subparsers.add_parser("assets", help="Get assets")
-assets_parser2.add_argument("type_label", help="Asset type label")
-assets_group = assets_parser2.add_mutually_exclusive_group(required=True)
-assets_group.add_argument("--org_id", "-i", help="Organization id")
-assets_group.add_argument("--org_name", "-n", help="Organization name")
-
-# TODO
-metric_attr_parser = assets_subparsers.add_parser(
-    "attr", help="Get asset attributes")
-
-# TODO
-attr_values_parser = assets_subparsers.add_parser(
-    "attr-vals", help="Get asset attribute values")
-
-# TODO
-metrics_parser = assets_subparsers.add_parser(
-    "metrics", help="Get asset metrics")
-
-metric_values_parser = assets_subparsers.add_parser(
-    "metric-vals", help="Get asset metric values")
-metrics_group1 = metric_values_parser.add_mutually_exclusive_group(required=True)
-metrics_group1.add_argument("--org_id", "-i", help="Organization id")
-metrics_group1.add_argument("--org_name", "-n", help="Organization name")
-metrics_group2 = metric_values_parser.add_mutually_exclusive_group(required=True)
-metrics_group2.add_argument("--asset_id", "-a", help="Asset id")
-metrics_group2.add_argument("--type_label", "-t", help="Asset type label")
-metric_values_parser.add_argument(
-    "--metric_label", "-m", required=True, help="Metric label")
-metric_values_parser.add_argument(
-    "--plot", "-p", action="store_true", help="Plot the values")
-
-
-# Setup contxt parser
-contxt_parser = subparsers.add_parser("contxt", help="Contxt service")
-contxt_subparsers = contxt_parser.add_subparsers(
-    title="subcommands", dest="subcommand")
-
-orgs_parser = contxt_subparsers.add_parser("orgs", help="Get organizations")
-
-create_org_parser = contxt_subparsers.add_parser(
-    "create-org", help="Create organization")
-create_org_parser.add_argument("org_name", help="Organization name")
-
-users_parser = contxt_subparsers.add_parser("users", help="Get users")
-users_group = users_parser.add_mutually_exclusive_group(required=True)
-users_group.add_argument("--org_id", "-i", help="Organization id")
-users_group.add_argument("--org_name", "-n", help="Organization name")
-
-add_user_parser = contxt_subparsers.add_parser(
-    "add-user", help="Add user to an organization")
-add_user_parser.add_argument("org_id", help="Organization id")
-add_user_parser.add_argument("user_id", help="User id")
-
-
-# Setup bus parser
-bus_parser = subparsers.add_parser("bus", help="Message bus service")
-bus_subparsers = bus_parser.add_subparsers(
-    title="subcommands", dest="subcommand")
-
-channel_parser = bus_subparsers.add_parser("channels", help="Get channels")
-channel_group = channel_parser.add_mutually_exclusive_group(required=True)
-channel_group.add_argument("--org_id", "-i", help="Organization id")
-channel_group.add_argument("--org_name", "-n", help="Organization name")
-channel_parser.add_argument("service_id", help="Service id")
+# Setup tab autocompletion
+argcomplete.autocomplete(parser)
 
 # Parse args
 args = parser.parse_args()
-print(args)
-
-# Create auth
-if True:
-    from contxt.utils.auth import CLIAuth
-    cli_auth = CLIAuth()
 
 # Launch the command
-if args.command == 'auth':
-    # TODO: make a standard Auth class
-    if args.subcommand == "login":
-        cli_auth.login()
-    elif args.subcommand == "logout":
-        cli_auth.reset()
-
-elif args.command == 'iot':
-    # from contxt.cli.iot import IOT
-    # iot = IOT(iot_parser)
-    # iot.parse_command(args)
-    from contxt.functions.iot import IOT
-    from contxt.services.iot import IOTService
-    iot = IOT(cli_auth)
-    iot_service = IOTService(cli_auth)
-
-    if args.subcommand == "groupings":
-        groupings = iot_service.get_all_groupings(args.facility_id)
-        print(groupings)
-    elif args.subcommand == "feeds":
-        feeds = iot_service.get_all_feeds(args.facility_id)
-        print(feeds)
-    elif args.subcommand == "fields":
-        if args.facility_id:
-            # Get fields for facility
-            fields = iot_service.get_all_fields(args.facility_id)
-            print(fields)
-        else:
-            # Get fields for grouping
-            fields = iot.get_fields_for_grouping(args.grouping_id)
-            print(fields)
-    elif args.subcommand == "field-data":
-        field_data = iot.get_data_for_fields(
-            grouping_id=args.grouping_id,
-            start_date=args.start_date,
-            window=args.start_date,
-            end_date=args.end_date,
-            plot=args.plot)
-
-elif args.command == 'ems':
-    # from contxt.cli.ems import EMS
-    # ems = EMS(ems_parser)
-    # ems.parse_command(args)
-    from contxt.functions.ems import EMS
-    ems = EMS(cli_auth)
-    if args.subcommand == "util-spend":
-        if args.facility_id:
-            # Facility spend
-            spend = ems.get_facility_spend(
-                facility_id=args.facility_id,
-                interval=args.interval,
-                resource_type=args.resource_type,
-                start_date=args.start_datek,
-                end_date=args.end_date,
-                proforma=args.proforma)
-            print(spend)
-        else:
-            # Organization spend
-            ems.get_organization_spend(
-                resource_type=args.resource_type,
-                interval=args.interval,
-                start_date=args.start_date,
-                end_date=args.end_date,
-                to_csv=args.output,
-                proforma=args.proforma,
-                organization_id=args.org_id,
-                organization_name=args.org_name)
-
-elif args.command == 'assets':
-    # from contxt.cli.assets import Assets
-    # assets = Assets(assets_parser)
-    # assets.parse_command(args)
-    if args.subcommand == "facilities":
-        from contxt.functions.facilities import Facilities
-        facs = Facilities(cli_auth)
-        facilities = facs.get_all_facilities(
-            organization_id=args.org_id,
-            organization_name=args.org_name)
-        print(facilities)
-    elif args.subcommand == "types":
-        from contxt.functions.assets import Assets
-        assets = Assets(cli_auth)
-        if not args.type_label:
-            # Print meta data about all types
-            types = assets.get_asset_types(
-                organization_id=args.org_id,
-                organization_name=args.org_name)
-            print(types)
-        else:
-            # Print detailed data about specified type
-            type_ = assets.get_asset_type_info(
-                type=args.type_label,
-                organization_id=args.org_id,
-                organization_name=args.org_name)
-            from contxt.cli.assets import Assets
-            Assets.print_asset_type_handler(type_)
-    elif args.subcommand == "assets":
-        from contxt.functions.assets import Assets
-        assets = Assets(cli_auth)
-        assets_of_type = assets.get_assets_for_type(
-            type=args.type_label,
-            organization_id=args.org_id,
-            organization_name=args.org_name)
-        print(assets_of_type)
-    elif args.subcommand == "metrics":
-        if args.asset_id:
-            from contxt.functions.assets import Assets
-            assets = Assets(cli_auth)
-            metric_values = assets.get_metric_values_for_asset(
-                metric=args.metric_label,
-                asset_id=args.asset_id,
-                organization_id=args.org_id,
-                organization_name=args.org_name)
-            from contxt.cli.assets import Assets
-            Assets.print_asset_metric_values(metric_values)
-        else:
-            from contxt.functions.assets import Assets
-            assets = Assets(cli_auth)
-            metric_values = assets.get_metric_values_for_asset_type(
-                asset_type_label=args.type_label,
-                metric_label=args.metric_label,
-                organization_id=args.org_id,
-                organization_name=args.org_name,
-                plot=args.plot)
-            print(metric_values)
-
-
-elif args.command == 'contxt':
-    # from contxt.cli.contxt import Contxt
-    # contxt = Contxt(contxt_parser)
-    # contxt.parse_command(args)
-    from contxt.services.contxt import ContxtService
-    from contxt.functions.organizations import Organizations
-    contxt_service = ContxtService(cli_auth)
-    orgs = Organizations(cli_auth)
-
-    if args.subcommand == "orgs":
-        orgs = contxt_service.get_organizations()
-        print(orgs)
-    elif args.subcommand == "create-org":
-        orgs.create_organization(args.org_name)
-    elif args.subcommand == "users":
-        orgs = Organizations(cli_auth)
-        users = orgs.get_organization_users(
-            organization_id=args.org_id,
-            organization_name=args.org_name)
-        print(users)
-    elif args.subcommand == "add-user":
-        contxt_service = ContxtService(cli_auth)
-        contxt_service.add_user_to_organization(
-            user_id=args.user_id, organization_id=args.org_id)
-
-elif args.command == 'bus':
-    # from contxt.cli.bus import Bus
-    # bus = Bus(bus_parser)
-    # bus.parse_command(args)
-    if args.subcommand == "channels":
-        from contxt.functions.bus import Bus
-        bus = Bus(cli_auth)
-        channels = bus.get_all_channels_for_service(
-            service_id=args.service_id,
-            organization_id=args.org_id,
-            organization_name=args.org_name)
+if args.command:
+    # Create auth
+    from contxt.utils.auth import CLIAuth
+    auth = CLIAuth()
+    # Parse
+    parsers[args.command].parse(args, auth)
+else:
+    # Print all subparser usages
+    for p in parsers.values():
+        p.parser.print_usage()
