@@ -7,7 +7,7 @@ class ArgParser:
         raise NotImplementedError
 
     def parse(self, args, auth):
-        if 'func' in args:
+        if "func" in args:
             args.func(args, auth)
 
 

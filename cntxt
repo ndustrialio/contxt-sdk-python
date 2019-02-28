@@ -3,39 +3,25 @@
 
 from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
 
-import argcomplete
+from argcomplete import autocomplete
 
-from contxt.cli_bare.parsers import (AssetsParser, AuthParser, BusParser,
-                                     ContxtParser, EmsParser, IotParser)
+from contxt.cli_bare.parsers import ArgParser
 
-# Setup main parser
-parser = ArgumentParser(description="Contxt CLI", formatter_class=ArgumentDefaultsHelpFormatter)
-subparsers = parser.add_subparsers(title="subcommands", dest="command")
+# Setup parser and our subparsers, which are subclassed from ArgParser
+root_parser = ArgumentParser(description="Contxt CLI", formatter_class=ArgumentDefaultsHelpFormatter)
+parsers = root_parser.add_subparsers(title="subcommands", dest="command")
+subparsers = [cls(parsers) for cls in ArgParser.__subclasses__()]
 
-# Setup all subparsers
-parsers = {
-    'auth': AuthParser(subparsers),
-    'iot': IotParser(subparsers),
-    'ems': EmsParser(subparsers),
-    'assets': AssetsParser(subparsers),
-    'contxt': ContxtParser(subparsers),
-    'bus': BusParser(subparsers)
-}
-
-# Setup tab autocompletion
-argcomplete.autocomplete(parser)
-
-# Parse args
-args = parser.parse_args()
+# Setup tab autocompletion and parse args
+autocomplete(root_parser)
+args = root_parser.parse_args()
 
 # Launch the command
-if args.command:
-    # Create auth
+if "func" in args:
     from contxt.utils.auth import CLIAuth
     auth = CLIAuth()
-    # Parse
-    parsers[args.command].parse(args, auth)
+    args.func(args, auth)
 else:
-    # Print all subparser usages
-    for p in parsers.values():
+    # Subcommand not specified, print all subparser usages as help
+    for p in subparsers:
         p.parser.print_usage()
