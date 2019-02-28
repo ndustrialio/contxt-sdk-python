@@ -160,7 +160,7 @@ class Assets:
                 }])
             return pd.DataFrame(filtered_dicts)
 
-        data_vis = DataVisualizer(multi_plots=True, quiet=False)
+        data_vis = DataVisualizer(multi_plots=True)
 
         # Create graphs
         labeled_graphs = {
