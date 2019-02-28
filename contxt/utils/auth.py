@@ -158,7 +158,19 @@ class CLIAuth(BaseAuth):
         else:
             print(f"Unrecognized subcommand {args.auth_subcommand}")
 
+    def _ask_question(self, question):
+        accepted_answers = ["y", "n"]
+        ans = input(f"{question} ({'/'.join(accepted_answers)}) ").lower()[0]
+        while ans not in accepted_answers:
+            ans = input(f"Please enter {' or '.join(accepted_answers)}. ")
+        return ans == "y"
+
     def login(self):
+
+        if self.get_auth_token() is not None:
+            proceed = self._ask_question("Already logged in. Do you wish to continue?")
+            if not proceed:
+                return
 
         username = input("Contxt Username: ")
         password = getpass("Contxt Password: ")
