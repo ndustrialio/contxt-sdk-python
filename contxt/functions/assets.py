@@ -1,5 +1,4 @@
 import pandas as pd
-from plotly import graph_objs as go
 from tqdm import tqdm
 
 from contxt.functions.organizations import get_organization_id_from_arguments
@@ -176,3 +175,9 @@ class Assets:
 
         # Plot
         data_vis.run(labeled_graphs)
+
+    def get_asset_tree(self, asset_id, organization_id=None, organization_name=None):
+        asset_service, organization_id = self._initialize_asset_service(
+            organization_id, organization_name)
+
+        return asset_service.get_asset_tree_by_id(asset_id).root
