@@ -124,6 +124,34 @@ class EmsParser(ArgParser):
         spend_parser.add_argument("-p", "--pro-forma", action="store_true", help="Include pro forma calculations")
         spend_parser.set_defaults(func=self._utility_spend)
 
+        # TODO: Usage
+        usage_parser = _subparsers.add_parser("util-usage", help="Utility usage")
+        usage_group = usage_parser.add_mutually_exclusive_group(required=True)
+        usage_group.add_argument("-f", "--facility-id", type=int, help="Facility id")
+        usage_group.add_argument("-g", "--org-id", help="Organization id")
+        usage_group.add_argument("-n", "--org-name", help="Organization name")
+        usage_parser.add_argument("interval", choices=["daily", "monthly"], help="Time interval")
+        usage_parser.add_argument("resource_type", choices=["electric", "gas", "combined"], help="Type of resource")
+        usage_parser.add_argument("start_date", help="Start month (YYYY-MM)")
+        usage_parser.add_argument("end_date", help="End month (YYYY-MM)")
+        usage_parser.add_argument("-o", "--output", help="Filename to save data (csv)")
+        usage_parser.add_argument("-p", "--pro-forma", action="store_true", help="Include pro forma calculations")
+        usage_parser.set_defaults(func=self._utility_usage)
+
+        # TODO: Metrics (do we want to duplicate this?)
+        metrics_parser = _subparsers.add_parser("util-metrics", help="Utility metrics")
+        metrics_group = metrics_parser.add_mutually_exclusive_group(required=True)
+        metrics_group.add_argument("-f", "--facility-id", type=int, help="Facility id")
+        metrics_group.add_argument("-g", "--org-id", help="Organization id")
+        metrics_group.add_argument("-n", "--org-name", help="Organization name")
+        metrics_parser.add_argument("interval", choices=["daily", "monthly"], help="Time interval")
+        metrics_parser.add_argument("resource_type", choices=["electric", "gas", "combined"], help="Type of resource")
+        metrics_parser.add_argument("start_date", help="Start month (YYYY-MM)")
+        metrics_parser.add_argument("end_date", help="End month (YYYY-MM)")
+        metrics_parser.add_argument("-o", "--output", help="Filename to save data (csv)")
+        metrics_parser.add_argument("-p", "--pro-forma", action="store_true", help="Include pro forma calculations")
+        metrics_parser.set_defaults(func=self._utility_metrics)
+
         return parser
 
     def _utility_spend(self, args, auth):
@@ -146,10 +174,16 @@ class EmsParser(ArgParser):
                 interval=args.interval,
                 start_date=args.start_date,
                 end_date=args.end_date,
-                to_csv=args.output,
+                filename=args.output,
                 pro_forma=args.pro_forma,
                 organization_id=args.org_id,
                 organization_name=args.org_name)
+
+    def _utility_usage(self, args, auth):
+        raise NotImplementedError
+
+    def _utility_metrics(self, args, auth):
+        raise NotImplementedError
 
 
 class AssetsParser(ArgParser):
@@ -215,7 +249,7 @@ class AssetsParser(ArgParser):
             organization_id=args.org_id,
             organization_name=args.org_name)
         print(facilities)
-    
+
     def _types(self, args, auth):
         from contxt.functions.assets import Assets
         assets = Assets(auth)
@@ -233,7 +267,7 @@ class AssetsParser(ArgParser):
                 organization_name=args.org_name)
             from contxt.cli.assets import Assets
             Assets.print_asset_type_handler(type_)
-    
+
     def _assets(self, args, auth):
         from contxt.functions.assets import Assets
         assets = Assets(auth)
@@ -245,13 +279,13 @@ class AssetsParser(ArgParser):
 
     def _attributes(self, args, auth):
         raise NotImplementedError
-    
+
     def _attribute_values(self, args, auth):
         raise NotImplementedError
 
     def _metrics(self, args, auth):
         raise NotImplementedError
-    
+
     def _metric_values(self, args, auth):
         if args.asset_id:
             from contxt.functions.assets import Assets
