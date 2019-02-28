@@ -29,6 +29,11 @@ In order to run the CLI, you must first install the dependencies (in the `requir
 pip install -r requirements.txt
 ```
 
+Additionally, there is support for command line tab completion via [argcomplete](https://github.com/kislyuk/argcomplete). To active, run the following and refresh your bash environment:
+```
+activate-global-python-argcomplete
+```
+
 ### Running the code
 
 #### Logging In
