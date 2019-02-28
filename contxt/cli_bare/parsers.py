@@ -242,6 +242,32 @@ class AssetsParser(ArgParser):
 
         return parser
 
+    # TODO: move these print utilities to the classes themselves
+    def _print_asset_type(self, asset_type):
+        from contxt.services import APIObjectCollection
+        print(f"Type Information:\n{asset_type}")
+        attrs = APIObjectCollection(list(asset_type.attributes.values()))
+        print(f"\nAttributes:\n{attrs}")
+        metrics = APIObjectCollection(list(asset_type.metrics.values()))
+        print(f"\nMetrics:\n{metrics}")
+
+    def _print_asset_metric_values(self, metric, metric_values):
+        from tabulate import tabulate
+
+        items = []
+        for val in metric_values:
+            values = val.get_values()
+            values.append(metric.label)
+            values.append(metric.units)
+            items.append(values)
+
+        if len(metric_values) > 0:
+            keys = metric_values[0].get_keys()
+            keys.extend(['label', 'units'])
+            print(tabulate(items, headers=keys))
+        else:
+            print(metric_values)
+
     def _facilities(self, args, auth):
         from contxt.functions.facilities import Facilities
         facs = Facilities(auth)
@@ -265,8 +291,7 @@ class AssetsParser(ArgParser):
                 type=args.type_label,
                 organization_id=args.org_id,
                 organization_name=args.org_name)
-            from contxt.cli.assets import Assets
-            Assets.print_asset_type_handler(type_)
+            self._print_asset_type(type_)
 
     def _assets(self, args, auth):
         from contxt.functions.assets import Assets
@@ -295,8 +320,7 @@ class AssetsParser(ArgParser):
                 asset_id=args.asset_id,
                 organization_id=args.org_id,
                 organization_name=args.org_name)
-            from contxt.cli.assets import Assets
-            Assets.print_asset_metric_values(metric_values)
+            self._print_asset_metric_values(*metric_values)
         else:
             from contxt.functions.assets import Assets
             assets = Assets(auth)
@@ -388,3 +412,4 @@ class BusParser(ArgParser):
             service_id=args.service_id,
             organization_id=args.org_id,
             organization_name=args.org_name)
+        print(channels)
