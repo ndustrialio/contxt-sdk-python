@@ -7,9 +7,7 @@ from contxt.services.facilities import FacilitiesService
 class Facilities:
 
     def __init__(self, auth_module):
-
         self.auth = auth_module
-
         self.facilities_service = FacilitiesService(self.auth)
         self.contxt_service = ContxtService(self.auth)
 

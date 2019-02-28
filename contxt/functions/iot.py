@@ -50,7 +50,7 @@ class IOT:
                 start_time=iso_start_date,
                 window=window,
                 end_time=iso_end_date,
-                limit=5000) for f in tqdm(grouping.fields[:2])
+                limit=5000) for f in tqdm(grouping.fields)
         ]
 
         # Plot or dump to csv

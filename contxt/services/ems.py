@@ -28,7 +28,7 @@ class EMSService(Service):
             access_token=auth_module.get_token_for_client(
                 self.env['audience']))
 
-    def get_monthly_utility_spend(self, facility_id, type, date_start, date_end, proforma=False, exclude_account_charges=False):
+    def get_monthly_utility_spend(self, facility_id, type, date_start, date_end, pro_forma=False, exclude_account_charges=False):
 
         assert isinstance(facility_id, int)
         assert isinstance(type, str)
@@ -39,7 +39,7 @@ class EMSService(Service):
             'type': type,
             'date_start': date_start.strftime('%Y-%m'),
             'date_end': date_end.strftime('%Y-%m'),
-            'proforma': 'true' if proforma else 'false',
+            'pro_forma': 'true' if pro_forma else 'false',
             'exclude_account_charges': 'true' if exclude_account_charges else 'false'
         }
 
@@ -80,10 +80,10 @@ class UtilitySpendPeriod(APIObject):
 
         self.date = spend_api_object['date']
         self.spend = spend_api_object['value']
-        self.proforma_date = spend_api_object['proforma_date']
+        self.pro_forma_date = spend_api_object['pro_forma_date']
 
     def get_values(self):
-        return [self.date, self.spend, self.proforma_date]
+        return [self.date, self.spend, self.pro_forma_date]
 
     def get_keys(self):
-        return ['date', 'value', 'proforma_date']
+        return ['date', 'value', 'pro_forma_date']

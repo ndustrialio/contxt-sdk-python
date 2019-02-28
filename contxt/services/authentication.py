@@ -7,9 +7,10 @@ CONFIGS_BY_ENVIRONMENT = {
     }
 }
 
+
 class ContxtAuthService(Service):
 
-    def __init__(self, access_token, environment):
+    def __init__(self, access_token, environment='production'):
 
         if environment not in CONFIGS_BY_ENVIRONMENT:
             raise Exception('Invalid environment specified')

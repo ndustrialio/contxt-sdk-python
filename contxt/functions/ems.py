@@ -27,7 +27,7 @@ class EMS:
         self.contxt_service = ContxtService(self.auth)
         self.facilities_service = FacilitiesService(self.auth)
 
-    def get_facility_spend(self, facility_id, interval, resource_type, start_date, end_date, proforma=False):
+    def get_facility_spend(self, facility_id, interval, resource_type, start_date, end_date, pro_forma=False):
 
         start_date = datetime.strptime(start_date, "%Y-%m")
         end_date = datetime.strptime(end_date, "%Y-%m")
@@ -42,7 +42,7 @@ class EMS:
                                                               type=resource_type,
                                                               date_start=start_date,
                                                               date_end=end_date,
-                                                              proforma=proforma)
+                                                              pro_forma=pro_forma)
 
         elif interval == 'daily':
             pass
@@ -50,7 +50,7 @@ class EMS:
         else:
             print("Invalid interval provided: {}. Must be 'monthly' or 'daily'")
 
-    def get_organization_spend(self, resource_type, interval, start_date, end_date, to_csv, proforma=False,
+    def get_organization_spend(self, resource_type, interval, start_date, end_date, filename, pro_forma=False,
                                organization_id=None, organization_name=None):
 
         start_date = datetime.strptime(start_date, "%Y-%m")
@@ -79,7 +79,7 @@ class EMS:
                                                                    type=resource_type,
                                                                    date_start=start_date,
                                                                    date_end=end_date,
-                                                                   proforma=proforma)
+                                                                   pro_forma=pro_forma)
             except UnauthorizedException as e:
                 logger.warning(f"Unauthorized for facility {facility.id}")
                 continue
@@ -95,7 +95,7 @@ class EMS:
         if False:
             self.plot_monthly_utility_spend(facility_name_to_spends)
         else:
-            self.write_monthly_utility_spend_to_file(organization_spend, to_csv)
+            self.write_monthly_utility_spend_to_file(organization_spend, filename)
 
     def plot_monthly_utility_spend(self, facility_name_to_spends):
         data_vis = DataVisualizer(multi_plots=False)

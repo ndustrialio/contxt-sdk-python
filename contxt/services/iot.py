@@ -30,39 +30,37 @@ class IOTService(Service):
 
         assert isinstance(facility_id, int)
 
-        params = {}
-
         response = PagedResponse(
             PagedEndpoint(
                 base_url=self.base_url,
                 client=self.client,
                 request=GET(uri=f'facilities/{facility_id}/groupings'),
-                parameters=params))
+                parameters={}))
 
-        groupings = []
-        for record in response:
-
-            groupings.append(FieldGrouping(record,
-                                           owner_obj=FieldGroupingOwner(record['Owner']),
-                                           category_obj=FieldCategory(record['FieldCategory']) if record['FieldCategory'] is not None else None,
-                                           field_obj_list=[Field(field) for field in record['Fields']]
-                                           ))
-
+        groupings = [
+            FieldGrouping(
+                record,
+                owner_obj=FieldGroupingOwner(record['Owner']),
+                category_obj=FieldCategory(record['FieldCategory'])
+                if record['FieldCategory'] is not None else None,
+                field_obj_list=[Field(field) for field in record['Fields']])
+            for record in response
+        ]
         return APIObjectCollection(groupings)
 
     def get_single_grouping(self, grouping_id):
 
         assert isinstance(grouping_id, str)
 
-        response = self.execute(
-            GET(uri=f'groupings/{grouping_id}'), execute=True)
+        response = self.execute(GET(uri=f'groupings/{grouping_id}'))
 
         if response:
-            return FieldGrouping(response,
-                                 owner_obj=FieldGroupingOwner(response['Owner']),
-                                 category_obj=FieldCategory(response['FieldCategory']) if response['FieldCategory'] is not None else None,
-                                 field_obj_list=[Field(field) for field in response['Fields']]
-                                 )
+            return FieldGrouping(
+                response,
+                owner_obj=FieldGroupingOwner(response['Owner']),
+                category_obj=FieldCategory(response['FieldCategory'])
+                if response['FieldCategory'] is not None else None,
+                field_obj_list=[Field(field) for field in response['Fields']])
         else:
             return None
 
@@ -74,64 +72,47 @@ class IOTService(Service):
         assert isinstance(window, int)
         assert isinstance(limit, int)
 
-        params = {'timeStart': str(Utils.get_epoch_time(start_time)),
-                  'window': str(window),
-                  'limit': limit
-                  }
+        params = {
+            'timeStart': str(Utils.get_epoch_time(start_time)),
+            'window': str(window),
+            'limit': limit
+        }
 
         if end_time:
             assert isinstance(end_time, datetime)
             params['timeEnd'] = str(Utils.get_epoch_time(end_time))
 
-        data = DataResponse(
+        return DataResponse(
             data=self.execute(
                 GET(uri=f'outputs/{output_id}/fields/{field_human_name}/data').
                 params(params),
                 execute=True),
             client=self.client)
-        return data
 
     def get_all_feeds(self, facility_id=None):
+        assert isinstance(facility_id, (type(None), int))
 
-        params = {}
-        if facility_id:
-            assert isinstance(facility_id, int)
-            params['facility_id'] = facility_id
+        params = {'facility_id': facility_id} if facility_id else {}
 
         print('Getting all feeds')
-        response = PagedResponse(PagedEndpoint(base_url=self.base_url,
-                                               client=self.client,
-                                               request=GET(uri='feeds'),
-                                               parameters=params))
+        response = PagedResponse(
+            PagedEndpoint(
+                base_url=self.base_url,
+                client=self.client,
+                request=GET(uri='feeds'),
+                parameters=params))
 
-        feeds = []
-        if response:
-            for record in response:
-                feeds.append(Feed(record))
-
-            return APIObjectCollection(feeds)
-        else:
-            return None
+        return APIObjectCollection([Feed(record) for record in response]) if response else None
 
     def get_all_fields(self, facility_id):
-
-        params = {}
-
         response = PagedResponse(
             PagedEndpoint(
                 base_url=self.base_url,
                 client=self.client,
                 request=GET(uri=f'facilities/{facility_id}/fields'),
-                parameters=params))
+                parameters={}))
 
-        fields = []
-        if response:
-            for record in response:
-                fields.append(Field(record))
-
-            return APIObjectCollection(fields)
-        else:
-            return None
+        return APIObjectCollection([Field(record) for record in response]) if response else None
 
 
 class FieldGrouping(APIObject):

@@ -312,7 +312,7 @@ class LazyAssetsService(Assets):
             return AssetNode(attributes=attr_values_by_label, children=children_nodes, meta=asset_dict,
                              type_label=asset_type.label)
 
-        asset_json = self.execute(GET(uri=f'assets/{asset_id}', execute=True))
+        asset_json = self.execute(GET(uri=f'assets/{asset_id}'))
         root = create_node(asset_json)
         asset_tree = AssetTree(root)
         return asset_tree
