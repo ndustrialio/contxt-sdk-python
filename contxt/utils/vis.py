@@ -1,5 +1,6 @@
 import io
 import webbrowser
+from collections import OrderedDict
 from contextlib import redirect_stdout
 
 import dash
@@ -23,8 +24,8 @@ class DataVisualizer:
     @staticmethod
     def _create_scatter_plot(df, x_label, y_label, **kwargs):
         # Sort dataframe
-        if df.index.contains(x_label):
-            df = df.sort_values(x_label)
+        if x_label in df.columns:
+            df = df.sort_values(x_label, ascending=True)
         # Create scatter plot
         return go.Scatter(
             x=df.get(x_label),
@@ -40,6 +41,9 @@ class DataVisualizer:
             port="8050"):
         # Create dash app
         app = dash.Dash(__name__)
+
+        # Sort the labeled graphs by label
+        labeled_graphs = OrderedDict(sorted(labeled_graphs.items()))
 
         # Populate dropdown with options
         options = [dict(label=k, value=k) for k in labeled_graphs.keys()]

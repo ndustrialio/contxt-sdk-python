@@ -148,10 +148,7 @@ class Assets:
 
     # TODO: fix this nested dictionary argument to something more elegant
     def plot_multi_asset_metrics(self, metric_labels_to_asset_labels_to_values):
-        def make_graph_label(metric_label, asset_label):
-            return f"{asset_label}'s {metric_label}"
-
-        def create_graph(metric_values, metric_label, asset_label):
+        def create_df(metric_values):
             filtered_dicts = []
             for mv in metric_values:
                 filtered_dicts.extend([{
@@ -161,22 +158,21 @@ class Assets:
                     'x': datetime_zulu_parse(mv.effective_end_date),
                     'y': float(mv.value)
                 }])
-            df = pd.DataFrame(filtered_dicts)
-            if not df.empty:
-                df = df.sort_values('x')
-            return go.Scatter(
-                x=df.get('x'),
-                y=df.get('y'),
-                name=make_graph_label(metric_label, asset_label),
-                line=dict(shape='spline'))
+            return pd.DataFrame(filtered_dicts)
+
+        data_vis = DataVisualizer(multi_plots=True, quiet=False)
 
         # Create graphs
         labeled_graphs = {
-            make_graph_label(m, a): create_graph(v, m, a)
+            f"{a}'s {m}": data_vis._create_scatter_plot(
+                df=create_df(v),
+                x_label='x',
+                y_label='y',
+                name=f"{a}'s {m}",
+                line=dict(shape='spline'))
             for m, d in metric_labels_to_asset_labels_to_values.items()
             for a, v in d.items()
         }
 
         # Plot
-        data_vis = DataVisualizer(multi_plots=True)
         data_vis.run(labeled_graphs)

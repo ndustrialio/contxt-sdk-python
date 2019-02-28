@@ -158,7 +158,7 @@ class EmsParser(ArgParser):
         from contxt.functions.ems import EMS
         ems = EMS(auth)
         if args.facility_id:
-            # Facility spend
+            # Get facility spend
             spend = ems.get_facility_spend(
                 facility_id=args.facility_id,
                 interval=args.interval,
@@ -168,7 +168,7 @@ class EmsParser(ArgParser):
                 pro_forma=args.pro_forma)
             print(spend)
         else:
-            # Organization spend
+            # Get organization spend
             ems.get_organization_spend(
                 resource_type=args.resource_type,
                 interval=args.interval,
@@ -236,7 +236,7 @@ class AssetsParser(ArgParser):
         metrics_group2 = metric_vals_parser.add_mutually_exclusive_group(required=True)
         metrics_group2.add_argument("-a", "--asset_id", help="Asset id")
         metrics_group2.add_argument("-t", "--type_label", help="Asset type label")
-        metric_vals_parser.add_argument("-m", "--metric_label", required=True, help="Metric label")
+        metric_vals_parser.add_argument("metric_label", nargs="+", help="Metric label")
         metric_vals_parser.add_argument("-p", "--plot", action="store_true", help="Plot the values")
         metric_vals_parser.set_defaults(func=self._metric_values)
 
@@ -280,13 +280,13 @@ class AssetsParser(ArgParser):
         from contxt.functions.assets import Assets
         assets = Assets(auth)
         if not args.type_label:
-            # Print meta data about all types
+            # Get all asset types
             types = assets.get_asset_types(
                 organization_id=args.org_id,
                 organization_name=args.org_name)
             print(types)
         else:
-            # Print detailed data about specified type
+            # Get single asset type
             type_ = assets.get_asset_type_info(
                 type=args.type_label,
                 organization_id=args.org_id,
@@ -313,24 +313,38 @@ class AssetsParser(ArgParser):
 
     def _metric_values(self, args, auth):
         if args.asset_id:
+            # Get metric values for single asset
             from contxt.functions.assets import Assets
             assets = Assets(auth)
-            metric_values = assets.get_metric_values_for_asset(
-                metric=args.metric_label,
-                asset_id=args.asset_id,
-                organization_id=args.org_id,
-                organization_name=args.org_name)
-            self._print_asset_metric_values(*metric_values)
+            metric_value_pairs = [
+                assets.get_metric_values_for_asset(
+                    metric=metric_label,
+                    asset_id=args.asset_id,
+                    organization_id=args.org_id,
+                    organization_name=args.org_name)
+                for metric_label in args.metric_label
+            ]
+            if args.plot:
+                raise NotImplementedError
+            else:
+                for pair in metric_value_pairs:
+                    self._print_asset_metric_values(*pair)
         else:
+            # Get metric values for all assets of the specified type(s)
             from contxt.functions.assets import Assets
             assets = Assets(auth)
-            metric_values = assets.get_metric_values_for_asset_type(
-                asset_type_label=args.type_label,
-                metric_label=args.metric_label,
-                organization_id=args.org_id,
-                organization_name=args.org_name,
-                plot=args.plot)
-            print(metric_values)
+            metric_values = {
+                metric_label: assets.get_metric_values_for_asset_type(
+                    asset_type_label=args.type_label,
+                    metric_label=metric_label,
+                    organization_id=args.org_id,
+                    organization_name=args.org_name)
+                for metric_label in args.metric_label
+            }
+            if args.plot:
+                assets.plot_multi_asset_metrics(metric_values)
+            else:
+                print(metric_values)
 
 
 class ContxtParser(ArgParser):
