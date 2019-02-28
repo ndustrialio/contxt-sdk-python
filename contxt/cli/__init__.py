@@ -5,6 +5,9 @@ from contxt.utils.auth import CLIAuth
 
 logger = make_logger(__name__)
 
+# TODO: contxt.cli files are not longer user, remove them
+logger.warning('Deprecating ContxtCLI class')
+
 
 class ContxtCLI:
 
