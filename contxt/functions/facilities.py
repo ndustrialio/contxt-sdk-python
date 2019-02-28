@@ -1,4 +1,3 @@
-
 from contxt.functions.organizations import get_organization_id_from_arguments
 from contxt.services.contxt import ContxtService
 from contxt.services.facilities import FacilitiesService
