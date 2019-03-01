@@ -145,7 +145,6 @@ class Asset:
 
     def attributes(self, force_fetch=False):
         if force_fetch or len(self.attribute_values) == 0:
-            print('Getting all attributes for asset {}'.format(self.label))
             attribute_values = self.assets_instance.get_attribute_values_for_asset(self, asset_type_obj=self.asset_type)
             # store as a map to self
             for item in attribute_values:

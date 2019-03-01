@@ -48,6 +48,24 @@ class EMSService(Service):
 
         return FacilityUtilitySpend(response)
 
+    def get_monthly_utility_usage(self, facility_id, type, date_start, date_end):
+
+        assert isinstance(facility_id, int)
+        assert isinstance(type, str)
+        assert isinstance(date_start, datetime)
+        assert isinstance(date_end, datetime)
+
+        params = {
+            'type': type,
+            'date_start': date_start.strftime('%Y-%m'),
+            'date_end': date_end.strftime('%Y-%m'),
+        }
+
+        response = self.execute(GET(uri='facilities/{}/utility/usage/monthly'.format(facility_id)).params(params),
+                                execute=True)
+
+        return FacilityUtilityUsage(response)
+
 
 class FacilityUtilitySpend(APIObject):
 
@@ -86,3 +104,42 @@ class UtilitySpendPeriod(APIObject):
     def get_keys(self):
         return ['date', 'value', 'proforma_date']
 
+
+class UtilityUsagePeriod(APIObject):
+
+    def __init__(self, spend_api_object, keys_to_ignore=None):
+        super().__init__(keys_to_ignore=keys_to_ignore)
+
+        self.date = spend_api_object['date']
+        self.value = spend_api_object['value']
+        #self.proforma_date = spend_api_object['proforma_date']
+
+    def get_values(self):
+        #return [self.date, self.value, self.proforma_date]
+        return [self.date, self.value]
+
+    def get_keys(self):
+        #return ['date', 'value', 'proforma_date']
+        return ['date', 'value']
+
+
+class FacilityUtilityUsage(APIObject):
+
+    def __init__(self, spend_api_object, keys_to_ignore=None):
+        super().__init__(keys_to_ignore=keys_to_ignore)
+
+        self.type = spend_api_object['type']
+        self.unit = spend_api_object['unit']
+
+        periods = [UtilityUsagePeriod(s) for s in spend_api_object['values']]
+        self.usage_periods = APIObjectCollection(periods)
+
+    def __str__(self):
+        print('Utility Usage -> Type: {} -- Units: {}'.format(self.type, self.unit))
+        return self.usage_periods.__str__()
+
+    def get_dict(self):
+        return {
+            **super().get_dict(),
+            'spend_periods': self.usage_periods.get_dicts()
+        }

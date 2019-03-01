@@ -19,7 +19,7 @@ class Assets:
 
         self.contxt_service = ContxtService(self.auth)
 
-    def _initialize_asset_service(self, organization_id=None, organization_name=None):
+    def initialize_asset_service(self, organization_id=None, organization_name=None):
         organization_id = get_organization_id_from_arguments(contxt_service=self.contxt_service,
                                                              organization_id=organization_id,
                                                              organization_name=organization_name)
@@ -34,13 +34,13 @@ class Assets:
 
     def get_asset_types(self, organization_id=None, organization_name=None):
 
-        asset_service, _ = self._initialize_asset_service(organization_id, organization_name)
+        asset_service, _ = self.initialize_asset_service(organization_id, organization_name)
 
         return APIObjectCollection(list(asset_service.types_by_label.values()))
 
     def get_asset_type_info(self, type, organization_id=None, organization_name=None):
 
-        asset_service, _ = self._initialize_asset_service(organization_id, organization_name)
+        asset_service, _ = self.initialize_asset_service(organization_id, organization_name)
 
         if type not in asset_service.types_by_label:
             logger.critical(f'Type not found: {type}')
@@ -54,7 +54,7 @@ class Assets:
 
     def get_assets_for_type(self, type, organization_id=None, organization_name=None):
 
-        asset_service, organization_id = self._initialize_asset_service(organization_id, organization_name)
+        asset_service, organization_id = self.initialize_asset_service(organization_id, organization_name)
 
         asset_type = self.get_asset_type_info(type, organization_id=organization_id)
 
@@ -62,13 +62,16 @@ class Assets:
 
         return APIObjectCollection(list(assets))
 
-    def get_metric_values_for_asset(self, metric, asset_id, organization_id=None, organization_name=None):
+    def get_metric_values_for_asset(self, metric, asset_id, organization_id=None, organization_name=None, asset_instance=None):
 
-        asset_service, organization_id = self._initialize_asset_service(organization_id, organization_name)
+        if asset_instance is None:
+            asset_service, _ = self.initialize_asset_service(organization_id, organization_name)
+        else:
+            asset_service = asset_instance
 
         asset_object = asset_service.fetch_asset_by_id(asset_id)
 
-        asset_service.load_type_metrics(asset_object.asset_type)
+        asset_service.load_type_full(asset_object.asset_type)
 
         if metric not in asset_object.asset_type.metrics:
             logger.critical("No such metric for asset type")
@@ -80,15 +83,31 @@ class Assets:
 
         return metric_object, metric_values
 
+    def get_asset_info(self, asset_id, organization_id=None, organization_name=None, asset_instance=None):
+
+        if asset_instance is None:
+            asset_service, _ = self.initialize_asset_service(organization_id, organization_name)
+        else:
+            asset_service = asset_instance
+
+        asset_object = asset_service.fetch_asset_by_id(asset_id)
+
+        asset_service.load_type_full(asset_object.asset_type)
+
+        return asset_object
+
     def get_metric_values_for_asset_type(self,
                                          metric_label,
                                          asset_type_label,
                                          organization_id=None,
                                          organization_name=None,
-                                         plot=False):
+                                         plot=False,
+                                         asset_instance=None):
 
-        asset_service, organization_id = self._initialize_asset_service(
-            organization_id, organization_name)
+        if asset_instance is None:
+            asset_service, _ = self.initialize_asset_service(organization_id, organization_name)
+        else:
+            asset_service = asset_instance
 
         asset_object = asset_service.fetch_asset_by_id(asset_type_label)
 
