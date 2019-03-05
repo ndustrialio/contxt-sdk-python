@@ -3,9 +3,9 @@ from tqdm import tqdm
 
 from contxt.functions.organizations import get_organization_id_from_arguments
 from contxt.services import APIObjectCollection
-from contxt.services.asset_framework import (LazyAssetsService,
-                                             datetime_zulu_parse)
 from contxt.services.contxt import ContxtService
+from contxt.services.legacy.asset_framework import (LazyAssetsService,
+                                                    datetime_zulu_parse)
 from contxt.utils import make_logger
 from contxt.utils.vis import DataVisualizer
 

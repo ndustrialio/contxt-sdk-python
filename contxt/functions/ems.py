@@ -7,10 +7,10 @@ from tqdm import tqdm
 
 from contxt.functions.organizations import find_organization_by_name
 from contxt.services import UnauthorizedException
-from contxt.services.asset_framework import datetime_zulu_parse
 from contxt.services.contxt import ContxtService
 from contxt.services.ems import EMSService
 from contxt.services.facilities import FacilitiesService
+from contxt.services.legacy.asset_framework import datetime_zulu_parse
 from contxt.utils import make_logger
 from contxt.utils.vis import DataVisualizer
 
