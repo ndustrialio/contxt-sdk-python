@@ -96,7 +96,8 @@ class IotParser(ArgParser):
     def _field_data(self, args, auth):
         from contxt.functions.iot import IOT
         iot = IOT(auth)
-        field_data = iot.get_field_data_for_grouping(
+        # TODO: may want to control dumping/plotting from here
+        iot.get_field_data_for_grouping(
             grouping_id=args.grouping_id,
             start_date=args.start_date,
             window=args.window,

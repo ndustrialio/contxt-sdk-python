@@ -1,13 +1,10 @@
-import json
 import logging
-from datetime import datetime
 from typing import Dict, List, Optional, Set, Tuple
 
 import pandas as pd
 import requests
 from jwt import decode
-from pytz import UTC
-from requests import PreparedRequest, Request, Response
+from requests import PreparedRequest, Response
 from requests.auth import AuthBase
 from requests.exceptions import HTTPError
 from tabulate import tabulate
