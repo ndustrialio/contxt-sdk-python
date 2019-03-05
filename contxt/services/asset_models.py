@@ -347,7 +347,7 @@ class AttributeValue(ApiObject):
 
 
 class Metric(ApiObject):
-    # TODO: need to fix global metric
+    # TODO: need to fix global metric for POST
     creatable_fields = [
         'label', 'description', 'organization_id', 'time_interval', 'units',
         'is_global'
