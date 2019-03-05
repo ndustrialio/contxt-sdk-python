@@ -143,32 +143,18 @@ class CLIAuth(BaseAuth):
             logger.info("Token doesn't exist or can't be refreshed. Please re-authenticate")
             self.login()
 
-    def setup_parser(self, arg_parser):
-        auth_subparser = arg_parser.add_subparsers(dest="auth_subcommand")
-
-        auth_subparser.add_parser("login")
-        auth_subparser.add_parser("reset")
-
-    def parse_command(self, args):
-
-        if args.auth_subcommand == "login":
-            self.login()
-        elif args.auth_subcommand == "reset":
-            self.reset()
-        else:
-            print(f"Unrecognized subcommand {args.auth_subcommand}")
-
-    def _ask_question(self, question):
+    def _query_user(self, question):
         accepted_answers = ["y", "n"]
-        ans = input(f"{question} ({'/'.join(accepted_answers)}) ").lower()[0]
+        ans = input(f"{question} ({'/'.join(accepted_answers)}) ").lower()[0:1]
         while ans not in accepted_answers:
-            ans = input(f"Please enter {' or '.join(accepted_answers)}. ")
+            ans = input(
+                f"Please enter {' or '.join(accepted_answers)}. ").lower()[0:1]
         return ans == "y"
 
     def login(self):
 
         if self.get_auth_token() is not None:
-            proceed = self._ask_question("Already logged in. Do you wish to continue?")
+            proceed = self._query_user("Already logged in. Do you wish to continue?")
             if not proceed:
                 return
 
