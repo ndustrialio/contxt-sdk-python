@@ -51,59 +51,63 @@ class AssetFramework(ApiService):
             auth: CLIAuth,
             organization_id: str = "02efa741-a96f-4124-a463-ae13a704b8fc",
             env: str = 'production',
-            load_all_types: bool = True,
+            load_types: bool = True,
+            types_to_fully_load: Optional[List[str]] = None,
     ):
         config = self._init_config(env)
         access_token = auth.get_token_for_client(config['audience'])
         super().__init__(config['base_url'], access_token)
-
         # TODO: handle multiple orgs
         self.organization_id = organization_id
-
-        # Optionally load asset types
         self.types_by_id = {}
         self.types_by_label = {}
 
-        if load_all_types:
+        # Cache asset types
+        if load_types:
+            full_types = types_to_fully_load or []
             for asset_type in self.get_asset_types(self.organization_id):
                 # if not asset_type.is_global:
-                self._cache_asset_type_with_attributes_and_metrics(asset_type)
-                # self._cache_asset_type(asset_type)
+                if asset_type.label in full_types or asset_type.normalized_label in full_types:
+                    self._cache_asset_type(asset_type)
+                    self._cache_attributes(asset_type)
+                    self._cache_metrics(asset_type)
+                else:
+                    self._cache_asset_type(asset_type)
 
-        # self._init_asset_type_with_attributes_and_metrics(
-        #     self.asset_type_with_label("Facility"))
         if self.types_by_id:
-            logger.info(f"Cached asset types {[at.label for at in self.types_by_id.values()]}")
+            logger.info(
+                f"Cached asset types {[at.label for at in self.types_by_id.values()]}"
+            )
 
     def _init_config(self, env: str, default=__marker):
         if env not in self.configs_by_env:
             if default is self.__marker:
-                raise KeyError(f"Invalid environment '{env}'. Expected one of {', '.join(self.configs_by_env.keys())}.")
+                raise KeyError(
+                    f"Invalid environment '{env}'. Expected one of {', '.join(self.configs_by_env.keys())}."
+                )
             return default
         return self.configs_by_env[env]
 
     def _cache_asset_type(self, asset_type: AssetType):
         # TODO: should we replace label with normalized label?
-        # Store type by id, label, and normalized label
         self.types_by_id[asset_type.id] = asset_type
         self.types_by_label[asset_type.label] = asset_type
         self.types_by_label[asset_type.normalized_label] = asset_type
 
-    def _cache_asset_type_with_attributes_and_metrics(self, asset_type):
-        # TODO: clean this up
-        self._cache_asset_type(asset_type)
-        self._init_attributes(asset_type)
-        self._init_metrics(asset_type)
+    def _uncache_asset_type(self, asset_type: AssetType):
+        self.types_by_id.pop(asset_type.id)
+        self.types_by_label.pop(asset_type.label)
+        self.types_by_label.pop(asset_type.normalized_label, None)
 
-    def _init_attributes(self, asset_type: AssetType):
+    def _cache_attributes(self, asset_type: AssetType):
         if not asset_type.attributes:
-            logger.info(f"Fetching attributes for type {asset_type.label}")
+            logger.info(f"Caching attributes for asset_type {asset_type.label}")
             attributes = self.get_attributes(asset_type.id)
             asset_type.set_attributes(attributes)
 
-    def _init_metrics(self, asset_type: AssetType):
+    def _cache_metrics(self, asset_type: AssetType):
         if not asset_type.metrics:
-            logger.info(f"Fetching metrics for type {asset_type.label}")
+            logger.info(f"Caching metrics for asset_type {asset_type.label}")
             metrics = self.get_metrics(asset_type.id)
             asset_type.set_metrics(metrics)
 
@@ -132,7 +136,7 @@ class AssetFramework(ApiService):
         return new_asset_type
 
     def get_asset_type(self, asset_type_id: str) -> AssetType:
-        logger.debug(f"Fetching asset types for asset_type_id {asset_type_id}")
+        logger.debug(f"Fetching asset_type {asset_type_id}")
         return AssetType(**self.get(f"assets/types/{asset_type_id}"))
 
     def update_asset_type(self, asset_type: AssetType) -> None:
@@ -143,15 +147,13 @@ class AssetFramework(ApiService):
     def delete_asset_type(self, asset_type: AssetType) -> None:
         logger.debug(f"Deleting asset_type {asset_type.id}")
         self.delete(f"assets/types/{asset_type.id}")
-        # Clear cache
-        self.types_by_id.pop(asset_type.id)
-        self.types_by_label.pop(asset_type.label)
-        self.types_by_label.pop(asset_type.normalized_label, None)
+        self._uncache_asset_type(asset_type)
 
     # Batch asset types
     def create_asset_types(self,
                            asset_types: List[AssetType]) -> List[AssetType]:
         # TODO: batch create
+        logger.debug(f"Creating {len(asset_types)} asset_types")
         return [
             self.create_asset_type(asset_type) for asset_type in asset_types
         ]
@@ -159,22 +161,24 @@ class AssetFramework(ApiService):
     def get_asset_types(self, organization_id: str = None) -> List[AssetType]:
         if organization_id:
             logger.debug(
-                f"Fetching asset types for organization_id {organization_id}")
+                f"Fetching asset_types for organization {organization_id}")
             return [
                 AssetType(**rec) for rec in self.get(
                     f"organizations/{organization_id}/assets/types")
             ]
         else:
-            logger.debug(f"Fetching asset types")
+            logger.debug(f"Fetching asset_types")
             return [AssetType(**rec) for rec in self.get(f"assets/types")]
 
     def update_asset_types(self, asset_types: List[AssetType]) -> None:
         # TODO: batch update
+        logger.debug(f"Updating {len(asset_types)} asset_types")
         for asset_type in asset_types:
             self.update_asset_type(asset_type)
 
     def delete_asset_types(self, asset_types: List[AssetType]) -> None:
         # TODO: batch delete
+        logger.debug(f"Deleting {len(asset_types)} asset_types")
         for asset_type in asset_types:
             self.delete_asset_type(asset_type)
 
@@ -200,6 +204,7 @@ class AssetFramework(ApiService):
     # Batch assets
     def create_assets(self, assets: List[Asset]) -> List[Asset]:
         # TODO: batch create
+        logger.debug(f"Creating {len(assets)} assets")
         return [self.create_asset(asset) for asset in assets]
 
     def get_assets(self) -> List[Asset]:
@@ -208,17 +213,20 @@ class AssetFramework(ApiService):
 
     def update_assets(self, assets: List[Asset]) -> None:
         # TODO: batch update
+        logger.debug(f"Updating {len(assets)} assets")
         for asset in assets:
             self.update_asset(asset)
 
     def delete_assets(self, assets: List[Asset]) -> None:
         # TODO: batch delete
+        logger.debug(f"Deleting {len(assets)} assets")
         for asset in assets:
             self.delete_asset(asset)
 
-    def get_assets_for_type(self, asset_type_id: str, organization_id: str) -> List[Asset]:
+    def get_assets_for_type(self, asset_type_id: str,
+                            organization_id: str) -> List[Asset]:
         logger.debug(
-            f"Fetching assets of asset_type_id {asset_type_id} and organization_id {organization_id}"
+            f"Fetching assets of asset_type {asset_type_id} for organization {organization_id}"
         )
         return [
             Asset(**rec) for rec in self.get(
@@ -230,7 +238,8 @@ class AssetFramework(ApiService):
     def create_attribute(self, attribute: Attribute) -> Attribute:
         data = attribute.post()
         logger.debug(f"Creating attribute with {data}")
-        return Attribute(**self.post(f"assets/types/{attribute.asset_type_id}/attributes", data=data))
+        return Attribute(**self.post(
+            f"assets/types/{attribute.asset_type_id}/attributes", data=data))
 
     def get_attribute(self, attribute_id: str) -> Attribute:
         logger.debug(f"Fetching attribute {attribute_id}")
@@ -238,7 +247,7 @@ class AssetFramework(ApiService):
 
     def update_attribute(self, attribute: Attribute) -> None:
         data = attribute.put()
-        logger.debug(f"Updating attribute with {data}")
+        logger.debug(f"Updating attribute {attribute.id} with {data}")
         self.put(f"assets/attributes/{attribute.id}", data=data)
 
     def delete_attribute(self, attribute: Attribute) -> None:
@@ -246,12 +255,14 @@ class AssetFramework(ApiService):
         self.delete(f"assets/attributes/{attribute.id}")
 
     # Batch attributes
-    def create_attributes(self, attributes: List[Attribute]) -> List[Attribute]:
+    def create_attributes(self,
+                          attributes: List[Attribute]) -> List[Attribute]:
         # TODO: batch create
+        logger.debug(f"Creating {len(attributes)} attributes")
         return [self.create_attribute(attribute) for attribute in attributes]
 
     def get_attributes(self, asset_type_id: str) -> List[Attribute]:
-        logger.debug(f"Fetching attributes for asset_type_id {asset_type_id}")
+        logger.debug(f"Fetching attributes for asset_type {asset_type_id}")
         return [
             Attribute(**rec)
             for rec in self.get(f"assets/types/{asset_type_id}/attributes")
@@ -259,22 +270,25 @@ class AssetFramework(ApiService):
 
     def update_attributes(self, attributes: List[Attribute]) -> None:
         # TODO: batch update
+        logger.debug(f"Updating {len(attributes)} attributes")
         for attribute in attributes:
             self.update_attribute(attribute)
 
     def delete_attributes(self, attributes: List[Attribute]) -> None:
         # TODO: batch delete
+        logger.debug(f"Deleting {len(attributes)} attributes")
         for attribute in attributes:
             self.delete_attribute(attribute)
 
     # Single attribute value
     # TODO: why do we need both ids?
-    def create_attribute_value(self, attribute_value: AttributeValue) -> AttributeValue:
+    def create_attribute_value(
+            self, attribute_value: AttributeValue) -> AttributeValue:
         data = attribute_value.post()
         logger.debug(f"Creating attribute_value with {data}")
         return AttributeValue(**self.post(
-            f"assets/{attribute_value.asset_id}/attributes/{attribute_value.asset_attribute_id}/values", data=data
-        ))
+            f"assets/{attribute_value.asset_id}/attributes/{attribute_value.asset_attribute_id}/values",
+            data=data))
 
     def get_attribute_value(self, attribute_value_id: str) -> AttributeValue:
         logger.debug(f"Fetching attribute_value {attribute_value_id}")
@@ -283,7 +297,7 @@ class AssetFramework(ApiService):
 
     def update_attribute_value(self, attribute_value: AttributeValue) -> None:
         data = attribute_value.put()
-        logger.debug(f"Updating attribute_value with {data}")
+        logger.debug(f"Updating attribute_value {attribute_value.id} with {data}")
         self.put(f"assets/attributes/values/{attribute_value.id}", data=data)
 
     def delete_attribute_value(self, attribute_value: AttributeValue) -> None:
@@ -291,24 +305,33 @@ class AssetFramework(ApiService):
         self.delete(f"assets/attributes/values/{attribute_value.id}")
 
     # Batch attribute values
-    def create_attribute_values(self, attribute_values: List[AttributeValue]) -> List[AttributeValue]:
+    def create_attribute_values(self, attribute_values: List[AttributeValue]
+                                ) -> List[AttributeValue]:
         # TODO: batch create
+        logger.debug(f"Creating {len(attribute_values)} attribute_values")
         return [
             self.create_attribute_value(attribute_value)
             for attribute_value in attribute_values
         ]
 
-    def get_attribute_values(self, asset_type_id: str) -> List[AttributeValue]:
-        logger.debug(f"Fetching attribute_values for asset_type_id {asset_type_id}")
-        raise NotImplementedError
+    def get_attribute_values(self, asset_id: str) -> List[AttributeValue]:
+        logger.debug(f"Fetching attribute_values for asset {asset_id}")
+        return [
+            AttributeValue(**rec)
+            for rec in self.get(f"assets/{asset_id}/attributes/values")
+        ]
 
-    def update_attribute_values(self, attribute_values: List[AttributeValue]) -> None:
+    def update_attribute_values(
+            self, attribute_values: List[AttributeValue]) -> None:
         # TODO: batch update
+        logger.debug(f"Updating {len(attribute_values)} attribute_values")
         for attribute_value in attribute_values:
             self.update_attribute_value(attribute_value)
 
-    def delete_attribute_values(self, attribute_values: List[AttributeValue]) -> None:
+    def delete_attribute_values(
+            self, attribute_values: List[AttributeValue]) -> None:
         # TODO: batch delete
+        logger.debug(f"Deleting {len(attribute_values)} attribute_values")
         for attribute_value in attribute_values:
             self.delete_attribute_value(attribute_value)
 
@@ -325,7 +348,7 @@ class AssetFramework(ApiService):
 
     def update_metric(self, metric: Metric) -> None:
         data = metric.put()
-        logger.debug(f"Updating metric with {data}")
+        logger.debug(f"Updating metric {metric.id} with {data}")
         self.put(f"assets/metrics/{metric.id}", data=data)
 
     def delete_metric(self, metric: Metric) -> None:
@@ -335,44 +358,65 @@ class AssetFramework(ApiService):
     # Batch metrics
     def create_metrics(self, metrics: List[Metric]) -> List[Metric]:
         # TODO: batch create
-        return [self.create_metric(metric) for metric in metrics]
+        logger.debug(f"Creating {len(metrics)} metrics")
+        return [self.create_metric(metric_value) for metric_value in metrics]
 
     def get_metrics(self, asset_type_id: str) -> List[Metric]:
-        logger.debug(f"Fetching metrics for asset_type_id {asset_type_id}")
-        return [Metric(**rec) for rec in self.get(f"assets/types/{asset_type_id}/metrics")]
+        logger.debug(f"Fetching metrics for asset_type {asset_type_id}")
+        return [
+            Metric(**rec)
+            for rec in self.get(f"assets/types/{asset_type_id}/metrics")
+        ]
 
     def update_metrics(self, metrics: List[Metric]) -> None:
         # TODO: batch update
+        logger.debug(f"Updating {len(metrics)} metrics")
         for metric in metrics:
             self.update_metric(metric)
 
     def delete_metrics(self, metrics: List[Metric]) -> None:
         # TODO: batch delete
+        logger.debug(f"Deleting {len(metrics)} metrics")
         for metric in metrics:
             self.delete_metric(metric)
 
     # Single metric value
+    # TODO: why both?
     def create_metric_value(self, metric_value: MetricValue) -> MetricValue:
-        raise NotImplementedError
+        data = metric_value.post()
+        logger.debug(f"Creating metric_value with {data}")
+        return MetricValue(**self.post(
+            f"assets/{metric_value.asset_id}/metrics/{metric_value.asset_metric_id}/metrics",
+            data=data))
 
     def get_metric_value(self, metric_value_id: str) -> MetricValue:
-        raise NotImplementedError
+        logger.debug(f"Fetching metric_value {metric_value_id}")
+        return MetricValue(**self.get(f"assets/metrics/{metric_value_id}"))
 
     def update_metric_value(self, metric_value: MetricValue) -> None:
-        raise NotImplementedError
+        data = metric_value.put()
+        logger.debug(f"Updating metric_value {metric_value.id} with {data}")
+        self.put(f"assets/metrics/values/{metric_value.id}", data=data)
 
     def delete_metric_value(self, metric_value: MetricValue) -> None:
-        raise NotImplementedError
+        logger.debug(f"Deleting metric {metric_value.id}")
+        self.delete(f"assets/metrics/values/{metric_value.id}")
 
     # Batch metric values
-    def create_metric_values(self, metric_values: List[MetricValue]) -> List[MetricValue]:
+    def create_metric_values(
+            self, metric_values: List[MetricValue]) -> List[MetricValue]:
         # TODO: batch create
-        return [self.create_metric_value(metric_value) for metric_value in metric_values]
+        logger.debug(f"Creating {len(metric_values)} metric_values")
+        return [
+            self.create_metric_value(metric_value)
+            for metric_value in metric_values
+        ]
 
-    def get_metric_values(self, asset_id: str, metric_id: str) -> List[MetricValue]:
+    def get_metric_values(self, asset_id: str,
+                          metric_id: str) -> List[MetricValue]:
         # TODO: why do we need to specify both?
         logger.debug(
-            f"Fetching metric values for asset_id {asset_id} and metric_id {metric_id}"
+            f"Fetching metric_values for asset {asset_id} and metric {metric_id}"
         )
         return [
             MetricValue(**rec, asset=rec['Asset']) for rec in self.get(
@@ -381,11 +425,13 @@ class AssetFramework(ApiService):
 
     def update_metric_values(self, metric_values: List[MetricValue]) -> None:
         # TODO: batch update
+        logger.debug(f"Updating {len(metric_values)} metric_values")
         for metric_value in metric_values:
             self.update_metric_value(metric_value)
 
     def delete_metric_values(self, metric_values: List[MetricValue]) -> None:
         # TODO: batch delete
+        logger.debug(f"Deleting {len(metric_values)} metric_values")
         for metric_value in metric_values:
             self.delete_metric_value(metric_value)
 
@@ -393,31 +439,13 @@ class AssetFramework(ApiService):
 if __name__ == "__main__":
     auth = CLIAuth()
     organization_id = "02efa741-a96f-4124-a463-ae13a704b8fc"
-    af = AssetFramework(auth, organization_id, env='staging', load_all_types=True)
-
-    # Create metric
-    asset_type = af.asset_type_with_label('UtilityMeter')
-    metric = Metric(
-        asset_type_id=asset_type.id,
-        label="test_label",
-        description="Test description",
-        organization_id="null",
-        # organization_id=af.organization_id,
-        time_interval=TimeIntervals.daily,
-        units="?",
-        is_global=True)
-    created_metric = af.create_metric(metric)
-
-    # Update metric
-    created_metric.label = "updated_label"
-    created_metric.description = "updated description"
-    created_metric.time_interval = TimeIntervals.weekly
-    created_metric.units = "??"
-    af.update_metric(created_metric)
-    updated_metric = af.get_metric(created_metric.id)
-
-    # Delete metric
-    af.delete_metric(updated_metric)
+    af = AssetFramework(
+        auth,
+        organization_id,
+        env='staging',
+        load_types=True,
+        types_to_fully_load=['UtilityMeter'])
+    asset_framework = af
 
     # Attribute value
     # asset = af.get_asset("8d9ec95e-c574-48f6-ae8d-2eb35e8ae97a")
