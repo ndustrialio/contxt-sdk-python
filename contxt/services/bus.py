@@ -1,4 +1,4 @@
-from contxt.services import Service, GET, POST, APIObject, APIObjectCollection
+from contxt.services import GET, POST, APIObject, APIObjectCollection, Service
 
 CONFIGS_BY_ENVIRONMENT = {
     'production': {
@@ -29,7 +29,7 @@ class MessageBusService(Service):
         assert isinstance(service_id, str)
         assert isinstance(organization_id, str)
 
-        req = GET(uri='organizations/{}/services/{}/channels'.format(organization_id, service_id))
+        req = GET(uri=f'organizations/{organization_id}/services/{service_id}/channels')
         req.api_version = None
 
         response = self.execute(req)

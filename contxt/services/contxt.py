@@ -50,14 +50,15 @@ class ContxtService(Service):
         assert isinstance(organization_id, str)
         assert isinstance(user_id, str)
 
-        return OrganizationUser(self.execute(POST(uri='organizations/{}/users/{}'.format(organization_id, user_id))))
+        return OrganizationUser(self.execute(POST(uri=f'organizations/{organization_id}/users/{user_id}')))
 
     def get_organization_users(self, organization_id):
 
         assert isinstance(organization_id, str)
 
         users = []
-        for user in self.execute(GET(uri='organizations/{}/users'.format(organization_id))):
+        for user in self.execute(
+                GET(uri=f'organizations/{organization_id}/users')):
             users.append(User(user))
         return APIObjectCollection(users)
 

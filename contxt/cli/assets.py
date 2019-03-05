@@ -1,17 +1,8 @@
-import pandas as pd
 from tabulate import tabulate
-from tqdm import tqdm
 
 from contxt.cli import ContxtCLI
-from contxt.functions.organizations import (OrganizationArgumentException,
-                                            check_required_organization_args,
-                                            get_organization_id_from_arguments)
 from contxt.services import APIObjectCollection
-from contxt.services.asset_framework import LazyAssetsService
-from contxt.services.contxt import ContxtService
-from contxt.services.facilities import FacilitiesService
 from contxt.utils import make_logger
-from contxt.utils.vis import run_plotly
 
 logger = make_logger(__name__)
 
@@ -241,8 +232,7 @@ COMMANDS = {
 class Assets(ContxtCLI):
 
     def __init__(self, arg_parser):
-
-        super(Assets, self).__init__(arg_parser, COMMANDS)
+        super().__init__(arg_parser, COMMANDS)
 
     @staticmethod
     def print_asset_type_handler(type_object):

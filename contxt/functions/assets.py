@@ -3,10 +3,11 @@ from tqdm import tqdm
 
 from contxt.functions.organizations import get_organization_id_from_arguments
 from contxt.services import APIObjectCollection
-from contxt.services.asset_framework import LazyAssetsService
+from contxt.services.asset_framework import (LazyAssetsService,
+                                             datetime_zulu_parse)
 from contxt.services.contxt import ContxtService
 from contxt.utils import make_logger
-from contxt.utils.vis import run_plotly
+from contxt.utils.vis import DataVisualizer
 
 logger = make_logger(__name__)
 
@@ -81,8 +82,8 @@ class Assets:
         return metric_object, metric_values
 
     def get_metric_values_for_asset_type(self,
-                                         metric_label,
                                          asset_type_label,
+                                         metric_label,
                                          organization_id=None,
                                          organization_name=None,
                                          plot=False):
@@ -90,16 +91,12 @@ class Assets:
         asset_service, organization_id = self._initialize_asset_service(
             organization_id, organization_name)
 
-        asset_object = asset_service.fetch_asset_by_id(asset_type_label)
-
-        asset_service.load_type_metrics(asset_object.asset_type)
-
         # Validate and get asset type name
         if asset_type_label not in asset_service.types_by_label:
             logger.critical(f"Type not found: {asset_type_label}")
             return
 
-        type_object = asset_service.types_by_label[asset_type_label]
+        type_object = asset_service.asset_type_with_label(asset_type_label)
 
         # Validate and get metric name
         asset_service.load_type_metrics(type_object)
@@ -122,28 +119,65 @@ class Assets:
         }
 
         if plot:
-            self.plot_asset_metrics(asset_label_to_metric_values, metric_label)
+            self.plot_multi_asset_metrics({metric_label: asset_label_to_metric_values})
 
         return asset_label_to_metric_values
 
-    def plot_asset_metrics(self, asset_label_to_metric_values, metric_label):
-        def make_title(asset_label):
-            return '{} for {}'.format(metric_label, asset_label)
+    def compare_metric_values_for_asset_type(self,
+                                             asset_type_label,
+                                             metric_labels,
+                                             organization_id=None,
+                                             organization_name=None,
+                                             plot=False):
+        metric_labels_to_asset_labels_to_values = {}
+        # TODO: this reloads the same assets service on each call
+        for metric_label in metric_labels:
+            metric_labels_to_asset_labels_to_values[
+                metric_label] = self.get_metric_values_for_asset_type(
+                    asset_type_label=asset_type_label,
+                    metric_label=metric_label,
+                    organization_id=organization_id,
+                    organization_name=organization_name,
+                    plot=False)
 
+        if plot:
+            self.plot_multi_asset_metrics(metric_labels_to_asset_labels_to_values)
+
+        return metric_labels_to_asset_labels_to_values
+
+    # TODO: fix this nested dictionary argument to something more elegant
+    def plot_multi_asset_metrics(self, metric_labels_to_asset_labels_to_values):
         def create_df(metric_values):
             filtered_dicts = []
             for mv in metric_values:
                 filtered_dicts.extend([{
-                    'x': mv.effective_start_date,
-                    'y': mv.value
+                    'x': datetime_zulu_parse(mv.effective_start_date),
+                    'y': float(mv.value)
                 }, {
-                    'x': mv.effective_end_date,
-                    'y': mv.value
+                    'x': datetime_zulu_parse(mv.effective_end_date),
+                    'y': float(mv.value)
                 }])
             return pd.DataFrame(filtered_dicts)
 
-        title_to_df = {
-            make_title(k): create_df(v)
-            for k, v in asset_label_to_metric_values.items()
+        data_vis = DataVisualizer(multi_plots=True)
+
+        # Create graphs
+        labeled_graphs = {
+            f"{a}'s {m}": data_vis._create_scatter_plot(
+                df=create_df(v),
+                x_label='x',
+                y_label='y',
+                name=f"{a}'s {m}",
+                line=dict(shape='spline'))
+            for m, d in metric_labels_to_asset_labels_to_values.items()
+            for a, v in d.items()
         }
-        run_plotly(title_to_df, x_label='x', y_label='y')
+
+        # Plot
+        data_vis.run(labeled_graphs)
+
+    def get_asset_tree(self, asset_id, organization_id=None, organization_name=None):
+        asset_service, organization_id = self._initialize_asset_service(
+            organization_id, organization_name)
+
+        return asset_service.get_asset_tree_by_id(asset_id).root

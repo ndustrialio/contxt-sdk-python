@@ -1,9 +1,12 @@
 from importlib import import_module
 
-from contxt.utils.auth import CLIAuth
 from contxt.utils import make_logger
+from contxt.utils.auth import CLIAuth
 
 logger = make_logger(__name__)
+
+# TODO: contxt.cli files are not longer user, remove them
+logger.warning('Deprecating ContxtCLI class')
 
 
 class ContxtCLI:
@@ -48,17 +51,19 @@ class ContxtCLI:
                 for arg_dict in func['args']:
 
                     if arg_dict['type'] == bool:
-                        func_cmd_parser.add_argument("--{}".format(arg_dict['arg']),
-                                                     action="store_true",
-                                                     help=arg_dict['help'])
+                        func_cmd_parser.add_argument(
+                            f"--{arg_dict['arg']}",
+                            action="store_true",
+                            help=arg_dict['help'])
                     else:
-                        func_cmd_parser.add_argument("--{}".format(arg_dict['arg']),
-                                                     required=arg_dict['required'],
-                                                     dest=arg_dict['arg'],
-                                                     choices=arg_dict[
-                                                         'valid_values'] if 'valid_values' in arg_dict else None,
-                                                     type=arg_dict['type'],
-                                                     help=arg_dict['help'])
+                        func_cmd_parser.add_argument(
+                            f"--{arg_dict['arg']}",
+                            required=arg_dict['required'],
+                            dest=arg_dict['arg'],
+                            choices=arg_dict['valid_values']
+                            if 'valid_values' in arg_dict else None,
+                            type=arg_dict['type'],
+                            help=arg_dict['help'])
 
         return function_call_map
 
