@@ -7,7 +7,7 @@ from typing import Dict, List, Optional, Set, Tuple, Union
 from inflect import engine
 from pytz import UTC
 
-from contxt.services.api_client import ApiObject
+from contxt.services.api import ApiObject
 from contxt.utils import make_logger
 
 p = engine()

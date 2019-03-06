@@ -11,15 +11,10 @@ from tabulate import tabulate
 
 from contxt.utils import make_logger
 
-# from contxt.utils.auth import CLIAuth
-
 logger = make_logger(__name__)
 logger.setLevel(logging.DEBUG)
 
 API_VERSION = 'v1'
-
-
-
 
 
 class RequestAuth(AuthBase):

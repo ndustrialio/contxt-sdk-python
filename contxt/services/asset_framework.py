@@ -1,7 +1,7 @@
 import logging
 from typing import Dict, List, Optional, Set, Tuple
 
-from contxt.services.api_client import ApiObject, ApiService
+from contxt.services.api import ApiObject, ApiService
 from contxt.services.asset_models import (Asset, AssetType, Attribute,
                                           AttributeValue, DataTypes, Metric,
                                           MetricValue, TimeIntervals)
