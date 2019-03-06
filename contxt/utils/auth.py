@@ -6,7 +6,7 @@ from pathlib import Path
 import jwt
 from auth0.v3.authentication.get_token import GetToken
 
-from contxt.services.authentication import ContxtAuthService
+from contxt.services.auth import ContxtAuthService
 from contxt.utils import Config, Utils, make_logger
 
 logger = make_logger(__name__)

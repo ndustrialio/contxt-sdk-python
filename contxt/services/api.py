@@ -56,9 +56,8 @@ class ApiService:
 
     def _log_response(self, response, *args, **kwargs):
         url = f"{response.url}/{response.request.body or ''}"
-        logger.debug(
-            f"Called {response.request.method} {url} ({response.elapsed.total_seconds()} s)"
-        )
+        t = response.elapsed.total_seconds()
+        logger.debug(f"Called {response.request.method} {url} ({t} s)")
 
     def get_url(self, uri: str) -> str:
         return f"{self.base_url}/{uri}"

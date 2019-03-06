@@ -1,3 +1,5 @@
+from typing import Dict, List, Optional, Set, Tuple, Union
+
 from contxt.services.asset_framework import AssetFramework
 from contxt.services.asset_models import (Asset, AssetType, Attribute,
                                           AttributeValue, DataTypes, Metric,
@@ -11,7 +13,7 @@ logger = make_logger(__name__)
 # TODO: methods for creating assets, attribute_values, metric_values
 class AssetSchema:
 
-    def __init__(self, name, asset_types, assets=None):
+    def __init__(self, name, asset_types: List[AssetType], assets: Optional[List[Asset]] = None):
         self.name = name
         self.asset_types = asset_types
         self.assets = assets

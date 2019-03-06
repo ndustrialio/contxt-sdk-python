@@ -156,7 +156,7 @@ class AssetFramework(ApiService):
             self.create_asset_type(asset_type) for asset_type in asset_types
         ]
 
-    def get_asset_types(self, organization_id: str = None) -> List[AssetType]:
+    def get_asset_types(self, organization_id: Optional[str] = None) -> List[AssetType]:
         if organization_id:
             logger.debug(
                 f"Fetching asset_types for organization {organization_id}")
@@ -209,6 +209,21 @@ class AssetFramework(ApiService):
         logger.debug(f"Fetching assets")
         return [Asset(**rec) for rec in self.get("assets")]
 
+    def get_assets_for_organization(
+            self,
+            organization_id: str,
+            asset_type_id: Optional[str] = None,
+    ) -> List[Asset]:
+        # BUG: this endpoint returns globals when type_id is None
+        logger.debug(
+            f"Fetching assets for organization {organization_id} and asset_type {asset_type_id}"
+        )
+        return [
+            Asset(**rec) for rec in self.get(
+                f"organizations/{organization_id}/assets",
+                params={"asset_type_id": asset_type_id})
+        ]
+
     def update_assets(self, assets: List[Asset]) -> None:
         # TODO: batch update
         logger.debug(f"Updating {len(assets)} assets")
@@ -220,17 +235,6 @@ class AssetFramework(ApiService):
         logger.debug(f"Deleting {len(assets)} assets")
         for asset in assets:
             self.delete_asset(asset)
-
-    def get_assets_for_type(self, asset_type_id: str,
-                            organization_id: str) -> List[Asset]:
-        logger.debug(
-            f"Fetching assets of asset_type {asset_type_id} for organization {organization_id}"
-        )
-        return [
-            Asset(**rec) for rec in self.get(
-                f"/organizations/{organization_id}/assets",
-                params={"asset_type_id": asset_type_id})
-        ]
 
     # Single attribute
     def create_attribute(self, attribute: Attribute) -> Attribute:
@@ -279,9 +283,9 @@ class AssetFramework(ApiService):
             self.delete_attribute(attribute)
 
     # Single attribute value
-    # TODO: why do we need both ids?
     def create_attribute_value(
             self, attribute_value: AttributeValue) -> AttributeValue:
+        # TODO: why do we need both ids?
         data = attribute_value.post()
         logger.debug(f"Creating attribute_value with {data}")
         return AttributeValue(**self.post(
@@ -313,6 +317,10 @@ class AssetFramework(ApiService):
         ]
 
     def get_attribute_values(self, asset_id: str) -> List[AttributeValue]:
+        # TODO: can pass attribute label
+        # TODO: clean this up
+        # https://contxt.readme.io/v1.0/reference#get-effective-values-by-asset-id
+        # https://contxt.readme.io/v1.0/reference#get-values-by-attribute-id
         logger.debug(f"Fetching attribute_values for asset {asset_id}")
         return [
             AttributeValue(**rec)
@@ -379,8 +387,8 @@ class AssetFramework(ApiService):
             self.delete_metric(metric)
 
     # Single metric value
-    # TODO: why both?
     def create_metric_value(self, metric_value: MetricValue) -> MetricValue:
+        # TODO: why do we need both ids?
         data = metric_value.post()
         logger.debug(f"Creating metric_value with {data}")
         return MetricValue(**self.post(
@@ -412,7 +420,7 @@ class AssetFramework(ApiService):
 
     def get_metric_values(self, asset_id: str,
                           metric_id: str) -> List[MetricValue]:
-        # TODO: why do we need to specify both?
+        # TODO: why do we need both ids?
         logger.debug(
             f"Fetching metric_values for asset {asset_id} and metric {metric_id}"
         )
