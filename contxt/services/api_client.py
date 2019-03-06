@@ -61,11 +61,10 @@ class ApiService:
         }
 
     def _log_response(self, response, *args, **kwargs):
-        url = f"{response.url}/{response.request.body}" if response.request.body else response.url
-        logger.debug(f"Called {response.request.method} {url} ({response.elapsed.total_seconds()} s)")
-
-    def _is_paged(self, response_json) -> bool:
-        return "_metadata" in response_json
+        url = f"{response.url}/{response.request.body or ''}"
+        logger.debug(
+            f"Called {response.request.method} {url} ({response.elapsed.total_seconds()} s)"
+        )
 
     def get_url(self, uri: str) -> str:
         return f"{self.base_url}/{uri}"
@@ -75,15 +74,17 @@ class ApiService:
         decoded_token = decode(self.client.access_token, verify=False)
         return decoded_token['sub']
 
-    def get(self, uri, params: Optional[Dict[str, str]] = None):
+    def get(self, uri, params: Optional[Dict[str, str]] = None, records_only=True):
         response = requests.get(
             url=self.get_url(uri), params=params, **self._request_kwargs())
         response_json = self.process_response(response)
 
-        # Check for paged response
-        if self._is_paged(response_json):
-            response_json = response_json["records"]
+        # Return just records, if requested and available
+        records = response_json.get("records")
+        if records_only and records is not None:
+            return records
 
+        # Return entire response
         return response_json
 
     def post(self, uri: str, data: Optional[dict] = None, json: Optional[dict] = None):
@@ -113,7 +114,7 @@ class ApiService:
             # Catch the error, to log the response's message, and reraise
             # Try to decode the response as json, else fall back to raw text
             response_json = self.get_json(response)
-            msg = response_json.get('message', None) or response_json or response.text
+            msg = response_json.get('message') or response_json or response.text
             logger.error(f"HTTP Error: {response.reason} - {msg}")
             raise
 
