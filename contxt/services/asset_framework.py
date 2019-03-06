@@ -59,8 +59,8 @@ class AssetFramework(ApiService):
         super().__init__(config['base_url'], access_token)
         # TODO: handle multiple orgs
         self.organization_id = organization_id
+        self.types = {}
         self.types_by_id = {}
-        self.types_by_label = {}
 
         # Cache asset types
         if load_types:
@@ -91,25 +91,23 @@ class AssetFramework(ApiService):
     def _cache_asset_type(self, asset_type: AssetType):
         # TODO: should we replace label with normalized label?
         self.types_by_id[asset_type.id] = asset_type
-        self.types_by_label[asset_type.label] = asset_type
-        self.types_by_label[asset_type.normalized_label] = asset_type
+        self.types[asset_type.label] = asset_type
+        self.types[asset_type.normalized_label] = asset_type
 
     def _uncache_asset_type(self, asset_type: AssetType):
         self.types_by_id.pop(asset_type.id)
-        self.types_by_label.pop(asset_type.label)
-        self.types_by_label.pop(asset_type.normalized_label, None)
+        self.types.pop(asset_type.label)
+        self.types.pop(asset_type.normalized_label, None)
 
     def _cache_attributes(self, asset_type: AssetType):
         if not asset_type.attributes:
             logger.info(f"Caching attributes for asset_type {asset_type.label}")
-            attributes = self.get_attributes(asset_type.id)
-            asset_type.set_attributes(attributes)
+            asset_type.attributes = self.get_attributes(asset_type.id)
 
     def _cache_metrics(self, asset_type: AssetType):
         if not asset_type.metrics:
             logger.info(f"Caching metrics for asset_type {asset_type.label}")
-            metrics = self.get_metrics(asset_type.id)
-            asset_type.set_metrics(metrics)
+            asset_type.metrics = self.get_metrics(asset_type.id)
 
     def asset_type_with_id(self, asset_type_id: str,
                            default=__marker) -> AssetType:
@@ -121,11 +119,11 @@ class AssetFramework(ApiService):
 
     def asset_type_with_label(self, asset_type_label: str,
                               default=__marker) -> AssetType:
-        if asset_type_label not in self.types_by_label:
+        if asset_type_label not in self.types:
             if default is self.__marker:
                 raise KeyError(f"Asset type {asset_type_label} not found.")
             return default
-        return self.types_by_label[asset_type_label]
+        return self.types[asset_type_label]
 
     # Single asset types
     def create_asset_type(self, asset_type: AssetType) -> AssetType:
