@@ -62,5 +62,5 @@ class AssetSchemas:
         # Store schemas in dictionary
         self.schemas = {s.name: s for s in schemas}
 
-    def get(self, name):
-        return self.schemas.get(name, None)
+    def get(self, name, value=None):
+        return self.schemas.get(name, value)
