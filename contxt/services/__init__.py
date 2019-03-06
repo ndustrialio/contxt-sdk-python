@@ -6,11 +6,9 @@ import pandas as pd
 import requests
 from tabulate import tabulate
 
+from contxt.exceptions import UnauthorizedException
+
 API_VERSION = 'v1'
-
-
-class UnauthorizedException(Exception):
-    pass
 
 
 class ApiClient(object):

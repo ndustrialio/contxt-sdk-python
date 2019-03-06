@@ -3,8 +3,8 @@ from datetime import datetime
 
 from tqdm import tqdm
 
+from contxt.exceptions import UnauthorizedException
 from contxt.functions.organizations import find_organization_by_name
-from contxt.services import UnauthorizedException
 from contxt.services.contxt import ContxtService
 from contxt.services.ems import EMSService
 from contxt.services.facilities import FacilitiesService

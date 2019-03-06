@@ -1,3 +1,0 @@
-
-class OrganizationArgumentException(Exception):
-    pass

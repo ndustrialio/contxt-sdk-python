@@ -19,8 +19,7 @@ logger.setLevel(logging.DEBUG)
 API_VERSION = 'v1'
 
 
-class UnauthorizedException(Exception):
-    pass
+
 
 
 class RequestAuth(AuthBase):
