@@ -4,7 +4,7 @@ import pytz
 
 from contxt.services import (DELETE, GET, POST, PUT, APIObject,
                              APIObjectCollection, PagedEndpoint, PagedResponse)
-from contxt.services.legacy.assets import (Asset, AssetAttributeValue,
+from contxt.legacy.services.assets import (Asset, AssetAttributeValue,
                                            AssetMetric, Assets, AssetType,
                                            InvalidAttributeException)
 from contxt.utils import make_logger
