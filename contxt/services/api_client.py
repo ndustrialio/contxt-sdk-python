@@ -105,25 +105,26 @@ class ApiService:
         return self.process_response(response)
 
     def process_response(self, response: Response):
+        # Handle any errors
         try:
             # Raise any error
             response.raise_for_status()
         except HTTPError as e:
             # Catch the error, to log the response's message, and reraise
             # Try to decode the response as json, else fall back to raw text
-            response_json = self.get_json(response) or {}
+            response_json = self.get_json(response)
             msg = response_json.get('message', None) or response_json or response.text
             logger.error(f"HTTP Error: {response.reason} - {msg}")
             raise
 
+        # Return json, if any
         return self.get_json(response)
 
     def get_json(self, response: Response):
         try:
             return response.json()
         except ValueError as e:
-            logger.warning("No valid json object found")
-            return None
+            return {}
 
 
 class ApiObject:
