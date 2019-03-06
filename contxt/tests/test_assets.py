@@ -5,7 +5,7 @@ from contxt.services.asset_migration import AssetMigrationManager, AssetSchema
 from contxt.services.asset_models import (Asset, AssetType, Attribute,
                                           AttributeValue, DataTypes, Metric,
                                           MetricValue, TimeIntervals)
-from contxt.tests.asset_schema import get_test_schema
+from contxt.tests.asset_schema import AssetSchemas
 from contxt.utils.auth import CLIAuth
 
 
@@ -35,8 +35,9 @@ def init_schema():
         organization_id="02efa741-a96f-4124-a463-ae13a704b8fc",
         env="staging",
         load_types=True)
-    schema = get_test_schema(asset_framework.organization_id)
-    migrator = AssetMigrationManager(asset_framework, schema)
+    schemas = AssetSchemas(asset_framework.organization_id)
+    test_schema = schemas.get('TestSchema')
+    migrator = AssetMigrationManager(asset_framework, test_schema)
     migrator.create()
 
 
