@@ -1,9 +1,11 @@
 import pytest
 
 from contxt.services.asset_framework import AssetFramework
+from contxt.services.asset_migration import AssetMigrationManager, AssetSchema
 from contxt.services.asset_models import (Asset, AssetType, Attribute,
                                           AttributeValue, DataTypes, Metric,
                                           MetricValue, TimeIntervals)
+from contxt.tests.asset_schema import get_test_schema
 from contxt.utils.auth import CLIAuth
 
 
@@ -17,6 +19,7 @@ def asset_framework(cli_auth: CLIAuth,
                     organization_id="02efa741-a96f-4124-a463-ae13a704b8fc"):
     return AssetFramework(cli_auth, organization_id, env="staging", load_types=False)
 
+
 @pytest.fixture
 def asset_type(asset_framework):
     asset_type = AssetType(
@@ -25,9 +28,20 @@ def asset_type(asset_framework):
         organization_id=asset_framework.organization_id)
     return asset_framework.create_asset_type(asset_type)
 
-@pytest.fixture
-def asset(asset_framework):
-    asset = Asset()
+
+def init_schema():
+    asset_framework = AssetFramework(
+        auth=CLIAuth(),
+        organization_id="02efa741-a96f-4124-a463-ae13a704b8fc",
+        env="staging",
+        load_types=True)
+    schema = get_test_schema(asset_framework.organization_id)
+    migrator = AssetMigrationManager(asset_framework, schema)
+    migrator.create()
+
+
+# Create test schema
+init_schema()
 
 
 # TODO: need to split these tests up, and test for errors, globals, different orgs
@@ -153,21 +167,11 @@ class TestAssetFramework:
         # Delete the test asset_type
         asset_framework.delete_asset_type(asset_type)
 
-    def test_attribute_value_crud_endpoints(self, asset_framework, asset_type):
-        # Create metric
-        metric = Metric(
-            asset_type_id=asset_type.id,
-            label="test_label",
-            description="Test description",
-            organization_id=af.organization_id,
-            time_interval=TimeIntervals.daily,
-            units="?")
-        created_metric = af.create_metric(metric)
-
+    def test_attribute_value_crud_endpoints(self, asset_framework, asset_type, metric):
         # Test create_metric_value
         metric_value = MetricValue(
             asset_id="?",
-            asset_metric_id=created_metric.id,
+            asset_metric_id=metric.id,
             effective_start_date="?",
             effective_end_date="?",
             notes="Test note",
@@ -237,13 +241,26 @@ class TestAssetFramework:
 if __name__ == "__main__":
     auth = CLIAuth()
     organization_id = "02efa741-a96f-4124-a463-ae13a704b8fc"
-    asset_framework = AssetFramework(
-        auth,
-        organization_id,
-        env='staging',
-        load_types=True,
-        types_to_fully_load=['UtilityMeter'])
-    af = asset_framework
-    asset_type = af.asset_type_with_label('UtilityMeter')
+    af = AssetFramework(auth, organization_id, env="staging")
 
-    TestAssetFramework().test_attribute_value_crud_endpoints(asset_framework, asset_type)
+    # asset_attributes, asset_metrics
+
+    # asset_framework = AssetFramework(
+    #     auth,
+    #     organization_id,
+    #     env='staging',
+    #     load_types=True,
+    #     types_to_fully_load=['UtilityMeter'])
+
+    # Create metric
+    # asset_type = af.asset_type_with_label('UtilityMeter')
+    # metric = Metric(
+    #     asset_type_id=asset_type.id,
+    #     label="test_label",
+    #     description="Test description",
+    #     organization_id=af.organization_id,
+    #     time_interval=TimeIntervals.daily,
+    #     units="?")
+    # created_metric = af.create_metric(metric)
+
+    # TestAssetFramework().test_attribute_value_crud_endpoints(asset_framework, asset_type)
