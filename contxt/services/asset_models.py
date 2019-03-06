@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from ast import literal_eval
 from datetime import date, datetime
-from typing import Dict, List, Optional, Set, Tuple
+from typing import Dict, List, Optional, Set, Tuple, Union
 
 from inflect import engine
 from pytz import UTC
@@ -87,7 +87,7 @@ class DataParsers:
 
 class AssetType(ApiObject):
     creatable_fields = ['label', 'description', 'organization_id', 'parent_id']
-    updatable_fields = ['description']
+    updatable_fields = ['description', 'parent_id']
     __marker = object()
 
     def __init__(
@@ -99,12 +99,13 @@ class AssetType(ApiObject):
             global_asset_type_parent_id: Optional[str] = None,
             is_global: Optional[bool] = None,
             parent_id: Optional[str] = None,
+            # parent_label: Optional[str] = None,
             hierarchy_level: Optional[int] = None,
-            children: Optional[List[dict]] = None,
+            children: Optional[Union[List[dict], List[AssetType]]] = None,
             created_at: Optional[str] = None,
             updated_at: Optional[str] = None,
-            asset_attributes: Optional[List[dict]] = None,
-            asset_metrics: Optional[List[dict]] = None,
+            asset_attributes: Optional[Union[List[dict], List[Attribute]]] = None,
+            asset_metrics: Optional[Union[List[dict], List[Metric]]] = None,
             **kwargs,
     ) -> None:
         super().__init__()
@@ -114,13 +115,27 @@ class AssetType(ApiObject):
         self.description = description
         self.organization_id = organization_id
         self.parent_id = parent_id
+        # TODO: parent_label is not an api response, but is used for migrations
+        # self.parent_label = parent_label
         self.hierarchy_level = hierarchy_level
         self.global_asset_type_parent_id = global_asset_type_parent_id
         self.is_global = is_global
-        self.set_attributes(
-            [Attribute(**attr) for attr in asset_attributes or []])
-        self.set_metrics([Metric(**metric) for metric in asset_metrics or []])
-        self.set_children([AssetType(**child) for child in children or []])
+
+        asset_attributes = asset_attributes or []
+        self._attributes = asset_attributes if asset_attributes and isinstance(
+            asset_attributes[0],
+            Attribute) else [Attribute(**attr) for attr in asset_attributes]
+
+        asset_metrics = asset_metrics or []
+        self._metrics = asset_metrics if asset_metrics and isinstance(
+            asset_metrics[0],
+            Metric) else [Metric(**metric) for metric in asset_metrics]
+
+        children = children or []
+        self._children = children if children and isinstance(
+            children[0],
+            AssetType) else [AssetType(**child) for child in children]
+
         self.created_at = DataParsers.datetime(
             created_at) if created_at else None
         self.updated_at = DataParsers.datetime(
@@ -135,35 +150,51 @@ class AssetType(ApiObject):
         else:
             return self.label.title().replace(' ', '')
 
+    @property
     def plural_label(self) -> str:
         return p.plural(self.label)
 
-    def set_attributes(self, attributes: List[Attribute]) -> None:
-        self.attributes = attributes
+    @property
+    def attributes(self) -> List[Attribute]:
+        return self._attributes
+
+    @attributes.setter
+    def attributes(self, attributes: List[Attribute]) -> None:
+        self._attributes = attributes
         self._attributes_by_id = {}
         self._attributes_by_label = {}
         # Store by id/label for fast lookup
-        for attribute in self.attributes:
+        for attribute in self._attributes:
             self._attributes_by_id[attribute.id] = attribute
             self._attributes_by_label[attribute.label] = attribute
             self._attributes_by_label[attribute.normalized_label] = attribute
 
-    def set_metrics(self, metrics: List[Metric]) -> None:
-        self.metrics = metrics
+    @property
+    def metrics(self) -> List[Metric]:
+        return self._metrics
+
+    @metrics.setter
+    def metrics(self, metrics: List[Metric]) -> None:
+        self._metrics = metrics
         self._metrics_by_id = {}
         self._metrics_by_label = {}
         # Store by id/label for fast lookup
-        for metric in self.metrics:
+        for metric in self._metrics:
             self._metrics_by_id[metric.id] = metric
             self._metrics_by_label[metric.label] = metric
             self._metrics_by_label[metric.normalized_label] = metric
 
-    def set_children(self, children: List[AssetType]) -> None:
-        self.children = children
+    @property
+    def children(self) -> List[AssetType]:
+        return self._children
+
+    @children.setter
+    def children(self, children: List[AssetType]) -> None:
+        self._children = children
         self._children_by_id = {}
         self._children_by_label = {}
         # Store by id/label for fast lookup
-        for child in self.children:
+        for child in self._children:
             self._children_by_id[child.id] = child
             self._children_by_label[child.label] = child
             self._children_by_label[child.normalized_label] = child
