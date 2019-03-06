@@ -1,13 +1,14 @@
 git+https://git@github.com/ndustrialio/ndustrialio-python.git@SPIKE/assetsII#egg=ndustrialio-python
-tabulate
-dateutils
-plotly
-tqdm
+argcomplete
 dash
 dash-html-components
 dash-core-components
-dash-table
-dash-daq
+# dateutils
+# dash-table
+# dash-daq
 flask
+tabulate
+tqdm
+mypy
 pandas
-argcomplete
+plotly
