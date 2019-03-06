@@ -56,13 +56,13 @@ class ApiService:
             "auth": RequestAuth(self.client.access_token),
             # "timeout": 1,
             "hooks": {
-                "response": self._log_response_url
+                "response": self._log_response
             }
         }
 
-    def _log_response_url(self, response, *args, **kwargs):
+    def _log_response(self, response, *args, **kwargs):
         url = f"{response.url}/{response.request.body}" if response.request.body else response.url
-        logger.debug(f"Called {response.request.method} {url}")
+        logger.debug(f"Called {response.request.method} {url} ({response.elapsed.total_seconds()} s)")
 
     def _is_paged(self, response_json) -> bool:
         return "_metadata" in response_json
