@@ -44,11 +44,11 @@ class DataTypes:
 
 class DataParsers:
     @staticmethod
-    def parse_datetime(datetime_):
+    def parse_datetime(datetime_) -> str:
         return datetime_.strftime('%Y-%m-%dT%H:%M:%S.%fZ')
 
     @staticmethod
-    def parse_as_datetime(timestamp):
+    def parse_as_datetime(timestamp) -> datetime:
         return datetime.strptime(timestamp,
                                  '%Y-%m-%dT%H:%M:%S.%fZ').replace(tzinfo=UTC)
 
@@ -365,7 +365,7 @@ class AttributeValue(ApiObject):
         self.asset_attribute_id = asset_attribute_id
         self.asset_id = asset_id
         self.effective_date = DataParsers.date(
-            effective_date) if effective_date else date.today()
+            effective_date or str(date.today()))
         self.notes = notes
         # TODO: need to know data_type to parse
         self.value = DataParsers.unknown(value)
@@ -457,6 +457,22 @@ class MetricValue(ApiObject):
             effective_end_date) if effective_end_date else None
         self.notes = notes
         self.value = DataParsers.number(value) if value else None
-        self.created_at = DataParsers.datetime(created_at)
-        self.updated_at = DataParsers.datetime(updated_at)
-        self.asset = Asset(**asset)
+        self.created_at = DataParsers.datetime(created_at) if created_at else None
+        self.updated_at = DataParsers.datetime(updated_at) if updated_at else None
+        self.asset = Asset(**asset) if asset else None
+
+    def post(self):
+        """Get data for a post request"""
+        d = self.get_dict(include=self.creatable_fields)
+        for k, v in d.items():
+            if isinstance(v, datetime):
+                d[k] = DataParsers.parse_datetime(v)
+        return d
+    
+    def put(self):
+        """Get data for a put request"""
+        d = self.get_dict(include=self.updatable_fields)
+        for k, v in d.items():
+            if isinstance(v, datetime):
+                d[k] = DataParsers.parse_datetime(v)
+        return d
