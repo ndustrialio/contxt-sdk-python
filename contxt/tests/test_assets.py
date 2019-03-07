@@ -2,7 +2,7 @@ from datetime import date, datetime, timedelta
 
 import pytest
 
-from contxt.services.asset_framework import AssetFramework
+from contxt.services.asset_framework_new import AssetFramework
 from contxt.services.asset_migration import AssetMigrationManager, AssetSchema
 from contxt.services.asset_models import (Asset, AssetType, Attribute,
                                           AttributeValue, DataParsers,
