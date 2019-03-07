@@ -34,6 +34,10 @@ class ApiClient:
 
 
 class ApiService:
+    configs_by_env = {
+        'staging': dict(base_url=None, audience=None),
+        'production': dict(base_url=None, audience=None)
+    }
 
     def __init__(self,
                  base_url: str,
@@ -41,9 +45,13 @@ class ApiService:
                  api_version: str = API_VERSION) -> None:
         self.client = ApiClient(access_token)
         self.base_url = self._init_base_url(base_url, api_version)
+        # TODO: we can speed up calls by using Request.Session object
 
     def _init_base_url(self, base_url: str, api_version: str) -> str:
         return f"{base_url}/{api_version}" if api_version else base_url
+
+    def _get_url(self, uri: str) -> str:
+        return f"{self.base_url}/{uri}"
 
     def _request_kwargs(self):
         return {
@@ -59,8 +67,27 @@ class ApiService:
         t = response.elapsed.total_seconds()
         logger.debug(f"Called {response.request.method} {url} ({t} s)")
 
-    def get_url(self, uri: str) -> str:
-        return f"{self.base_url}/{uri}"
+    def _process_response(self, response: Response):
+        # Handle any errors
+        try:
+            # Raise any error
+            response.raise_for_status()
+        except HTTPError as e:
+            # Catch the error, to log the response's message, and reraise
+            # Try to decode the response as json, else fall back to raw text
+            response_json = self._get_json(response)
+            msg = response_json.get('message') or response_json or response.text
+            logger.error(f"HTTP Error: {response.reason} - {msg}")
+            raise
+
+        # Return json, if any
+        return self._get_json(response)
+
+    def _get_json(self, response: Response):
+        try:
+            return response.json()
+        except ValueError as e:
+            return {}
 
     def get_logged_in_user_id(self) -> str:
         # TODO do actual token verification
@@ -69,11 +96,11 @@ class ApiService:
 
     def get(self, uri, params: Optional[Dict[str, str]] = None, records_only=True):
         response = requests.get(
-            url=self.get_url(uri), params=params, **self._request_kwargs())
-        response_json = self.process_response(response)
+            url=self._get_url(uri), params=params, **self._request_kwargs())
+        response_json = self._process_response(response)
 
         # Return just records, if requested and available
-        records = response_json.get("records")
+        records = response_json.get("records") if isinstance(response_json, dict) else None
         if records_only and records is not None:
             return records
 
@@ -82,46 +109,25 @@ class ApiService:
 
     def post(self, uri: str, data: Optional[dict] = None, json: Optional[dict] = None):
         response = requests.post(
-            url=self.get_url(uri),
+            url=self._get_url(uri),
             data=data,
             json=json,
             **self._request_kwargs())
-        return self.process_response(response)
+        return self._process_response(response)
 
     def put(self, uri: str, data=None):
         response = requests.put(
-            url=self.get_url(uri), data=data, **self._request_kwargs())
-        return self.process_response(response)
+            url=self._get_url(uri), data=data, **self._request_kwargs())
+        return self._process_response(response)
 
     def delete(self, uri: str):
         response = requests.delete(
-            url=self.get_url(uri), **self._request_kwargs())
-        return self.process_response(response)
-
-    def process_response(self, response: Response):
-        # Handle any errors
-        try:
-            # Raise any error
-            response.raise_for_status()
-        except HTTPError as e:
-            # Catch the error, to log the response's message, and reraise
-            # Try to decode the response as json, else fall back to raw text
-            response_json = self.get_json(response)
-            msg = response_json.get('message') or response_json or response.text
-            logger.error(f"HTTP Error: {response.reason} - {msg}")
-            raise
-
-        # Return json, if any
-        return self.get_json(response)
-
-    def get_json(self, response: Response):
-        try:
-            return response.json()
-        except ValueError as e:
-            return {}
+            url=self._get_url(uri), **self._request_kwargs())
+        return self._process_response(response)
 
 
 class ApiObject:
+    __marker = object()
     creatable_fields = []
     updatable_fields = []
 
