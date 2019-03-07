@@ -119,3 +119,18 @@ class AssetMigrationManager:
 
     def create_metric_value(self, asset: Asset, metric_value: MetricValue):
         pass
+
+    def delete(self):
+        logger.info(f"Deleting assets_schema {self.schema.name}")
+
+        # Delete asset types, which also deletes attributes, metrics, and values
+        for asset_type in self.schema.asset_types:
+            # First, delete children
+            for child in asset_type.children:
+                created_child = self.assets_service.asset_type_with_label(child.label)
+                self.assets_service.delete_asset_type(created_child)
+
+            # Delete parent
+            created_asset_type = self.assets_service.asset_type_with_label(
+                asset_type.label)
+            self.assets_service.delete_asset_type(created_asset_type)
