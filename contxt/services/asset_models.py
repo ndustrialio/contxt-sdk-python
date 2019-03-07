@@ -36,7 +36,7 @@ class TimeIntervals:
 
 
 class DataTypes:
-    boolean = 'bool'
+    boolean = 'boolean'
     datetime = 'date'
     number = 'number'
     string = 'string'
@@ -86,9 +86,9 @@ class DataParsers:
 
 
 class AssetType(ApiObject):
+    __marker = object()
     creatable_fields = ['label', 'description', 'organization_id', 'parent_id']
     updatable_fields = ['description', 'parent_id']
-    __marker = object()
 
     def __init__(
             self,
