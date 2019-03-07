@@ -68,9 +68,7 @@ class AssetFramework(ApiService):
             for asset_type in self.get_asset_types(self.organization_id):
                 # if not asset_type.is_global:
                 if asset_type.label in full_types or asset_type.normalized_label in full_types:
-                    self._cache_asset_type(asset_type)
-                    self._cache_attributes(asset_type)
-                    self._cache_metrics(asset_type)
+                    self._cache_asset_type_full(asset_type)
                 else:
                     self._cache_asset_type(asset_type)
 
@@ -98,6 +96,11 @@ class AssetFramework(ApiService):
         self.types_by_id.pop(asset_type.id)
         self.types.pop(asset_type.label)
         self.types.pop(asset_type.normalized_label, None)
+
+    def _cache_asset_type_full(self, asset_type: AssetType):
+        self._cache_asset_type(asset_type)
+        self._cache_attributes(asset_type)
+        self._cache_metrics(asset_type)
 
     def _cache_attributes(self, asset_type: AssetType):
         if not asset_type.attributes:

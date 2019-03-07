@@ -35,6 +35,7 @@ def init_schema():
     asset_framework._cache_attributes(asset_type)
     return new_asset
 
+
 # Create test schema
 TEST_ASSET = init_schema()
 
