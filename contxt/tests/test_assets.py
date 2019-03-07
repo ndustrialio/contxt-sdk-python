@@ -1,12 +1,42 @@
+from datetime import date, datetime, timedelta
+
 import pytest
 
 from contxt.services.asset_framework import AssetFramework
 from contxt.services.asset_migration import AssetMigrationManager, AssetSchema
 from contxt.services.asset_models import (Asset, AssetType, Attribute,
-                                          AttributeValue, DataTypes, Metric,
-                                          MetricValue, TimeIntervals)
+                                          AttributeValue, DataParsers,
+                                          DataTypes, Metric, MetricValue,
+                                          TimeIntervals)
 from contxt.tests.asset_schema import AssetSchemas
 from contxt.utils.auth import CLIAuth
+
+
+def init_schema():
+    organization_id = "02efa741-a96f-4124-a463-ae13a704b8fc"
+    asset_framework = AssetFramework(
+        auth=CLIAuth(),
+        organization_id=organization_id,
+        env="staging",
+        load_types=True)
+    schemas = AssetSchemas(asset_framework.organization_id)
+    test_schema = schemas.get('TestSchema')
+    migrator = AssetMigrationManager(asset_framework, test_schema)
+    migrator.create()
+    # Create an asset
+    asset_type = asset_framework.asset_type_with_label("TestParentType")
+    asset = Asset(
+        asset_type_id=asset_type.id,
+        label="Test Asset",
+        description="Test asset description",
+        organization_id=asset_framework.organization_id)
+    # HACK: return the test asset until we incorporate assets into the schema
+    new_asset = asset_framework.create_asset(asset)
+    asset_framework._cache_attributes(asset_type)
+    return new_asset
+
+# Create test schema
+TEST_ASSET = init_schema()
 
 
 @pytest.fixture
@@ -17,38 +47,35 @@ def cli_auth():
 @pytest.fixture
 def asset_framework(cli_auth: CLIAuth,
                     organization_id="02efa741-a96f-4124-a463-ae13a704b8fc"):
-    return AssetFramework(cli_auth, organization_id, env="staging", load_types=False)
+    return AssetFramework(cli_auth, organization_id, env="staging", load_types=True, types_to_fully_load=['TestParentType'])
 
 
 @pytest.fixture
-def asset_type(asset_framework):
-    asset_type = AssetType(
-        label="TestAssetType",
-        description="Test description",
-        organization_id=asset_framework.organization_id)
-    return asset_framework.create_asset_type(asset_type)
+def parent_asset_type(asset_framework):
+    return asset_framework.asset_type_with_label("TestParentType")
 
 
-def init_schema():
-    asset_framework = AssetFramework(
-        auth=CLIAuth(),
-        organization_id="02efa741-a96f-4124-a463-ae13a704b8fc",
-        env="staging",
-        load_types=True)
-    schemas = AssetSchemas(asset_framework.organization_id)
-    test_schema = schemas.get('TestSchema')
-    migrator = AssetMigrationManager(asset_framework, test_schema)
-    migrator.create()
+@pytest.fixture
+def child_asset_type(asset_framework):
+    return asset_framework.asset_type_with_label("TestChildType")
 
 
-# Create test schema
-init_schema()
+@pytest.fixture
+def attribute(asset_framework: AssetFramework):
+    return asset_framework.asset_type_with_label("TestParentType").attribute_with_label("test_attr_label")
+
+
+@pytest.fixture
+def metric(asset_framework: AssetFramework):
+    return asset_framework.asset_type_with_label(
+        "TestParentType").metric_with_label("test_met_label")
 
 
 # TODO: need to split these tests up, and test for errors, globals, different orgs
 class TestAssetFramework:
 
     def test_asset_type_crud_endpoints(self, asset_framework: AssetFramework):
+        """Test create, retrieve, update, and delete asset_type"""
         # Test create_asset_type
         asset_type = AssetType(
             label="TestAssetType",
@@ -93,10 +120,11 @@ class TestAssetFramework:
         assert asset_framework.asset_type_with_label(
             created_asset_type.normalized_label, None) is None
 
-    def test_asset_crud_endpoints(self, asset_framework: AssetFramework, asset_type):
+    def test_asset_crud_endpoints(self, asset_framework: AssetFramework, child_asset_type):
+        """Test create, retrieve, update, and delete asset"""
         # Test create_asset
         asset = Asset(
-            asset_type_id=asset_type.id,
+            asset_type_id=child_asset_type.id,
             label="Test asset label",
             description="Test asset description",
             organization_id=asset_framework.organization_id)
@@ -122,13 +150,11 @@ class TestAssetFramework:
         with pytest.raises(Exception) as e:
             asset_framework.get_asset(updated_asset.id)
 
-        # Delete the test asset_type
-        asset_framework.delete_asset_type(asset_type)
-
-    def test_attribute_crud_endpoints(self, asset_framework, asset_type):
+    def test_attribute_crud_endpoints(self, asset_framework, parent_asset_type):
+        """Test create, retrieve, update, and delete attribute"""
         # Test create_attribute
         attribute = Attribute(
-            asset_type_id=asset_type.id,
+            asset_type_id=parent_asset_type.id,
             label="test_attribute_label",
             description="test attribute description",
             units="?",
@@ -165,40 +191,46 @@ class TestAssetFramework:
         with pytest.raises(Exception) as e:
             asset_framework.get_asset(updated_attribute.id)
 
-        # Delete the test asset_type
-        asset_framework.delete_asset_type(asset_type)
+    def test_attribute_value_crud_endpoints(self, asset_framework: AssetFramework, attribute):
+        """Test create, retrieve, update, and delete attribute_value"""
+        # TODO: we need a schema that creates assets too
+        # Test create_attribute_value
+        attribute_value = AttributeValue(
+            asset_id=TEST_ASSET.id,
+            asset_attribute_id=attribute.id,
+            notes="test note",
+            value="test_value")
+        created_attribute_value = asset_framework.create_attribute_value(
+            attribute_value)
+        assert created_attribute_value.asset_id == attribute_value.asset_id
+        assert created_attribute_value.asset_attribute_id == attribute_value.asset_attribute_id
+        assert created_attribute_value.effective_date == attribute_value.effective_date
+        assert created_attribute_value.notes == attribute_value.notes
+        assert created_attribute_value.value == attribute_value.value
 
-    def test_attribute_value_crud_endpoints(self, asset_framework, asset_type, metric):
-        # Test create_metric_value
-        metric_value = MetricValue(
-            asset_id="?",
-            asset_metric_id=metric.id,
-            effective_start_date="?",
-            effective_end_date="?",
-            notes="Test note",
-            value=5)
-        created_metric_value = asset_framework.create_metric_value(metric_value)
-        assert created_metric_value.asset_id == metric_value.asset_id
-        assert created_metric_value.asset_metric_id == metric_value.asset_metric_id
-        assert created_metric_value.effective_start_date == metric_value.effective_start_date
-        assert created_metric_value.effective_end_date == metric_value.effective_end_date
-        assert created_metric_value.notes == metric_value.notes
-        assert created_metric_value.value == metric_value.value
+        # Test update_attribute_value and get_attribute_value
+        created_attribute_value.notes = "edited test note"
+        created_attribute_value.value = "edited test value"
+        # created_attribute_value.effective_date = "2018-01-01"
+        asset_framework.update_attribute_value(created_attribute_value)
+        updated_attribute_value = asset_framework.get_attribute_value(
+            created_attribute_value)
+        assert updated_attribute_value.notes == created_attribute_value.notes
+        assert updated_attribute_value.value == created_attribute_value.value
+        # assert updated_attribute_value.effective_date == created_attribute_value.effective_date
 
-        # Test update_metric_value and get_metric_value
-        asset_framework.update_metric_value(created_metric_value)
-        updated_metric_value = asset_framework.get_metric_value(
-            created_metric_value.id)
+        # Test delete_attribute_value
+        asset_framework.delete_attribute_value(updated_attribute_value)
+        # Check the asset was actually deleted
+        assert asset_framework.get_attribute_value(updated_attribute_value) is None
+        # with pytest.raises(Exception) as e:
+        #     asset_framework.get_attribute_value(updated_attribute_value)
 
-        # Test delete_metric_value
-        asset_framework.delete_metric_value(updated_metric_value)
-        # Delete the test asset_type
-        asset_framework.delete_asset_type(asset_type)
-
-    def test_metric_crud_endpoints(self, asset_framework, asset_type):
+    def test_metric_crud_endpoints(self, asset_framework, parent_asset_type):
+        """Test create, retrieve, update, and delete metric"""
         # Test create_metric
         metric = Metric(
-            asset_type_id=asset_type.id,
+            asset_type_id=parent_asset_type.id,
             label="test_label",
             description="Test description",
             organization_id=asset_framework.organization_id,
@@ -231,12 +263,49 @@ class TestAssetFramework:
         with pytest.raises(Exception) as e:
             asset_framework.get_asset(updated_metric.id)
 
-        # Delete the test asset_type
-        asset_framework.delete_asset_type(asset_type)
+    def test_metric_value_crud_endpoints(self, asset_framework, metric):
+        """Test create, retrieve, update, and delete metric_value"""
+        # Test create_attribute_value
+        # TODO: need an easier way to specify date ranges
+        def get_end_date(start_date):
+            return start_date + timedelta(weeks=1) - timedelta(milliseconds=1)
 
-    def test_metric_value_crud_endpoints(self, asset_framework, asset_type):
-        # Delete the test asset_type
-        asset_framework.delete_asset_type(asset_type)
+        start_date = datetime(2018, 3, 1)
+        metric_value = MetricValue(
+            asset_id=TEST_ASSET.id,
+            asset_metric_id=metric.id,
+            effective_start_date=DataParsers.parse_datetime(start_date),
+            effective_end_date=DataParsers.parse_datetime(get_end_date(start_date)),
+            notes="test note",
+            value=1)
+        created_metric_value = asset_framework.create_metric_value(
+            metric_value)
+        assert created_metric_value.asset_id == metric_value.asset_id
+        assert created_metric_value.asset_metric_id == metric_value.asset_metric_id
+        assert created_metric_value.effective_start_date == metric_value.effective_start_date
+        assert created_metric_value.effective_end_date == metric_value.effective_end_date
+        assert created_metric_value.notes == metric_value.notes
+        assert created_metric_value.value == metric_value.value
+
+        # Test update_metric_value and get_metric_value
+        new_start_date = datetime(2018, 3, 8)
+        created_metric_value.effective_start_date = DataParsers.parse_as_datetime(DataParsers.parse_datetime(new_start_date))
+        created_metric_value.effective_end_date = DataParsers.parse_as_datetime(
+            DataParsers.parse_datetime(get_end_date(new_start_date)))
+        created_metric_value.notes = "edited test note"
+        created_metric_value.value = 2
+        asset_framework.update_metric_value(created_metric_value)
+        updated_metric_value = asset_framework.get_metric_value(
+            created_metric_value)
+        assert updated_metric_value.effective_start_date == created_metric_value.effective_start_date
+        assert updated_metric_value.effective_end_date == created_metric_value.effective_end_date
+        assert updated_metric_value.notes == created_metric_value.notes
+        assert updated_metric_value.value == created_metric_value.value
+
+        # Test delete_metric_value
+        asset_framework.delete_metric_value(updated_metric_value)
+        # Check the asset was actually deleted
+        assert asset_framework.get_metric_value(updated_metric_value) is None
 
 
 if __name__ == "__main__":
@@ -244,24 +313,5 @@ if __name__ == "__main__":
     organization_id = "02efa741-a96f-4124-a463-ae13a704b8fc"
     af = AssetFramework(auth, organization_id, env="staging")
 
-    # asset_attributes, asset_metrics
-
-    # asset_framework = AssetFramework(
-    #     auth,
-    #     organization_id,
-    #     env='staging',
-    #     load_types=True,
-    #     types_to_fully_load=['UtilityMeter'])
-
-    # Create metric
-    # asset_type = af.asset_type_with_label('UtilityMeter')
-    # metric = Metric(
-    #     asset_type_id=asset_type.id,
-    #     label="test_label",
-    #     description="Test description",
-    #     organization_id=af.organization_id,
-    #     time_interval=TimeIntervals.daily,
-    #     units="?")
-    # created_metric = af.create_metric(metric)
-
-    # TestAssetFramework().test_attribute_value_crud_endpoints(asset_framework, asset_type)
+    # af = asset_framework(CLIAuth())
+    # TestAssetFramework().test_metric_value_crud_endpoints(af, metric(af))
