@@ -292,10 +292,20 @@ class AssetFramework(ApiService):
             f"assets/{attribute_value.asset_id}/attributes/{attribute_value.asset_attribute_id}/values",
             data=data))
 
-    def get_attribute_value(self, attribute_value_id: str) -> AttributeValue:
-        logger.debug(f"Fetching attribute_value {attribute_value_id}")
-        return AttributeValue(
-            **self.get(f"assets/attribute_values/{attribute_value_id}"))
+    # TODO: this endpoint does not exist
+    # def get_attribute_value(self, attribute_value_id: str) -> AttributeValue:
+    #     logger.debug(f"Fetching attribute_value {attribute_value_id}")
+    #     return AttributeValue(
+    #         **self.get(f"assets/attributes/values/{attribute_value_id}"))
+
+    def get_attribute_value(self, attribute_value: AttributeValue) -> AttributeValue:
+        # HACK: work around since you cannot fetch a single attribute value
+        logger.debug(f"Fetching attribute_value {attribute_value.id}")
+        attribute_values = self.get_attribute_values(attribute_value.asset_id)
+        for value in attribute_values:
+            if attribute_value.id == value.id:
+                return value
+        return None
 
     def update_attribute_value(self, attribute_value: AttributeValue) -> None:
         data = attribute_value.put()
@@ -392,12 +402,22 @@ class AssetFramework(ApiService):
         data = metric_value.post()
         logger.debug(f"Creating metric_value with {data}")
         return MetricValue(**self.post(
-            f"assets/{metric_value.asset_id}/metrics/{metric_value.asset_metric_id}/metrics",
+            f"assets/{metric_value.asset_id}/metrics/{metric_value.asset_metric_id}/values",
             data=data))
 
-    def get_metric_value(self, metric_value_id: str) -> MetricValue:
-        logger.debug(f"Fetching metric_value {metric_value_id}")
-        return MetricValue(**self.get(f"assets/metrics/{metric_value_id}"))
+    # TODO: this endpoint does not exist
+    # def get_metric_value(self, metric_value_id: str) -> MetricValue:
+    #     logger.debug(f"Fetching metric_value {metric_value_id}")
+    #     return MetricValue(**self.get(f"assets/metrics/values/{metric_value_id}"))
+
+    def get_metric_value(self, metric_value: MetricValue) -> MetricValue:
+        # HACK: work around since you cannot fetch a single metric value
+        logger.debug(f"Fetching metric_value {metric_value.id}")
+        metric_values = self.get_metric_values(metric_value.asset_id, metric_value.asset_metric_id)
+        for value in metric_values:
+            if metric_value.id == value.id:
+                return value
+        return None
 
     def update_metric_value(self, metric_value: MetricValue) -> None:
         data = metric_value.put()
