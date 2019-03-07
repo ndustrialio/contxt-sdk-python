@@ -1,8 +1,6 @@
+from contxt.functions.organizations import get_organization_id_from_arguments
 from contxt.services.bus import MessageBusService
 from contxt.services.contxt import ContxtService
-
-from contxt.functions.organizations import get_organization_id_from_arguments
-
 from contxt.utils import make_logger
 
 logger = make_logger(__name__)
@@ -11,9 +9,7 @@ logger = make_logger(__name__)
 class Bus:
 
     def __init__(self, auth_module):
-
         self.auth = auth_module
-
         self.contxt_service = ContxtService(self.auth)
         self.mb_service = MessageBusService(self.auth)
 

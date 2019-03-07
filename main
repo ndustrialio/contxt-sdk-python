@@ -1,16 +1,17 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import argparse
 
-from contxt.cli.iot import IOT
-from contxt.cli.ems import EMS
 from contxt.cli.assets import Assets
-from contxt.cli.contxt import Contxt
 from contxt.cli.bus import Bus
+from contxt.cli.contxt import Contxt
+from contxt.cli.ems import EMS
+from contxt.cli.iot import IOT
 from contxt.utils import make_logger
 from contxt.utils.auth import CLIAuth
 
 logger = make_logger(__name__)
+logger.warning('Deprecating in favor of cntxt')
 
 parser = argparse.ArgumentParser(description='Contxt CLI')
 
@@ -30,20 +31,7 @@ subparsers = {
 
 args = parser.parse_args()
 
-'''
-if args.cli_cmd == "auth":
-
-    if args.subcommand == "login":
-        cli_auth.login()
-        print('Success!')
-
-    elif args.subcommand == 'reset':
-        cli_auth.reset()
-        print('Successfully reset tokens')
-'''
 if args.cli_cmd in subparsers:
-
     subparsers[args.cli_cmd].parse_command(args)
-
 else:
     logger.critical("Unrecognized command")

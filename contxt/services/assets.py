@@ -82,8 +82,9 @@ class AssetAttributeValue:
     '''
 
     def set(self, value, effective_date=None):
-        print('Setting new value for Attribute {} of Asset {} as {} with effective_date {}'
-              .format(self.asset_attribute_obj.label, self.asset_obj.label, value, effective_date))
+        print(
+            f'Setting new value for Attribute {self.asset_attribute_obj.label} of Asset {self.asset_obj.label} as {value} with effective_date {effective_date}'
+        )
 
         body = {
             'value': value,
@@ -99,10 +100,10 @@ class AssetAttributeValue:
         return self
 
     def __str__(self):
-        return str('{} -> {}'.format(self.label, self.value))
+        return str(f'{self.label} -> {self.value}')
 
     def __repr__(self):
-        return str('{} -> {}'.format(self.label, self.value))
+        return str(f'{self.label} -> {self.value}')
 
     def __call__(self, value=None, effective_date=None):
 
@@ -128,11 +129,13 @@ class Asset:
         for key, value in kwargs.items():
             if key not in self.asset_type.attributes:
                 raise InvalidAttributeException(
-                    "Attribute {} does not exist for type {}".format(key, self.asset_type.label))
-            body = {'value': value,
-                    'effective_date': str(datetime(year=2018, month=1, day=1))
-                    ## set this for now until FM-200 is fixed
-                    }
+                    f"Attribute {key} does not exist for type {self.asset_type.label}"
+                )
+            body = {
+                'value': value,
+                'effective_date': str(datetime(year=2018, month=1, day=1))
+                ## set this for now until FM-200 is fixed
+            }
             # returns an AssetAttributeValue object
             self.attribute_values[key] = self.assets_instance.create_attribute_value(asset_obj=self,
                                                                                      asset_attribute_obj=
@@ -158,12 +161,10 @@ class Asset:
         return self.attribute_values
 
     def __str__(self):
-        return "<Asset: asset_id: '{}', label: '{}', description: '{}', attributes: {}>".format(
-            self.id, self.label, self.description, self.attribute_values)
+        return f"<Asset: asset_id: '{self.id}', label: '{self.label}', description: '{self.description}', attributes: {self.attribute_values}>"
 
     def __repr__(self):
-        return "<Asset: asset_id: '{}', label: '{}', description: '{}', attributes: {}>".format(
-            self.id, self.label, self.description, self.attribute_values)
+        return f"<Asset: asset_id: '{self.id}', label: '{self.label}', description: '{self.description}', attributes: {self.attribute_values}>"
 
     def get_values(self):
         return [self.id, self.label, self.description]
@@ -230,7 +231,7 @@ class AssetType(APIObject):
 
     def getAll(self, force_fetch=False):
         if force_fetch or len(self.assets) == 0:
-            print('Getting all {} for organization_id {}'.format(self.label_plural, self.organization_id))
+            print(f'Getting all {self.label_plural} for organization_id {self.organization_id}')
             self.assets = self.assets_instance.get_assets_for_type(self)
         return self.assets
 
@@ -245,7 +246,7 @@ class AssetType(APIObject):
 
     # TODO - implement me
     def get(self, asset_label):
-        print('Getting asset with type {} and label {}'.format(self.label, asset_label))
+        print(f'Getting asset with type {self.label} and label {asset_label}')
 
     def get_values(self):
         return [self.id, self.label ,self.description, self.organization_id, self.parent_id, self.is_global]
@@ -308,30 +309,39 @@ class Assets(Service):
         type_class_obj.set_metrics(self.get_metrics_for_type(type_class_obj))
 
     def get_attributes_for_type(self, asset_type_obj):
-        attributes = PagedResponse(PagedEndpoint(base_url=self.base_url,
-                                                 client=self.client,
-                                                 request=GET(uri='assets/types/{}/attributes'.format(asset_type_obj.id)),
-                                                 parameters={}))
+        attributes = PagedResponse(
+            PagedEndpoint(
+                base_url=self.base_url,
+                client=self.client,
+                request=GET(
+                    uri=f'assets/types/{asset_type_obj.id}/attributes'),
+                parameters={}))
         return [AssetAttribute(asset_type_obj=asset_type_obj, api_object=record) for record in attributes]
 
     def get_metrics_for_type(self, asset_type_obj):
-        metrics = PagedResponse(PagedEndpoint(base_url=self.base_url,
-                                              client=self.client,
-                                              request=GET(uri='assets/types/{}/metrics'.format(asset_type_obj.id)),
-                                              parameters={}))
+        metrics = PagedResponse(
+            PagedEndpoint(
+                base_url=self.base_url,
+                client=self.client,
+                request=GET(uri=f'assets/types/{asset_type_obj.id}/metrics'),
+                parameters={}))
         return [AssetMetric(asset_type_obj=asset_type_obj, api_object=record) for record in metrics]
 
     def get_assets_for_type(self, asset_type_obj):
         parameters = {
             'asset_type_id': asset_type_obj.id
         }
-        assets = PagedResponse(self.execute(
-            GET(uri='organizations/{}/assets'.format(self.organization_id)).params(parameters),
-            execute=True))
+        assets = PagedResponse(
+            self.execute(
+                GET(uri=f'organizations/{self.organization_id}/assets').params(
+                    parameters),
+                execute=True))
         return [Asset(assets_instance=self, asset_type_obj=asset_type_obj, api_object=record) for record in assets]
 
     def get_attribute_values_for_asset(self, asset_obj, asset_type_obj):
-        values = self.execute(GET(uri='assets/{}/attributes/values'.format(asset_obj.id)), execute=True)
+        values = self.execute(
+            GET(uri=f'assets/{asset_obj.id}/attributes/values'),
+            execute=True)
         attribute_value_objects = []
 
         # if this is true, then the attributes for the type haven't been loaded yet
@@ -376,7 +386,7 @@ class Assets(Service):
             'units': units,
             'is_required': is_required
         }
-        uri = '/assets/types/{}/attributes'.format(asset_type_obj.id)
+        uri = f'/assets/types/{asset_type_obj.id}/attributes'
         response = self.execute(POST(uri=uri).body(api_body), execute=True)
         return AssetAttribute(asset_type_obj=asset_type_obj, api_object=response)
 
@@ -388,7 +398,7 @@ class Assets(Service):
         # /assets/:asset_id/attributes/:asset_attribute_id/values
         api_body['asset_attribute_id'] = asset_attribute_obj.id
         attribute_value_response = self.execute(
-            POST(uri='/assets/{}/attributes/{}/values'.format(asset_obj.id, asset_attribute_obj.id)).body(api_body),
+            POST(uri=f'/assets/{asset_obj.id}/attributes/{asset_attribute_obj.id}/values').body(api_body),
             execute=True)
         return AssetAttributeValue(assets_instance=self,
                                    asset_obj=asset_obj,
@@ -398,7 +408,8 @@ class Assets(Service):
     def update_attribute_value(self, asset_attribute_value_obj, api_body):
         # /assets/attributes/values/:asset_attribute_value_id
         self.execute(
-            PUT(uri='/assets/attributes/values/{}'.format(asset_attribute_value_obj.id)).body(api_body),
+            PUT(uri=f'/assets/attributes/values/{asset_attribute_value_obj.id}'
+                ).body(api_body),
             execute=True)
         return True
 

@@ -15,7 +15,7 @@ CONFIGS_BY_ENVIRONMENT = {
 
 class FacilitiesService(Service):
 
-    def __init__(self, auth_module, environment='production'):
+    def __init__(self, auth_module, environment='staging'):
 
         if environment not in CONFIGS_BY_ENVIRONMENT:
             raise Exception('Invalid environment specified')
@@ -33,7 +33,7 @@ class FacilitiesService(Service):
 
         if organization_id:
             assert isinstance(organization_id, str)
-            uri = 'organizations/{}/facilities'.format(organization_id)
+            uri = f'organizations/{organization_id}/facilities'
 
         response = self.execute(GET(uri=uri))
 
@@ -47,7 +47,7 @@ class FacilitiesService(Service):
 
         assert isinstance(facility_id, int)
 
-        return Facility(self.execute(GET(uri='facilities/{}'.format(facility_id))))
+        return Facility(self.execute(GET(uri=f'facilities/{facility_id}')))
 
 
 class Facility(APIObject):
@@ -56,7 +56,7 @@ class Facility(APIObject):
 
         super().__init__(
             keys_to_ignore=keys_to_ignore if keys_to_ignore is not None else [
-                'address1', 'address2', 'geometry_id', 'asset_id', 'tags',
+                'address1', 'address2', 'geometry_id', 'tags',
                 'Organization', 'Info'
             ])
 

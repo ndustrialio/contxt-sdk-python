@@ -10,3 +10,4 @@ dash-table
 dash-daq
 flask
 pandas
+argcomplete

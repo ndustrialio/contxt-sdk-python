@@ -1,5 +1,4 @@
 import json
-import os
 from datetime import datetime
 from getpass import getpass
 from pathlib import Path
@@ -8,7 +7,7 @@ import jwt
 from auth0.v3.authentication.get_token import GetToken
 
 from contxt.services.authentication import ContxtAuthService
-from contxt.utils import Configuration, get_epoch_time, make_logger
+from contxt.utils import Config, Utils, make_logger
 
 logger = make_logger(__name__)
 
@@ -19,13 +18,12 @@ class BaseAuth:
 
     def __init__(self, client_id, cli_mode=False, client_secret=None):
         self.client_id = client_id
-        self.cli_mode = cli_mode
         self.client_secret = client_secret
+        self.cli_mode = cli_mode
         self.auth0 = GetToken('ndustrial.auth0.com')
 
-        home_dir = str(Path.home())
-        self.contxt_config_dir = os.path.join(home_dir, '.contxt')
-        self.token_file = os.path.join(self.contxt_config_dir, 'tokens')
+        self.contxt_config_path = Path.home() / '.contxt'
+        self.token_file = self.contxt_config_path / 'tokens'
 
         # load up the tokens we have
         self.tokens = self.load_tokens()
@@ -56,10 +54,9 @@ class BaseAuth:
         self.store_service_token(AUTH_AUDIENCE, token['access_token'], refresh_token)
 
     def authenticate_to_service(self, service_audience):
-        print("Getting new token for {}".format(service_audience))
+        print(f"Getting new token for {service_audience}")
         token = self.contxt_auth.get_new_token_for_client_id(service_audience)
         self.store_service_token(service_audience, token)
-
         return token
 
     def get_token_for_client(self, client_id):
@@ -104,21 +101,16 @@ class BaseAuth:
     def token_is_expired_for_client(self, client_id):
 
         access_token = self.tokens[client_id]['token']
-
         decoded_token = jwt.decode(access_token, verify=False)
-
         token_expiration_epoch = decoded_token['exp']
 
-        if token_expiration_epoch <= get_epoch_time(datetime.now()):
-            return True
-
-        return False
+        return token_expiration_epoch <= Utils.get_epoch_time(datetime.now())
 
     def load_tokens(self):
-        os.makedirs(self.contxt_config_dir, exist_ok=True)
+        self.contxt_config_path.mkdir(parents=True, exist_ok=True)
 
         try:
-            with open(self.token_file, 'r') as f:
+            with self.token_file.open('r') as f:
                 tokens = json.load(f)
         except FileNotFoundError:
             print('Token file has not been created yet')
@@ -127,27 +119,27 @@ class BaseAuth:
         return tokens
 
     def store_service_token(self, client_id, access_token, refresh_token=None):
-        self.tokens[client_id] = {'token': access_token,
-                                  'refresh_token': refresh_token
-                                  }
+        self.tokens[client_id] = {
+            'token': access_token,
+            'refresh_token': refresh_token
+        }
 
         self.store_tokens()
 
     def store_tokens(self):
-        with open(self.token_file, 'w') as f:
+        with self.token_file.open('w') as f:
             json.dump(self.tokens, f, indent=4)
 
     def clear_tokens(self):
-        os.remove(self.token_file)
+        self.token_file.unlink()
 
 
 class CLIAuth(BaseAuth):
 
-    def __init__(self):
-        super().__init__(client_id=Configuration.CLI_CLIENT_ID,
-                         cli_mode=True)
+    def __init__(self, force_login=True):
+        super().__init__(client_id=Config.CLI_CLIENT_ID, cli_mode=True)
 
-        if self.get_auth_token() is None:
+        if self.get_auth_token() is None and force_login:
             logger.info("Token doesn't exist or can't be refreshed. Please re-authenticate")
             self.login()
 
@@ -164,25 +156,39 @@ class CLIAuth(BaseAuth):
         elif args.auth_subcommand == "reset":
             self.reset()
         else:
-            print("Unrecognized subcommand {}".format(args.auth_subcommand))
+            print(f"Unrecognized subcommand {args.auth_subcommand}")
+
+    def _ask_question(self, question):
+        accepted_answers = ["y", "n"]
+        ans = input(f"{question} ({'/'.join(accepted_answers)}) ").lower()[0]
+        while ans not in accepted_answers:
+            ans = input(f"Please enter {' or '.join(accepted_answers)}. ")
+        return ans == "y"
 
     def login(self):
+
+        if self.get_auth_token() is not None:
+            proceed = self._ask_question("Already logged in. Do you wish to continue?")
+            if not proceed:
+                return
 
         username = input("Contxt Username: ")
         password = getpass("Contxt Password: ")
 
-        token = self.auth0.login(client_id=Configuration.CLI_CLIENT_ID,
-                                 client_secret=Configuration.CLI_CLIENT_SECRET,
-                                 username=username,
-                                 password=password,
-                                 scope='offline_access',
-                                 audience=Configuration.AUTH_AUDIENCE_ID,
-                                 grant_type='password',
-                                 realm='')
+        token = self.auth0.login(
+            client_id=Config.CLI_CLIENT_ID,
+            client_secret=Config.CLI_CLIENT_SECRET,
+            username=username,
+            password=password,
+            scope='offline_access',
+            audience=Config.AUTH_AUDIENCE_ID,
+            grant_type='password',
+            realm='')
 
-        self.store_service_token(Configuration.AUTH_AUDIENCE_ID,
-                                 access_token=token['access_token'],
-                                 refresh_token=token['refresh_token'])
+        self.store_service_token(
+            client_id=Config.AUTH_AUDIENCE_ID,
+            access_token=token['access_token'],
+            refresh_token=token['refresh_token'])
 
     def reset(self):
         self.clear_tokens()

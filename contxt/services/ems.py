@@ -16,7 +16,7 @@ CONFIGS_BY_ENVIRONMENT = {
 
 class EMSService(Service):
 
-    def __init__(self, auth_module, environment='staging'):
+    def __init__(self, auth_module, environment='production'):
 
         if environment not in CONFIGS_BY_ENVIRONMENT:
             raise Exception('Invalid environment specified')
@@ -28,7 +28,7 @@ class EMSService(Service):
             access_token=auth_module.get_token_for_client(
                 self.env['audience']))
 
-    def get_monthly_utility_spend(self, facility_id, type, date_start, date_end, proforma=False, exclude_account_charges=False):
+    def get_monthly_utility_spend(self, facility_id, type, date_start, date_end, pro_forma=False, exclude_account_charges=False):
 
         assert isinstance(facility_id, int)
         assert isinstance(type, str)
@@ -39,16 +39,18 @@ class EMSService(Service):
             'type': type,
             'date_start': date_start.strftime('%Y-%m'),
             'date_end': date_end.strftime('%Y-%m'),
-            'proforma': 'true' if proforma else 'false',
+            'proforma': 'true' if pro_forma else 'false',
             'exclude_account_charges': 'true' if exclude_account_charges else 'false'
         }
 
-        response = self.execute(GET(uri='facilities/{}/utility/spend/monthly'.format(facility_id)).params(params),
-                                execute=True)
+        response = self.execute(
+            GET(uri=f'facilities/{facility_id}/utility/spend/monthly').params(
+                params),
+            execute=True)
 
         return FacilityUtilitySpend(response)
 
-    def get_monthly_utility_usage(self, facility_id, type, date_start, date_end):
+    def get_monthly_utility_usage(self, facility_id, type, date_start, date_end, pro_forma=False):
 
         assert isinstance(facility_id, int)
         assert isinstance(type, str)
@@ -59,6 +61,7 @@ class EMSService(Service):
             'type': type,
             'date_start': date_start.strftime('%Y-%m'),
             'date_end': date_end.strftime('%Y-%m'),
+            'pro_forma': 'true' if pro_forma else 'false'
         }
 
         response = self.execute(GET(uri='facilities/{}/utility/usage/monthly'.format(facility_id)).params(params),
@@ -79,7 +82,7 @@ class FacilityUtilitySpend(APIObject):
         self.spend_periods = APIObjectCollection(periods)
 
     def __str__(self):
-        print('Utility Spend -> Type: {} -- Currency: {}'.format(self.type, self.currency))
+        print(f'Utility Spend -> Type: {self.type} -- Currency: {self.currency}')
         return self.spend_periods.__str__()
 
     def get_dict(self):
@@ -96,10 +99,13 @@ class UtilitySpendPeriod(APIObject):
 
         self.date = spend_api_object['date']
         self.spend = spend_api_object['value']
-        self.proforma_date = spend_api_object['proforma_date']
+        if 'proforma_date' in spend_api_object:
+            self.pro_forma_date = spend_api_object['proforma_date']
+        else:
+            self.pro_forma_date = None
 
     def get_values(self):
-        return [self.date, self.spend, self.proforma_date]
+        return [self.date, self.spend, self.pro_forma_date]
 
     def get_keys(self):
         return ['date', 'value', 'proforma_date']
@@ -112,15 +118,16 @@ class UtilityUsagePeriod(APIObject):
 
         self.date = spend_api_object['date']
         self.value = spend_api_object['value']
-        #self.proforma_date = spend_api_object['proforma_date']
+        if 'pro_forma_date' in spend_api_object:
+            self.pro_forma_date = spend_api_object['pro_forma_date']
+        else:
+            self.pro_forma_date = None
 
     def get_values(self):
-        #return [self.date, self.value, self.proforma_date]
-        return [self.date, self.value]
+        return [self.date, self.value, self.pro_forma_date]
 
     def get_keys(self):
-        #return ['date', 'value', 'proforma_date']
-        return ['date', 'value']
+        return ['date', 'value', 'pro_forma_date']
 
 
 class FacilityUtilityUsage(APIObject):

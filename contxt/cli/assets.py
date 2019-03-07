@@ -232,8 +232,7 @@ COMMANDS = {
 class Assets(ContxtCLI):
 
     def __init__(self, arg_parser):
-
-        super(Assets, self).__init__(arg_parser, COMMANDS)
+        super().__init__(arg_parser, COMMANDS)
 
     @staticmethod
     def print_asset_type_handler(type_object):

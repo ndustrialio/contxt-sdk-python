@@ -1,7 +1,5 @@
 from contxt.cli import ContxtCLI
-
 from contxt.utils import make_logger
-
 
 logger = make_logger(__name__)
 
@@ -75,6 +73,12 @@ COMMANDS = {
                         'type': int,
                         'help': 'Specify the data windowing period',
                         'valid_values': [0, 60, 900, 3600]
+                    },
+                    {
+                        'arg': 'plot',
+                        'required': False,
+                        'type': bool,
+                        'help': 'Plot',
                     },
                 ]
             }
