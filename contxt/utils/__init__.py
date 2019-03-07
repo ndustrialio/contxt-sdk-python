@@ -11,7 +11,7 @@ def make_logger(name):
     return logging.getLogger(name)
 
 
-class Utils(object):
+class Utils:
     __marker = object()
 
     @staticmethod
