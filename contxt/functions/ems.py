@@ -5,7 +5,7 @@ from tqdm import tqdm
 import dateutil.parser
 import pytz
 
-from contxt.functions.organizations import find_organization_by_name, get_organization_id_from_arguments
+from contxt.functions.organizations import find_organization_by_name
 from contxt.functions.assets import Assets
 
 from contxt.services import UnauthorizedException
