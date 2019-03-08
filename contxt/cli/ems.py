@@ -136,4 +136,4 @@ class EMS(ContxtCLI):
 
     def __init__(self, arg_parser):
 
-        super(EMS, self).__init__(arg_parser, COMMANDS)
+        super().__init__(arg_parser, COMMANDS)
