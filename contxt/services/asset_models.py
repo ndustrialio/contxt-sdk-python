@@ -121,16 +121,20 @@ class AssetType(ApiObject):
         self.global_asset_type_parent_id = global_asset_type_parent_id
         self.is_global = is_global
 
+        # Set attributes, from either a list of dicts or a list of Attributes
+        # TODO: can we make this cleaner?
         asset_attributes = asset_attributes or []
         self._attributes = asset_attributes if asset_attributes and isinstance(
             asset_attributes[0],
             Attribute) else [Attribute(**attr) for attr in asset_attributes]
 
+        # Set metrics, from either a list of dicts or a list of Metrics
         asset_metrics = asset_metrics or []
         self._metrics = asset_metrics if asset_metrics and isinstance(
             asset_metrics[0],
             Metric) else [Metric(**metric) for metric in asset_metrics]
 
+        # Set children, from either a list of dicts or a list of AssetTypes
         children = children or []
         self._children = children if children and isinstance(
             children[0],
@@ -272,13 +276,23 @@ class Asset(ApiObject):
         self.description = description
         self.organization_id = organization_id
         self.parent_id = parent_id
-        self.attribute_values = [
-            AttributeValue(**value) for value in asset_attribute_values or []
-        ]
-        # TODO: include metric values with asset
-        self.metric_values = [
-            MetricValue(**value) for value in asset_metric_values or []
-        ]
+
+        # Set attribute values, from either a list of dicts or a list of AttributeValues
+        # TODO: can we make this cleaner?
+        asset_attribute_values = asset_attribute_values or []
+        self.attribute_values = asset_attribute_values if asset_attribute_values and isinstance(
+            asset_attribute_values[0], AttributeValue) else [
+                AttributeValue(**value) for value in asset_attribute_values
+            ]
+
+        # Set metric values, from either a list of dicts or a list of MetricValues
+        # TODO: change api endpoint to optionally return these
+        asset_metric_values = asset_metric_values or []
+        self.metric_values = asset_metric_values if asset_metric_values and isinstance(
+            asset_metric_values[0], MetricValue) else [
+                MetricValue(**value) for value in asset_metric_values
+            ]
+
         self.hierarchy_level = hierarchy_level
         self.children = [Asset(**child) for child in children or []]
         self.created_at = DataParsers.datetime(

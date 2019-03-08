@@ -189,9 +189,10 @@ class AssetFramework(ApiService):
         logger.debug(f"Creating asset with {data}")
         return Asset(**self.post("assets", data=data))
 
-    def get_asset(self, asset_id: str) -> Asset:
+    def get_asset(self, asset_id: str, with_metric_values=False) -> Asset:
         logger.debug(f"Fetching asset {asset_id}")
-        return Asset(**self.get(f"assets/{asset_id}"))
+        metric_values = self.get_metric_values(asset_id) if with_metric_values else None
+        return Asset(**self.get(f"assets/{asset_id}"), asset_metric_values=metric_values)
 
     def update_asset(self, asset: Asset) -> None:
         data = asset.put()
