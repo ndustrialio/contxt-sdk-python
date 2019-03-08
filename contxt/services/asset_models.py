@@ -272,11 +272,11 @@ class Asset(ApiObject):
         self.description = description
         self.organization_id = organization_id
         self.parent_id = parent_id
-        self.asset_attribute_values = [
+        self.attribute_values = [
             AttributeValue(**value) for value in asset_attribute_values or []
         ]
         # TODO: include metric values with asset
-        self.asset_metric_values = [
+        self.metric_values = [
             MetricValue(**value) for value in asset_metric_values or []
         ]
         self.hierarchy_level = hierarchy_level
@@ -468,7 +468,7 @@ class MetricValue(ApiObject):
             if isinstance(v, datetime):
                 d[k] = DataParsers.parse_datetime(v)
         return d
-    
+
     def put(self):
         """Get data for a put request"""
         d = self.get_dict(include=self.updatable_fields)

@@ -218,6 +218,7 @@ class AssetFramework(ApiService):
             asset_type_id: Optional[str] = None,
     ) -> List[Asset]:
         # BUG: this endpoint returns globals when type_id is None
+        # TODO: we can add asset_attribute_id and asset_attribute_value as params
         logger.debug(
             f"Fetching assets for organization {organization_id} and asset_type {asset_type_id}"
         )
@@ -442,15 +443,22 @@ class AssetFramework(ApiService):
         ]
 
     def get_metric_values(self, asset_id: str,
-                          metric_id: str) -> List[MetricValue]:
+                          metric_id: Optional[str] = None) -> List[MetricValue]:
         # TODO: why do we need both ids?
-        logger.debug(
-            f"Fetching metric_values for asset {asset_id} and metric {metric_id}"
-        )
-        return [
-            MetricValue(**rec, asset=rec['Asset']) for rec in self.get(
-                f"assets/{asset_id}/metrics/{metric_id}/values")
-        ]
+        if metric_id:
+            logger.debug(
+                f"Fetching metric_values for asset {asset_id} and metric {metric_id}"
+            )
+            return [
+                MetricValue(**rec, asset=rec['Asset']) for rec in self.get(
+                    f"assets/{asset_id}/metrics/{metric_id}/values")
+            ]
+        else:
+            logger.debug(f"Fetching metric_values for asset {asset_id}")
+            return [
+                MetricValue(**rec, asset=rec['Asset'])
+                for rec in self.get(f"assets/{asset_id}/metrics/values")
+            ]
 
     def update_metric_values(self, metric_values: List[MetricValue]) -> None:
         # TODO: batch update
