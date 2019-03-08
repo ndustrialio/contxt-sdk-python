@@ -9,6 +9,5 @@ dash-core-components
 flask
 tabulate
 tqdm
-mypy
 pandas
 plotly
