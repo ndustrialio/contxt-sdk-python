@@ -1,5 +1,6 @@
 import csv
 from datetime import datetime
+import traceback
 
 from tqdm import tqdm
 import dateutil.parser
@@ -24,7 +25,7 @@ class EMS:
 
         self.auth = auth_module
 
-        self.ems_service = EMSService(self.auth, environment='staging')
+        self.ems_service = EMSService(self.auth)
         self.contxt_service = ContxtService(self.auth)
         self.facilities_service = FacilitiesService(self.auth, environment='production')
 
@@ -171,7 +172,8 @@ class EMS:
         return organization_spend
 
     def get_organization_usage_vs_monthly_metric(self, metric, interval, resource_type, start_date, end_date,
-                                                 organization_name=None, organization_id=None, pro_forma=False):
+                                                 organization_name=None, organization_id=None, pro_forma=False,
+                                                 metric_scalar=1):
 
         # initialize an instance of the asset service to use for this, so we can speed things up
         asset_service, organization_id = self.asset_functions.initialize_asset_service(organization_id=organization_id,
@@ -191,7 +193,8 @@ class EMS:
                                                                              start_date=start_date,
                                                                              end_date=end_date,
                                                                              pro_forma=pro_forma,
-                                                                             asset_instance=asset_service)
+                                                                             asset_instance=asset_service,
+                                                                             metric_scalar=metric_scalar)
 
                 facility_normalized_metrics[facility.name] = normalized_usage
 
@@ -206,7 +209,8 @@ class EMS:
         return facility_normalized_metrics
 
     def get_organization_spend_vs_monthly_metric(self, metric, interval, resource_type, start_date, end_date,
-                                                 organization_name=None, organization_id=None, pro_forma=False):
+                                                 organization_name=None, organization_id=None, pro_forma=False,
+                                                 metric_scalar=1):
 
         # initialize an instance of the asset service to use for this, so we can speed things up
         asset_service, organization_id = self.asset_functions.initialize_asset_service(organization_id=organization_id,
@@ -216,7 +220,6 @@ class EMS:
 
         facility_normalized_metrics = {}
 
-        counter = 0
         for facility in tqdm(facilities):
 
             try:
@@ -227,7 +230,8 @@ class EMS:
                                                                              start_date=start_date,
                                                                              end_date=end_date,
                                                                              pro_forma=pro_forma,
-                                                                             asset_instance=asset_service)
+                                                                             asset_instance=asset_service,
+                                                                             metric_scalar=metric_scalar)
 
                 facility_normalized_metrics[facility.name] = normalized_spend
 
@@ -235,6 +239,7 @@ class EMS:
                 logger.warning(f"Unauthorized for facility {facility.id}")
                 continue
             except Exception as e:
+                traceback.print_exc()
                 logger.critical(f"Error loading data for facility {facility.id}")
                 logger.error(e)
                 continue
@@ -299,12 +304,12 @@ class EMS:
                     normalized_value = float((int(spend.spend) / normalized_data_by_date[date]['metric_value']) * metric_scalar)
                     normalized_data_by_date[date]['normalized'] = normalized_value
                 else:
-                    normalized_data_by_date[date]['normalized'] = None
+                    normalized_data_by_date[date]['normalized'] = "Spend Data Available"
                 normalized_data_by_date[date]['pro_forma_date'] = spend.pro_forma_date
             else:
                 normalized_data_by_date[date] = {}
                 normalized_data_by_date[date]['spend'] = None
-                normalized_data_by_date[date]['normalized'] = None
+                normalized_data_by_date[date]['normalized'] = "Metric Data Unavailable"
                 normalized_data_by_date[date]['pro_forma_date'] = None
 
         return normalized_data_by_date
@@ -353,23 +358,29 @@ class EMS:
         normalized_data_by_date = {}
         for value in values:
             date = dateutil.parser.parse(value.effective_start_date)
+
+            # skip this record if it's not in the date range
+            if date < start_date or date > end_date:
+                continue
+
             if value.value is not None:
                 normalized_data_by_date[date] = {'metric_value': int(value.value)}
 
         for usage in facility_usage.usage_periods:
             date = datetime.strptime(usage.date, '%Y-%m').replace(tzinfo=pytz.UTC)
+
             if date in normalized_data_by_date:
                 normalized_data_by_date[date]['usage'] = usage.value
                 if usage.value is not None:
                     normalized_value = float((int(usage.value) / normalized_data_by_date[date]['metric_value']) * metric_scalar)
                     normalized_data_by_date[date]['normalized'] = normalized_value
                 else:
-                    normalized_data_by_date[date]['normalized'] = None
+                    normalized_data_by_date[date]['normalized'] = "Usage Data Unavailable"
                 normalized_data_by_date[date]['pro_forma_date'] = usage.pro_forma_date
             else:
                 normalized_data_by_date[date] = {}
                 normalized_data_by_date[date]['usage'] = None
-                normalized_data_by_date[date]['normalized'] = None
+                normalized_data_by_date[date]['normalized'] = "Metric Data Unavailable"
                 normalized_data_by_date[date]['pro_forma_date'] = None
 
         return normalized_data_by_date

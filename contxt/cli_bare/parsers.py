@@ -1,5 +1,10 @@
 from tabulate import tabulate
 import csv
+import os
+
+from contxt.utils import make_logger
+
+logger = make_logger(__name__)
 
 class ArgParser:
 
@@ -61,6 +66,14 @@ class IotParser(ArgParser):
         fields_group.add_argument("-g", "--grouping-id", help="Grouping id")
         fields_parser.set_defaults(func=self._fields)
 
+        # Unprovisioned Fields
+        unprovisioned_fields_parser = _subparsers.add_parser("unprovisioned", help="Unprovisioned fields")
+        feeds_group = unprovisioned_fields_parser.add_mutually_exclusive_group(required=True)
+        feeds_group.add_argument("--feed_key", type=str, help="Provide feed key")
+        feeds_group.add_argument("--feed_id", type=int, help="Provide feed id")
+        unprovisioned_fields_parser.add_argument("--to-csv", type=str, help="Dump results to csv if desired")
+        unprovisioned_fields_parser.set_defaults(func=self._unprovisioned_fields)
+
         # Field data
         field_data_parser = _subparsers.add_parser("field-data", help="Get field data")
         field_data_parser.add_argument("grouping_id", help="Grouping id")
@@ -96,6 +109,19 @@ class IotParser(ArgParser):
             fields = iot.get_fields_for_grouping(args.grouping_id)
             print(fields)
 
+    def _unprovisioned_fields(self, args, auth):
+        from contxt.functions.iot import IOT
+        iot = IOT(auth)
+        fields = iot.get_unprovisioned_fields_for_feed(
+            feed_id=args.feed_id,
+            feed_key=args.feed_key
+        )
+
+        if args.to_csv:
+            self._collection_to_csv(args.to_csv, fields)
+        else:
+            print(fields)
+
     def _field_data(self, args, auth):
         from contxt.functions.iot import IOT
         iot = IOT(auth)
@@ -105,6 +131,18 @@ class IotParser(ArgParser):
             window=args.window,
             end_date=args.end_date,
             plot=args.plot)
+
+    def _collection_to_csv(self, filename, api_collection_data):
+
+        with open(os.path.join('.',filename), 'w') as f:
+
+            fields = api_collection_data.get_keys()
+
+            writer = csv.DictWriter(f, fieldnames=fields)
+            writer.writeheader()
+
+            for row in api_collection_data:
+                writer.writerow(row.get_dict())
 
 
 class EmsParser(ArgParser):
@@ -241,10 +279,16 @@ class EmsParser(ArgParser):
                 end_date=args.end_date,
                 metric=args.metric,
                 resource_type=args.resource_type,
-                pro_forma=args.pro_forma
+                pro_forma=args.pro_forma,
+                metric_scalar=args.metric_scalar or 1
             )
             self._print_facility_normalized_metrics(normalized_spend, 'spend')
         else:
+
+            if not args.to_csv:
+                logger.critical("Please provide --to-csv as an argument to specify report export file")
+                return
+
             normalized_spend = ems.get_organization_spend_vs_monthly_metric(
                 organization_name=args.org_name,
                 organization_id=args.org_id,
@@ -253,9 +297,10 @@ class EmsParser(ArgParser):
                 end_date=args.end_date,
                 resource_type=args.resource_type,
                 pro_forma=args.pro_forma,
-                interval=args.interval
+                interval=args.interval,
+                metric_scalar=args.metric_scalar or 1
             )
-            self.to_csv_organization_normalized_metric(normalized_spend)
+            self.to_csv_organization_normalized_metric(args.to_csv, normalized_spend)
 
     def _utility_usage_metrics(self, args, auth):
         from contxt.functions.ems import EMS
@@ -269,7 +314,7 @@ class EmsParser(ArgParser):
                 metric=args.metric,
                 resource_type=args.resource_type,
                 pro_forma=args.pro_forma,
-                metric_scalar=args.metric_scalar
+                metric_scalar=args.metric_scalar or 1
             )
             self._print_facility_normalized_metrics(normalized_usage, 'usage')
         else:
@@ -281,9 +326,10 @@ class EmsParser(ArgParser):
                 end_date=args.end_date,
                 resource_type=args.resource_type,
                 pro_forma=args.pro_forma,
-                interval=args.interval
+                interval=args.interval,
+                metric_scalar=args.metric_scalar or 1
             )
-            self.to_csv_organization_normalized_metric(normalized_usage)
+            self.to_csv_organization_normalized_metric(args.to_csv, normalized_usage)
 
     @staticmethod
     def _print_facility_normalized_metrics(normalized_data_by_date, normalization_key):
@@ -303,7 +349,7 @@ class EmsParser(ArgParser):
                        headers=['date', normalization_key, 'metric-value', 'normalized', 'pro_forma_date']))
 
     @staticmethod
-    def to_csv_organization_normalized_metric(normalized_data_by_facility):
+    def to_csv_organization_normalized_metric(filename, normalized_data_by_facility):
 
         to_csv_data = []
 
@@ -317,8 +363,10 @@ class EmsParser(ArgParser):
             for date, spend in data.items():
                 if date not in unique_dates:
                     unique_dates.append(date)
-
-                by_facility[facility_name][date] = spend['normalized']
+                if 'normalized' in spend:
+                    by_facility[facility_name][date] = spend['normalized']
+                else:
+                    by_facility[facility_name][date] = "N/A"
 
         facility_data = {}
         for date in sorted(unique_dates):
@@ -326,7 +374,7 @@ class EmsParser(ArgParser):
                 if facility_name not in facility_data:
                     facility_data[facility_name] = {}
                 if date not in date_data:
-                    facility_data[facility_name] = None
+                    facility_data[facility_name][date] = None
                 else:
                     facility_data[facility_name][date] = date_data[date]
 
@@ -334,7 +382,7 @@ class EmsParser(ArgParser):
             date_dict['facility_name'] = facility
             to_csv_data.append(date_dict)
 
-        with open('./org_usage_per_pound.csv', 'w') as f:
+        with open(filename, 'w') as f:
 
             fields = ['facility_name']
             fields.extend(unique_dates)

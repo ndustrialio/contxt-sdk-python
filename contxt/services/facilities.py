@@ -15,7 +15,7 @@ CONFIGS_BY_ENVIRONMENT = {
 
 class FacilitiesService(Service):
 
-    def __init__(self, auth_module, environment='staging'):
+    def __init__(self, auth_module, environment='production'):
 
         if environment not in CONFIGS_BY_ENVIRONMENT:
             raise Exception('Invalid environment specified')

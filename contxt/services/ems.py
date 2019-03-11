@@ -39,7 +39,7 @@ class EMSService(Service):
             'type': type,
             'date_start': date_start.strftime('%Y-%m'),
             'date_end': date_end.strftime('%Y-%m'),
-            'proforma': 'true' if pro_forma else 'false',
+            'pro_forma': 'true' if pro_forma else 'false',
             'exclude_account_charges': 'true' if exclude_account_charges else 'false'
         }
 
@@ -99,8 +99,8 @@ class UtilitySpendPeriod(APIObject):
 
         self.date = spend_api_object['date']
         self.spend = spend_api_object['value']
-        if 'proforma_date' in spend_api_object:
-            self.pro_forma_date = spend_api_object['proforma_date']
+        if 'pro_forma_date' in spend_api_object:
+            self.pro_forma_date = spend_api_object['pro_forma_date']
         else:
             self.pro_forma_date = None
 
@@ -108,7 +108,7 @@ class UtilitySpendPeriod(APIObject):
         return [self.date, self.spend, self.pro_forma_date]
 
     def get_keys(self):
-        return ['date', 'value', 'proforma_date']
+        return ['date', 'value', 'pro_forma_date']
 
 
 class UtilityUsagePeriod(APIObject):
