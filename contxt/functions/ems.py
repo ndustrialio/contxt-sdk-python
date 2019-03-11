@@ -263,7 +263,7 @@ class EMS:
                                                         asset_instance=asset_instance)
 
         if metric not in asset_obj.asset_type.metrics:
-            logger.critical("No such metric for Facility")
+            logger.critical(f"No such metric for facility with ID {facility_id}")
             return
 
         # get the metric we're looking for
@@ -307,10 +307,11 @@ class EMS:
                     normalized_data_by_date[date]['normalized'] = "Spend Data Available"
                 normalized_data_by_date[date]['pro_forma_date'] = spend.pro_forma_date
             else:
-                normalized_data_by_date[date] = {}
-                normalized_data_by_date[date]['spend'] = None
-                normalized_data_by_date[date]['normalized'] = "Metric Data Unavailable"
-                normalized_data_by_date[date]['pro_forma_date'] = None
+                normalized_data_by_date[date] = {
+                    'spend': None,
+                    'normalized': "Metric Data Unavailable",
+                    'pro_forma_date': None
+                }
 
         return normalized_data_by_date
 
@@ -378,10 +379,11 @@ class EMS:
                     normalized_data_by_date[date]['normalized'] = "Usage Data Unavailable"
                 normalized_data_by_date[date]['pro_forma_date'] = usage.pro_forma_date
             else:
-                normalized_data_by_date[date] = {}
-                normalized_data_by_date[date]['usage'] = None
-                normalized_data_by_date[date]['normalized'] = "Metric Data Unavailable"
-                normalized_data_by_date[date]['pro_forma_date'] = None
+                normalized_data_by_date[date] = {
+                    'usage': None,
+                    'normalized': "Metric Data Unavailable",
+                    'pro_forma_date': None
+                }
 
         return normalized_data_by_date
 

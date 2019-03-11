@@ -68,9 +68,11 @@ class IotParser(ArgParser):
 
         # Unprovisioned Fields
         unprovisioned_fields_parser = _subparsers.add_parser("unprovisioned", help="Unprovisioned fields")
+
         feeds_group = unprovisioned_fields_parser.add_mutually_exclusive_group(required=True)
         feeds_group.add_argument("--feed_key", type=str, help="Provide feed key")
         feeds_group.add_argument("--feed_id", type=int, help="Provide feed id")
+
         unprovisioned_fields_parser.add_argument("--to-csv", type=str, help="Dump results to csv if desired")
         unprovisioned_fields_parser.set_defaults(func=self._unprovisioned_fields)
 
@@ -153,60 +155,71 @@ class EmsParser(ArgParser):
 
         # Spend
         spend_parser = _subparsers.add_parser("util-spend", help="Utility spend")
+        spend_parser.add_argument("interval", choices=["daily", "monthly"], help="Time interval")
+        spend_parser.add_argument("resource_type", choices=["electric", "gas", "combined"], help="Type of resource")
+        spend_parser.add_argument("start_date", help="Start month (YYYY-MM)")
+        spend_parser.add_argument("end_date", help="End month (YYYY-MM)")
+
         spend_group = spend_parser.add_mutually_exclusive_group(required=True)
         spend_group.add_argument("-f", "--facility-id", type=int, help="Facility id")
         spend_group.add_argument("-g", "--org-id", help="Organization id")
         spend_group.add_argument("-n", "--org-name", help="Organization name")
-        spend_parser.add_argument("--interval", choices=["daily", "monthly"], help="Time interval")
-        spend_parser.add_argument("--resource_type", choices=["electric", "gas", "combined"], help="Type of resource")
-        spend_parser.add_argument("--start_date", help="Start month (YYYY-MM)")
-        spend_parser.add_argument("--end_date", help="End month (YYYY-MM)")
+
         spend_parser.add_argument("-o", "--to-csv", help="Filename to save data (csv)")
         spend_parser.add_argument("-p", "--pro-forma", action="store_true", help="Include pro forma calculations")
         spend_parser.set_defaults(func=self._utility_spend)
 
-        # TODO: Usage
+        # Usage
         usage_parser = _subparsers.add_parser("util-usage", help="Utility usage")
+        usage_parser.add_argument("interval", choices=["daily", "monthly"], help="Time interval")
+        usage_parser.add_argument("resource_type", choices=["electric", "gas", "combined"], help="Type of resource")
+        usage_parser.add_argument("start_date", help="Start month (YYYY-MM)")
+        usage_parser.add_argument("end_date", help="End month (YYYY-MM)")
+
         usage_group = usage_parser.add_mutually_exclusive_group(required=True)
         usage_group.add_argument("-f", "--facility-id", type=int, help="Facility id")
         usage_group.add_argument("-g", "--org-id", help="Organization id")
         usage_group.add_argument("-n", "--org-name", help="Organization name")
-        usage_parser.add_argument("--interval", choices=["daily", "monthly"], help="Time interval")
-        usage_parser.add_argument("--resource_type", choices=["electric", "gas", "combined"], help="Type of resource")
-        usage_parser.add_argument("--start_date", help="Start month (YYYY-MM)")
-        usage_parser.add_argument("--end_date", help="End month (YYYY-MM)")
+
         usage_parser.add_argument("-o", "--to-csv", help="Filename to save data (csv)")
         usage_parser.add_argument("-p", "--pro-forma", action="store_true", help="Include pro forma calculations")
         usage_parser.set_defaults(func=self._utility_usage)
 
-        # TODO: Metrics (do we want to duplicate this?)
+        # Spend Metric Normalization
         spend_metrics_parser = _subparsers.add_parser("util-spend-metrics", help="Utility spend metrics")
+
+        spend_metrics_parser.add_argument("metric", help="Provide the metric you want to normalize against")
+        spend_metrics_parser.add_argument("interval", choices=["daily", "monthly"], help="Time interval")
+        spend_metrics_parser.add_argument("resource_type", choices=["electric", "gas", "combined"], help="Type of resource")
+        spend_metrics_parser.add_argument("start_date", help="Start month (YYYY-MM)")
+        spend_metrics_parser.add_argument("end_date", help="End month (YYYY-MM)")
+
         spend_metrics_group = spend_metrics_parser.add_mutually_exclusive_group(required=True)
         spend_metrics_group.add_argument("-f", "--facility-id", type=int, help="Facility id")
         spend_metrics_group.add_argument("-g", "--org-id", help="Organization id")
         spend_metrics_group.add_argument("-n", "--org-name", help="Organization name")
-        spend_metrics_parser.add_argument("--interval", choices=["daily", "monthly"], help="Time interval")
-        spend_metrics_parser.add_argument("--metric", type=str, help="Provide the metric you want to normalize against")
-        spend_metrics_parser.add_argument("--resource_type", choices=["electric", "gas", "combined"], help="Type of resource")
-        spend_metrics_parser.add_argument("--start_date", help="Start month (YYYY-MM)")
-        spend_metrics_parser.add_argument("--end_date", help="End month (YYYY-MM)")
+
         spend_metrics_parser.add_argument("-o", "--to-csv", help="Filename to save data (csv)")
         spend_metrics_parser.add_argument("-p", "--pro-forma", action="store_true", help="Include pro forma calculations")
         spend_metrics_parser.add_argument("--metric-scalar", type=float, help="Optionally scale the normalized metric by a float")
         spend_metrics_parser.set_defaults(func=self._utility_spend_metrics)
 
-        # TODO: Metrics (do we want to duplicate this?)
+        # Usage Metric Normalization
         usage_metrics_parser = _subparsers.add_parser("util-usage-metrics", help="Utility usage metrics")
+
+        usage_metrics_parser.add_argument("metric", help="Provide the metric you want to normalize against")
+        usage_metrics_parser.add_argument("interval", choices=["daily", "monthly"], help="Time interval")
+        usage_metrics_parser.add_argument("resource_type", choices=["electric", "gas", "combined"],
+                                          help="Type of resource")
+        usage_metrics_parser.add_argument("start_date", help="Start month (YYYY-MM)")
+        usage_metrics_parser.add_argument("end_date", help="End month (YYYY-MM)")
+
         usage_metrics_group = usage_metrics_parser.add_mutually_exclusive_group(required=True)
         usage_metrics_group.add_argument("-f", "--facility-id", type=int, help="Facility id")
         usage_metrics_group.add_argument("-g", "--org-id", help="Organization id")
         usage_metrics_group.add_argument("-n", "--org-name", help="Organization name")
-        usage_metrics_parser.add_argument("--interval", choices=["daily", "monthly"], help="Time interval")
-        usage_metrics_parser.add_argument("--metric", type=str, help="Provide the metric you want to normalize against")
-        usage_metrics_parser.add_argument("--resource_type", choices=["electric", "gas", "combined"], help="Type of resource")
-        usage_metrics_parser.add_argument("--start_date", help="Start month (YYYY-MM)")
-        usage_metrics_parser.add_argument("--end_date", help="End month (YYYY-MM)")
-        usage_metrics_parser.add_argument("-o", "--to-csv", required=True, help="Filename to save data (csv)")
+
+        usage_metrics_parser.add_argument("-o", "--to-csv", help="Filename to save data (csv)")
         usage_metrics_parser.add_argument("-p", "--pro-forma", action="store_true", help="Include pro forma calculations")
         usage_metrics_parser.add_argument("--metric-scalar", type=float, help="Optionally scale the normalized metric by a float")
         usage_metrics_parser.set_defaults(func=self._utility_usage_metrics)
@@ -318,6 +331,11 @@ class EmsParser(ArgParser):
             )
             self._print_facility_normalized_metrics(normalized_usage, 'usage')
         else:
+
+            if not args.to_csv:
+                logger.critical("Please provide --to-csv as an argument to specify report export file")
+                return
+
             normalized_usage = ems.get_organization_usage_vs_monthly_metric(
                 organization_name=args.org_name,
                 organization_id=args.org_id,
