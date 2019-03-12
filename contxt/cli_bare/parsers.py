@@ -381,20 +381,15 @@ class EmsParser(ArgParser):
             for date, spend in data.items():
                 if date not in unique_dates:
                     unique_dates.append(date)
-                if 'normalized' in spend:
-                    by_facility[facility_name][date] = spend['normalized']
-                else:
-                    by_facility[facility_name][date] = "N/A"
+
+                by_facility[facility_name][date] = spend.get('normalized', 'N/A')
 
         facility_data = {}
         for date in sorted(unique_dates):
             for facility_name, date_data in by_facility.items():
                 if facility_name not in facility_data:
                     facility_data[facility_name] = {}
-                if date not in date_data:
-                    facility_data[facility_name][date] = None
-                else:
-                    facility_data[facility_name][date] = date_data[date]
+                facility_data[facility_name][date] = date_data.get(date)
 
         for facility, date_dict in facility_data.items():
             date_dict['facility_name'] = facility
