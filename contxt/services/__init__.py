@@ -1,5 +1,6 @@
 import json
 from datetime import datetime
+import pytz
 
 import jwt
 import pandas as pd
@@ -151,7 +152,7 @@ class DataResponse(object):
 
         while True:
             for record in self.records:
-                record['event_time'] = datetime.strptime(record['event_time'], "%Y-%m-%dT%H:%M:%S.%fZ")
+                record['event_time'] = datetime.strptime(record['event_time'], "%Y-%m-%dT%H:%M:%S.%fZ").replace(tzinfo=pytz.UTC)
                 yield record
 
             if self.has_more:

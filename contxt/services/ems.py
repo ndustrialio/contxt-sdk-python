@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from contxt.services import GET, APIObject, APIObjectCollection, Service
+from contxt.services.iot import Field
 
 CONFIGS_BY_ENVIRONMENT = {
     'production': {
@@ -27,6 +28,26 @@ class EMSService(Service):
             base_url=self.env['base_url'],
             access_token=auth_module.get_token_for_client(
                 self.env['audience']))
+
+    def get_main_services(self, facility_id, type=None):
+
+        assert isinstance(facility_id, int)
+
+        response = self.execute(
+            GET(uri=f'facilities/{facility_id}'),
+            execute=True
+        )
+
+        # manual filter for main services
+        rows = []
+        if type:
+            for row in response['main_services']:
+                if row['type'] == type:
+                    rows.append(row)
+        else:
+            rows = response['main_services']
+
+        return APIObjectCollection([FacilityMainService(row) for row in rows])
 
     def get_monthly_utility_spend(self, facility_id, type, date_start, date_end, pro_forma=False, exclude_account_charges=False):
 
@@ -150,3 +171,27 @@ class FacilityUtilityUsage(APIObject):
             **super().get_dict(),
             'spend_periods': self.usage_periods.get_dicts()
         }
+
+
+class FacilityMainService(APIObject):
+
+    def __init__(self, facility_main_object, keys_to_ignore=None):
+        super().__init__(keys_to_ignore=keys_to_ignore)
+
+        self.id = facility_main_object['id']
+        self.facility_id = facility_main_object['facility_id']
+        self.name = facility_main_object['name']
+        self.type = facility_main_object['type']
+        self.demand_field = Field(facility_main_object['demand_field']) if facility_main_object['demand_field'] else None
+        self.usage_field = Field(facility_main_object['usage_field']) if facility_main_object['usage_field'] else None
+
+    def get_values(self):
+        return [self.facility_id,
+                self.name,
+                self.type,
+                self.demand_field.id if self.demand_field else None,
+                self.usage_field.id if self.usage_field else None
+                ]
+
+    def get_keys(self):
+        return ['facility_id', 'name', 'type', 'demand_field_id', 'usage_field_id']

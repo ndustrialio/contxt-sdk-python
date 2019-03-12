@@ -13,6 +13,7 @@ from contxt.services import UnauthorizedException
 from contxt.services.contxt import ContxtService
 from contxt.services.ems import EMSService
 from contxt.services.facilities import FacilitiesService
+from contxt.services.iot import IOTService
 from contxt.utils import make_logger
 from contxt.utils.vis import DataVisualizer
 
@@ -27,9 +28,44 @@ class EMS:
 
         self.ems_service = EMSService(self.auth)
         self.contxt_service = ContxtService(self.auth)
+        self.iot_service = IOTService(self.auth)
         self.facilities_service = FacilitiesService(self.auth, environment='production')
 
         self.asset_functions = Assets(self.auth)
+
+    def get_facility_main_data(self, facility_id, resource_type, start_date, end_date):
+        if not isinstance(start_date, datetime):
+            start_date = datetime.strptime(start_date, "%Y-%m-%d")
+        if not isinstance(end_date, datetime):
+            end_date = datetime.strptime(end_date, "%Y-%m-%d")
+
+        if resource_type not in ['electric', 'gas', 'combined']:
+            logger.critical("resource_type must be one of 'electrical','gas','combined'")
+            return
+
+        facility_obj = self.facilities_service.get_facility_by_id(facility_id)
+        facility_timezone = pytz.timezone(facility_obj.timezone)
+
+        main_services = self.ems_service.get_main_services(facility_id, resource_type)
+
+        data_by_main = {}
+        for service in main_services:
+            print(f"Getting data for main service {service.name}. IOT Info -> "
+                  f"{service.demand_field.field_human_name} and output {service.demand_field.output_id} "
+                  f"from {start_date} to {end_date}")
+            data = self.iot_service.get_data_for_field(output_id=service.demand_field.output_id,
+                                                       field_human_name=service.demand_field.field_human_name,
+                                                       start_time=start_date,
+                                                       end_time=end_date,
+                                                       window=900,
+                                                       limit=5000)
+            data_by_main[service.name] = []
+            for row in data:
+                data_by_main[service.name].append({'event_time': row['event_time'].astimezone(facility_timezone),
+                                                   'value': row['value']
+                                                   })
+
+        return data_by_main
 
     def get_facility_spend(self, facility_id, interval, resource_type, start_date, end_date, pro_forma=False):
 

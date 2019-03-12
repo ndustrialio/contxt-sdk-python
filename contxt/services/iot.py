@@ -203,8 +203,8 @@ class Field(APIObject):
         self.output_id = field_api_object['output_id']
         self.field_descriptor = field_api_object['field_descriptor']
         self.field_human_name = field_api_object['field_human_name']
-        self.is_hidden = field_api_object['is_hidden']
-        self.status = field_api_object['status']
+        self.is_hidden = field_api_object['is_hidden'] if 'is_hidden' in field_api_object else None
+        self.status = field_api_object['status'] if 'status' in field_api_object else None
         self.units = field_api_object['units']
 
 
