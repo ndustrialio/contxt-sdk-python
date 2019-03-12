@@ -105,6 +105,10 @@ class ContxtCLI:
         else:
             print(res)
 
+        if 'to_file_handler' in func_definition:
+            file_handler = getattr(self, func_definition['to_file_handler'])
+            file_handler(res)
+
     def parse_command(self, args):
 
         self.call_function(args)

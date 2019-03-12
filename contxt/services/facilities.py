@@ -56,7 +56,7 @@ class Facility(APIObject):
 
         super().__init__(
             keys_to_ignore=keys_to_ignore if keys_to_ignore is not None else [
-                'address1', 'address2', 'geometry_id', 'asset_id', 'tags',
+                'address1', 'address2', 'geometry_id', 'tags',
                 'Organization', 'Info'
             ])
 
