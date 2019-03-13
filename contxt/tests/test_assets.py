@@ -275,8 +275,8 @@ class TestAssetFramework:
         metric_value = MetricValue(
             asset_id=TEST_ASSET.id,
             asset_metric_id=metric.id,
-            effective_start_date=DataParsers.parse_datetime(start_date),
-            effective_end_date=DataParsers.parse_datetime(get_end_date(start_date)),
+            effective_start_date=DataParsers.format_datetime(start_date),
+            effective_end_date=DataParsers.format_datetime(get_end_date(start_date)),
             notes="test note",
             value=1)
         created_metric_value = asset_framework.create_metric_value(
@@ -290,9 +290,9 @@ class TestAssetFramework:
 
         # Test update_metric_value and get_metric_value
         new_start_date = datetime(2018, 3, 8)
-        created_metric_value.effective_start_date = DataParsers.parse_as_datetime(DataParsers.parse_datetime(new_start_date))
+        created_metric_value.effective_start_date = DataParsers.parse_as_datetime(DataParsers.format_datetime(new_start_date))
         created_metric_value.effective_end_date = DataParsers.parse_as_datetime(
-            DataParsers.parse_datetime(get_end_date(new_start_date)))
+            DataParsers.format_datetime(get_end_date(new_start_date)))
         created_metric_value.notes = "edited test note"
         created_metric_value.value = 2
         asset_framework.update_metric_value(created_metric_value)

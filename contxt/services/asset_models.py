@@ -49,7 +49,7 @@ class DataParsers:
     the appropriate Python object"""
 
     @staticmethod
-    def parse_datetime(datetime_) -> str:
+    def format_datetime(datetime_) -> str:
         return datetime_.strftime('%Y-%m-%dT%H:%M:%S.%fZ')
 
     @staticmethod
@@ -59,7 +59,7 @@ class DataParsers:
 
     # TODO: change these as dates rather than datetimes
     @staticmethod
-    def parse_date(datetime_):
+    def format_date(datetime_):
         return datetime_.strftime('%Y-%m-%d')
 
     @staticmethod
@@ -685,7 +685,7 @@ class MetricValue(ApiObject):
         d = self.get_dict(include=self.creatable_fields)
         for k, v in d.items():
             if isinstance(v, datetime):
-                d[k] = DataParsers.parse_datetime(v)
+                d[k] = DataParsers.format_datetime(v)
         return d
 
     def put(self):
@@ -693,5 +693,5 @@ class MetricValue(ApiObject):
         d = self.get_dict(include=self.updatable_fields)
         for k, v in d.items():
             if isinstance(v, datetime):
-                d[k] = DataParsers.parse_datetime(v)
+                d[k] = DataParsers.format_datetime(v)
         return d
