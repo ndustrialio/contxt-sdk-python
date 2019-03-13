@@ -39,6 +39,29 @@ class Utils:
 
         return int((dt_object.astimezone(pytz.utc) - utc_1970).total_seconds())
 
+    @staticmethod
+    def dict_to_set(dict_):
+        # TODO: this does not handle nested dicts
+
+        def flatten(obj):
+            if isinstance(obj, (list, tuple)):
+                return tuple([flatten(o) for o in obj])
+            elif isinstance(obj, dict):
+                return tuple([(flatten(k), flatten(v)) for k, v in sorted(obj.items())])
+            return obj
+
+        return set(flatten(dict_))
+
+    @staticmethod
+    def set_to_dict(set_):
+
+        def expand(obj):
+            if isinstance(obj, (set, tuple)):
+                return {k: expand(v) for k, v in obj}
+            return obj
+
+        return expand(set_)
+
 
 class Envs:
     staging = '4a9cfc2b-2580-4d01-8e67-0ea176296746'
