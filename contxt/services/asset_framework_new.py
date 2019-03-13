@@ -3,8 +3,9 @@ from typing import Dict, List, Optional, Set, Tuple
 
 from contxt.services.api import ApiObject, ApiService
 from contxt.services.asset_models import (Asset, AssetType, Attribute,
-                                          AttributeValue, DataTypes, Metric,
-                                          MetricValue, TimeIntervals)
+                                          AttributeValue, CompleteAsset,
+                                          DataTypes, Metric, MetricValue,
+                                          TimeIntervals)
 from contxt.utils import make_logger
 from contxt.utils.auth import CLIAuth
 
@@ -128,6 +129,53 @@ class AssetFramework(ApiService):
             return default
         return self.types[asset_type_label]
 
+    # Abstractions
+    def get_complete_asset(self, asset_id: str):
+        """High-level abstraction of an asset, complete with attributes,
+        attribute values, metrics, and metric values."""
+        asset = self.get_asset(asset_id, with_metric_values=True)
+        asset_type = self.asset_type_with_id(asset.asset_type_id)
+        return CompleteAsset(asset, asset_type)
+
+    def sync_complete_asset(self, asset: CompleteAsset):
+        """Push any changes to the abstracted CompleteAsset to the Asset
+        Framework API """
+        # Update attribute values
+        # TODO: probably better to do a set calculation here instead of
+        # multiple list comprehensions
+        attribute_values_to_create = [
+            v for v in asset.edited_attribute_values if v.id is None
+        ]
+        attribute_values_to_update = [
+            v for v in asset.edited_attribute_values
+            if v.id is not None and v.value is not None
+        ]
+        attribute_values_to_delete = [
+            v for v in asset.edited_attribute_values
+            if v.id is not None and v.value is None
+        ]
+        self.create_attribute_values(attribute_values_to_create)
+        self.update_attribute_values(attribute_values_to_update)
+        self.delete_attribute_values(attribute_values_to_delete)
+        asset.edited_attribute_values.clear()
+
+        # Update metric values
+        metric_values_to_create = [
+            v for v in asset.edited_metric_values if v.id is None
+        ]
+        metric_values_to_update = [
+            v for v in asset.edited_metric_values
+            if v.id is not None and v.value is not None
+        ]
+        metric_values_to_delete = [
+            v for v in asset.edited_metric_values
+            if v.id is not None and v.value is None
+        ]
+        self.create_metric_values(metric_values_to_create)
+        self.update_metric_values(metric_values_to_update)
+        self.delete_metric_values(metric_values_to_delete)
+        asset.edited_metric_values.clear()
+
     # Single asset types
     def create_asset_type(self, asset_type: AssetType) -> AssetType:
         data = asset_type.post()
@@ -189,7 +237,10 @@ class AssetFramework(ApiService):
         logger.debug(f"Creating asset with {data}")
         return Asset(**self.post("assets", data=data))
 
-    def get_asset(self, asset_id: str, with_metric_values=False) -> Asset:
+    def get_asset(self,
+                  asset_id: str,
+                  with_attribute_values=True,
+                  with_metric_values=False) -> Asset:
         logger.debug(f"Fetching asset {asset_id}")
         metric_values = self.get_metric_values(asset_id) if with_metric_values else None
         return Asset(**self.get(f"assets/{asset_id}"), asset_metric_values=metric_values)
