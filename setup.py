@@ -18,7 +18,7 @@ URL = "https://github.com/ndustrialio/contxt-sdk-python"
 EMAIL = "dev@ndustrial.io"
 AUTHOR = "ndustrial.io"
 REQUIRES_PYTHON = ">=3.5.0"
-VERSION = "0.0.1b1"
+VERSION = "0.0.1b2"
 
 # What packages are required for this module to be executed?
 REQUIRED = [
@@ -109,12 +109,12 @@ setup(
     author_email=EMAIL,
     python_requires=REQUIRES_PYTHON,
     url=URL,
-    # packages=find_packages(exclude=("tests",)),
+    packages=find_packages(exclude=("tests",)),
     # If your package is a single module, use this instead of "packages":
-    py_modules=[NAME],
-    # entry_points={
-    #     "console_scripts": ["mycli=mymodule:cli"],
-    # },
+    # py_modules=[NAME],
+    entry_points={
+        "console_scripts": ["contxt=contxt:main"],
+    },
     install_requires=REQUIRED,
     extras_require=EXTRAS,
     include_package_data=True,
