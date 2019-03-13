@@ -1,4 +1,4 @@
-from contxt.services import GET, APIObject, APIObjectCollection, Service
+from contxt.legacy.services import GET, APIObject, APIObjectCollection, Service
 from contxt.services.contxt import Organization
 
 CONFIGS_BY_ENVIRONMENT = {

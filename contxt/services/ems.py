@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from contxt.services import GET, APIObject, APIObjectCollection, Service
+from contxt.legacy.services import GET, APIObject, APIObjectCollection, Service
 
 CONFIGS_BY_ENVIRONMENT = {
     'production': {

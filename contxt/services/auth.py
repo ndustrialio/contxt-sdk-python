@@ -1,4 +1,4 @@
-from contxt.services import POST, ApiRequest, Service
+from contxt.legacy.services import POST, ApiRequest, Service
 
 CONFIGS_BY_ENVIRONMENT = {
     'production': {
