@@ -85,6 +85,194 @@ class DataParsers:
     unknown = parse_as_unknown
 
 
+class CompleteAsset(ApiObject):
+    """High-level abstraction of an asset"""
+
+    def __init__(
+            self,
+            asset: Asset,
+            asset_type: AssetType,
+    ):
+        # Asset
+        self.asset = asset
+        self.asset_type = asset_type
+
+        # Labeled attribute/metric values
+        self._attribute_values_by_label = self._init_attribute_values()
+        self._metric_values_by_label = self._init_metric_values()
+
+        # Use two sets to track changes to values
+        # TODO: figure out a more elegant way to track this
+        self.edited_attribute_values = set()
+        self.edited_metric_values = set()
+
+    def _init_attribute_values(self):
+        # Fetch attribute labels to use as keys
+        attribute_values_by_label = {
+            a.normalized_label: None
+            for a in self.asset_type.attributes
+        }
+
+        # TODO: this is sorted to only store the attribute value with the
+        # latest effective_date. However, we may later need to keep the
+        # complete list.
+        for av in sorted(
+                self.asset.attribute_values, key=lambda av: av.effective_date):
+            label = self.asset_type.attribute_with_id(
+                av.asset_attribute_id).normalized_label
+            attribute_values_by_label[label] = av
+
+        return attribute_values_by_label
+
+    def _init_metric_values(self):
+        # Fetch metric labels to use as keys
+        metric_values_by_label = {
+            m.normalized_label: {}
+            for m in self.asset_type.metrics
+        }
+
+        for mv in self.asset.metric_values:
+            label = self.asset_type.metric_with_id(
+                mv.asset_metric_id).normalized_label
+            metric_values_by_label[label][mv.effective_start_date] = mv
+
+        return metric_values_by_label
+
+    def _effective_end_date(self, effective_start_date, time_interval):
+        delta = timedelta()
+        if time_interval == TimeIntervals.hourly:
+            delta = timedelta(hours=1) - timedelta(milliseconds=1)
+        elif time_interval == TimeIntervals.daily:
+            delta = timedelta(days=1) - timedelta(milliseconds=1)
+        elif time_interval == TimeIntervals.weekly:
+            delta = timedelta(weeks=1) - timedelta(milliseconds=1)
+        elif time_interval == TimeIntervals.monthly:
+            delta = timedelta(months=1) - timedelta(milliseconds=1)
+        elif time_interval == TimeIntervals.yearly:
+            delta = timedelta(years=1) - timedelta(milliseconds=1)
+        elif time_interval == TimeIntervals.sparse:
+            pass
+        else:
+            raise KeyError(f"Unrecognized time interval: {time_interval}")
+        return effective_start_date + delta
+
+    def attribute(self, label):
+        attr = self._attribute_values_by_label[label]
+        return attr.value if attr else attr
+
+    @property
+    def attributes(self):
+        """Get dict of key (Attribute label) value (value of AttributeValue
+        with latest effective_date) pairs"""
+        return {
+            k: v.value if v else None
+            for k, v in self._attribute_values_by_label.items()
+        }
+
+    @attributes.setter
+    def attributes(self, attributes: dict):
+        # Determine attributes that changed, by performing a set difference on
+        # the two dictionaries
+        new_attribute_values = dict(
+            set(attributes.items()) - set(self.attributes.items()))
+
+        # Handle each change
+        for label, new_value in new_attribute_values.items():
+            # Validate attribute label
+            if label not in self._attribute_values_by_label:
+                raise KeyError(
+                    f"Attribute {label} does not exist for AssetType {self.asset_type.normalized_label}"
+                )
+
+            # Make the change, and mark as changed
+            attribute = self.asset_type.attribute_with_label(label)
+            attribute_value = self._attribute_values_by_label[
+                label] or AttributeValue(
+                    asset_id=self.asset.id,
+                    asset_attribute_id=attribute.id,
+                    notes="",
+                    value=None)
+            prev_value = attribute_value.value
+            attribute_value.value = new_value
+            self.edited_attribute_values.add(attribute_value)
+
+            # Log the change and handle any bookkeeping
+            if new_value is None:
+                logger.debug(f"Deleted {label}")
+                # self.asset.attribute_values.remove(attribute_value)
+            elif prev_value is None:
+                logger.debug(f"Set {label}: {new_value}")
+                self.asset.attribute_values.append(attribute_value)
+            else:
+                logger.debug(f"Changed {label}: {prev_value} -> {new_value}")
+
+        # Refresh internal list of attribute values
+        self._attribute_values_by_label = self._init_attribute_values()
+
+    def metric(self, label):
+        return self._metric_values_by_label[label]
+
+    @property
+    def metrics(self):
+        """Get dict of key (Metric label) value (dict of effective_start_date
+        to value of MetricValue) pairs"""
+        return {
+            k: {kk: vv.value if vv else None
+                for kk, vv in v.items()}
+            for k, v in self._metric_values_by_label.items()
+        }
+
+    @metrics.setter
+    def metrics(self, metrics: dict):
+        # Determine metrics that changed, by performing a set difference on
+        # the two dictionaries
+        # TODO: this only identifies the label, since this is a nested dict
+        curr_metrics = self.metrics
+        new_metrics = Utils.set_to_dict(
+            Utils.dict_to_set(metrics) - Utils.dict_to_set(curr_metrics))
+
+        # Determine each change
+        for label, start_date_to_value in new_metrics.items():
+            # Validate metric label
+            if label not in self._metric_values_by_label:
+                raise KeyError(
+                    f"Metric {label} does not exist for AssetType {self.asset_type.normalized_label}"
+                )
+
+            # Determine metric values that changed
+            metric = self.asset_type.metric_with_label(label)
+            metric_values = self._metric_values_by_label[label]
+            new_metric_values = Utils.set_to_dict(
+                Utils.dict_to_set(start_date_to_value) - Utils.dict_to_set(curr_metrics[label]))
+
+            for start_date, new_value in new_metric_values.items():
+                # Make the change, and mark as changed
+                metric_value = metric_values.get(start_date) or MetricValue(
+                    asset_id=self.asset.id,
+                    asset_metric_id=metric.id,
+                    effective_start_date=start_date,
+                    effective_end_date=self._effective_end_date(
+                        start_date, metric.time_interval),
+                    notes="",
+                    value=None)
+                prev_value = metric_value.value
+                metric_value.value = new_value
+                self.edited_metric_values.add(metric_value)
+
+                # Log the change and handle any bookkeeping
+                if new_value is None:
+                    logger.debug(f"Deleted {label} {start_date}")
+                    # self.asset.metric_values.remove(metric_value)
+                elif prev_value is None:
+                    logger.debug(f"Set {label} {start_date}: {new_value}")
+                    self.asset.metric_values.append(metric_value)
+                else:
+                    logger.debug(f"Changed {label} {start_date}: {prev_value} -> {new_value}")
+
+        # Refresh internal list of metric values
+        self._metric_values_by_label = self._init_metric_values()
+
+
 class AssetType(ApiObject):
     __marker = object()
     creatable_fields = ['label', 'description', 'organization_id', 'parent_id']
@@ -451,28 +639,40 @@ class MetricValue(ApiObject):
             self,
             asset_id: str,
             asset_metric_id: str,
-            effective_start_date: str,
-            effective_end_date: str,
+            effective_start_date: Union[str, datetime],
+            effective_end_date: Union[str, datetime],
             notes: str,
             value: str,
             id: Optional[str] = None,
             asset: Optional[dict] = None,
-            created_at: Optional[str] = None,
-            updated_at: Optional[str] = None,
+            created_at: Optional[Union[str, datetime]] = None,
+            updated_at: Optional[Union[str, datetime]] = None,
             **kwargs,
     ):
         super().__init__()
         self.id = id
         self.asset_id = asset_id
         self.asset_metric_id = asset_metric_id
-        self.effective_start_date = DataParsers.datetime(
-            effective_start_date) if effective_start_date else None
-        self.effective_end_date = DataParsers.datetime(
-            effective_end_date) if effective_end_date else None
+
+        self.effective_start_date = effective_start_date if isinstance(
+            effective_start_date,
+            datetime) else DataParsers.datetime(effective_start_date)
+
+        self.effective_end_date = effective_end_date if isinstance(
+            effective_end_date,
+            datetime) else DataParsers.datetime(effective_end_date)
+
         self.notes = notes
         self.value = DataParsers.number(value) if value else None
-        self.created_at = DataParsers.datetime(created_at) if created_at else None
-        self.updated_at = DataParsers.datetime(updated_at) if updated_at else None
+
+        self.created_at = created_at if isinstance(
+            created_at,
+            (datetime, type(None))) else DataParsers.datetime(created_at)
+
+        self.updated_at = updated_at if isinstance(
+            updated_at,
+            (datetime, type(None))) else DataParsers.datetime(updated_at)
+
         self.asset = Asset(**asset) if asset else None
 
     def post(self):
