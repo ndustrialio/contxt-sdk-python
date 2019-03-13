@@ -1,4 +1,3 @@
-import logging
 from typing import Dict, List, Optional, Set, Tuple
 
 from contxt.services.api import ApiObject, ApiService
@@ -10,7 +9,6 @@ from contxt.utils import make_logger
 from contxt.utils.auth import CLIAuth
 
 logger = make_logger(__name__)
-logger.setLevel(logging.DEBUG)
 
 
 # TODO: create a class for this

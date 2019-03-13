@@ -1,4 +1,3 @@
-import logging
 from typing import Dict, List, Optional, Set, Tuple
 
 import pandas as pd
@@ -12,7 +11,6 @@ from tabulate import tabulate
 from contxt.utils import make_logger
 
 logger = make_logger(__name__)
-logger.setLevel(logging.DEBUG)
 
 API_VERSION = 'v1'
 

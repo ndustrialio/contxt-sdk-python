@@ -7,8 +7,11 @@ import pytz
 from tzlocal import get_localzone
 
 
-def make_logger(name):
-    return logging.getLogger(name)
+def make_logger(name, level=None):
+    logger = logging.getLogger(name)
+    if level:
+        logger.setLevel(level)
+    return logger
 
 
 class Utils:
