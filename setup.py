@@ -22,21 +22,12 @@ VERSION = "0.0.1b3"
 
 # What packages are required for this module to be executed?
 REQUIRED = [
-    "requests==2.21.0",
-    "argcomplete==1.9.4",
-    "dash_html_components==0.14.0",
-    "plotly==3.7.0",
-    "setuptools==40.8.0",
-    "pandas==0.24.1",
-    "dash_core_components==0.44.0",
-    "pytz==2018.9",
-    "tzlocal==1.5.1",
-    "tqdm==4.31.1",
-    "dash==0.39.0",
-    "auth0_python==3.6.1",
-    "python_dateutil==2.8.0",
-    "inflect==2.1.0",
-    "PyJWT==1.7.1"
+    "requests==2.21.0", "argcomplete==1.9.4", "dash_html_components==0.14.0",
+    "plotly==3.7.0", "setuptools==40.8.0", "pandas==0.24.1",
+    "dash_core_components==0.44.0", "pytz==2018.9", "tzlocal==1.5.1",
+    "tqdm==4.31.1", "dash==0.39.0", "auth0_python==3.6.1",
+    "python_dateutil==2.8.0", "inflect==2.1.0", "PyJWT==1.7.1",
+    "tabulate==0.8.3"
 ]
 
 # What packages are optional?
