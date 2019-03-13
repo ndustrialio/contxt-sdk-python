@@ -1,20 +1,19 @@
 from __future__ import annotations
 
 from ast import literal_eval
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from typing import Dict, List, Optional, Set, Tuple, Union
 
 from inflect import engine
 from pytz import UTC
 
 from contxt.services.api import ApiObject
-from contxt.utils import make_logger
+from contxt.utils import Utils, make_logger
 
 p = engine()
 logger = make_logger(__name__)
 
 # TODO: Need a way to track changed attributes
-
 def warn_of_unknown_kwargs(cls_, kwargs):
     # Warn of unexpected kwargs
     cls_name = cls_.__class__.__name__
@@ -28,14 +27,17 @@ def warn_of_unknown_kwargs(cls_, kwargs):
 
 
 class TimeIntervals:
+    """Valid time intervals for a MetricValue"""
     hourly = "hourly"
     daily = "daily"
     weekly = "weekly"
     monthly = "monthly"
     yearly = "yearly"
+    sparse = "sparse"
 
 
 class DataTypes:
+    """Valid data types for an Attribute"""
     boolean = 'boolean'
     datetime = 'date'
     number = 'number'
@@ -43,6 +45,9 @@ class DataTypes:
 
 
 class DataParsers:
+    """Parsers used to parse a string returned from the Asset Framework API to
+    the appropriate Python object"""
+
     @staticmethod
     def parse_datetime(datetime_) -> str:
         return datetime_.strftime('%Y-%m-%dT%H:%M:%S.%fZ')
