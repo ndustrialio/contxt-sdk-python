@@ -466,7 +466,7 @@ class AssetsParser(ArgParser):
 
     # TODO: move these print utilities to the classes themselves
     def _print_asset_type(self, asset_type):
-        from contxt.services import APIObjectCollection
+        from contxt.legacy.services import APIObjectCollection
         print(f"Type Information:\n{asset_type}")
         attrs = APIObjectCollection(list(asset_type.attributes.values()))
         print(f"\nAttributes:\n{attrs}")
