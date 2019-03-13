@@ -6,7 +6,7 @@ from pathlib import Path
 import jwt
 from auth0.v3.authentication.get_token import GetToken
 
-from contxt.services.authentication import ContxtAuthService
+from contxt.services.auth import ContxtAuthService
 from contxt.utils import Config, Utils, make_logger
 
 logger = make_logger(__name__)
@@ -28,10 +28,8 @@ class BaseAuth:
         # load up the tokens we have
         self.tokens = self.load_tokens()
 
-        if AUTH_AUDIENCE in self.tokens:
-            self.auth_access_token = self.get_token_for_client(AUTH_AUDIENCE)
-        else:
-            self.auth_access_token = None
+        self.auth_access_token = self.get_token_for_client(
+            AUTH_AUDIENCE) if AUTH_AUDIENCE in self.tokens else None
 
         self.contxt_auth = ContxtAuthService(self.auth_access_token, 'production')
 
@@ -45,16 +43,17 @@ class BaseAuth:
                                  refresh_token=refresh_token)
 
     def refresh_contxt_auth_token(self):
+        logger.debug(f"Refreshing contxt auth token")
         refresh_token = self.tokens[AUTH_AUDIENCE]['refresh_token']
         token = self.auth0.refresh_token(client_id=self.client_id,
-                                         client_secret=self.client_secret if self.client_secret else '',
+                                         client_secret=self.client_secret or '',
                                          refresh_token=refresh_token)
 
         # store the new access token and re-store the existing refresh token
         self.store_service_token(AUTH_AUDIENCE, token['access_token'], refresh_token)
 
     def authenticate_to_service(self, service_audience):
-        print(f"Getting new token for {service_audience}")
+        logger.debug(f"Getting new token for {service_audience}")
         token = self.contxt_auth.get_new_token_for_client_id(service_audience)
         self.store_service_token(service_audience, token)
         return token
@@ -79,7 +78,7 @@ class BaseAuth:
                 logger.critical('Need to implement client_id/client_secret authentication')
                 raise NotImplementedError('Need to implement client_id/client_secret authentication')
         '''
-
+        logger.debug(f"Getting token for client {client_id}")
         # check to see if we've gotten a token for this service or not
         if client_id not in self.tokens:
             # try to get a token, whether it's a refresh or not
@@ -99,7 +98,7 @@ class BaseAuth:
         return access_token
 
     def token_is_expired_for_client(self, client_id):
-
+        logger.debug(f"Checking if token is expired for client {client_id}")
         access_token = self.tokens[client_id]['token']
         decoded_token = jwt.decode(access_token, verify=False)
         token_expiration_epoch = decoded_token['exp']
@@ -107,6 +106,7 @@ class BaseAuth:
         return token_expiration_epoch <= Utils.get_epoch_time(datetime.now())
 
     def load_tokens(self):
+        logger.debug(f"Loading tokens from {self.token_file}")
         self.contxt_config_path.mkdir(parents=True, exist_ok=True)
 
         try:
@@ -115,7 +115,8 @@ class BaseAuth:
         except FileNotFoundError:
             print('Token file has not been created yet')
             return {}
-
+        
+        logger.debug(f"Found tokens for {list(tokens.keys())}")
         return tokens
 
     def store_service_token(self, client_id, access_token, refresh_token=None):
@@ -127,10 +128,12 @@ class BaseAuth:
         self.store_tokens()
 
     def store_tokens(self):
+        logger.debug(f"Storing tokens to {self.token_file}")
         with self.token_file.open('w') as f:
             json.dump(self.tokens, f, indent=4)
 
     def clear_tokens(self):
+        logger.debug(f"Removing toke file {self.token_file}")
         self.token_file.unlink()
 
 
@@ -143,32 +146,18 @@ class CLIAuth(BaseAuth):
             logger.info("Token doesn't exist or can't be refreshed. Please re-authenticate")
             self.login()
 
-    def setup_parser(self, arg_parser):
-        auth_subparser = arg_parser.add_subparsers(dest="auth_subcommand")
-
-        auth_subparser.add_parser("login")
-        auth_subparser.add_parser("reset")
-
-    def parse_command(self, args):
-
-        if args.auth_subcommand == "login":
-            self.login()
-        elif args.auth_subcommand == "reset":
-            self.reset()
-        else:
-            print(f"Unrecognized subcommand {args.auth_subcommand}")
-
-    def _ask_question(self, question):
+    def _query_user(self, question):
         accepted_answers = ["y", "n"]
-        ans = input(f"{question} ({'/'.join(accepted_answers)}) ").lower()[0]
+        ans = input(f"{question} ({'/'.join(accepted_answers)}) ").lower()[0:1]
         while ans not in accepted_answers:
-            ans = input(f"Please enter {' or '.join(accepted_answers)}. ")
+            ans = input(
+                f"Please enter {' or '.join(accepted_answers)}. ").lower()[0:1]
         return ans == "y"
 
     def login(self):
 
         if self.get_auth_token() is not None:
-            proceed = self._ask_question("Already logged in. Do you wish to continue?")
+            proceed = self._query_user("Already logged in. Do you wish to continue?")
             if not proceed:
                 return
 

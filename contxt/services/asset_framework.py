@@ -4,9 +4,9 @@ import pytz
 
 from contxt.services import (DELETE, GET, POST, PUT, APIObject,
                              APIObjectCollection, PagedEndpoint, PagedResponse)
-from contxt.services.assets import (Asset, AssetAttributeValue, AssetMetric,
-                                    Assets, AssetType,
-                                    InvalidAttributeException)
+from contxt.services.assets import (Asset, AssetAttributeValue,
+                                           AssetMetric, Assets, AssetType,
+                                           InvalidAttributeException)
 from contxt.utils import make_logger
 
 logger = make_logger(__name__)

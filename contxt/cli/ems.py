@@ -312,8 +312,7 @@ COMMANDS = {
 class EMS(ContxtCLI):
 
     def __init__(self, arg_parser):
-
-        super(EMS, self).__init__(arg_parser, COMMANDS)
+        super().__init__(arg_parser, COMMANDS)
 
     @staticmethod
     def print_facility_spend_vs_metric(normalized_spend_by_date):
@@ -410,5 +409,3 @@ class EMS(ContxtCLI):
 
     #@staticmethod
     #def csv_facility_spend_vs_metric(normalized_spend_by_date):
-
-

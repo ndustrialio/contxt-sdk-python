@@ -6,14 +6,12 @@ import pandas as pd
 import requests
 from tabulate import tabulate
 
+from contxt.exceptions import UnauthorizedException
+
 API_VERSION = 'v1'
 
 
-class UnauthorizedException(Exception):
-    pass
-
-
-class ApiClient(object):
+class ApiClient:
     def __init__(self, access_token):
 
         self.access_token = access_token
@@ -78,7 +76,7 @@ class ApiClient(object):
             return None
 
 
-class PagedEndpoint(object):
+class PagedEndpoint:
     def __init__(self, base_url, client, request, parameters):
         self.base_url = base_url
         self.client = client
@@ -100,7 +98,7 @@ class PagedEndpoint(object):
         return self.client.execute(self.request.params(self.parameters).base_url(self.base_url))
 
 
-class PagedResponse(object):
+class PagedResponse:
     def __init__(self, endpoint):
 
         self.endpoint = endpoint
@@ -135,7 +133,7 @@ class PagedResponse(object):
                 break
 
 
-class DataResponse(object):
+class DataResponse:
     def __init__(self, data, client):
         self.client = client
         self.count = data['meta']['count']
@@ -169,7 +167,7 @@ class DataResponse(object):
                 break
 
 
-class StringRequest(object):
+class StringRequest:
     URLENCODED_CONTENT_TYPE = 'application/x-www-form-urlencoded'
     JSON_CONTENT_TYPE = 'application/json'
 
@@ -220,7 +218,7 @@ class StringRequest(object):
         return self.request_string
 
 
-class ApiRequest(object):
+class ApiRequest:
     URLENCODED_CONTENT_TYPE = 'application/x-www-form-urlencoded'
     JSON_CONTENT_TYPE = 'application/json'
 
@@ -360,7 +358,7 @@ class DELETE(ApiRequest):
         return 'DELETE'
 
 
-class ApiService(object):
+class ApiService:
     def __init__(self, base_url):
 
         self.client = None

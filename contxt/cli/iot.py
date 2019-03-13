@@ -135,4 +135,4 @@ class IOT(ContxtCLI):
 
     def __init__(self, arg_parser):
 
-        super(IOT, self).__init__(arg_parser, COMMANDS)
+        super().__init__(arg_parser, COMMANDS)
