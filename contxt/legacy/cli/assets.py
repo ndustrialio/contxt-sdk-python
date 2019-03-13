@@ -1,6 +1,6 @@
 from tabulate import tabulate
 
-from contxt.cli import ContxtCLI
+from contxt.legacy.cli import ContxtCLI
 from contxt.services import APIObjectCollection
 from contxt.utils import make_logger
 

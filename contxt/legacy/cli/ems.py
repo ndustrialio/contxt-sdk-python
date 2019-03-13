@@ -1,7 +1,7 @@
 import csv
 
 from tabulate import tabulate
-from contxt.cli import ContxtCLI
+from contxt.legacy.cli import ContxtCLI
 from contxt.utils import make_logger
 
 logger = make_logger(__name__)
