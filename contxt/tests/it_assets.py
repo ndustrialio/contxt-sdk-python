@@ -313,6 +313,3 @@ if __name__ == "__main__":
     auth = CLIAuth()
     organization_id = "02efa741-a96f-4124-a463-ae13a704b8fc"
     af = AssetFramework(auth, organization_id, env="staging")
-
-    # af = asset_framework(CLIAuth())
-    # TestAssetFramework().test_metric_value_crud_endpoints(af, metric(af))
