@@ -12,11 +12,37 @@ from contxt.utils.vis import DataVisualizer
 
 logger = make_logger(__name__)
 
+class FeedArgumentException(Exception):
+    pass
+
+class FeedNotFoundException(Exception):
+    pass
+
 
 class IOT:
 
     def __init__(self, auth):
         self.iot_service = IOTService(auth)
+
+    def get_feed_id_from_key(self, feed_key):
+        feeds = self.iot_service.get_feeds_collection(key=feed_key)
+        if len(feeds) > 0:
+            return feeds[0]
+        else:
+            return None
+
+    def get_unprovisioned_fields_for_feed(self, feed_id=None, feed_key=None):
+
+        if feed_id is None and feed_key is None:
+            raise FeedArgumentException("Must provide either feed_key or feed_id")
+
+        if feed_id is None:
+            feed = self.get_feed_id_from_key(feed_key)
+            if not feed:
+                raise FeedNotFoundException(f"Feed with key {feed_key} not found")
+            feed_id = feed.id
+
+        return self.iot_service.get_unprovisioned_fields(feed_id)
 
     def get_fields_for_grouping(self, grouping_id):
         return self.iot_service.get_single_grouping(grouping_id).fields
@@ -39,7 +65,7 @@ class IOT:
             return
 
         # Get data for fields in grouping
-        self.iot_service.get_all_feeds(2)
+        self.iot_service.get_feeds_collection(2)
         logger.info(f"Pulling data for fields: \n{grouping.fields}")
         iso_start_date = parse_date_str(start_date)
         iso_end_date = parse_date_str(end_date) if end_date else None

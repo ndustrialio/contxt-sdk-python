@@ -89,12 +89,18 @@ class IOTService(Service):
                 execute=True),
             client=self.client)
 
-    def get_all_feeds(self, facility_id=None):
+    def get_feeds_collection(self, facility_id=None, key=None):
         assert isinstance(facility_id, (type(None), int))
+        assert isinstance(key, (type(None), str))
 
-        params = {'facility_id': facility_id} if facility_id else {}
+        params = {}
 
-        print('Getting all feeds')
+        if facility_id:
+            params['facility_id'] = facility_id
+
+        if key:
+            params['key'] = key
+
         response = PagedResponse(
             PagedEndpoint(
                 base_url=self.base_url,
@@ -113,6 +119,14 @@ class IOTService(Service):
                 parameters={}))
 
         return APIObjectCollection([Field(record) for record in response]) if response else None
+
+    def get_unprovisioned_fields(self, feed_id):
+
+        assert isinstance(feed_id, int)
+
+        response = self.execute(GET(uri=f'feeds/{feed_id}/fields/unprovisioned'))
+
+        return APIObjectCollection([UnprovisionedField(record) for record in response]) if response else None
 
 
 class FieldGrouping(APIObject):
@@ -144,6 +158,15 @@ class FieldGrouping(APIObject):
             'field_category_name': self.category.name if self.category else None,
             'field_count': len(self.fields)
         }
+
+
+class UnprovisionedField(APIObject):
+
+    def __init__(self, unprovisioned_api_object):
+        super().__init__()
+
+        self.field_descriptor = unprovisioned_api_object['field_descriptor']
+        self.assumed_type = unprovisioned_api_object['assumed_type']
 
 
 class FieldCategory(APIObject):
