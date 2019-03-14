@@ -1,4 +1,4 @@
-from contxt.cli import ContxtCLI
+from contxt.legacy.cli import ContxtCLI
 from contxt.utils import make_logger
 
 logger = make_logger(__name__)
@@ -135,4 +135,4 @@ class IOT(ContxtCLI):
 
     def __init__(self, arg_parser):
 
-        super(IOT, self).__init__(arg_parser, COMMANDS)
+        super().__init__(arg_parser, COMMANDS)

@@ -7,11 +7,14 @@ import pytz
 from tzlocal import get_localzone
 
 
-def make_logger(name):
-    return logging.getLogger(name)
+def make_logger(name, level=None):
+    logger = logging.getLogger(name)
+    if level:
+        logger.setLevel(level)
+    return logger
 
 
-class Utils(object):
+class Utils:
     __marker = object()
 
     @staticmethod
@@ -38,6 +41,29 @@ class Utils(object):
         utc_1970 = datetime(1970, 1, 1).replace(tzinfo=pytz.utc)
 
         return int((dt_object.astimezone(pytz.utc) - utc_1970).total_seconds())
+
+    @staticmethod
+    def dict_to_set(dict_):
+        # TODO: this does not handle nested dicts
+
+        def flatten(obj):
+            if isinstance(obj, (list, tuple)):
+                return tuple([flatten(o) for o in obj])
+            elif isinstance(obj, dict):
+                return tuple([(flatten(k), flatten(v)) for k, v in sorted(obj.items())])
+            return obj
+
+        return set(flatten(dict_))
+
+    @staticmethod
+    def set_to_dict(set_):
+
+        def expand(obj):
+            if isinstance(obj, (set, tuple)):
+                return {k: expand(v) for k, v in obj}
+            return obj
+
+        return expand(set_)
 
 
 class Envs:

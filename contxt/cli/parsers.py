@@ -129,7 +129,8 @@ class IotParser(ArgParser):
     def _field_data(self, args, auth):
         from contxt.functions.iot import IOT
         iot = IOT(auth)
-        field_data = iot.get_field_data_for_grouping(
+        # TODO: may want to control dumping/plotting from here
+        iot.get_field_data_for_grouping(
             grouping_id=args.grouping_id,
             start_date=args.start_date,
             window=args.window,
@@ -436,20 +437,15 @@ class EmsParser(ArgParser):
             for date, spend in data.items():
                 if date not in unique_dates:
                     unique_dates.append(date)
-                if 'normalized' in spend:
-                    by_facility[facility_name][date] = spend['normalized']
-                else:
-                    by_facility[facility_name][date] = "N/A"
+
+                by_facility[facility_name][date] = spend.get('normalized', 'N/A')
 
         facility_data = {}
         for date in reversed(sorted(unique_dates)):
             for facility_name, date_data in by_facility.items():
                 if facility_name not in facility_data:
                     facility_data[facility_name] = {}
-                if date not in date_data:
-                    facility_data[facility_name][date] = None
-                else:
-                    facility_data[facility_name][date] = date_data[date]
+                facility_data[facility_name][date] = date_data.get(date)
 
         for facility, date_dict in facility_data.items():
             date_dict['facility_name'] = facility
@@ -525,7 +521,7 @@ class AssetsParser(ArgParser):
 
     # TODO: move these print utilities to the classes themselves
     def _print_asset_type(self, asset_type):
-        from contxt.services import APIObjectCollection
+        from contxt.legacy.services import APIObjectCollection
         print(f"Type Information:\n{asset_type}")
         attrs = APIObjectCollection(list(asset_type.attributes.values()))
         print(f"\nAttributes:\n{attrs}")

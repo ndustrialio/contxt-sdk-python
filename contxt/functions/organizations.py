@@ -1,9 +1,6 @@
-from contxt.functions import OrganizationArgumentException
-
+from contxt.exceptions import (OrganizationArgumentException,
+                               OrganizationNotFoundException)
 from contxt.services.contxt import ContxtService
-
-class OrganizationNotFoundException(Exception):
-    pass
 
 
 def find_organization_by_name(contxt_service, organization_name):
@@ -71,4 +68,3 @@ class Organizations:
                                                            user_id=current_user_id))
 
         return new_organization
-

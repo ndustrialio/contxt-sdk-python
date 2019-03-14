@@ -6,10 +6,10 @@ from tqdm import tqdm
 import dateutil.parser
 import pytz
 
+from contxt.exceptions import UnauthorizedException
 from contxt.functions.organizations import find_organization_by_name
 from contxt.functions.assets import Assets
 
-from contxt.services import UnauthorizedException
 from contxt.services.contxt import ContxtService
 from contxt.services.ems import EMSService
 from contxt.services.facilities import FacilitiesService

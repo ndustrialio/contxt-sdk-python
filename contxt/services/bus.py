@@ -1,4 +1,4 @@
-from contxt.services import GET, POST, APIObject, APIObjectCollection, Service
+from contxt.legacy.services import GET, POST, APIObject, APIObjectCollection, Service
 
 CONFIGS_BY_ENVIRONMENT = {
     'production': {
@@ -21,8 +21,10 @@ class MessageBusService(Service):
 
         self.env = CONFIGS_BY_ENVIRONMENT[environment]
 
-        super(MessageBusService, self).__init__(base_url=self.env['base_url'],
-                                                access_token=auth_module.get_token_for_client(self.env['audience']))
+        super().__init__(
+            base_url=self.env['base_url'],
+            access_token=auth_module.get_token_for_client(
+                self.env['audience']))
 
     def get_channels(self, service_id, organization_id):
 
@@ -45,7 +47,7 @@ class Channel(APIObject):
 
     def __init__(self, channel_api_object):
 
-        super(Channel, self).__init__()
+        super().__init__()
 
         self.id = channel_api_object['id']
         self.name = channel_api_object['name']

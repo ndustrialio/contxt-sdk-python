@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from contxt.services import (GET, APIObject, APIObjectCollection, DataResponse,
+from contxt.legacy.services import (GET, APIObject, APIObjectCollection, DataResponse,
                              PagedEndpoint, PagedResponse, Service)
 from contxt.utils import Utils
 

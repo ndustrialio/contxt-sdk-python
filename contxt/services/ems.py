@@ -120,10 +120,7 @@ class UtilitySpendPeriod(APIObject):
 
         self.date = spend_api_object['date']
         self.spend = spend_api_object['value']
-        if 'pro_forma_date' in spend_api_object:
-            self.pro_forma_date = spend_api_object['pro_forma_date']
-        else:
-            self.pro_forma_date = None
+        self.pro_forma_date = spend_api_object.get('pro_forma_date')
 
     def get_values(self):
         return [self.date, self.spend, self.pro_forma_date]
@@ -139,10 +136,7 @@ class UtilityUsagePeriod(APIObject):
 
         self.date = spend_api_object['date']
         self.value = spend_api_object['value']
-        if 'pro_forma_date' in spend_api_object:
-            self.pro_forma_date = spend_api_object['pro_forma_date']
-        else:
-            self.pro_forma_date = None
+        self.pro_forma_date = spend_api_object.get('pro_forma_date')
 
     def get_values(self):
         return [self.date, self.value, self.pro_forma_date]

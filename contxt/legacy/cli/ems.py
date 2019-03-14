@@ -1,7 +1,7 @@
 import csv
 
 from tabulate import tabulate
-from contxt.cli import ContxtCLI
+from contxt.legacy.cli import ContxtCLI
 from contxt.utils import make_logger
 
 logger = make_logger(__name__)
@@ -312,8 +312,7 @@ COMMANDS = {
 class EMS(ContxtCLI):
 
     def __init__(self, arg_parser):
-
-        super(EMS, self).__init__(arg_parser, COMMANDS)
+        super().__init__(arg_parser, COMMANDS)
 
     @staticmethod
     def print_facility_spend_vs_metric(normalized_spend_by_date):
@@ -410,5 +409,3 @@ class EMS(ContxtCLI):
 
     #@staticmethod
     #def csv_facility_spend_vs_metric(normalized_spend_by_date):
-
-
