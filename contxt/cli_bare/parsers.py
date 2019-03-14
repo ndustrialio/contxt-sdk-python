@@ -429,7 +429,8 @@ class EmsParser(ArgParser):
         by_facility = {}
 
         # gotta organize by date so that all the dates match across facilities
-        for facility_name, data in normalized_data_by_facility.items():
+        for facility_name in sorted(normalized_data_by_facility.keys()):
+            data = normalized_data_by_facility[facility_name]
 
             by_facility[facility_name] = {}
             for date, spend in data.items():
@@ -441,7 +442,7 @@ class EmsParser(ArgParser):
                     by_facility[facility_name][date] = "N/A"
 
         facility_data = {}
-        for date in sorted(unique_dates):
+        for date in reversed(sorted(unique_dates)):
             for facility_name, date_data in by_facility.items():
                 if facility_name not in facility_data:
                     facility_data[facility_name] = {}

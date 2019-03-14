@@ -80,11 +80,11 @@ class EMS:
 
         if interval == 'monthly':
 
-            return self.ems_service.get_monthly_utility_spend(facility_id=facility_id,
+            return reversed(self.ems_service.get_monthly_utility_spend(facility_id=facility_id,
                                                               type=resource_type,
                                                               date_start=start_date,
                                                               date_end=end_date,
-                                                              pro_forma=pro_forma)
+                                                              pro_forma=pro_forma))
 
         elif interval == 'daily':
             pass
@@ -452,7 +452,7 @@ class EMS:
 
             csv_writer.writeheader()
 
-            for facility_name, spend_dict in organization_spend_or_usage.items():
-                row = spend_dict
+            for facility_name in sorted(organization_spend_or_usage.keys()):
+                row = organization_spend_or_usage[facility_name]
                 row['facility'] = facility_name
                 csv_writer.writerow(row)
