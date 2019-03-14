@@ -1,6 +1,8 @@
 from tabulate import tabulate
 import csv
 import os
+from datetime import datetime
+
 
 from contxt.utils import make_logger
 
@@ -148,16 +150,33 @@ class IotParser(ArgParser):
                 writer.writerow(row.get_dict())
 
 
+RESOURCE_TYPES = ["electric", "gas", "combined"]
+
+
 class EmsParser(ArgParser):
 
     def _init_parser(self, subparsers):
         parser = subparsers.add_parser("ems", help="EMS service")
         _subparsers = parser.add_subparsers(title="subcommands", dest="subcommand")
 
+        # Main Services
+        mains_parser = _subparsers.add_parser("mains", help="Get Main Services")
+        mains_parser.add_argument("facility_id", type=int, help="Facility to get main services for")
+        mains_parser.add_argument("--resource_type", choices=RESOURCE_TYPES, help="Filter by type of resource")
+        mains_parser.set_defaults(func=self._get_mains)
+
+        # Get Main Service Data
+        md_parser = _subparsers.add_parser("main-data", help="Get main service data for a facility")
+        md_parser.add_argument("facility_id", type=int, help="Facility ID")
+        md_parser.add_argument("resource_type", choices=RESOURCE_TYPES)
+        md_parser.add_argument("start_date", help="Start month (YYYY-MM)")
+        md_parser.add_argument("end_date", help="End month (YYYY-MM)")
+        md_parser.set_defaults(func=self._get_main_data)
+
         # Spend
         spend_parser = _subparsers.add_parser("util-spend", help="Utility spend")
         spend_parser.add_argument("interval", choices=["daily", "monthly"], help="Time interval")
-        spend_parser.add_argument("resource_type", choices=["electric", "gas", "combined"], help="Type of resource")
+        spend_parser.add_argument("resource_type", choices=RESOURCE_TYPES, help="Type of resource")
         spend_parser.add_argument("start_date", help="Start month (YYYY-MM)")
         spend_parser.add_argument("end_date", help="End month (YYYY-MM)")
 
@@ -226,6 +245,25 @@ class EmsParser(ArgParser):
         usage_metrics_parser.set_defaults(func=self._utility_usage_metrics)
 
         return parser
+
+    def _get_mains(self, args, auth):
+        from contxt.services.ems import EMSService
+        ems = EMSService(auth)
+
+        mains = ems.get_main_services(facility_id=args.facility_id, type=args.resource_type)
+        print(mains)
+
+
+    def _get_main_data(self, args, auth):
+        from contxt.functions.ems import EMS
+        ems = EMS(auth)
+
+        data = ems.get_facility_main_data(facility_id=args.facility_id,
+                                          resource_type=args.resource_type,
+                                          start_date=args.start_date,
+                                          end_date=args.end_date)
+
+        self.to_csv_main_service_data(data)
 
     def _utility_spend(self, args, auth):
         from contxt.functions.ems import EMS
@@ -351,6 +389,22 @@ class EmsParser(ArgParser):
             self.to_csv_organization_normalized_metric(args.output, normalized_usage)
 
     @staticmethod
+    def to_csv_main_service_data(main_service_data):
+
+        output_dir = os.path.join('.', f"main_service_export_{datetime.now().strftime('%m-%d_%H_%M_%S')}")
+
+        os.makedirs(output_dir)
+
+        for service_name, data in main_service_data.items():
+            filename = os.path.join(output_dir, f"{service_name}.csv")
+
+            with open(filename, 'w') as f:
+                writer = csv.DictWriter(f, fieldnames=['event_time', 'value'])
+
+                for row in reversed(data):
+                    writer.writerow(row)
+
+    @staticmethod
     def _print_facility_normalized_metrics(normalized_data_by_date, normalization_key):
 
         normalized_to_print = []
@@ -376,7 +430,8 @@ class EmsParser(ArgParser):
         by_facility = {}
 
         # gotta organize by date so that all the dates match across facilities
-        for facility_name, data in normalized_data_by_facility.items():
+        for facility_name in sorted(normalized_data_by_facility.keys()):
+            data = normalized_data_by_facility[facility_name]
 
             by_facility[facility_name] = {}
             for date, spend in data.items():
@@ -386,7 +441,7 @@ class EmsParser(ArgParser):
                 by_facility[facility_name][date] = spend.get('normalized', 'N/A')
 
         facility_data = {}
-        for date in sorted(unique_dates):
+        for date in reversed(sorted(unique_dates)):
             for facility_name, date_data in by_facility.items():
                 if facility_name not in facility_data:
                     facility_data[facility_name] = {}
