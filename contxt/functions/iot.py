@@ -80,7 +80,7 @@ class IOT:
         ]
 
         # Plot or dump to csv
-        if not plot:
+        if plot:
             self.plot_field_data(grouping.fields, field_data)
         else:
             curr_time = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
