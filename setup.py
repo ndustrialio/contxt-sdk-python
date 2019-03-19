@@ -12,13 +12,13 @@ from shutil import rmtree
 from setuptools import Command, find_packages, setup
 
 # Package meta-data
-NAME = "contxt"
+NAME = "contxt-sdk"
 DESCRIPTION = "Contxt SDK from ndustrial.io"
 URL = "https://github.com/ndustrialio/contxt-sdk-python"
 EMAIL = "dev@ndustrial.io"
 AUTHOR = "ndustrial.io"
 REQUIRES_PYTHON = ">=3.5.0"
-VERSION = "0.0.1b3"
+VERSION = "0.0.1b0"
 
 # What packages are required for this module to be executed?
 REQUIRED = [
