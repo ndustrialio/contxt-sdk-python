@@ -8,3 +8,7 @@ class OrganizationNotFoundException(Exception):
 
 class OrganizationArgumentException(Exception):
     pass
+
+
+class ChannelArgumentException(Exception):
+    pass

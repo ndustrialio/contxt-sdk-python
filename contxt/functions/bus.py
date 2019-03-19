@@ -20,3 +20,21 @@ class Bus:
                                                              organization_name=organization_name)
 
         return self.mb_service.get_channels(service_id, organization_id)
+
+    def get_stats_for_channel(self, service_id, organization_id=None, organization_name=None, channel_id=None, channel_name=None):
+
+        if channel_id is None and channel_name is None:
+            raise ChannelArgumentException("Neither channel_id nor channel_name provided. One is required.")
+
+        organization_id = get_organization_id_from_arguments(contxt_service=self.contxt_service,
+                                                             organization_id=organization_id,
+                                                             organization_name=organization_name)
+
+        if channel_id is None:
+            channels = self.get_all_channels_for_service(service_id, organization_id=organization_id)
+
+            for channel in channels:
+                if channel.name == channel_name:
+                    channel_id = channel.id
+
+        return self.mb_service.get_stats(service_id, organization_id, channel_id)

@@ -410,9 +410,14 @@ class APIObject:
 
     def get_dict(self):
         return {
-            k: v
+            k: self.to_raw(v)
             for k, v in self.__dict__.items() if k not in self._keys_to_ignore
         }
+
+    def to_raw(self, v):
+        if isinstance(v, APIObject): return v.get_dict()
+        elif isinstance(v, APIObjectCollection): return v.get_dicts()
+        else: return v
 
     def get_keys(self):
         return self.get_dict().keys()
