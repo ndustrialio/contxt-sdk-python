@@ -18,7 +18,7 @@ URL = "https://github.com/ndustrialio/contxt-sdk-python"
 EMAIL = "dev@ndustrial.io"
 AUTHOR = "ndustrial.io"
 REQUIRES_PYTHON = ">=3.5.0"
-VERSION = "0.0.1b0"
+VERSION = "0.0.1b1"
 
 # What packages are required for this module to be executed?
 REQUIRED = [
@@ -35,7 +35,7 @@ REQUIRED = [
     "pytz",
     "requests",
     "setuptools",
-    "tabulate"
+    "tabulate",
     "tqdm",
     "tzlocal",
 ]
