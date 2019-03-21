@@ -12,3 +12,6 @@ class OrganizationArgumentException(Exception):
 
 class ChannelArgumentException(Exception):
     pass
+
+class ChannelNotFoundException(Exception):
+    pass

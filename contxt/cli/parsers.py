@@ -642,11 +642,11 @@ class BusParser(ArgParser):
         # Stats
         stats_parser = _subparsers.add_parser("stats", help="View Message Bus Channel statistics")
         stats_organization_group = stats_parser.add_mutually_exclusive_group(required=True)
-        stats_organization_group.add_argument("-oi", "--org-id", help="Organization id")
-        stats_organization_group.add_argument("-on", "--org-name", help="Organization name")
+        stats_organization_group.add_argument("-I", "--org-id", help="Organization id")
+        stats_organization_group.add_argument("-N", "--org-name", help="Organization name")
         stats_channel_group = stats_parser.add_mutually_exclusive_group(required=True)
-        stats_channel_group.add_argument("-ci", "--channel-id", help="Channel id")
-        stats_channel_group.add_argument("-cn", "--channel-name", help="Channel name")
+        stats_channel_group.add_argument("-i", "--channel-id", help="Channel id")
+        stats_channel_group.add_argument("-n", "--channel-name", help="Channel name")
         stats_parser.add_argument("service_id", help="Service id")
         stats_parser.set_defaults(func=self._stats)
 

@@ -1,18 +1,13 @@
-from contxt.legacy.services import GET, POST, APIObject, APIObjectCollection, Service
-from pprint import PrettyPrinter
+from contxt.legacy.services import GET, APIObject, APIObjectCollection, APIObjectDict, Service
 
 CONFIGS_BY_ENVIRONMENT = {
     'production': {
         'base_url': 'https://bus.ndustrial.io/',
         'audience': 'T62CR77ouw4I6VPlSSlLT9VpVA1ebByx'
     },
-    # 'staging': {
-    #     'base_url': 'https://bus-staging.ndustrial.io/',
-    #     'audience': 'YHCtC2dZAvvt2SdxUVwWpVdm4fSOkUdL'
-    # },
     'staging': {
-        'base_url': 'http://bus.lineageapi.com/',
-        'audience': 'T62CR77ouw4I6VPlSSlLT9VpVA1ebByx',
+        'base_url': 'https://bus-staging.ndustrial.io/',
+        'audience': 'YHCtC2dZAvvt2SdxUVwWpVdm4fSOkUdL'
     },
 }
 
@@ -31,10 +26,7 @@ class MessageBusService(Service):
             access_token=auth_module.get_token_for_client(
                 self.env['audience']))
 
-    def get_channels(self, service_id, organization_id):
-
-        assert isinstance(service_id, str)
-        assert isinstance(organization_id, str)
+    def get_channels(self, service_id: str, organization_id: str):
 
         req = GET(uri=f'organizations/{organization_id}/services/{service_id}/channels')
         req.api_version = None
@@ -47,11 +39,7 @@ class MessageBusService(Service):
 
         return APIObjectCollection(channels)
 
-    def get_stats(self, service_id, organization_id, channel_id):
-
-        assert isinstance(service_id, str)
-        assert isinstance(organization_id, str)
-        assert isinstance(channel_id, str)
+    def get_stats(self, service_id: str, organization_id: str, channel_id: str):
 
         req = GET(uri=f'organizations/{organization_id}/services/{service_id}/channels/{channel_id}/statistics')
         req.api_version = None
@@ -72,26 +60,17 @@ class Channel(APIObject):
         self.organization_id = channel_api_object['organization_id']
         self.service_id = channel_api_object['service_id']
 
-
-class PrettyPrintedAPIObject(APIObject):
-
     def __str__(self):
-        dict = self.get_dict()
-        pp = PrettyPrinter(indent=4)
-        return pp.pformat(dict)
+        return self.pretty_print()
 
 
-class PrettyPrintedAPIObjectCollection(APIObjectCollection):
+class PublisherStatsCollection(APIObjectCollection):
 
     def __repr__(self):
-        if not self.list_of_objects:
-            return 'None'
-        vals = [obj for obj in self.list_of_objects]
-        pp = PrettyPrinter(indent=4)
-        return pp.pformat(vals)
+        return self.pretty_print()
 
 
-class ChannelStats(PrettyPrintedAPIObject):
+class ChannelStats(APIObject):
 
     def __init__(self, channel_stats_object):
 
@@ -101,22 +80,15 @@ class ChannelStats(PrettyPrintedAPIObject):
         self.msg_rate_out = channel_stats_object['msgRateOut']
         self.average_msg_size = channel_stats_object['averageMsgSize']
         self.storage_size = channel_stats_object['storageSize']
-        self.publishers = PrettyPrintedAPIObjectCollection([PublisherStats(publisher) for publisher in channel_stats_object['publishers']])
+        self.publishers = PublisherStatsCollection([PublisherStats(publisher) for publisher in channel_stats_object['publishers']])
 
-        self.subscriptions = SubscriptionStats(channel_stats_object['subscriptions'].items())
+        self.subscriptions = APIObjectDict(channel_stats_object['subscriptions'])
 
-
-class SubscriptionStats(PrettyPrintedAPIObject):
-
-    def __init__(self, subscriptions):
-
-        super().__init__()
-
-        for subscriber_id, subscriber in subscriptions:
-            setattr(self, subscriber_id, SubscriberStats(subscriber))
+    def __str__(self):
+        return self.subscriptions.__str__()
 
 
-class PublisherStats(PrettyPrintedAPIObject):
+class PublisherStats(APIObject):
 
     def __init__(self, publisher_stats_object):
 
@@ -126,8 +98,17 @@ class PublisherStats(PrettyPrintedAPIObject):
         self.producer_id = publisher_stats_object['producerId']
         self.connected_since = publisher_stats_object['connectedSince']
 
+    def __str__(self):
+        return self.pretty_print()
 
-class SubscriberStats(PrettyPrintedAPIObject):
+
+class ConsumerStatsCollection(APIObjectCollection):
+
+    def __repr__(self):
+        return self.pretty_print()
+
+
+class SubscriberStats(APIObject):
 
     def __init__(self, subscriber_stats_object):
 
@@ -139,10 +120,13 @@ class SubscriberStats(PrettyPrintedAPIObject):
         self.blocked_subscription_on_unacked_msgs = subscriber_stats_object['blockedSubscriptionOnUnackedMsgs']
         self.unacked_messages = subscriber_stats_object['unackedMessages']
 
-        self.consumers = PrettyPrintedAPIObjectCollection([ConsumerStats(consumer) for consumer in subscriber_stats_object['consumers'] ])
+        self.consumers = ConsumerStatsCollection([ConsumerStats(consumer) for consumer in subscriber_stats_object['consumers'] ])
+
+    def __str__(self):
+        return self.pretty_print()
 
 
-class ConsumerStats(PrettyPrintedAPIObject):
+class ConsumerStats(APIObject):
 
     def __init__(self, consumer_stats_object):
 
@@ -153,3 +137,6 @@ class ConsumerStats(PrettyPrintedAPIObject):
         self.unacked_messages = consumer_stats_object['unackedMessages']
         self.blocked_consumer_on_unacked_msgs = consumer_stats_object['blockedConsumerOnUnackedMsgs']
         self.connected_since = consumer_stats_object['connectedSince']
+
+    def __str__(self):
+        return self.pretty_print()

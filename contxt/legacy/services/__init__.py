@@ -1,5 +1,6 @@
 import json
 from datetime import datetime
+from pprint import pformat
 
 import jwt
 import pandas as pd
@@ -415,9 +416,12 @@ class APIObject:
         }
 
     def to_raw(self, v):
-        if isinstance(v, APIObject): return v.get_dict()
-        elif isinstance(v, APIObjectCollection): return v.get_dicts()
-        else: return v
+        if isinstance(v, APIObject) or isinstance(v, APIObjectDict):
+            return v.get_dict()
+        elif isinstance(v, APIObjectCollection):
+            return v.get_dicts()
+        else:
+            return v
 
     def get_keys(self):
         return self.get_dict().keys()
@@ -428,6 +432,10 @@ class APIObject:
     def get_df(self):
         d = self.get_dict()
         return pd.DataFrame(data=d.values(), columns=d.keys())
+
+    def pretty_print(self):
+        dict = self.get_dict()
+        return pformat(dict, indent=4)
 
     def __str__(self):
         d = self.get_dict()
@@ -469,3 +477,27 @@ class APIObjectCollection:
 
     def get_df(self):
         return pd.DataFrame(self.get_values(), columns=self.get_keys())
+
+    def pretty_print(self):
+        if not self.list_of_objects:
+            return 'None'
+        vals = [obj for obj in self.list_of_objects]
+        return pformat(vals, indent=4)
+
+
+class APIObjectDict:
+
+    def __init__(self, obj_dict: dict):
+        self.dict_of_objects = obj_dict
+
+    def get_dict(self):
+        return self.dict_of_objects
+
+    def pretty_print(self):
+        if not self.dict_of_objects:
+            return 'None'
+        return pformat(self.dict_of_objects.values(), indent=4)
+
+    def __str__(self):
+        d = self.get_dict()
+        return tabulate([d.values()], headers=d.keys())
