@@ -8,6 +8,7 @@ def find_organization_by_name(contxt_service, organization_name):
     for org in contxt_service.get_organizations():
         if org.name.upper() == organization_name.upper():
             organization = org
+            break
 
     return organization
 
