@@ -634,8 +634,8 @@ class BusParser(ArgParser):
         # Channels
         channel_parser = _subparsers.add_parser("channels", help="Get channels")
         channel_group = channel_parser.add_mutually_exclusive_group(required=True)
-        channel_group.add_argument("-oi", "--org-id", help="Organization id")
-        channel_group.add_argument("-on", "--org-name", help="Organization name")
+        channel_group.add_argument("-I", "--org-id", help="Organization id")
+        channel_group.add_argument("-N", "--org-name", help="Organization name")
         channel_parser.add_argument("service_id", help="Service id")
         channel_parser.set_defaults(func=self._channels)
 
