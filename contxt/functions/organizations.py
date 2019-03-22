@@ -2,12 +2,11 @@ from contxt.exceptions import (OrganizationArgumentException,
                                OrganizationNotFoundException)
 from contxt.services.contxt import ContxtService
 
-
 def find_organization_by_name(contxt_service, organization_name):
 
     organization = None
     for org in contxt_service.get_organizations():
-        if org.name == organization_name:
+        if org.name.upper() == organization_name.upper():
             organization = org
 
     return organization
