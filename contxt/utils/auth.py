@@ -4,8 +4,7 @@ from getpass import getpass
 from pathlib import Path
 
 import jwt
-from auth0.v3.authentication.get_token import GetToken
-
+from auth0.v3.authentication import GetToken
 from contxt.services.auth import ContxtAuthService
 from contxt.utils import Config, Utils, make_logger
 

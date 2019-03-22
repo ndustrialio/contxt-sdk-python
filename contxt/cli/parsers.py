@@ -98,7 +98,7 @@ class IotParser(ArgParser):
     def _feeds(self, args, auth):
         from contxt.functions.iot import IOT
         iot = IOT(auth)
-        feeds = iot.iot_service.get_all_feeds(args.facility_id)
+        feeds = iot.iot_service.get_feeds_collection(args.facility_id)
         print(feeds)
 
     def _fields(self, args, auth):
