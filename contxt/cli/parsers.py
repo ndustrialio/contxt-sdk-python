@@ -689,10 +689,21 @@ class BusParser(ArgParser):
         # Channels
         channel_parser = _subparsers.add_parser("channels", help="Get channels")
         channel_group = channel_parser.add_mutually_exclusive_group(required=True)
-        channel_group.add_argument("-i", "--org-id", help="Organization id")
-        channel_group.add_argument("-n", "--org-name", help="Organization name")
+        channel_group.add_argument("-oi", "--org-id", help="Organization id")
+        channel_group.add_argument("-on", "--org-name", help="Organization name")
         channel_parser.add_argument("service_id", help="Service id")
         channel_parser.set_defaults(func=self._channels)
+
+        # Stats
+        stats_parser = _subparsers.add_parser("stats", help="View Message Bus Channel statistics")
+        stats_organization_group = stats_parser.add_mutually_exclusive_group(required=True)
+        stats_organization_group.add_argument("-I", "--org-id", help="Organization id")
+        stats_organization_group.add_argument("-N", "--org-name", help="Organization name")
+        stats_channel_group = stats_parser.add_mutually_exclusive_group(required=True)
+        stats_channel_group.add_argument("-i", "--channel-id", help="Channel id")
+        stats_channel_group.add_argument("-n", "--channel-name", help="Channel name")
+        stats_parser.add_argument("service_id", help="Service id")
+        stats_parser.set_defaults(func=self._stats)
 
         return parser
 
@@ -704,3 +715,15 @@ class BusParser(ArgParser):
             organization_id=args.org_id,
             organization_name=args.org_name)
         print(channels)
+
+    def _stats(self, args, auth):
+        from contxt.functions.bus import Bus
+        bus = Bus(auth)
+        stats = bus.get_stats_for_channel(
+            organization_id=args.org_id,
+            organization_name=args.org_name,
+            service_id=args.service_id,
+            channel_id=args.channel_id,
+            channel_name=args.channel_name,
+        )
+        print(stats)
