@@ -2,6 +2,7 @@ import json
 from datetime import datetime
 from pprint import pformat
 
+import pytz
 import jwt
 import pandas as pd
 import requests
@@ -145,7 +146,7 @@ class PagedResponse:
                 break
 
 
-class DataResponse:
+class DataResponse(object):
     def __init__(self, data, client):
         self.client = client
         self.count = data['meta']['count']
@@ -161,13 +162,11 @@ class DataResponse:
 
         while True:
             for record in self.records:
-                record['event_time'] = datetime.strptime(
-                    record['event_time'], "%Y-%m-%dT%H:%M:%S.%fZ")
+                record['event_time'] = datetime.strptime(record['event_time'], "%Y-%m-%dT%H:%M:%S.%fZ").replace(tzinfo=pytz.UTC)
                 yield record
 
             if self.has_more:
-                response = self.client.execute(
-                    StringRequest(self.next_page_url).method('GET'))
+                response = self.client.execute(StringRequest(self.next_page_url).method('GET'))
 
                 self.count = response['meta']['count']
                 self.has_more = response['meta']['has_more']
