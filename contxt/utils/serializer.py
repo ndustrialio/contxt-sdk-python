@@ -4,16 +4,23 @@ from json import dump, dumps
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Set, Tuple
 
+import pandas as pd
 from tabulate import tabulate
-
-from contxt.services.asset_framework import AssetFramework
-from contxt.utils.auth import CLIAuth
 
 
 class Serializer:
     """
     A general serializer to transform a Python object to common data formats.
     """
+
+    @staticmethod
+    def _keys(obj):
+        if isinstance(obj, dict):
+            return obj.keys()
+        elif isinstance(obj, (list, tuple)) and obj:
+            return list(set().union(*(Serializer._keys(i) for i in obj)))
+        else:
+            return []
 
     @staticmethod
     def to_dict(obj: Any,
@@ -124,20 +131,13 @@ class Serializer:
         :param header: write header row, defaults to True
         :param header: bool, optional
         """
-        def keys(o):
-            if isinstance(o, dict):
-                return o.keys()
-            elif isinstance(o, (list, tuple)) and o:
-                return set().union(*(keys(i) for i in o))
-            else:
-                return []
 
         # Get dict
         d = Serializer.to_dict(obj)
 
         # Write
         with path.open("w") as f:
-            writer = DictWriter(f, fieldnames=keys(d), **kwargs)
+            writer = DictWriter(f, fieldnames=Serializer._keys(d), **kwargs)
             if header:
                 writer.writeheader()
             if isinstance(d, (list, tuple)):
@@ -147,3 +147,16 @@ class Serializer:
                 # TODO: may not actually be a dict
                 # Write dict
                 writer.writerow(d)
+
+    @staticmethod
+    def to_df(obj: Any, **kwargs):
+        """Serializes `obj` as a `pandas.DataFrame`.
+        
+        :param obj: object to serialize
+        :type obj: Any
+        :return: dataframe
+        :rtype: DataFrame
+        """
+
+        d = Serializer.to_dict(obj)
+        return pd.DataFrame(d, columns=Serializer._keys(d), **kwargs)

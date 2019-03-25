@@ -1,0 +1,35 @@
+{
+	"asset_type_id": "5f1b81d2-f248-4244-91ee-76ef561639a5",
+	"attribute_values": [
+		{
+			"asset_attribute_id": "7ae4f4c9-138e-4678-b244-fcfe18bc19b7",
+			"asset_id": "78125c40-3429-4191-873b-06ce2ad7dfe1",
+			"created_at": "2018-11-27T20:25:15.634000+00:00",
+			"effective_date": "2018-01-01T00:00:00+00:00",
+			"id": "1bef1bb9-222c-4e17-ab8d-28e506e81165",
+			"notes": null,
+			"updated_at": "2018-11-27T20:25:15.634000+00:00",
+			"value": 100000
+		},
+		{
+			"asset_attribute_id": "95bc7018-ca88-45c9-90f1-15f7c04737d0",
+			"asset_id": "78125c40-3429-4191-873b-06ce2ad7dfe1",
+			"created_at": "2018-11-26T20:33:51.405000+00:00",
+			"effective_date": "2018-01-01T00:00:00+00:00",
+			"id": "59a87b2a-3239-441c-9afc-7ee534909f18",
+			"notes": null,
+			"updated_at": "2019-03-15T12:31:15.623000+00:00",
+			"value": "c40401ab-2c88-4ab5-b589-2e4277527ddc"
+		}
+	],
+	"children": [],
+	"created_at": "2018-10-17T12:26:01.620000+00:00",
+	"description": null,
+	"hierarchy_level": 1,
+	"id": "78125c40-3429-4191-873b-06ce2ad7dfe1",
+	"label": "Western Plains Energy",
+	"metric_values": [],
+	"organization_id": "a8e526e4-cb2d-4188-ac25-294e76f9f467",
+	"parent_id": null,
+	"updated_at": "2018-10-17T12:26:01.620000+00:00"
+}
