@@ -33,6 +33,12 @@ class BaseAuth:
                                                  client_id=self.client_id,
                                                  client_secret=self.client_secret)
         else:
+            # if there is no token for auth, then we need to go ask the user to login so we can get one
+            if not self.auth_access_token:
+                self.login()
+                self.auth_access_token = self.get_token_for_audience(
+                    AUTH_AUDIENCE) if AUTH_AUDIENCE in self.tokens else None
+
             self.contxt_auth = ContxtAuthService(access_token=self.auth_access_token)
 
     def get_auth_token(self):
@@ -101,7 +107,7 @@ class BaseAuth:
             with self.token_file.open('r') as f:
                 tokens = json.load(f)
         except FileNotFoundError:
-            print('Token file has not been created yet')
+            logger.debug('Token file has not been created yet')
             return {}
 
         return tokens
