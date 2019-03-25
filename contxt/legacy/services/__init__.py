@@ -403,6 +403,15 @@ class Service(ApiService):
         return decoded_token['sub']
 
 
+def to_raw(v):
+    if isinstance(v, APIObject) or isinstance(v, APIObjectDict):
+        return v.get_dict()
+    elif isinstance(v, APIObjectCollection):
+        return v.get_dicts()
+    else:
+        return v
+
+
 class APIObject:
     def __init__(self, keys_to_ignore=None):
         # TODO: may want to following a naming pattern for ignored keys, like
@@ -411,17 +420,9 @@ class APIObject:
 
     def get_dict(self):
         return {
-            k: self.to_raw(v)
+            k: to_raw(v)
             for k, v in self.__dict__.items() if k not in self._keys_to_ignore
         }
-
-    def to_raw(self, v):
-        if isinstance(v, APIObject) or isinstance(v, APIObjectDict):
-            return v.get_dict()
-        elif isinstance(v, APIObjectCollection):
-            return v.get_dicts()
-        else:
-            return v
 
     def get_keys(self):
         return self.get_dict().keys()
@@ -465,7 +466,7 @@ class APIObjectCollection:
         return self.list_of_objects.__getitem__(item)
 
     def get_dicts(self):
-        return [o.get_dict() for o in self.list_of_objects]
+        return [to_raw(o) for o in self.list_of_objects]
 
     def get_keys(self):
         dicts = self.get_dicts()
@@ -491,12 +492,12 @@ class APIObjectDict:
         self.dict_of_objects = obj_dict
 
     def get_dict(self):
-        return self.dict_of_objects
+        return {key: to_raw(self.dict_of_objects[key]) for key in self.dict_of_objects}
 
     def pretty_print(self):
         if not self.dict_of_objects:
             return 'None'
-        return pformat(self.dict_of_objects.values(), indent=4)
+        return pformat(self.dict_of_objects, indent=4)
 
     def __str__(self):
         d = self.get_dict()
