@@ -126,7 +126,7 @@ setup(
     # If your package is a single module, use this instead of "packages":
     # py_modules=[NAME],
     entry_points={
-        "console_scripts": ["contxt=contxt:main"],
+        "console_scripts": ["contxt=contxt.__main__:main"],
     },
     install_requires=REQUIRED,
     extras_require=EXTRAS,
