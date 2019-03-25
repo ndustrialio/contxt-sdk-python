@@ -54,7 +54,7 @@ class AssetFramework(ApiService):
             types_to_fully_load: Optional[List[str]] = None,
     ):
         config = self._init_config(env)
-        access_token = auth.get_token_for_client(config['audience'])
+        access_token = auth.get_token_for_audience(config['audience'])
         super().__init__(config['base_url'], access_token)
         # TODO: handle multiple orgs
         self.organization_id = organization_id
