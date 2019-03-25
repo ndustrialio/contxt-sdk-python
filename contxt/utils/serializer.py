@@ -128,8 +128,7 @@ class Serializer:
             if isinstance(o, dict):
                 return o.keys()
             elif isinstance(o, (list, tuple)) and o:
-                # TODO: in this case, we assume the entire list has identical keys
-                return keys(o[0])
+                return set().union(*(keys(i) for i in o))
             else:
                 return []
 
