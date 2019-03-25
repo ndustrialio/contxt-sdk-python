@@ -22,7 +22,7 @@ def main():
 
     # Launch the command
     if "func" in args:
-        from contxt.utils.auth import CLIAuth
+        from contxt.utils.auth.cli import CLIAuth
         auth = CLIAuth()
         args.func(args, auth)
     else:
