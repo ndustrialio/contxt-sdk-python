@@ -148,34 +148,3 @@ class Serializer:
                 # TODO: may not actually be a dict
                 # Write dict
                 writer.writerow(d)
-
-
-if __name__ == "__main__":
-    import jsonpickle
-    import json
-    from pprint import pprint
-    from time import time
-    auth = CLIAuth()
-    af = AssetFramework(auth, "a8e526e4-cb2d-4188-ac25-294e76f9f467", types_to_fully_load=["Facility"])
-    complete_asset = af.get_complete_asset("78125c40-3429-4191-873b-06ce2ad7dfe1")
-
-    t = time()
-    pickled = jsonpickle.encode(complete_asset)
-    # pprint(json.dumps(pickled))
-    print(time() - t)
-
-    t = time()
-    d = Serializer.to_dict(complete_asset.asset, "cls")
-    print(time() - t)
-
-    pprint(d)
-    json.dumps(d)
-
-    a = complete_asset.asset
-    d = Serializer.to_dict(a)
-    j = Serializer.to_json(a, path=Path("test.json"))
-    t = Serializer.to_table(a.attribute_values)
-    print(t)
-    Serializer.to_csv(a.attribute_values, Path("test.csv"))
-
-    print("done")
