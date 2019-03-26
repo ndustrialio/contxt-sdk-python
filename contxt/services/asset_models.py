@@ -679,19 +679,3 @@ class MetricValue(ApiObject):
             (datetime, type(None))) else DataParsers.datetime(updated_at)
 
         self.asset = Asset(**asset) if asset else None
-
-    def post(self):
-        """Get data for a post request"""
-        d = self.get_dict(include=self.creatable_fields)
-        for k, v in d.items():
-            if isinstance(v, datetime):
-                d[k] = DataParsers.format_datetime(v)
-        return d
-
-    def put(self):
-        """Get data for a put request"""
-        d = self.get_dict(include=self.updatable_fields)
-        for k, v in d.items():
-            if isinstance(v, datetime):
-                d[k] = DataParsers.format_datetime(v)
-        return d
