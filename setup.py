@@ -1,26 +1,19 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# Note: To use the "upload" functionality of this file, you must:
+# Note: To use the "publish" functionality of this file, you must:
 #   $ pip install twine
 
-import io
 import os
 import sys
 from shutil import rmtree
 
 from setuptools import Command, find_packages, setup
 
-# Package meta-data
-NAME = "contxt-sdk"
-DESCRIPTION = "Contxt SDK from ndustrial.io"
-URL = "https://github.com/ndustrialio/contxt-sdk-python"
-EMAIL = "dev@ndustrial.io"
-AUTHOR = "ndustrial.io"
+# Python requirement
 REQUIRES_PYTHON = ">=3.5.0"
-VERSION = "0.0.1b1"
 
-# What packages are required for this module to be executed?
+# Requirements
 REQUIRED = [
     "argcomplete",
     "auth0-python",
@@ -40,42 +33,30 @@ REQUIRED = [
     "tzlocal",
 ]
 
-# What packages are optional?
+# Optional requirements
 EXTRAS = {
     "dev": ["mypy", "pytest"],
 }
 
-# The rest you shouldn't have to touch too much :)
-# ------------------------------------------------
-# Except, perhaps the License and Trove Classifiers!
-# If you do change the License, remember to change the Trove Classifier for that!
+###############################################################################
 
 here = os.path.abspath(os.path.dirname(__file__))
 
-# HACK: read the requirements file
-# with open(os.path.join(here, "requirements.txt")) as f:
-#     REQUIRED.extend(f.read().splitlines())
+# Import __version__.py
+about = {}
+with open(os.path.join(here, "contxt", "__version__.py")) as f:
+    exec(f.read(), about)
 
-# Import the README and use it as the long-description.
-# Note: this will only work if "README.md" is present in your MANIFEST.in file!
+# Import readme (make sure its declared in MANIFEST.in)
 try:
-    with io.open(os.path.join(here, "README.md"), encoding="utf-8") as f:
+    with open(os.path.join(here, "README.md")) as f:
         long_description = "\n" + f.read()
 except FileNotFoundError:
-    long_description = DESCRIPTION
-
-# Load the package"s __version__.py module as a dictionary.
-about = {}
-if not VERSION:
-    project_slug = NAME.lower().replace("-", "_").replace(" ", "_")
-    with open(os.path.join(here, project_slug, "__version__.py")) as f:
-        exec(f.read(), about)
-else:
-    about["__version__"] = VERSION
+    long_description = about["__description__"]
 
 
-class UploadCommand(Command):
-    """Support setup.py upload."""
+class PublishCommand(Command):
+    """Support setup.py publish."""
 
     description = "Build and publish the package."
     user_options = []
@@ -111,17 +92,16 @@ class UploadCommand(Command):
         sys.exit()
 
 
-# Where the magic happens:
 setup(
-    name=NAME,
+    name=about["__title__"],
     version=about["__version__"],
-    description=DESCRIPTION,
+    description=about["__description__"],
     long_description=long_description,
     long_description_content_type="text/markdown",
-    author=AUTHOR,
-    author_email=EMAIL,
+    author=about["__author__"],
+    author_email=about["__author_email__"],
+    url=about["__url__"],
     python_requires=REQUIRES_PYTHON,
-    url=URL,
     packages=find_packages(exclude=("tests",)),
     # If your package is a single module, use this instead of "packages":
     # py_modules=[NAME],
@@ -131,16 +111,15 @@ setup(
     install_requires=REQUIRED,
     extras_require=EXTRAS,
     include_package_data=True,
-    license="ISC",
+    license=about["__license__"],
     classifiers=[
-        # Trove classifiers
-        # Full list: https://pypi.python.org/pypi?%3Aaction=list_classifiers
+        # Trove classifiers: https://pypi.python.org/pypi?%3Aaction=list_classifiers
         "License :: OSI Approved :: ISC License (ISCL)",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
     ],
-    # $ setup.py publish support.
     cmdclass={
-        "upload": UploadCommand,
+        # $ python setup.py publish
+        "publish": PublishCommand,
     },
 )
