@@ -42,6 +42,11 @@ class Serializer:
         # (for example, if passed an int, it will return it). this is likely
         # an unexpected behavior for callers
 
+        # NOTE: alternative (but slower) implementations:
+        # 1. d = json.dumps(d, default=lambda o: getattr(o, "__dict__", str(o)))
+        # 2. d = jsonpickle.encode(d, unpicklable=False))
+        # >> json.loads(d)
+
         # Create default key filter (ignore _ vars)
         if key_filter is None:
             key_filter = lambda k: not k.startswith("_")
