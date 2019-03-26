@@ -269,22 +269,12 @@ class Assets(Service):
 
         super().__init__(
             base_url=self.env['base_url'],
-            access_token=auth_module.get_token_for_client(
+            access_token=auth_module.get_token_for_audience(
                 self.env['audience']))
 
         self.organization_id = organization_id
         self.load_configuration()
         self.types_by_id = {}
-
-        '''
-        self.asset_config = self.load_org_asset_configuration()
-
-        for type_label, type_config in self.asset_config[self.organization_id]['AssetTypes'].items():
-            print(type_label)
-            type_class_obj = AssetType(organization_id, type_label, type_config)
-            setattr(self, type_label, type_class_obj)
-            setattr(self, type_label.capitalize(), type_class_obj)
-        '''
 
     def baseURL(self):
         return 'https://facilities.api.ndustrial.io'
