@@ -9,6 +9,7 @@ from requests.exceptions import HTTPError
 from tabulate import tabulate
 
 from contxt.utils import make_logger
+from contxt.utils.serializer import Serializer
 
 logger = make_logger(__name__)
 
@@ -130,44 +131,35 @@ class ApiObject:
     updatable_fields = []
 
     def __init__(self, keys_to_ignore=None):
-        # TODO: may want to following a naming pattern for ignored keys, like
-        # prefixed with _ instead of explicitly declaring the ignored keys
+        # TODO: deprecate this list, call Serializer directly
         self._keys_to_ignore = {'_keys_to_ignore'} | set(keys_to_ignore or [])
 
-    def get_dict(self, include=None, exclude=None):
-        if include is not None and exclude is not None:
-            raise KeyError("Cannot provide both include and exclude")
-        if include is not None:
-            keys = include
-        elif exclude is not None:
-            keys = set(self.__dict__.keys()) - set(exclude)
-        else:
-            keys = set(self.__dict__.keys()) - self._keys_to_ignore
+    def __str__(self):
+        return Serializer.to_table(self)
 
-        return {k: v for k, v in self.__dict__.items() if k in keys}
+    def get_dict(self):
+        # TODO: deprecate, call Serializer directly
+        return Serializer.to_dict(
+            self, key_filter=lambda k: k not in self._keys_to_ignore)
 
     def get_keys(self):
-        return self.get_dict().keys()
+        # TODO: deprecate, call Serializer directly
+        return Serializer.to_dict(self).keys()
 
     def get_values(self):
-        return self.get_dict().values()
+        # TODO: deprecate, call Serializer directly
+        return Serializer.to_dict(self).values()
 
     def get_df(self):
-        d = self.get_dict()
-        return pd.DataFrame(data=d.values(), columns=d.keys())
+        # TODO: deprecate, call Serializer directly
+        return Serializer.to_df(self)
 
     def post(self):
         """Get data for a post request"""
-        return self.get_dict(include=self.creatable_fields)
+        return Serializer.to_dict(
+            self, key_filter=lambda k: k in set(self.creatable_fields))
 
     def put(self):
         """Get data for a put request"""
-        return self.get_dict(include=self.updatable_fields)
-
-    def __str__(self):
-        d = self.get_dict()
-        return tabulate([d.values()], headers=d.keys())
-
-
-if __name__ == "__main__":
-    print('Done')
+        return Serializer.to_dict(
+            self, key_filter=lambda k: k in set(self.updatable_fields))

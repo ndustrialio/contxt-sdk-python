@@ -63,7 +63,8 @@ class Serializer:
             }
         elif isinstance(obj, (date, datetime)):
             # Date/datetime (default to iso)
-            return obj.isoformat()
+            # TODO: maybe call on DataParser
+            return obj.isoformat().replace("+00:00", "Z")
         elif hasattr(obj, "_ast"):
             # Abstract syntax tree
             return Serializer.to_dict(obj._ast())
