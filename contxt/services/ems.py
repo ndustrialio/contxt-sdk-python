@@ -26,7 +26,7 @@ class EMSService(Service):
 
         super().__init__(
             base_url=self.env['base_url'],
-            access_token=auth_module.get_token_for_client(
+            access_token=auth_module.get_token_for_audience(
                 self.env['audience']))
 
     def get_main_services(self, facility_id, type=None):

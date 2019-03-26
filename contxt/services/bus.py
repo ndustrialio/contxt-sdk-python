@@ -23,7 +23,7 @@ class MessageBusService(Service):
 
         super().__init__(
             base_url=self.env['base_url'],
-            access_token=auth_module.get_token_for_client(
+            access_token=auth_module.get_token_for_audience(
                 self.env['audience']))
 
     def get_channels(self, service_id: str, organization_id: str):
@@ -33,9 +33,7 @@ class MessageBusService(Service):
 
         response = self.execute(req)
 
-        channels = []
-        for record in response:
-            channels.append(Channel(record))
+        channels = [Channel(record) for record in response]
 
         return APIObjectCollection(channels)
 
@@ -66,7 +64,7 @@ class Channel(APIObject):
 
 class PublisherStatsCollection(APIObjectCollection):
 
-    def __repr__(self):
+    def __str__(self):
         return self.pretty_print()
 
 
@@ -82,10 +80,16 @@ class ChannelStats(APIObject):
         self.storage_size = channel_stats_object['storageSize']
         self.publishers = PublisherStatsCollection([PublisherStats(publisher) for publisher in channel_stats_object['publishers']])
 
-        self.subscriptions = APIObjectDict(channel_stats_object['subscriptions'])
+        self.subscriptions = SubscriptionsDict({key: SubscriberStats(channel_stats_object['subscriptions'][key]) for key in channel_stats_object['subscriptions']})
 
     def __str__(self):
-        return self.subscriptions.__str__()
+        return self.pretty_print()
+
+
+class SubscriptionsDict(APIObjectDict):
+
+    def __str__(self):
+        return self.pretty_print()
 
 
 class PublisherStats(APIObject):
@@ -104,7 +108,7 @@ class PublisherStats(APIObject):
 
 class ConsumerStatsCollection(APIObjectCollection):
 
-    def __repr__(self):
+    def __str__(self):
         return self.pretty_print()
 
 
