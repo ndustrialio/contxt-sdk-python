@@ -1,12 +1,12 @@
 from typing import Dict, List, Optional, Set, Tuple
 
-from contxt.services.api import ApiObject, ApiService
+from contxt.services.api import ApiService
 from contxt.services.asset_models import (Asset, AssetType, Attribute,
                                           AttributeValue, CompleteAsset,
                                           DataTypes, Metric, MetricValue,
                                           TimeIntervals)
 from contxt.utils import make_logger
-from contxt.utils.auth import CLIAuth
+from contxt.utils.auth.cli import CLIAuth
 
 logger = make_logger(__name__)
 

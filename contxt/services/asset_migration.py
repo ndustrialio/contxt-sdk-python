@@ -5,7 +5,7 @@ from contxt.services.asset_models import (Asset, AssetType, Attribute,
                                           AttributeValue, DataTypes, Metric,
                                           MetricValue, TimeIntervals)
 from contxt.utils import Config, make_logger
-from contxt.utils.auth import CLIAuth
+from contxt.utils.auth.cli import CLIAuth
 
 logger = make_logger(__name__)
 

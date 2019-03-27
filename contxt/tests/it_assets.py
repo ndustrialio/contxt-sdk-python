@@ -9,7 +9,7 @@ from contxt.services.asset_models import (Asset, AssetType, Attribute,
                                           DataTypes, Metric, MetricValue,
                                           TimeIntervals)
 from contxt.tests.asset_schema import AssetSchemas
-from contxt.utils.auth import CLIAuth
+from contxt.utils.auth.cli import CLIAuth
 
 
 def init_schema():
