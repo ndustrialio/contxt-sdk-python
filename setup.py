@@ -11,7 +11,7 @@ from shutil import rmtree
 from setuptools import Command, find_packages, setup
 
 # Python requirement
-REQUIRES_PYTHON = ">=3.5.0"
+REQUIRES_PYTHON = ">=3.6.0"
 
 # Requirements
 REQUIRED = [
