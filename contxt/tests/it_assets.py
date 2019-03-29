@@ -2,8 +2,8 @@ from datetime import date, datetime, timedelta
 
 import pytest
 
-from contxt.services.asset_framework import AssetFramework
-from contxt.services.asset_migration import AssetMigrationManager, AssetSchema
+from contxt.services.assets import AssetsService
+from contxt.services.assets_migration import AssetMigrationManager, AssetSchema
 from contxt.models.asset import (Asset, AssetType, Attribute,
                                           AttributeValue, DataParsers,
                                           DataTypes, Metric, MetricValue,
@@ -14,7 +14,7 @@ from contxt.utils.auth.cli import CLIAuth
 
 def init_schema():
     organization_id = "02efa741-a96f-4124-a463-ae13a704b8fc"
-    asset_framework = AssetFramework(
+    asset_framework = AssetsService(
         auth=CLIAuth(),
         organization_id=organization_id,
         env="staging",
@@ -48,7 +48,7 @@ def cli_auth():
 @pytest.fixture
 def asset_framework(cli_auth: CLIAuth,
                     organization_id="02efa741-a96f-4124-a463-ae13a704b8fc"):
-    return AssetFramework(cli_auth, organization_id, env="staging", load_types=True, types_to_fully_load=['TestParentType'])
+    return AssetsService(cli_auth, organization_id, env="staging", load_types=True, types_to_fully_load=['TestParentType'])
 
 
 @pytest.fixture
@@ -62,20 +62,20 @@ def child_asset_type(asset_framework):
 
 
 @pytest.fixture
-def attribute(asset_framework: AssetFramework):
+def attribute(asset_framework: AssetsService):
     return asset_framework.asset_type_with_label("TestParentType").attribute_with_label("test_attr_label")
 
 
 @pytest.fixture
-def metric(asset_framework: AssetFramework):
+def metric(asset_framework: AssetsService):
     return asset_framework.asset_type_with_label(
         "TestParentType").metric_with_label("test_met_label")
 
 
 # TODO: need to split these tests up, and test for errors, globals, different orgs
-class TestAssetFramework:
+class TestAssetsService:
 
-    def test_asset_type_crud_endpoints(self, asset_framework: AssetFramework):
+    def test_asset_type_crud_endpoints(self, asset_framework: AssetsService):
         """Test create, retrieve, update, and delete asset_type"""
         # Test create_asset_type
         asset_type = AssetType(
@@ -87,7 +87,7 @@ class TestAssetFramework:
         assert created_asset_type.label == asset_type.label
         assert created_asset_type.description == asset_type.description
         assert created_asset_type.organization_id == asset_type.organization_id
-        # Check created type was also cached within the AssetFramework instance
+        # Check created type was also cached within the AssetsService instance
         assert asset_framework.asset_type_with_id(created_asset_type.id) == created_asset_type
         assert asset_framework.asset_type_with_label(created_asset_type.label) == created_asset_type
         assert asset_framework.asset_type_with_label(
@@ -100,7 +100,7 @@ class TestAssetFramework:
             created_asset_type.id)
         # Check the field was updated
         assert updated_asset_type.description == created_asset_type.description
-        # Check upated type was also cached within the AssetFramework instance
+        # Check upated type was also cached within the AssetsService instance
         assert asset_framework.asset_type_with_id(
             created_asset_type.id) == created_asset_type
         assert asset_framework.asset_type_with_label(
@@ -113,7 +113,7 @@ class TestAssetFramework:
         # Check the asset type was actually deleted
         with pytest.raises(Exception) as e:
             asset_framework.get_asset_type(updated_asset_type.id)
-        # Check the cached type was also removed from the AssetFramework instance
+        # Check the cached type was also removed from the AssetsService instance
         assert asset_framework.asset_type_with_id(created_asset_type.id,
                                                   None) is None
         assert asset_framework.asset_type_with_label(created_asset_type.label,
@@ -121,7 +121,7 @@ class TestAssetFramework:
         assert asset_framework.asset_type_with_label(
             created_asset_type.normalized_label, None) is None
 
-    def test_asset_crud_endpoints(self, asset_framework: AssetFramework, child_asset_type):
+    def test_asset_crud_endpoints(self, asset_framework: AssetsService, child_asset_type):
         """Test create, retrieve, update, and delete asset"""
         # Test create_asset
         asset = Asset(
@@ -192,7 +192,7 @@ class TestAssetFramework:
         with pytest.raises(Exception) as e:
             asset_framework.get_asset(updated_attribute.id)
 
-    def test_attribute_value_crud_endpoints(self, asset_framework: AssetFramework, attribute):
+    def test_attribute_value_crud_endpoints(self, asset_framework: AssetsService, attribute):
         """Test create, retrieve, update, and delete attribute_value"""
         # TODO: we need a schema that creates assets too
         # Test create_attribute_value
@@ -312,4 +312,4 @@ class TestAssetFramework:
 if __name__ == "__main__":
     auth = CLIAuth()
     organization_id = "02efa741-a96f-4124-a463-ae13a704b8fc"
-    af = AssetFramework(auth, organization_id, env="staging")
+    af = AssetsService(auth, organization_id, env="staging")

@@ -32,7 +32,7 @@ logger = make_logger(__name__)
 #         return c
 
 
-class AssetFramework(ApiService):
+class AssetsService(ApiService):
     configs_by_env = {
         'production':
         dict(
@@ -526,7 +526,7 @@ class AssetFramework(ApiService):
 if __name__ == "__main__":
     auth = CLIAuth()
     organization_id = "02efa741-a96f-4124-a463-ae13a704b8fc"
-    af = AssetFramework(
+    af = AssetsService(
         auth,
         organization_id,
         env='staging',
