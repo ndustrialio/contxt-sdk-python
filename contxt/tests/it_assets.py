@@ -4,7 +4,7 @@ import pytest
 
 from contxt.services.asset_framework import AssetFramework
 from contxt.services.asset_migration import AssetMigrationManager, AssetSchema
-from contxt.services.asset_models import (Asset, AssetType, Attribute,
+from contxt.models.asset import (Asset, AssetType, Attribute,
                                           AttributeValue, DataParsers,
                                           DataTypes, Metric, MetricValue,
                                           TimeIntervals)

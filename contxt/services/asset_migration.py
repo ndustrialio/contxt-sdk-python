@@ -1,7 +1,7 @@
 from typing import Dict, List, Optional, Set, Tuple, Union
 
 from contxt.services.asset_framework import AssetFramework
-from contxt.services.asset_models import (Asset, AssetType, Attribute,
+from contxt.models.asset import (Asset, AssetType, Attribute,
                                           AttributeValue, DataTypes, Metric,
                                           MetricValue, TimeIntervals)
 from contxt.utils import Config, make_logger
