@@ -1,29 +1,13 @@
-from __future__ import annotations
-
-from ast import literal_eval
 from datetime import date, datetime, timedelta
-from typing import Dict, List, Optional, Set, Tuple, Union
+from typing import Any, Dict, List, Optional, Set, Tuple, Union
 
 from inflect import engine
-from pytz import UTC
 
-from contxt.services.api import ApiObject
+from contxt.services.api import ApiField, ApiObject, Parsers
 from contxt.utils import Utils, make_logger
 
 p = engine()
 logger = make_logger(__name__)
-
-# TODO: Need a way to track changed attributes
-def warn_of_unknown_kwargs(cls_, kwargs):
-    # Warn of unexpected kwargs
-    cls_name = cls_.__class__.__name__
-    for k, v in kwargs.items():
-        logger.warning(f"{cls_name}: Unexpected kwarg {k}")
-    # Warn of a present global
-    # if hasattr(cls_, "is_global") and cls_.is_global:
-    #     logger.warning(
-    #         f"{cls_name}: received global (id {cls_.id}, label {cls_.label})"
-    #     )
 
 
 class TimeIntervals:
@@ -38,56 +22,10 @@ class TimeIntervals:
 
 class DataTypes:
     """Valid data types for an Attribute"""
-    boolean = 'boolean'
-    datetime = 'date'
-    number = 'number'
-    string = 'string'
-
-
-class DataParsers:
-    """Parsers used to parse a string returned from the Asset Framework API to
-    the appropriate Python object"""
-
-    @staticmethod
-    def format_datetime(datetime_) -> str:
-        return datetime_.strftime('%Y-%m-%dT%H:%M:%S.%fZ')
-
-    @staticmethod
-    def parse_as_datetime(timestamp) -> datetime:
-        return datetime.strptime(timestamp,
-                                 '%Y-%m-%dT%H:%M:%S.%fZ').replace(tzinfo=UTC)
-
-    # TODO: change these as dates rather than datetimes
-    @staticmethod
-    def format_date(datetime_):
-        return datetime_.strftime('%Y-%m-%d')
-
-    @staticmethod
-    def parse_as_date(date):
-        return datetime.strptime(date, "%Y-%m-%d").replace(tzinfo=UTC)
-
-    @staticmethod
-    def parse_as_unknown(val):
-        # First, try a general parser (supports strings, numbers, tuples,
-        # lists, dicts, booleans, and None)
-        try:
-            return literal_eval(val)
-        except (SyntaxError, ValueError) as e:
-            pass
-        # Next, fall back to a date parser
-        try:
-            return DataParsers.datetime(val)
-        except (TypeError, ValueError) as e:
-            pass
-        # Failed, return original value
-        return val
-
-    boolean = bool
-    datetime = parse_as_datetime
-    date = parse_as_date
-    number = float
-    string = str
-    unknown = parse_as_unknown
+    boolean = "boolean"
+    datetime = "date"
+    number = "number"
+    string = "string"
 
 
 class CompleteAsset(ApiObject):
@@ -280,8 +218,21 @@ class CompleteAsset(ApiObject):
 
 class AssetType(ApiObject):
     __marker = object()
-    creatable_fields = ['label', 'description', 'organization_id', 'parent_id']
-    updatable_fields = ['description', 'parent_id']
+    api_fields = (
+        ApiField("id"),
+        ApiField("label", creatable=True),
+        ApiField("description", creatable=True, updatable=True),
+        ApiField("organization_id", creatable=True),
+        ApiField("global_asset_type_parent_id"),
+        ApiField("is_global", type=bool),
+        ApiField("parent_id", creatable=True, updatable=True),
+        ApiField("hierarchy_level", type=int),
+        ApiField("asset_attributes", attr_key="_attributes", type=Attribute),
+        ApiField("asset_metrics", attr_key="_metrics", type=Metric),
+        ApiField("children", attr_key="_children", type=AssetType),
+        ApiField("created_at", type=Parsers.datetime),
+        ApiField("updated_at", type=Parsers.datetime),
+    )
 
     def __init__(
             self,
@@ -289,56 +240,30 @@ class AssetType(ApiObject):
             description: str,
             organization_id: str,
             id: Optional[str] = None,
-            global_asset_type_parent_id: Optional[str] = None,
             is_global: Optional[bool] = None,
+            global_asset_type_parent_id: Optional[str] = None,
             parent_id: Optional[str] = None,
-            # parent_label: Optional[str] = None,
             hierarchy_level: Optional[int] = None,
-            children: Optional[Union[List[dict], List[AssetType]]] = None,
-            created_at: Optional[str] = None,
-            updated_at: Optional[str] = None,
-            asset_attributes: Optional[Union[List[dict], List[Attribute]]] = None,
-            asset_metrics: Optional[Union[List[dict], List[Metric]]] = None,
-            **kwargs,
+            asset_attributes: Optional[List[Attribute]] = None,
+            asset_metrics: Optional[List[Metric]] = None,
+            children: Optional[List[AssetType]] = None,
+            created_at: Optional[datetime] = None,
+            updated_at: Optional[datetime] = None,
     ) -> None:
         super().__init__()
-
         self.id = id
         self.label = label
         self.description = description
         self.organization_id = organization_id
         self.parent_id = parent_id
-        # TODO: parent_label is not an api response, but is used for migrations
-        # self.parent_label = parent_label
         self.hierarchy_level = hierarchy_level
         self.global_asset_type_parent_id = global_asset_type_parent_id
         self.is_global = is_global
-
-        # Set attributes, from either a list of dicts or a list of Attributes
-        # TODO: can we make this cleaner?
-        asset_attributes = asset_attributes or []
-        self._attributes = asset_attributes if asset_attributes and isinstance(
-            asset_attributes[0],
-            Attribute) else [Attribute(**attr) for attr in asset_attributes]
-
-        # Set metrics, from either a list of dicts or a list of Metrics
-        asset_metrics = asset_metrics or []
-        self._metrics = asset_metrics if asset_metrics and isinstance(
-            asset_metrics[0],
-            Metric) else [Metric(**metric) for metric in asset_metrics]
-
-        # Set children, from either a list of dicts or a list of AssetTypes
-        children = children or []
-        self._children = children if children and isinstance(
-            children[0],
-            AssetType) else [AssetType(**child) for child in children]
-
-        self.created_at = DataParsers.datetime(
-            created_at) if created_at else None
-        self.updated_at = DataParsers.datetime(
-            updated_at) if updated_at else None
-
-        warn_of_unknown_kwargs(self, kwargs)
+        self._attributes = asset_attributes or []
+        self._metrics = asset_metrics or []
+        self._children = children or []
+        self.created_at = created_at
+        self.updated_at = updated_at
 
     @property
     def normalized_label(self) -> str:
@@ -441,10 +366,20 @@ class AssetType(ApiObject):
 
 
 class Asset(ApiObject):
-    creatable_fields = [
-        'asset_type_id', 'label', 'description', 'organization_id', 'parent_id'
-    ]
-    updatable_fields = ['description', 'parent_id']
+    api_fields = (
+        ApiField("id"),
+        ApiField("asset_type_id", creatable=True),
+        ApiField("label", creatable=True),
+        ApiField("description", creatable=True, updatable=True),
+        ApiField("organization_id", creatable=True),
+        ApiField("parent_id", creatable=True, updatable=True),
+        ApiField("hierarchy_level", type=int),
+        # ApiField("asset_attribute_values", attr_key="attribute_values", type=AttributeValue, optional=True),
+        # ApiField("asset_metric_values", attr_key="metric_values", type=MetricValue, optional=True),
+        # ApiField("children", type=Asset, optional=True),
+        ApiField("created_at", type=Parsers.datetime),
+        ApiField("updated_at", type=Parsers.datetime),
+    )
 
     def __init__(
             self,
@@ -453,13 +388,13 @@ class Asset(ApiObject):
             description: str,
             organization_id: str,
             id: Optional[str] = None,
-            created_at: Optional[str] = None,
-            updated_at: Optional[str] = None,
+            created_at: Optional[datetime] = None,
+            updated_at: Optional[datetime] = None,
             parent_id: Optional[str] = None,
             hierarchy_level: Optional[str] = None,
-            asset_attribute_values: Optional[str] = None,
-            asset_metric_values: Optional[str] = None,
-            children: Optional[str] = None,
+            asset_attribute_values: Optional[List[MetricValue]] = None,
+            asset_metric_values: Optional[List[MetricValue]] = None,
+            children: Optional[List[Asset]] = None,
             **kwargs,
     ):
         super().__init__()
@@ -469,31 +404,12 @@ class Asset(ApiObject):
         self.description = description
         self.organization_id = organization_id
         self.parent_id = parent_id
-
-        # Set attribute values, from either a list of dicts or a list of AttributeValues
-        # TODO: can we make this cleaner?
-        asset_attribute_values = asset_attribute_values or []
-        self.attribute_values = asset_attribute_values if asset_attribute_values and isinstance(
-            asset_attribute_values[0], AttributeValue) else [
-                AttributeValue(**value) for value in asset_attribute_values
-            ]
-
-        # Set metric values, from either a list of dicts or a list of MetricValues
-        # TODO: change api endpoint to optionally return these
-        asset_metric_values = asset_metric_values or []
-        self.metric_values = asset_metric_values if asset_metric_values and isinstance(
-            asset_metric_values[0], MetricValue) else [
-                MetricValue(**value) for value in asset_metric_values
-            ]
-
+        self.attribute_values = asset_attribute_values or []
+        self.metric_values = asset_metric_values or []
         self.hierarchy_level = hierarchy_level
-        self.children = [Asset(**child) for child in children or []]
-        self.created_at = DataParsers.datetime(
-            created_at) if created_at else None
-        self.updated_at = DataParsers.datetime(
-            updated_at) if updated_at else None
-
-        warn_of_unknown_kwargs(self, kwargs)
+        self.children = children or []
+        self.created_at = created_at
+        self.updated_at = updated_at
 
     @property
     def normalized_label(self):
@@ -501,13 +417,20 @@ class Asset(ApiObject):
 
 
 class Attribute(ApiObject):
-    creatable_fields = [
-        'asset_type_id', 'label', 'description', 'organization_id',
-        'data_type', 'is_required', 'units'
-    ]
-    updatable_fields = [
-        'label', 'description', 'units', 'is_required', 'data_type'
-    ]
+    api_fields = (
+        ApiField("id"),
+        ApiField("asset_type_id", creatable=True),
+        ApiField("label", creatable=True, updatable=True),
+        ApiField("description", creatable=True, updatable=True),
+        ApiField("units", creatable=True, updatable=True),
+        ApiField("organization_id", creatable=True),
+        ApiField("data_type", creatable=True, updatable=True),
+        ApiField("is_required", type=bool, creatable=True, updatable=True),
+        ApiField("is_global", type=bool),
+        ApiField("global_asset_attribute_parent_id"),
+        ApiField("created_at", type=Parsers.datetime),
+        ApiField("updated_at", type=Parsers.datetime),
+    )
 
     def __init__(
             self,
@@ -521,12 +444,10 @@ class Attribute(ApiObject):
             id: Optional[str] = None,
             global_asset_attribute_parent_id: Optional[str] = None,
             is_global: Optional[bool] = None,
-            created_at: Optional[str] = None,
-            updated_at: Optional[str] = None,
-            **kwargs,
+            created_at: Optional[datetime] = None,
+            updated_at: Optional[datetime] = None,
     ):
         super().__init__()
-
         self.id = id
         self.asset_type_id = asset_type_id
         self.label = label
@@ -537,12 +458,8 @@ class Attribute(ApiObject):
         self.is_required = is_required
         self.global_asset_attribute_parent_id = global_asset_attribute_parent_id
         self.is_global = is_global
-        self.created_at = DataParsers.datetime(
-            created_at) if created_at else None
-        self.updated_at = DataParsers.datetime(
-            updated_at) if updated_at else None
-
-        warn_of_unknown_kwargs(self, kwargs)
+        self.created_at = created_at
+        self.updated_at = updated_at
 
     @property
     def normalized_label(self):
@@ -550,49 +467,54 @@ class Attribute(ApiObject):
 
 
 class AttributeValue(ApiObject):
-    creatable_fields = [
-        'asset_attribute_id', 'effective_date', 'notes', 'value'
-    ]
-    updatable_fields = ['effective_date', 'notes', 'value']
+    api_fields = (
+        ApiField("id"),
+        ApiField("asset_id"),
+        ApiField("asset_attribute_id", creatable=True),
+        ApiField("notes", creatable=True, updatable=True),
+        ApiField("value", type=Parsers.unknown, creatable=True, updatable=True),
+        ApiField("effective_date", creatable=True, updatable=True),
+        ApiField("created_at", type=Parsers.datetime),
+        ApiField("updated_at", type=Parsers.datetime),
+    )
 
     def __init__(
             self,
             asset_id: str,
             asset_attribute_id: str,
             notes: str,
-            value: str,
+            value: Any,
             id: Optional[str] = None,
-            effective_date: Optional[str] = None,
-            created_at: Optional[str] = None,
-            updated_at: Optional[str] = None,
-            **kwargs,
+            effective_date: Optional[datetime] = None,
+            created_at: Optional[datetime] = None,
+            updated_at: Optional[datetime] = None,
     ):
         super().__init__()
         self.id = id
         self.asset_attribute_id = asset_attribute_id
         self.asset_id = asset_id
-        self.effective_date = DataParsers.date(
-            effective_date or str(date.today()))
+        self.effective_date = effective_date or Parsers.date(str(date.today()))
         self.notes = notes
-        # TODO: need to know data_type to parse
-        self.value = DataParsers.unknown(value)
-        self.created_at = DataParsers.datetime(
-            created_at) if created_at else None
-        self.updated_at = DataParsers.datetime(
-            updated_at) if updated_at else None
-
-        warn_of_unknown_kwargs(self, kwargs)
+        self.value = value
+        self.created_at = created_at
+        self.updated_at = updated_at
 
 
+# TODO: need to fix global metric for POST
 class Metric(ApiObject):
-    # TODO: need to fix global metric for POST
-    creatable_fields = [
-        'label', 'description', 'organization_id', 'time_interval', 'units',
-        'is_global'
-    ]
-    updatable_fields = [
-        'label', 'description', 'time_interval', 'units'
-    ]
+    api_fields = (
+        ApiField("id"),
+        ApiField("asset_type_id"),
+        ApiField("label", creatable=True, updatable=True),
+        ApiField("description", creatable=True, updatable=True),
+        ApiField("organization_id", creatable=True),
+        ApiField("time_interval", creatable=True, updatable=True),
+        ApiField("units", creatable=True, updatable=True),
+        ApiField("global_asset_metric_parent_id"),
+        ApiField("is_global", type=bool, creatable=True),
+        ApiField("created_at", type=Parsers.datetime),
+        ApiField("updated_at", type=Parsers.datetime),
+    )
 
     def __init__(
             self,
@@ -605,12 +527,10 @@ class Metric(ApiObject):
             id: Optional[str] = None,
             global_asset_metric_parent_id: Optional[str] = None,
             is_global: Optional[bool] = None,
-            created_at: Optional[str] = None,
-            updated_at: Optional[str] = None,
-            **kwargs,
+            created_at: Optional[datetime] = None,
+            updated_at: Optional[datetime] = None,
     ):
         super().__init__()
-
         self.id = id
         self.asset_type_id = asset_type_id
         self.label = label
@@ -620,12 +540,8 @@ class Metric(ApiObject):
         self.time_interval = time_interval
         self.global_asset_metric_parent_id = global_asset_metric_parent_id
         self.is_global = is_global
-        self.created_at = DataParsers.datetime(
-            created_at) if created_at else None
-        self.updated_at = DataParsers.datetime(
-            updated_at) if updated_at else None
-
-        warn_of_unknown_kwargs(self, kwargs)
+        self.created_at = created_at
+        self.updated_at = updated_at
 
     @property
     def normalized_label(self):
@@ -633,49 +549,40 @@ class Metric(ApiObject):
 
 
 class MetricValue(ApiObject):
-    creatable_fields = [
-        'effective_start_date', 'effective_end_date', 'notes', 'value'
-    ]
-    updatable_fields = [
-        'effective_start_date', 'effective_end_date', 'notes', 'value'
-    ]
+    api_fields = (
+        ApiField("id"),
+        ApiField("asset_id"),
+        ApiField("Asset", attr_key="asset", type=Asset),
+        ApiField("asset_metric_id"),
+        ApiField("effective_start_date", type=Parsers.datetime, creatable=True, updatable=True),
+        ApiField("effective_end_date", type=Parsers.datetime, creatable=True, updatable=True),
+        ApiField("notes", creatable=True, updatable=True),
+        ApiField("value", type=float, creatable=True, updatable=True),
+        ApiField("created_at", type=Parsers.datetime),
+        ApiField("updated_at", type=Parsers.datetime),
+    )
 
     def __init__(
             self,
             asset_id: str,
             asset_metric_id: str,
-            effective_start_date: Union[str, datetime],
-            effective_end_date: Union[str, datetime],
+            effective_start_date: datetime,
+            effective_end_date: datetime,
             notes: str,
             value: str,
             id: Optional[str] = None,
-            asset: Optional[dict] = None,
-            created_at: Optional[Union[str, datetime]] = None,
-            updated_at: Optional[Union[str, datetime]] = None,
-            **kwargs,
+            asset: Optional[Asset] = None,
+            created_at: Optional[datetime] = None,
+            updated_at: Optional[datetime] = None,
     ):
         super().__init__()
         self.id = id
         self.asset_id = asset_id
         self.asset_metric_id = asset_metric_id
-
-        self.effective_start_date = effective_start_date if isinstance(
-            effective_start_date,
-            datetime) else DataParsers.datetime(effective_start_date)
-
-        self.effective_end_date = effective_end_date if isinstance(
-            effective_end_date,
-            datetime) else DataParsers.datetime(effective_end_date)
-
+        self.effective_start_date = effective_start_date
+        self.effective_end_date = effective_end_date
         self.notes = notes
-        self.value = DataParsers.number(value) if value else None
-
-        self.created_at = created_at if isinstance(
-            created_at,
-            (datetime, type(None))) else DataParsers.datetime(created_at)
-
-        self.updated_at = updated_at if isinstance(
-            updated_at,
-            (datetime, type(None))) else DataParsers.datetime(updated_at)
-
-        self.asset = Asset(**asset) if asset else None
+        self.value = value
+        self.created_at = created_at
+        self.updated_at = updated_at
+        self.asset = asset
