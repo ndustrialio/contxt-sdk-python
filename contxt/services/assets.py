@@ -1,10 +1,9 @@
 from typing import Dict, List, Optional, Set, Tuple
 
+from contxt.models.asset import (Asset, AssetType, Attribute, AttributeValue,
+                                 CompleteAsset, DataTypes, Metric, MetricValue,
+                                 TimeIntervals)
 from contxt.services.api import ApiService
-from contxt.models.asset import (Asset, AssetType, Attribute,
-                                          AttributeValue, CompleteAsset,
-                                          DataTypes, Metric, MetricValue,
-                                          TimeIntervals)
 from contxt.utils import make_logger
 from contxt.utils.auth.cli import CLIAuth
 
@@ -178,13 +177,15 @@ class AssetsService(ApiService):
     def create_asset_type(self, asset_type: AssetType) -> AssetType:
         data = asset_type.post()
         logger.debug(f"Creating asset_type with {data}")
-        new_asset_type = AssetType(**self.post("assets/types", data=data))
+        resp = self.post("assets/types", data=data)
+        new_asset_type = AssetType.from_api(resp)
         self._cache_asset_type(new_asset_type)
         return new_asset_type
 
     def get_asset_type(self, asset_type_id: str) -> AssetType:
         logger.debug(f"Fetching asset_type {asset_type_id}")
-        return AssetType(**self.get(f"assets/types/{asset_type_id}"))
+        resp = self.get(f"assets/types/{asset_type_id}")
+        return AssetType.from_api(resp)
 
     def update_asset_type(self, asset_type: AssetType) -> None:
         data = asset_type.put()
@@ -210,12 +211,12 @@ class AssetsService(ApiService):
             logger.debug(
                 f"Fetching asset_types for organization {organization_id}")
             return [
-                AssetType(**rec) for rec in self.get(
+                AssetType.from_api(rec) for rec in self.get(
                     f"organizations/{organization_id}/assets/types")
             ]
         else:
             logger.debug(f"Fetching asset_types")
-            return [AssetType(**rec) for rec in self.get(f"assets/types")]
+            return [AssetType.from_api(rec) for rec in self.get(f"assets/types")]
 
     def update_asset_types(self, asset_types: List[AssetType]) -> None:
         # TODO: batch update
@@ -233,15 +234,19 @@ class AssetsService(ApiService):
     def create_asset(self, asset: Asset) -> Asset:
         data = asset.post()
         logger.debug(f"Creating asset with {data}")
-        return Asset(**self.post("assets", data=data))
+        resp = self.post("assets", data=data)
+        return Asset.from_api(resp)
 
     def get_asset(self,
                   asset_id: str,
                   with_attribute_values=True,
                   with_metric_values=False) -> Asset:
         logger.debug(f"Fetching asset {asset_id}")
-        metric_values = self.get_metric_values(asset_id) if with_metric_values else None
-        return Asset(**self.get(f"assets/{asset_id}"), asset_metric_values=metric_values)
+        resp = self.get(f"assets/{asset_id}")
+        asset = Asset.from_api(resp)
+        if with_metric_values:
+            asset.metric_values = self.get_metric_values(asset_id)
+        return asset
 
     def update_asset(self, asset: Asset) -> None:
         data = asset.put()
@@ -260,7 +265,7 @@ class AssetsService(ApiService):
 
     def get_assets(self) -> List[Asset]:
         logger.debug(f"Fetching assets")
-        return [Asset(**rec) for rec in self.get("assets")]
+        return [Asset.from_api(rec) for rec in self.get("assets")]
 
     def get_assets_for_organization(
             self,
@@ -273,7 +278,7 @@ class AssetsService(ApiService):
             f"Fetching assets for organization {organization_id} and asset_type {asset_type_id}"
         )
         return [
-            Asset(**rec) for rec in self.get(
+            Asset.from_api(rec) for rec in self.get(
                 f"organizations/{organization_id}/assets",
                 params={"asset_type_id": asset_type_id})
         ]
@@ -294,12 +299,14 @@ class AssetsService(ApiService):
     def create_attribute(self, attribute: Attribute) -> Attribute:
         data = attribute.post()
         logger.debug(f"Creating attribute with {data}")
-        return Attribute(**self.post(
-            f"assets/types/{attribute.asset_type_id}/attributes", data=data))
+        resp = self.post(
+            f"assets/types/{attribute.asset_type_id}/attributes", data=data)
+        return Attribute.from_api(resp)
 
     def get_attribute(self, attribute_id: str) -> Attribute:
         logger.debug(f"Fetching attribute {attribute_id}")
-        return Attribute(**self.get(f"assets/attributes/{attribute_id}"))
+        resp = self.get(f"assets/attributes/{attribute_id}")
+        return Attribute.from_api(resp)
 
     def update_attribute(self, attribute: Attribute) -> None:
         data = attribute.put()
@@ -320,7 +327,7 @@ class AssetsService(ApiService):
     def get_attributes(self, asset_type_id: str) -> List[Attribute]:
         logger.debug(f"Fetching attributes for asset_type {asset_type_id}")
         return [
-            Attribute(**rec)
+            Attribute.from_api(rec)
             for rec in self.get(f"assets/types/{asset_type_id}/attributes")
         ]
 
@@ -339,12 +346,12 @@ class AssetsService(ApiService):
     # Single attribute value
     def create_attribute_value(
             self, attribute_value: AttributeValue) -> AttributeValue:
-        # TODO: why do we need both ids?
         data = attribute_value.post()
         logger.debug(f"Creating attribute_value with {data}")
-        return AttributeValue(**self.post(
+        resp = self.post(
             f"assets/{attribute_value.asset_id}/attributes/{attribute_value.asset_attribute_id}/values",
-            data=data))
+            data=data)
+        return AttributeValue.from_api(resp)
 
     # TODO: this endpoint does not exist
     # def get_attribute_value(self, attribute_value_id: str) -> AttributeValue:
@@ -387,7 +394,7 @@ class AssetsService(ApiService):
         # https://contxt.readme.io/v1.0/reference#get-values-by-attribute-id
         logger.debug(f"Fetching attribute_values for asset {asset_id}")
         return [
-            AttributeValue(**rec)
+            AttributeValue.from_api(rec)
             for rec in self.get(f"assets/{asset_id}/attributes/values")
         ]
 
@@ -409,12 +416,14 @@ class AssetsService(ApiService):
     def create_metric(self, metric: Metric) -> Metric:
         data = metric.post()
         logger.debug(f"Creating metric with {data}")
-        return Metric(**self.post(
-            f"assets/types/{metric.asset_type_id}/metrics", data=data))
+        resp = self.post(
+            f"assets/types/{metric.asset_type_id}/metrics", data=data)
+        return Metric.from_api(resp)
 
     def get_metric(self, metric_id: str) -> Metric:
         logger.debug(f"Fetching metric {metric_id}")
-        return Metric(**self.get(f"assets/metrics/{metric_id}"))
+        resp = self.get(f"assets/metrics/{metric_id}")
+        return Metric.from_api(resp)
 
     def update_metric(self, metric: Metric) -> None:
         data = metric.put()
@@ -434,7 +443,7 @@ class AssetsService(ApiService):
     def get_metrics(self, asset_type_id: str) -> List[Metric]:
         logger.debug(f"Fetching metrics for asset_type {asset_type_id}")
         return [
-            Metric(**rec)
+            Metric.from_api(rec)
             for rec in self.get(f"assets/types/{asset_type_id}/metrics")
         ]
 
@@ -452,12 +461,12 @@ class AssetsService(ApiService):
 
     # Single metric value
     def create_metric_value(self, metric_value: MetricValue) -> MetricValue:
-        # TODO: why do we need both ids?
         data = metric_value.post()
         logger.debug(f"Creating metric_value with {data}")
-        return MetricValue(**self.post(
+        resp = self.post(
             f"assets/{metric_value.asset_id}/metrics/{metric_value.asset_metric_id}/values",
-            data=data))
+            data=data)
+        return MetricValue.from_api(resp)
 
     # TODO: this endpoint does not exist
     # def get_metric_value(self, metric_value_id: str) -> MetricValue:
@@ -494,19 +503,18 @@ class AssetsService(ApiService):
 
     def get_metric_values(self, asset_id: str,
                           metric_id: Optional[str] = None) -> List[MetricValue]:
-        # TODO: why do we need both ids?
         if metric_id:
             logger.debug(
                 f"Fetching metric_values for asset {asset_id} and metric {metric_id}"
             )
             return [
-                MetricValue(**rec, asset=rec['Asset']) for rec in self.get(
+                MetricValue.from_api(rec) for rec in self.get(
                     f"assets/{asset_id}/metrics/{metric_id}/values")
             ]
         else:
             logger.debug(f"Fetching metric_values for asset {asset_id}")
             return [
-                MetricValue(**rec, asset=rec['Asset'])
+                MetricValue.from_api(rec)
                 for rec in self.get(f"assets/{asset_id}/metrics/values")
             ]
 
@@ -521,28 +529,3 @@ class AssetsService(ApiService):
         logger.debug(f"Deleting {len(metric_values)} metric_values")
         for metric_value in metric_values:
             self.delete_metric_value(metric_value)
-
-
-if __name__ == "__main__":
-    auth = CLIAuth()
-    organization_id = "02efa741-a96f-4124-a463-ae13a704b8fc"
-    af = AssetsService(
-        auth,
-        organization_id,
-        env='staging',
-        load_types=True,
-        types_to_fully_load=['UtilityMeter'])
-    asset_framework = af
-
-    # Attribute value
-    # asset = af.get_asset("8d9ec95e-c574-48f6-ae8d-2eb35e8ae97a")
-    # attribute = af.get_attribute("b0446d26-c4e2-4e5d-aa7c-e6f13591f9fc")
-    # af.delete_attribute_value(asset.asset_attribute_values[0])
-    # attribute = af.get_attribute("8d9ec95e-c574-48f6-ae8d-2eb35e8ae97a")
-    # attribute_value = AttributeValue(
-    #     asset_id=asset.id,
-    #     asset_attribute_id=attribute.id,
-    #     notes='Test note',
-    #     value=2)
-    # at = af.create_attribute_value(attribute_value)
-    print("done")
