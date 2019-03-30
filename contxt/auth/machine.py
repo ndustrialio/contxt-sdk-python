@@ -1,4 +1,4 @@
-from contxt.utils.auth import BaseAuth
+from contxt.auth import BaseAuth
 from contxt.utils import Config, make_logger
 
 logger = make_logger(__name__)

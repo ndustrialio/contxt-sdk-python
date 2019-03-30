@@ -8,7 +8,7 @@ from contxt.models.asset import (Asset, AssetType, Attribute, AttributeValue,
 from contxt.services.assets import AssetsService
 from contxt.services.assets_migration import AssetMigrationManager, AssetSchema
 from contxt.tests.asset_schema import AssetSchemas
-from contxt.utils.auth.cli import CLIAuth
+from contxt.auth.cli import CLIAuth
 
 
 def init_schema():

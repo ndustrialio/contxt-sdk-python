@@ -1,7 +1,7 @@
 from importlib import import_module
 
 from contxt.utils import make_logger
-from contxt.utils.auth.cli import CLIAuth
+from contxt.auth.cli import CLIAuth
 
 logger = make_logger(__name__)
 

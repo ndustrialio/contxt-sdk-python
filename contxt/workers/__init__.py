@@ -1,6 +1,6 @@
 import os
 
-from contxt.utils.auth.machine import MachineAuth
+from contxt.auth.machine import MachineAuth
 
 
 class WorkerConfigurationError(Exception):

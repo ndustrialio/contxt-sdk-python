@@ -5,7 +5,7 @@ from contxt.models.asset import (Asset, AssetType, Attribute, AttributeValue,
                                  TimeIntervals)
 from contxt.services.api import ApiService
 from contxt.utils import make_logger
-from contxt.utils.auth.cli import CLIAuth
+from contxt.auth.cli import CLIAuth
 
 logger = make_logger(__name__)
 
