@@ -16,3 +16,7 @@ class ChannelArgumentException(Exception):
 
 class ChannelNotFoundException(Exception):
     pass
+
+
+class WorkerConfigurationError(Exception):
+    pass
