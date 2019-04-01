@@ -495,7 +495,7 @@ class AttributeValue(ApiObject):
         self.id = id
         self.asset_attribute_id = asset_attribute_id
         self.asset_id = asset_id
-        self.effective_date = effective_date or Parsers.date(str(date.today()))
+        self.effective_date = effective_date or date.today()
         self.notes = notes
         self.value = value
         self.created_at = created_at

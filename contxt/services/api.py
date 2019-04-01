@@ -3,7 +3,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from ast import literal_eval
 from datetime import date, datetime
-from typing import Callable, Dict, List, Optional, Set, Tuple
+from typing import Any, Callable, Dict, List, Optional, Set, Tuple
 
 import requests
 from jwt import decode
@@ -38,16 +38,16 @@ class Parsers:
     """
 
     @staticmethod
-    def parse_as_datetime(timestamp) -> datetime:
+    def parse_as_datetime(timestamp: str) -> datetime:
         return datetime.strptime(timestamp,
                                  '%Y-%m-%dT%H:%M:%S.%fZ').replace(tzinfo=UTC)
 
     @staticmethod
-    def parse_as_date(date):
-        return datetime.strptime(date, "%Y-%m-%d").replace(tzinfo=UTC)
+    def parse_as_date(datestamp: str) -> date:
+        return date.fromisoformat(datestamp)
 
     @staticmethod
-    def parse_as_unknown(val):
+    def parse_as_unknown(val: Any):
         # First, try a general parser (supports strings, numbers, tuples,
         # lists, dicts, booleans, and None)
         try:
@@ -76,14 +76,16 @@ class Formatters:
     """
 
     @staticmethod
-    def format_datetime(datetime_: datetime) -> str:
+    def format_datetime(datetime_: datetime, timezone_aware: Optional[bool] = True) -> str:
+        # if timezone_aware:
+            # TODO: validate
         return datetime_.isoformat().replace("+00:00", "Z")
 
-    # TODO: change these as dates rather than datetimes
     @staticmethod
     def format_date(date_: date):
-        return date_.isoformat().replace("+00:00", "Z")
+        return date_.isoformat()
 
+    # Delay binding the functions to simple names to avoid overshadowing the datetime modules
     datetime = format_datetime
     date = format_date
 
