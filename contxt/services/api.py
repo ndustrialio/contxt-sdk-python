@@ -8,7 +8,7 @@ from typing import Callable, Dict, List, Optional, Set, Tuple
 import requests
 from jwt import decode
 from pytz import UTC
-from requests import PreparedRequest, Response
+from requests import PreparedRequest, Response, Session
 from requests.auth import AuthBase
 from requests.exceptions import HTTPError
 
@@ -115,11 +115,18 @@ class ApiService:
     def __init__(self,
                  base_url: str,
                  access_token: str,
-                 api_version: Optional[str] = None):
+                 api_version: Optional[str] = None,
+                 use_session: Optional[bool] = True):
         api_version = api_version or API_VERSION
         self.client = ApiClient(access_token)
         self.base_url = self._init_base_url(base_url, api_version)
-        # TODO: we can speed up calls by using Request.Session object
+        self.session = self._init_session() if use_session else None
+
+    def _init_session(self):
+        session = Session()
+        session.auth = RequestAuth(self.client.access_token)
+        session.hooks = {"response": self._log_response}
+        return session
 
     def _init_base_url(self, base_url: str, api_version: str) -> str:
         return f"{base_url}/{api_version}" if api_version else base_url
@@ -168,35 +175,56 @@ class ApiService:
         decoded_token = decode(self.client.access_token, verify=False)
         return decoded_token['sub']
 
-    def get(self, uri, params: Optional[Dict[str, str]] = None, records_only=True):
-        response = requests.get(
-            url=self._get_url(uri), params=params, **self._request_kwargs())
+    def get(self,
+            uri,
+            params: Optional[Dict[str, str]] = None,
+            records_only: Optional[True] = True):
+        if self.session:
+            response = self.session.get(self._get_url(uri), params=params)
+        else:
+            response = requests.get(
+                self._get_url(uri), params=params, **self._request_kwargs())
+
         response_json = self._process_response(response)
 
         # Return just records, if requested and available
-        records = response_json.get("records") if isinstance(response_json, dict) else None
+        records = response_json.get("records") if isinstance(
+            response_json, dict) else None
         if records_only and records is not None:
             return records
 
         # Return entire response
         return response_json
 
-    def post(self, uri: str, data: Optional[dict] = None, json: Optional[dict] = None):
-        response = requests.post(
-            url=self._get_url(uri),
-            data=data,
-            json=json,
-            **self._request_kwargs())
+    def post(self,
+             uri: str,
+             data: Optional[dict] = None,
+             json: Optional[dict] = None):
+        if self.session:
+            response = self.session.post(
+                self._get_url(uri), data=data, json=json)
+        else:
+            response = requests.post(
+                self._get_url(uri),
+                data=data,
+                json=json,
+                **self._request_kwargs())
         return self._process_response(response)
 
     def put(self, uri: str, data=None):
-        response = requests.put(
-            url=self._get_url(uri), data=data, **self._request_kwargs())
+        if self.session:
+            response = self.session.put(self._get_url(uri), data=data)
+        else:
+            response = requests.put(
+                self._get_url(uri), data=data, **self._request_kwargs())
         return self._process_response(response)
 
     def delete(self, uri: str):
-        response = requests.delete(
-            url=self._get_url(uri), **self._request_kwargs())
+        if self.session:
+            response = self.session.delete(self._get_url(uri))
+        else:
+            response = requests.delete(
+                self._get_url(uri), **self._request_kwargs())
         return self._process_response(response)
 
 
