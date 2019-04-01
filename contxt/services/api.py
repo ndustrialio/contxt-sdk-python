@@ -1,3 +1,6 @@
+from __future__ import annotations
+
+from abc import ABC, abstractmethod
 from ast import literal_eval
 from datetime import date, datetime
 from typing import Callable, Dict, List, Optional, Set, Tuple
@@ -109,15 +112,11 @@ class ApiService:
     A service associated with an API
     """
 
-    configs_by_env = {
-        'staging': dict(base_url=None, audience=None),
-        'production': dict(base_url=None, audience=None)
-    }
-
     def __init__(self,
                  base_url: str,
                  access_token: str,
-                 api_version: str = API_VERSION) -> None:
+                 api_version: Optional[str] = None):
+        api_version = api_version or API_VERSION
         self.client = ApiClient(access_token)
         self.base_url = self._init_base_url(base_url, api_version)
         # TODO: we can speed up calls by using Request.Session object
@@ -201,25 +200,64 @@ class ApiService:
         return self._process_response(response)
 
 
-class ApiObject:
+class ApiServiceConfig:
+    """
+    A configuration to specify the API's name, url, and audience
+    """
+
+    def __init__(self, name: str, base_url: str, audience: str):
+        self.name = name
+        self.base_url = base_url
+        self.audience = audience
+
+
+# TODO: we should automatically refresh the access token here
+class ConfiguredApiService(ApiService, ABC):
+    """
+    An ApiService that has a list of configurations, selected by name
+    """
+
+    def __init__(self, auth, env: str, **kwargs):
+        self.auth = auth
+        self.config = self._init_config(env)
+        super().__init__(
+            base_url=self.config.base_url,
+            access_token=auth.get_token_for_audience(self.config.audience),
+            **kwargs)
+
+    @property
+    @abstractmethod
+    def _configs(self):
+        pass
+
+    @classmethod
+    def _init_configs_by_env(cls):
+        if hasattr(cls, "_configs_by_env"):
+            return
+        cls._configs_by_env = {c.name: c for c in cls._configs}
+
+    def _init_config(self, env: str):
+        self._init_configs_by_env()
+        if env not in self._configs_by_env:
+            raise KeyError(
+                f"Invalid environment '{env}'. Expected one of {', '.join(self._configs_by_env.keys())}."
+            )
+        return self._configs_by_env[env]
+
+
+class ApiObject(ABC):
     """
     An abstract base class for a response from an API. This class serves to
     take a raw response from an API and create a parsed Python object.
     """
 
-    __marker = object()
-    # creatable_fields = None
-    # updatable_fields = None
-
-    # def __init__(self):
-    #     raise NotImplementedError
-
     def __str__(self):
         return Serializer.to_table(self)
 
-    # @property
-    # def api_fields(self):
-    #     raise NotImplementedError
+    @property
+    @abstractmethod
+    def api_fields(self):
+        pass
 
     @classmethod
     def clean_api_value(cls, api_field, api_value):
@@ -227,7 +265,7 @@ class ApiObject:
             # No value
             return api_value
         elif callable(getattr(api_field.type, "from_api", None)):
-            # Type is an ApiObject, apply from_api_dict instead of init
+            # Type is an ApiObject, apply from_api instead of init
             return api_field.type.from_api(api_value)
         elif isinstance(api_value, (list, tuple,)):
             # Value is a list, clean each item
@@ -247,7 +285,7 @@ class ApiObject:
             for f in cls.api_fields
         }
 
-        # Set creatable, updateable fields
+        # Set creatable, updateable fields for class (if not yet set)
         if not hasattr(cls, "_creatable_fields"):
             cls._creatable_fields = tuple(
                 f for f in cls.api_fields if f.creatable)
@@ -285,6 +323,8 @@ class ApiObject:
 
 
 # TODO: Need a way to track changed attributes
+# TODO: This custom schema-validation can be replaced by a more robust
+# (although slower) implementation: see https://github.com/marshmallow-code/marshmallow
 class ApiField:
     """
     A field retrieved from an API service.

@@ -1,48 +1,27 @@
 from typing import Dict, List, Optional, Set, Tuple
 
+from contxt.auth.cli import CLIAuth
 from contxt.models.asset import (Asset, AssetType, Attribute, AttributeValue,
                                  CompleteAsset, DataTypes, Metric, MetricValue,
                                  TimeIntervals)
-from contxt.services.api import ApiService
+from contxt.services.api import ApiServiceConfig, ConfiguredApiService
 from contxt.utils import make_logger
-from contxt.auth.cli import CLIAuth
 
 logger = make_logger(__name__)
 
 
-# TODO: create a class for this
-# class ServiceConfig:
-
-#     def __init__(self, base_url, audience):
-#         self.base_url = base_url
-#         self.audience = audience
-
-
-# class ServiceConfigs:
-
-#     def __init__(self, **kwargs):
-#         for k, v in kwargs.items():
-#             setattr(self, k, v)
-
-#     def config(self, env):
-#         c = getattr(self, env, None)
-#         if not c:
-#             raise KeyError(f"Invalid environment {env}. Expected {CONFIG_BY_ENV.keys()}")
-#         return c
-
-
-class AssetsService(ApiService):
-    configs_by_env = {
-        'production':
-        dict(
-            base_url='https://facilities.api.ndustrial.io',
-            audience='SgbCopArnGMa9PsRlCVUCVRwxocntlg0'),
-        'staging':
-        dict(
-            base_url='https://facilities-staging.api.ndustrial.io',
-            audience='xG775XHIOZVUn84seNeHXi0Qe55YuR5w')
-    }
+class AssetsService(ConfiguredApiService):
     __marker = object()
+    _configs = (
+        ApiServiceConfig(
+            name="production",
+            base_url="https://facilities.api.ndustrial.io",
+            audience="SgbCopArnGMa9PsRlCVUCVRwxocntlg0"),
+        ApiServiceConfig(
+            name="staging",
+            base_url="https://facilities-staging.api.ndustrial.io",
+            audience="xG775XHIOZVUn84seNeHXi0Qe55YuR5w"),
+    )
 
     def __init__(
             self,
@@ -74,15 +53,6 @@ class AssetsService(ApiService):
             logger.info(
                 f"Cached asset types {[at.label for at in self.types_by_id.values()]}"
             )
-
-    def _init_config(self, env: str, default=__marker):
-        if env not in self.configs_by_env:
-            if default is self.__marker:
-                raise KeyError(
-                    f"Invalid environment '{env}'. Expected one of {', '.join(self.configs_by_env.keys())}."
-                )
-            return default
-        return self.configs_by_env[env]
 
     def _cache_asset_type(self, asset_type: AssetType):
         # TODO: should we replace label with normalized label?

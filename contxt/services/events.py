@@ -3,32 +3,30 @@ from typing import Any, Dict, List, Optional, Set, Tuple, Union
 from contxt.auth.cli import CLIAuth
 from contxt.models.events import (Event, EventDefinition, EventType,
                                   TriggeredEvent)
-from contxt.services.api import ApiService
+from contxt.services.api import ApiServiceConfig, ConfiguredApiService
 from contxt.utils import make_logger
 
 logger = make_logger(__name__)
 
 
-class EventsService(ApiService):
-    configs_by_env = {
-        'production':
-        dict(
-            base_url='http://events.api.ndustrial.io',
-            audience='7jzwfE20O2XZ4aq3cO1wmk63G9GzNc8j'),
-        'staging':
-        dict(
-            base_url='http://events-staging.api.ndustrial.io',
-            audience='dn4MaocJFdKtsBy9sFFaTeuJWL1nt5xu')
-    }
+class EventsService(ConfiguredApiService):
+    _configs = (
+        ApiServiceConfig(
+            name="production",
+            base_url="http://events.api.ndustrial.io",
+            audience="7jzwfE20O2XZ4aq3cO1wmk63G9GzNc8j"),
+        ApiServiceConfig(
+            name="staging",
+            base_url="http://events-staging.api.ndustrial.io",
+            audience="dn4MaocJFdKtsBy9sFFaTeuJWL1nt5xu"),
+    )
 
     def __init__(
             self,
             auth: CLIAuth,
             env: str = 'production'
     ):
-        config = self._init_config(env)
-        access_token = auth.get_token_for_audience(config['audience'])
-        super().__init__(config['base_url'], access_token)
+        super().__init__(auth, env)
 
     def get_event_types(self) -> List[EventType]:
         resp = self.get("types")
