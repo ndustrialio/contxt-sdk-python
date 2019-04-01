@@ -2,13 +2,13 @@ from datetime import date, datetime, timedelta
 
 import pytest
 
+from contxt.auth.cli import CLIAuth
 from contxt.models.asset import (Asset, AssetType, Attribute, AttributeValue,
                                  DataTypes, Formatters, Metric, MetricValue,
                                  Parsers, TimeIntervals)
 from contxt.services.assets import AssetsService
-from contxt.services.assets_migration import AssetMigrationManager, AssetSchema
 from contxt.tests.asset_schema import AssetSchemas
-from contxt.auth.cli import CLIAuth
+from contxt.utils.assets_migration import AssetMigrationManager, AssetSchema
 
 
 def init_schema():

@@ -178,7 +178,7 @@ class ApiService:
     def get(self,
             uri,
             params: Optional[Dict[str, str]] = None,
-            records_only: Optional[True] = True):
+            records_only: Optional[bool] = True):
         if self.session:
             response = self.session.get(self._get_url(uri), params=params)
         else:
