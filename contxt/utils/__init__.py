@@ -72,8 +72,8 @@ class Envs:
 
 
 class Config:
+    ENV = Utils.get_environ_var('WORKER_ENV', Envs.staging)     # TODO: no longer used
     AUTH_AUDIENCE_ID = '75wT048QcpE7ujwBJPPjr263eTHl4gEX'
-    ENV = Utils.get_environ_var('WORKER_ENV', Envs.staging)
     CLI_CLIENT_ID = 'bleED0RUwb7CJ9j7D48tqSiSZRZn29AV'
     CLI_CLIENT_SECRET = '0s8VNQ26QrteS3H5KXIIPvkDcNL5PfT-_pWwAVNI4MpDaDg86O2XUH8lT19KLNiZ'
 

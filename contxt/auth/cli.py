@@ -1,13 +1,16 @@
 from getpass import getpass
 
-from contxt.services.auth import ContxtAuthService
 from contxt.auth import BaseAuth
+from contxt.services.auth import ContxtAuthService
 from contxt.utils import Config, make_logger
 
 logger = make_logger(__name__)
 
 
 class CLIAuth(BaseAuth):
+    """
+    Authentication for a CLI user
+    """
 
     def __init__(self, force_login=True):
         super().__init__(client_id=Config.CLI_CLIENT_ID, cli_mode=True)
@@ -26,14 +29,16 @@ class CLIAuth(BaseAuth):
 
     def login(self):
 
+        # Check login is needed
         if self.get_auth_token() is not None:
-            proceed = self._query_user("Already logged in. Do you wish to continue?")
-            if not proceed:
+            if not self._query_user("Already logged in. Continue?"):
                 return
 
+        # Prompt for username/password
         username = input("Contxt Username: ")
         password = getpass("Contxt Password: ")
 
+        # Login
         token = self.auth0.login(
             client_id=Config.CLI_CLIENT_ID,
             client_secret=Config.CLI_CLIENT_SECRET,
@@ -44,6 +49,7 @@ class CLIAuth(BaseAuth):
             grant_type='password',
             realm='')
 
+        # Store token
         self.store_service_token(
             audience=Config.AUTH_AUDIENCE_ID,
             access_token=token['access_token'],
