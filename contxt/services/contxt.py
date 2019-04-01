@@ -1,121 +1,71 @@
-from contxt.legacy.services import GET, POST, APIObject, APIObjectCollection, Service
+from typing import Any, Callable, Dict, List, Optional, Set, Tuple
 
-CONFIGS_BY_ENVIRONMENT = {
-    'production': {
-        'base_url': 'https://contxt.api.ndustrial.io/',
-        'audience': '8qY2xJob1JAxhmVhIDLCNnGriTM9bct8'
-    },
-    'staging': {
-        'base_url': 'https://contxt-staging.api.ndustrial.io/',
-        'audience': '8qY2xJob1JAxhmVhIDLCNnGriTM9bct8'
-    }
-}
+from contxt.auth.cli import CLIAuth
+from contxt.models.contxt import (ConfigValue, Organization, OrganizationUser,
+                                  Role, User)
+from contxt.services.api import ApiServiceConfig, ConfiguredApiService
+from contxt.utils import make_logger
+
+logger = make_logger(__name__)
 
 
-class ContxtService(Service):
+class ContxtService(ConfiguredApiService):
+    _configs = (
+        ApiServiceConfig(
+            name="production",
+            base_url="https://contxt.api.ndustrial.io",
+            audience="8qY2xJob1JAxhmVhIDLCNnGriTM9bct8"),
+        ApiServiceConfig(
+            name="staging",
+            base_url="https://contxt-staging.api.ndustrial.io",
+            audience="8qY2xJob1JAxhmVhIDLCNnGriTM9bct8"),
+    )
 
-    def __init__(self, auth_module, environment='production'):
+    def __init__(self, auth: CLIAuth, env: str = "production"):
+        super().__init__(auth, env)
 
-        if environment not in CONFIGS_BY_ENVIRONMENT:
-            raise Exception('Invalid environment specified')
+    def get_organizations(self) -> List[Organization]:
+        logger.debug("Fetching organizations")
+        resp = self.get("organizations")
+        return [Organization.from_api(rec) for rec in resp]
 
-        self.env = CONFIGS_BY_ENVIRONMENT[environment]
+    def create_organization(self, organization: Organization) -> Organization:
+        data = organization.post()
+        logger.debug(f"Creating organization with {data}")
+        resp = self.post("organizations", data=data)
+        return Organization.from_api(resp)
 
-        super().__init__(
-            base_url=self.env['base_url'],
-            access_token=auth_module.get_token_for_audience(
-                self.env['audience']))
+    def add_user_to_organization(self, user_id: str, organization_id: str) -> OrganizationUser:
+        logger.debug(f"Adding user {user_id} to organization {organization_id}")
+        resp = self.post(f"organizations/{organization_id}/users/{user_id}")
+        return OrganizationUser.from_api(resp)
 
-    def get_organizations(self):
+    # TODO: update references: get_organization_users
+    def get_users_for_organization(self, organization_id: str) -> List[User]:
+        logger.debug(f"Fetching users for organizations {organization_id}")
+        resp = self.get(f"organizations/{organization_id}/users")
+        return [User.from_api(rec) for rec in resp]
 
-        response = self.execute(GET(uri='organizations'))
+    def get_config_values_for_worker(self, worker_id: str, environment: str = None) -> List[ConfigValue]:
+        logger.debug(f"Fetching configuration_values for worker {worker_id}")
+        resp = self.get(
+            f"workers/{worker_id}/configurations/values",
+            params={"environment": environment})
+        return [ConfigValue.from_api(rec) for rec in resp]
 
-        organizations = []
-        for org in response:
-            organizations.append(Organization(org))
-        return APIObjectCollection(organizations)
+    def create_config_value(self, configuration_id: str) -> ConfigValue:
+        data = configuration_value.post()
+        logger.debug(f"Creating configuration_value with {data}")
+        resp = self.post(
+            f"configurations/{configuration_id}/values", data=data)
+        return ConfigValue.from_api(resp)
 
-    def create_organization(self, organization_name):
+    def update_config_value(self, configuration_id: str, value_id: str):
+        data = configuration_value.put()
+        logger.debug(f"Updating configuration_value {value_id} with {data}")
+        self.put(
+            f"configurations/{configuration_id}/values/{value_id}", data=data)
 
-        assert isinstance(organization_name, str)
-
-        body = {
-            'name': organization_name
-        }
-
-        return Organization(self.execute(POST(uri='organizations').body(body)))
-
-    def add_user_to_organization(self, user_id, organization_id):
-
-        assert isinstance(organization_id, str)
-        assert isinstance(user_id, str)
-
-        return OrganizationUser(self.execute(POST(uri=f'organizations/{organization_id}/users/{user_id}')))
-
-    def get_organization_users(self, organization_id):
-
-        assert isinstance(organization_id, str)
-
-        users = []
-        for user in self.execute(
-                GET(uri=f'organizations/{organization_id}/users')):
-            users.append(User(user))
-        return APIObjectCollection(users)
-
-
-class Organization(APIObject):
-
-    def __init__(self, organization_api_object, keys_to_ignore=None):
-        super().__init__(keys_to_ignore=keys_to_ignore
-                         if keys_to_ignore is not None else ['updated_at'])
-
-        self.id = organization_api_object['id']
-        self.name = organization_api_object['name']
-        self.legacy_organization_id = organization_api_object.get(
-            'legacy_organization_id', None)
-        self.created_at = organization_api_object['created_at']
-        self.updated_at = organization_api_object['updated_at']
-
-
-class OrganizationUser(APIObject):
-
-    def __init__(self, organization_user_api_object, keys_to_ignore=None):
-        super().__init__(keys_to_ignore=keys_to_ignore)
-        self.id = organization_user_api_object['id']
-        self.user_id = organization_user_api_object['user_id']
-        self.organization_id = organization_user_api_object['organization_id']
-
-
-class User(APIObject):
-
-    def __init__(self, user_api_object, keys_to_ignore=None):
-        super().__init__(keys_to_ignore=keys_to_ignore
-                         if keys_to_ignore is not None else ['email', 'Roles'])
-
-        self.id = user_api_object['id']
-        self.first_name = user_api_object['first_name']
-        self.last_name = user_api_object['last_name']
-        self.email = user_api_object['email']
-        self.is_activated = user_api_object['is_activated']
-        self.Roles = [Role(role) for role in user_api_object['Roles']]
-
-    def get_dict(self):
-        return {
-            **super().get_dict(),
-            'roles': ','.join([role.name for role in self.Roles])
-        }
-
-
-class Role(APIObject):
-
-    def __init__(self, role_api_object, keys_to_ignore=None):
-        super().__init__(
-            keys_to_ignore=keys_to_ignore
-            if keys_to_ignore is not None else ['created_at', 'updated_at'])
-
-        self.id = role_api_object['id']
-        self.name = role_api_object['name']
-        self.description = role_api_object['description']
-        self.organization_id = role_api_object['organization_id']
-        self.created_at = role_api_object['created_at']
-        self.updated_at = role_api_object['updated_at']
+    def delete_config_value(self, configuration_id, value_id):
+        logger.debug(f"Deleting configuration_value {value_id}")
+        self.delete(f"configurations/{configuration_id}/values{value_id}")
