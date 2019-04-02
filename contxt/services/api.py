@@ -22,14 +22,13 @@ API_VERSION = "v1"
 
 def warn_of_unexpected_api_keys(cls, kwargs):
     # Warn of unexpected kwargs
-    cls_name = cls.__class__.__name__
     for k, v in kwargs.items():
-        logger.warning(f"{cls_name}: Unexpected key from api {k} = {v}")
-    # Warn of a present global
-    # if hasattr(cls_, "is_global") and cls_.is_global:
-    #     logger.warning(
-    #         f"{cls_name}: received global (id {cls_.id}, label {cls_.label})"
-    #     )
+        logger.warning(f"{cls.__name__}: Unexpected key from api {k}")
+    # Warn of a present global (for asset service)
+    if getattr(cls, "is_global", False):
+        logger.warning(
+            f"{cls.__name__}: received global (id {getattr(cls, 'id', None)}, label {getattr(cls, 'label', None)})"
+        )
 
 
 class Parsers:
@@ -78,7 +77,7 @@ class Formatters:
     @staticmethod
     def format_datetime(datetime_: datetime, timezone_aware: Optional[bool] = True) -> str:
         # if timezone_aware:
-            # TODO: validate
+        # TODO: validate
         return datetime_.isoformat().replace("+00:00", "Z")
 
     @staticmethod
@@ -294,12 +293,12 @@ class ApiObject(ABC):
         if api_value is None:
             # No value
             return api_value
-        elif callable(getattr(api_field.type, "from_api", None)):
-            # Type is an ApiObject, apply from_api instead of init
-            return api_field.type.from_api(api_value)
         elif isinstance(api_value, (list, tuple,)):
             # Value is a list, clean each item
             return [cls.clean_api_value(api_field, v) for v in api_value]
+        elif callable(getattr(api_field.type, "from_api", None)):
+            # Type is an ApiObject, apply from_api instead of init
+            return api_field.type.from_api(api_value)
         else:
             # Apply type
             return api_field.type(api_value)
