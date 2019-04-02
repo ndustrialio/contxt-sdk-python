@@ -25,7 +25,6 @@ REQUIRED = [
     "plotly",
     "pyjwt",
     "python-dateutil",
-    "pytest",
     "pytz",
     "requests",
     "setuptools",
