@@ -4,7 +4,7 @@ import pytest
 
 @pytest.fixture()
 def setup_parser_args():
-    parser = contxt.create_parser()
+    parser, subparsers = contxt.create_parser()
     return parser.parse_args()
 
 def test_create_parser(setup_parser_args):
@@ -13,7 +13,6 @@ def test_create_parser(setup_parser_args):
 
 def test_facility_parser(setup_parser_args):
     pass
-    
     
 def test_iot_parser(setup_parser_args):
     pass

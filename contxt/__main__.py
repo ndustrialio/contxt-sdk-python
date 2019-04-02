@@ -26,11 +26,11 @@ def create_parser():
     # Setup tab autocompletion
     autocomplete(root_parser)
 
-    return root_parser
+    return root_parser, subparsers
 
 
 def main():
-    parser = create_parser()
+    parser, subparsers = create_parser()
     args = parser.parse_args()
 
     # Launch the command
