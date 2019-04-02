@@ -220,7 +220,7 @@ class CompleteAsset(ApiObject):
 
 class AssetType(ApiObject):
     __marker = object()
-    api_fields = (
+    _api_fields = (
         ApiField("id"),
         ApiField("label", creatable=True),
         ApiField("description", creatable=True, updatable=True),
@@ -368,7 +368,7 @@ class AssetType(ApiObject):
 
 
 class Asset(ApiObject):
-    api_fields = (
+    _api_fields = (
         ApiField("id"),
         ApiField("asset_type_id", creatable=True),
         ApiField("label", creatable=True),
@@ -419,7 +419,7 @@ class Asset(ApiObject):
 
 
 class Attribute(ApiObject):
-    api_fields = (
+    _api_fields = (
         ApiField("id"),
         ApiField("asset_type_id", creatable=True),
         ApiField("label", creatable=True, updatable=True),
@@ -469,7 +469,7 @@ class Attribute(ApiObject):
 
 
 class AttributeValue(ApiObject):
-    api_fields = (
+    _api_fields = (
         ApiField("id"),
         ApiField("asset_id"),
         ApiField("asset_attribute_id", creatable=True),
@@ -504,7 +504,7 @@ class AttributeValue(ApiObject):
 
 # TODO: need to fix global metric for POST
 class Metric(ApiObject):
-    api_fields = (
+    _api_fields = (
         ApiField("id"),
         ApiField("asset_type_id"),
         ApiField("label", creatable=True, updatable=True),
@@ -551,7 +551,7 @@ class Metric(ApiObject):
 
 
 class MetricValue(ApiObject):
-    api_fields = (
+    _api_fields = (
         ApiField("id"),
         ApiField("asset_id"),
         ApiField("Asset", attr_key="asset", type=Asset),

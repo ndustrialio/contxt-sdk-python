@@ -11,7 +11,7 @@ logger = make_logger(__name__)
 
 
 class EventType(ApiObject):
-    api_fields = (
+    _api_fields = (
         ApiField("id"),
         ApiField("name", creatable=True),
         ApiField("slug", creatable=True),
@@ -50,7 +50,7 @@ class EventType(ApiObject):
 
 
 class EventDefinition(ApiObject):
-    api_fields = (
+    _api_fields = (
         ApiField("id"),
         ApiField("event_id"),
         ApiField("description"),
@@ -77,7 +77,7 @@ class EventDefinition(ApiObject):
 
 
 class Event(ApiObject):
-    api_fields = (
+    _api_fields = (
         ApiField("id"),
         ApiField("name", creatable=True),
         ApiField("event_type_id", creatable=True),
@@ -125,7 +125,7 @@ class Owner(ApiObject):
 
 
 class TriggeredEvent(ApiObject):
-    api_fields = (
+    _api_fields = (
         ApiField("id"),
         ApiField("event_id", creatable=True),
         ApiField("Event", type=Event, attr_key="event"),

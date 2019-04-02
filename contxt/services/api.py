@@ -286,7 +286,7 @@ class ApiObject(ABC):
 
     @property
     @abstractmethod
-    def api_fields(self):
+    def _api_fields(self):
         pass
 
     @classmethod
@@ -312,16 +312,16 @@ class ApiObject(ABC):
                 api_field=f,
                 api_value=api_dict.pop(f.api_key, None)
                 if f.optional else api_dict.pop(f.api_key))
-            for f in cls.api_fields
+            for f in cls._api_fields
         }
 
         # Set creatable, updateable fields for class (if not yet set)
         if not hasattr(cls, "_creatable_fields"):
             cls._creatable_fields = tuple(
-                f for f in cls.api_fields if f.creatable)
+                f for f in cls._api_fields if f.creatable)
         if not hasattr(cls, "_updatable_fields"):
             cls._updatable_fields = tuple(
-                f for f in cls.api_fields if f.updatable)
+                f for f in cls._api_fields if f.updatable)
 
         # Warn of any unused keys
         warn_of_unexpected_api_keys(cls, api_dict)

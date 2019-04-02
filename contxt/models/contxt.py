@@ -4,7 +4,7 @@ from contxt.services.api import ApiField, ApiObject, Parsers
 
 
 class ConfigValue(ApiObject):
-    api_fields = (
+    _api_fields = (
         ApiField("value_id"),
         ApiField("key", creatable=True, updatable=True),
         ApiField("value", creatable=True, updatable=True),
@@ -25,7 +25,7 @@ class ConfigValue(ApiObject):
 
 
 class OrganizationUser(ApiObject):
-    api_fields = (
+    _api_fields = (
         ApiField("id"),
         ApiField("user_id"),
         ApiField("organization_id"),
@@ -54,7 +54,7 @@ class OrganizationUser(ApiObject):
 
 # TODO: hide organization_user, updated_at
 class Organization(ApiObject):
-    api_fields = (
+    _api_fields = (
         ApiField("id"),
         ApiField("name"),
         ApiField("legacy_organization_id"),
