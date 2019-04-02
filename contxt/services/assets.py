@@ -1,9 +1,8 @@
 from typing import Dict, List, Optional, Set, Tuple
 
 from contxt.auth.cli import CLIAuth
-from contxt.models.asset import (Asset, AssetType, Attribute, AttributeValue,
-                                 CompleteAsset, DataTypes, Metric, MetricValue,
-                                 TimeIntervals)
+from contxt.models.assets import (Asset, AssetType, Attribute, AttributeValue,
+                                 CompleteAsset, Metric, MetricValue)
 from contxt.services.api import ApiServiceConfig, ConfiguredApiService
 from contxt.utils import make_logger
 
@@ -26,14 +25,12 @@ class AssetsService(ConfiguredApiService):
     def __init__(
             self,
             auth: CLIAuth,
-            organization_id: str = "02efa741-a96f-4124-a463-ae13a704b8fc",
-            env: str = 'production',
+            organization_id: str,
+            env: str = "production",
             load_types: bool = True,
             types_to_fully_load: Optional[List[str]] = None,
     ):
-        config = self._init_config(env)
-        access_token = auth.get_token_for_audience(config['audience'])
-        super().__init__(config['base_url'], access_token)
+        super().__init__(auth, env)
         # TODO: handle multiple orgs
         self.organization_id = organization_id
         self.types = {}
@@ -329,7 +326,7 @@ class AssetsService(ConfiguredApiService):
     #     return AttributeValue(
     #         **self.get(f"assets/attributes/values/{attribute_value_id}"))
 
-    def get_attribute_value(self, attribute_value: AttributeValue) -> AttributeValue:
+    def get_attribute_value(self, attribute_value: AttributeValue) -> Optional[AttributeValue]:
         # HACK: work around since you cannot fetch a single attribute value
         logger.debug(f"Fetching attribute_value {attribute_value.id}")
         attribute_values = self.get_attribute_values(attribute_value.asset_id)
@@ -443,7 +440,7 @@ class AssetsService(ConfiguredApiService):
     #     logger.debug(f"Fetching metric_value {metric_value_id}")
     #     return MetricValue(**self.get(f"assets/metrics/values/{metric_value_id}"))
 
-    def get_metric_value(self, metric_value: MetricValue) -> MetricValue:
+    def get_metric_value(self, metric_value: MetricValue) -> Optional[MetricValue]:
         # HACK: work around since you cannot fetch a single metric value
         logger.debug(f"Fetching metric_value {metric_value.id}")
         metric_values = self.get_metric_values(metric_value.asset_id, metric_value.asset_metric_id)

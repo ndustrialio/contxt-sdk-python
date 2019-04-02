@@ -1,4 +1,4 @@
-from contxt.models.asset import (Asset, AssetType, Attribute, AttributeValue,
+from contxt.models.assets import (Asset, AssetType, Attribute, AttributeValue,
                                  DataTypes, Metric, MetricValue, TimeIntervals)
 from contxt.utils.assets_migration import AssetSchema
 
