@@ -112,13 +112,14 @@ class ApiService:
     """
     A service associated with an API
     """
+    __marker = object()
 
     def __init__(self,
                  base_url: str,
                  access_token: str,
-                 api_version: Optional[str] = None,
+                 api_version: Optional[str] = __marker,
                  use_session: Optional[bool] = True):
-        api_version = api_version or API_VERSION
+        api_version = API_VERSION if api_version is self.__marker else api_version
         self.client = ApiClient(access_token)
         self.base_url = self._init_base_url(base_url, api_version)
         self.session = self._init_session() if use_session else None
@@ -279,14 +280,16 @@ class ApiObject(ABC):
     An abstract base class for a response from an API. This class serves to
     take a raw response from an API and create a parsed Python object.
     """
+    _api_fields = NotImplemented
 
     def __str__(self):
         return Serializer.to_table(self)
 
-    @property
-    @abstractmethod
-    def _api_fields(self):
-        pass
+    # @property
+    # @classmethod
+    # @abstractmethod
+    # def _api_fields(cls):
+    #     pass
 
     @classmethod
     def clean_api_value(cls, api_field, api_value):

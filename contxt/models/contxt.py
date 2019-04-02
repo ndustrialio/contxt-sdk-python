@@ -1,4 +1,5 @@
 from datetime import datetime
+from json import loads
 from typing import Any, Callable, Dict, List, Optional, Set, Tuple
 
 from contxt.services.api import ApiField, ApiObject, Parsers
@@ -6,23 +7,73 @@ from contxt.services.api import ApiField, ApiObject, Parsers
 
 class ConfigValue(ApiObject):
     _api_fields = (
-        ApiField("value_id"),
-        ApiField("key", creatable=True, updatable=True),
-        ApiField("value", creatable=True, updatable=True),
-        ApiField("value_type", creatable=True, updatable=True),
+        ApiField("id"),
+        ApiField("key"),
+        ApiField("value"),
+        ApiField("type"),
+        ApiField("configuration_id"),
+        ApiField("is_hidden", type=bool),
+        ApiField("created_at", type=Parsers.datetime),
+        ApiField("updated_at", type=Parsers.datetime),
     )
 
     def __init__(
             self,
+            id: str,
             key: str,
             value: Any,
-            value_type: str,
-            value_id: Optional[str] = None,
+            type: str,
+            configuration_id: str,
+            is_hidden: bool,
+            created_at: Optional[datetime] = None,
+            updated_at: Optional[datetime] = None,
     ):
-        self.value_id = value_id
+        self.id = id
         self.key = key
-        self.value = value
-        self.value_type = value_type
+        self.value = self._init_value(value, type)
+        self.type = type
+        self.configuration_id = configuration_id
+        self.is_hidden = is_hidden
+        self.created_at = created_at
+        self.updated_at = updated_at
+
+    def _init_value(self, value, type):
+        if type == "integer":
+            return int(value)
+        elif type == "json":
+            return loads(value)
+        else:
+            return str(value)
+
+
+class Config(ApiObject):
+    _api_fields = (
+        ApiField("id"),
+        ApiField("name"),
+        ApiField("description"),
+        ApiField("environment_id"),
+        ApiField("ConfigurationValues", attr_key="config_values", type=ConfigValue),
+        ApiField("created_at", type=Parsers.datetime),
+        ApiField("updated_at", type=Parsers.datetime),
+    )
+
+    def __init__(
+            self,
+            id: str,
+            name: str,
+            description: str,
+            environment_id: str,
+            config_values: List[dict],
+            created_at: Optional[datetime] = None,
+            updated_at: Optional[datetime] = None,
+    ):
+        self.id = id
+        self.name = name
+        self.description = description
+        self.environment_id = environment_id
+        self.config_values = config_values
+        self.created_at = created_at
+        self.updated_at = updated_at
 
 
 class OrganizationUser(ApiObject):
