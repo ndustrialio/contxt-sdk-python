@@ -2,7 +2,7 @@ from typing import Dict, List, Optional, Set, Tuple
 
 from contxt.auth.cli import CLIAuth
 from contxt.models.assets import (Asset, AssetType, Attribute, AttributeValue,
-                                 CompleteAsset, Metric, MetricValue)
+                                  CompleteAsset, Metric, MetricValue)
 from contxt.services.api import ApiServiceConfig, ConfiguredApiService
 from contxt.utils import make_logger
 
@@ -316,7 +316,7 @@ class AssetsService(ConfiguredApiService):
         data = attribute_value.post()
         logger.debug(f"Creating attribute_value with {data}")
         resp = self.post(
-            f"assets/{attribute_value.asset_id}/attributes/{attribute_value.asset_attribute_id}/values",
+            f"assets/{attribute_value.asset_id}/attributes/{attribute_value.attribute_id}/values",
             data=data)
         return AttributeValue.from_api(resp)
 

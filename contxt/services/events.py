@@ -24,7 +24,7 @@ class EventsService(ConfiguredApiService):
     def __init__(
             self,
             auth: CLIAuth,
-            env: str = 'production'
+            env: str = "production"
     ):
         super().__init__(auth, env)
 

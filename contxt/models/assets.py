@@ -84,7 +84,7 @@ class AttributeValue(ApiObject):
     _api_fields = (
         ApiField("id"),
         ApiField("asset_id"),
-        ApiField("asset_attribute_id", creatable=True),
+        ApiField("asset_attribute_id", attr_key="attribute_id", creatable=True),
         ApiField("notes", creatable=True, updatable=True),
         ApiField("value", type=Parsers.unknown, creatable=True, updatable=True),
         ApiField("effective_date", creatable=True, updatable=True),
@@ -95,7 +95,7 @@ class AttributeValue(ApiObject):
     def __init__(
             self,
             asset_id: str,
-            asset_attribute_id: str,
+            attribute_id: str,
             notes: str,
             value: Any,
             id: Optional[str] = None,
@@ -105,8 +105,8 @@ class AttributeValue(ApiObject):
     ):
         super().__init__()
         self.id = id
-        self.asset_attribute_id = asset_attribute_id
         self.asset_id = asset_id
+        self.attribute_id = attribute_id
         self.effective_date = effective_date or date.today()
         self.notes = notes
         self.value = value
@@ -380,10 +380,9 @@ class Asset(ApiObject):
             updated_at: Optional[datetime] = None,
             parent_id: Optional[str] = None,
             hierarchy_level: Optional[str] = None,
-            asset_attribute_values: Optional[List[MetricValue]] = None,
-            asset_metric_values: Optional[List[MetricValue]] = None,
+            attribute_values: Optional[List[MetricValue]] = None,
+            metric_values: Optional[List[MetricValue]] = None,
             children: Optional[List[Asset]] = None,
-            **kwargs,
     ):
         super().__init__()
         self.id = id
@@ -392,8 +391,8 @@ class Asset(ApiObject):
         self.description = description
         self.organization_id = organization_id
         self.parent_id = parent_id
-        self.attribute_values = asset_attribute_values or []
-        self.metric_values = asset_metric_values or []
+        self.attribute_values = attribute_values or []
+        self.metric_values = metric_values or []
         self.hierarchy_level = hierarchy_level
         self.children = children or []
         self.created_at = created_at
@@ -438,7 +437,7 @@ class CompleteAsset(ApiObject):
         for av in sorted(
                 self.asset.attribute_values, key=lambda av: av.effective_date):
             label = self.asset_type.attribute_with_id(
-                av.asset_attribute_id).normalized_label
+                av.attribute_id).normalized_label
             attribute_values_by_label[label] = av
 
         return attribute_values_by_label
@@ -508,7 +507,7 @@ class CompleteAsset(ApiObject):
             attribute_value = self._attribute_values_by_label[
                 label] or AttributeValue(
                     asset_id=self.asset.id,
-                    asset_attribute_id=attribute.id,
+                    attribute_id=attribute.id,
                     notes="",
                     value=None)
             prev_value = attribute_value.value

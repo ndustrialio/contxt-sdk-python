@@ -4,8 +4,8 @@ import pytest
 
 from contxt.auth.cli import CLIAuth
 from contxt.models.assets import (Asset, AssetType, Attribute, AttributeValue,
-                                 DataTypes, Formatters, Metric, MetricValue,
-                                 Parsers, TimeIntervals)
+                                  DataTypes, Formatters, Metric, MetricValue,
+                                  Parsers, TimeIntervals)
 from contxt.services.assets import AssetsService
 from contxt.tests.asset_schema import AssetSchemas
 from contxt.utils.assets_migration import AssetMigrationManager, AssetSchema
@@ -197,13 +197,13 @@ class TestAssetsService:
         # Test create_attribute_value
         attribute_value = AttributeValue(
             asset_id=TEST_ASSET.id,
-            asset_attribute_id=attribute.id,
+            attribute_id=attribute.id,
             notes="test note",
             value="test_value")
         created_attribute_value = asset_framework.create_attribute_value(
             attribute_value)
         assert created_attribute_value.asset_id == attribute_value.asset_id
-        assert created_attribute_value.asset_attribute_id == attribute_value.asset_attribute_id
+        assert created_attribute_value.attribute_id == attribute_value.attribute_id
         assert created_attribute_value.effective_date == attribute_value.effective_date
         assert created_attribute_value.notes == attribute_value.notes
         assert created_attribute_value.value == attribute_value.value
