@@ -80,11 +80,11 @@ class EMS:
 
         if interval == 'monthly':
 
-            return reversed(self.ems_service.get_monthly_utility_spend(facility_id=facility_id,
+            return self.ems_service.get_monthly_utility_spend(facility_id=facility_id,
                                                               type=resource_type,
                                                               date_start=start_date,
                                                               date_end=end_date,
-                                                              pro_forma=pro_forma))
+                                                              pro_forma=pro_forma)
 
         elif interval == 'daily':
             pass

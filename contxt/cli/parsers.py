@@ -71,13 +71,21 @@ class IotParser(ArgParser):
 
         # Unprovisioned Fields
         unprovisioned_fields_parser = _subparsers.add_parser("unprovisioned", help="Unprovisioned fields")
-
         feeds_group = unprovisioned_fields_parser.add_mutually_exclusive_group(required=True)
         feeds_group.add_argument("--feed_key", help="Provide feed key")
         feeds_group.add_argument("--feed_id", type=int, help="Provide feed id")
-
         unprovisioned_fields_parser.add_argument("--output", help="Dump results to csv if desired")
         unprovisioned_fields_parser.set_defaults(func=self._unprovisioned_fields)
+
+        # Field Worksheets
+        create_worksheets_parser = _subparsers.add_parser("create-worksheet", help="Field Worksheets")
+        create_worksheets_parser.add_argument("feed_key", help="Provide feed key")
+        create_worksheets_parser.set_defaults(func=self._unprovisioned_field_worksheet)
+
+        ingest_worksheets_parser = _subparsers.add_parser("ingest-worksheet", help="Field Worksheet Ingestor")
+        ingest_worksheets_parser.add_argument("feed_key", help="Provide feed key")
+        ingest_worksheets_parser.add_argument("worksheet_file", help="A correctly formatted worksheet file")
+        ingest_worksheets_parser.set_defaults(func=self._ingest_field_worksheet)
 
         # Field data
         field_data_parser = _subparsers.add_parser("field-data", help="Get field data")
@@ -126,6 +134,66 @@ class IotParser(ArgParser):
             self._collection_to_csv(args.output, fields)
         else:
             print(fields)
+
+    def _unprovisioned_field_worksheet(self, args, auth):
+        from contxt.functions.iot import IOT
+        iot = IOT(auth)
+
+        fields = iot.get_unprovisioned_fields_for_feed(
+            feed_key=args.feed_key
+        )
+
+        filename = f'{args.feed_key}_unprovisioned_worksheet.csv'
+
+        with open(os.path.join('.', filename), 'w') as f:
+
+            headers = ['Field Descriptor','Label','Data Type','Units','Scalar','Cumulative Value?','equipment group','Facility Main?']
+            writer = csv.DictWriter(f, fieldnames=headers)
+            writer.writeheader()
+
+            for f in fields:
+                row = {col_name: '' if col_name != 'Field Descriptor' else f.field_descriptor for col_name in headers}
+                writer.writerow(row)
+
+        logger.info(f'Wrote unprovisioned fields to {filename}')
+
+    def _ingest_field_worksheet(self, args, auth):
+        from contxt.functions.iot import IOT
+        from contxt.services.iot import Field
+        iot_func = IOT(auth)
+        iot_service = IOT(auth)
+
+        feed = iot_service.get_feed_id_from_key(args.feed_key)
+
+        if not feed:
+            logger.error(f"Feed with key {args.feed_key} does not exist")
+            return
+
+        field_objs = []
+        with open(args.worksheet_file, 'r') as f:
+
+            headers = ['Field Descriptor','Label','Data Type','Units','Scalar','Cumulative Value?','equipment group','Facility Main?']
+            reader = csv.DictReader(f, fieldnames=headers)
+
+            # skip the header
+            next(reader)
+
+            # create a bunch of field objects
+            for row in reader:
+                field_objs.append(Field({
+                    'label': row['equipment group'] + row['Label'],
+                    'field_descriptor': row['Field Descriptor'],
+                    'field_human_name': row['Field Descriptor'],
+                    'units': row['Units'],
+                    'value_type': 'numeric', # TODO change me
+                    'feed_key': args.feed_key,
+                    'is_hidden': False
+                }))
+
+        iot_func.provision_field_object_collection(feed.id, field_objs)
+
+        print('Successful!')
+
 
     def _field_data(self, args, auth):
         from contxt.functions.iot import IOT

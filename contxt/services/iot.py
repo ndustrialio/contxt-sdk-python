@@ -1,7 +1,7 @@
 from datetime import datetime
 
-from contxt.legacy.services import (GET, APIObject, APIObjectCollection, DataResponse,
-                             PagedEndpoint, PagedResponse, Service)
+from contxt.legacy.services import (GET, POST, APIObject, APIObjectCollection, DataResponse,
+                             PagedEndpoint, PagedResponse, Service, ApiRequest)
 from contxt.utils import Utils
 
 CONFIGS_BY_ENVIRONMENT = {
@@ -128,6 +128,14 @@ class IOTService(Service):
 
         return APIObjectCollection([UnprovisionedField(record) for record in response]) if response else None
 
+    def provision_field_for_feed(self, feed_id, field_obj):
+
+        assert isinstance(feed_id, int)
+        assert isinstance(field_obj, Field)
+
+        return self.execute(POST(uri=f'feeds/{feed_id}/fields').body(field_obj.get_dict())
+                            .content_type(ApiRequest.URLENCODED_CONTENT_TYPE))
+
 
 class FieldGrouping(APIObject):
 
@@ -198,14 +206,16 @@ class Field(APIObject):
     def __init__(self, field_api_object):
         super().__init__()
 
-        self.id = field_api_object['id']
-        self.label = field_api_object['label']
-        self.output_id = field_api_object['output_id']
-        self.field_descriptor = field_api_object['field_descriptor']
-        self.field_human_name = field_api_object['field_human_name']
-        self.is_hidden = field_api_object['is_hidden'] if 'is_hidden' in field_api_object else None
-        self.status = field_api_object['status'] if 'status' in field_api_object else None
-        self.units = field_api_object['units']
+        self.id = field_api_object.get('id')
+        self.label = field_api_object.get('label')
+        self.output_id = field_api_object.get('output_id')
+        self.field_descriptor = field_api_object.get('field_descriptor')
+        self.field_human_name = field_api_object.get('field_human_name')
+        self.is_hidden = field_api_object.get('is_hidden')
+        self.status = field_api_object.get('status')
+        self.units = field_api_object.get('units')
+        self.value_type = field_api_object.get('value_type')
+        self.feed_key = field_api_object.get('feed_key')
 
 
 class Feed(APIObject):

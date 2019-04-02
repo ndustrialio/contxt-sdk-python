@@ -12,8 +12,10 @@ from contxt.utils.vis import DataVisualizer
 
 logger = make_logger(__name__)
 
+
 class FeedArgumentException(Exception):
     pass
+
 
 class FeedNotFoundException(Exception):
     pass
@@ -43,6 +45,12 @@ class IOT:
             feed_id = feed.id
 
         return self.iot_service.get_unprovisioned_fields(feed_id)
+
+    def provision_field_object_collection(self, feed_id, field_obj_collection):
+        for field_obj in field_obj_collection:
+            self.iot_service.provision_field_for_feed(feed_id=feed_id,
+                                                      field_obj=field_obj)
+            logger.info(f'Provisioned: {field_obj.field_descriptor}')
 
     def get_fields_for_grouping(self, grouping_id):
         return self.iot_service.get_single_grouping(grouping_id).fields
