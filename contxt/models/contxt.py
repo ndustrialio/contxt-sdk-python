@@ -21,7 +21,7 @@ class ConfigValue(ApiObject):
             self,
             id: str,
             key: str,
-            value: Any,
+            value: str,
             type: str,
             configuration_id: str,
             is_hidden: bool,
@@ -63,7 +63,7 @@ class Config(ApiObject):
             name: str,
             description: str,
             environment_id: str,
-            config_values: List[dict],
+            config_values: List[ConfigValue],
             created_at: Optional[datetime] = None,
             updated_at: Optional[datetime] = None,
     ):
@@ -109,7 +109,7 @@ class Organization(ApiObject):
     _api_fields = (
         ApiField("id"),
         ApiField("name"),
-        ApiField("legacy_organization_id"),
+        ApiField("legacy_organization_id", attr_key="legacy_id"),
         ApiField("OrganizationUser", attr_key="organization_user", type=OrganizationUser, optional=True),
         ApiField("created_at", type=Parsers.datetime),
         ApiField("updated_at", type=Parsers.datetime),
@@ -119,14 +119,14 @@ class Organization(ApiObject):
             self,
             name: str,
             id: Optional[str] = None,
-            legacy_organization_id: Optional[int] = None,
+            legacy_id: Optional[int] = None,
             organization_user: Optional[OrganizationUser] = None,
             created_at: Optional[datetime] = None,
             updated_at: Optional[datetime] = None,
     ):
         super().__init__()
         self.id = id
-        self.legacy_id = legacy_organization_id
+        self.legacy_id = legacy_id
         self.name = name
         self.organization_user = organization_user
         self.created_at = created_at
@@ -178,7 +178,7 @@ class Role(ApiObject):
             name: str,
             description: str,
             organization_id: str,
-            user_role: dict,
+            user_role: UserRole,
             id: Optional[str] = None,
             created_at: Optional[datetime] = None,
             updated_at: Optional[datetime] = None,
@@ -193,7 +193,8 @@ class Role(ApiObject):
         self.updated_at = updated_at
 
 
-# TODO: hide email, roles, organizations
+# TODO: hide email, phone_number, is_superuser, roles (transform to list of
+# role.name), organizations, created_at, updated_at
 class User(ApiObject):
     _api_fields = (
         ApiField("id"),
@@ -214,12 +215,12 @@ class User(ApiObject):
             first_name: str,
             last_name: str,
             email: str,
-            is_activated: bool,
-            roles: List[Role],
-            is_superuser: bool,
-            organizations: List[Organization],
             phone_number: str,
-            id: Optional[str],
+            is_activated: bool,
+            is_superuser: bool,
+            roles: List[Role],
+            organizations: List[Organization],
+            id: Optional[str] = None,
             created_at: Optional[datetime] = None,
             updated_at: Optional[datetime] = None,
     ):
@@ -228,12 +229,10 @@ class User(ApiObject):
         self.first_name = first_name
         self.last_name = last_name
         self.email = email
+        self.phone_number = phone_number
         self.is_activated = is_activated
+        self.is_superuser = is_superuser
         self.roles = roles
         self.organizations = organizations
-
-    # def get_dict(self):
-    #     return {
-    #         **super().get_dict(),
-    #         'roles': ', '.join([role.name for role in self.roles]),
-    #     }
+        self.created_at = created_at
+        self.updated_at = updated_at
