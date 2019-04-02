@@ -161,7 +161,7 @@ major no-no as these should be regarded the same as user credentials
 so setting this up in development will make it seamless upon deployment
 
 ```
-from contxt.utils.workers import BaseWorker
+from contxt.workers import BaseWorker
 
 from contxt.functions.facilities import Facilities
 

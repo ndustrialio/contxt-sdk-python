@@ -1,11 +1,10 @@
 from typing import Dict, List, Optional, Set, Tuple, Union
 
-from contxt.services.asset_framework import AssetFramework
-from contxt.services.asset_models import (Asset, AssetType, Attribute,
-                                          AttributeValue, DataTypes, Metric,
-                                          MetricValue, TimeIntervals)
+from contxt.models.assets import (Asset, AssetType, Attribute, AttributeValue,
+                                 DataTypes, Metric, MetricValue, TimeIntervals)
+from contxt.services.assets import AssetsService
 from contxt.utils import Config, make_logger
-from contxt.utils.auth.cli import CLIAuth
+from contxt.auth.cli import CLIAuth
 
 logger = make_logger(__name__)
 
@@ -21,7 +20,7 @@ class AssetSchema:
 
 class AssetMigrationManager:
 
-    def __init__(self, assets_service: AssetFramework, asset_schema: AssetSchema):
+    def __init__(self, assets_service: AssetsService, asset_schema: AssetSchema):
         self.assets_service = assets_service
         self.schema = asset_schema
 
