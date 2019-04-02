@@ -1,11 +1,12 @@
 from datetime import date, datetime, timedelta
 
 import pytest
+from pytz import UTC
 
 from contxt.auth.cli import CLIAuth
 from contxt.models.assets import (Asset, AssetType, Attribute, AttributeValue,
-                                  DataTypes, Formatters, Metric, MetricValue,
-                                  Parsers, TimeIntervals)
+                                  DataTypes, Metric, MetricValue,
+                                  TimeIntervals)
 from contxt.services.assets import AssetsService
 from contxt.tests.asset_schema import AssetSchemas
 from contxt.utils.assets_migration import AssetMigrationManager, AssetSchema
@@ -270,14 +271,15 @@ class TestAssetsService:
         def get_end_date(start_date):
             return start_date + timedelta(weeks=1) - timedelta(milliseconds=1)
 
-        start_date = datetime(2018, 3, 1)
+        start_date = datetime(2018, 3, 1, tzinfo=UTC)
         metric_value = MetricValue(
             asset_id=TEST_ASSET.id,
             asset_metric_id=metric.id,
-            effective_start_date=Formatters.datetime(start_date),
-            effective_end_date=Formatters.datetime(get_end_date(start_date)),
+            effective_start_date=start_date,
+            effective_end_date=get_end_date(start_date),
             notes="test note",
             value=1)
+        print(f"WARN: {metric_value.post()}")
         created_metric_value = asset_framework.create_metric_value(
             metric_value)
         assert created_metric_value.asset_id == metric_value.asset_id
@@ -288,10 +290,9 @@ class TestAssetsService:
         assert created_metric_value.value == metric_value.value
 
         # Test update_metric_value and get_metric_value
-        new_start_date = datetime(2018, 3, 8)
-        created_metric_value.effective_start_date = Parsers.datetime(Formatters.datetime(new_start_date))
-        created_metric_value.effective_end_date = Parsers.datetime(
-            Formatters.datetime(get_end_date(new_start_date)))
+        new_start_date = datetime(2018, 3, 8, tzinfo=UTC)
+        created_metric_value.effective_start_date = new_start_date
+        created_metric_value.effective_end_date = get_end_date(new_start_date)
         created_metric_value.notes = "edited test note"
         created_metric_value.value = 2
         asset_framework.update_metric_value(created_metric_value)

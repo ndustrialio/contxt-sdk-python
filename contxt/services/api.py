@@ -283,6 +283,17 @@ class ApiObject(ABC):
     """
     _api_fields = NotImplemented
 
+    def __init__(self):
+        cls = self.__class__
+        # Set creatable, updateable fields for class (if not yet set)
+        # HACK: move this somewhere more appropriate
+        if not hasattr(cls, "_creatable_fields"):
+            cls._creatable_fields = tuple(
+                f for f in cls._api_fields if f.creatable)
+        if not hasattr(cls, "_updatable_fields"):
+            cls._updatable_fields = tuple(
+                f for f in cls._api_fields if f.updatable)
+
     def __str__(self):
         return Serializer.to_table(self)
 
@@ -317,14 +328,6 @@ class ApiObject(ABC):
                 if f.optional else api_dict.pop(f.api_key))
             for f in cls._api_fields
         }
-
-        # Set creatable, updateable fields for class (if not yet set)
-        if not hasattr(cls, "_creatable_fields"):
-            cls._creatable_fields = tuple(
-                f for f in cls._api_fields if f.creatable)
-        if not hasattr(cls, "_updatable_fields"):
-            cls._updatable_fields = tuple(
-                f for f in cls._api_fields if f.updatable)
 
         # Warn of any unused keys
         warn_of_unexpected_api_keys(cls, api_dict)

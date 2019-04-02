@@ -87,7 +87,7 @@ class AttributeValue(ApiObject):
         ApiField("asset_attribute_id", attr_key="attribute_id", creatable=True),
         ApiField("notes", creatable=True, updatable=True),
         ApiField("value", type=Parsers.unknown, creatable=True, updatable=True),
-        ApiField("effective_date", creatable=True, updatable=True),
+        ApiField("effective_date", type=Parsers.date, creatable=True, updatable=True),
         ApiField("created_at", type=Parsers.datetime),
         ApiField("updated_at", type=Parsers.datetime),
     )

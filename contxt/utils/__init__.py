@@ -10,7 +10,7 @@ from tzlocal import get_localzone
 def make_logger(name, level=None):
     logger = logging.getLogger(name)
     if level:
-        logger.setLevel(level)
+        logger.setLevel(level.upper())
     return logger
 
 

@@ -1,5 +1,6 @@
 from contxt.models.assets import (Asset, AssetType, Attribute, AttributeValue,
-                                 DataTypes, Metric, MetricValue, TimeIntervals)
+                                  DataTypes, Metric, MetricValue,
+                                  TimeIntervals)
 from contxt.utils.assets_migration import AssetSchema
 
 
@@ -16,7 +17,7 @@ class AssetSchemas:
                         label="TestParentType",
                         description="Test description",
                         organization_id=organization_id,
-                        asset_attributes=[
+                        attributes=[
                             Attribute(
                                 asset_type_id=None,
                                 label="test_attr_label",
@@ -26,7 +27,7 @@ class AssetSchemas:
                                 data_type=DataTypes.string,
                                 is_required=False)
                         ],
-                        asset_metrics=[
+                        metrics=[
                             Metric(
                                 asset_type_id=None,
                                 label="test_met_label",
@@ -49,10 +50,10 @@ class AssetSchemas:
                         label="TestAsset",
                         description="Test description",
                         organization_id=organization_id,
-                        asset_attribute_values=[
+                        attribute_values=[
                             # AttributeValue(notes=, value=)
                         ],
-                        asset_metric_values=[
+                        metric_values=[
                             # MetricValue(notes=, value=)
                         ])
                 ])
