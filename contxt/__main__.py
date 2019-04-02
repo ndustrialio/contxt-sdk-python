@@ -9,25 +9,34 @@ from contxt.__version__ import __version__
 from contxt.cli.parsers import ArgParser
 
 
-def main():
+def create_parser():
+
     # Setup parser
     root_parser = ArgumentParser(
-        description="Contxt CLI",
-        formatter_class=ArgumentDefaultsHelpFormatter)
+        description="Contxt CLI", formatter_class=ArgumentDefaultsHelpFormatter
+    )
     root_parser.add_argument(
-        "-v", "--version", action="version", version=f"%(prog)s {__version__}")
+        "-v", "--version", action="version", version=f"%(prog)s {__version__}"
+    )
 
     # Setup our subparsers, which are subclassed from ArgParser
     parsers = root_parser.add_subparsers(title="subcommands", dest="command")
     subparsers = [cls(parsers) for cls in ArgParser.__subclasses__()]
 
-    # Setup tab autocompletion and parse args
+    # Setup tab autocompletion
     autocomplete(root_parser)
-    args = root_parser.parse_args()
+
+    return root_parser
+
+
+def main():
+    parser = create_parser()
+    args = parser.parse_args()
 
     # Launch the command
     if "func" in args:
         from contxt.auth.cli import CLIAuth
+
         auth = CLIAuth()
         args.func(args, auth)
     else:

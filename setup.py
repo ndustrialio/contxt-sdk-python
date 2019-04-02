@@ -28,7 +28,6 @@ REQUIRED = [
     "pytest",
     "pytz",
     "requests",
-    "requests_mock",
     "setuptools",
     "tabulate",
     "tqdm",
