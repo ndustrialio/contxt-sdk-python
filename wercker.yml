@@ -5,7 +5,7 @@ build:
         packages: git
         
     - pip-install:
-      extra_args: -e .[dev]
+      extra_args: .[dev]
 
     - script:
         name: echo python information
