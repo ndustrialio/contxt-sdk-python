@@ -42,7 +42,7 @@ class EMS:
             logger.critical("resource_type must be one of 'electrical','gas','combined'")
             return
 
-        facility_obj = self.facilities_service.get_facility_by_id(facility_id)
+        facility_obj = self.facilities_service.get_facility_with_id(facility_id)
         if not facility_obj:
             return
 
@@ -293,7 +293,7 @@ class EMS:
             end_date = datetime.strptime(end_date, "%Y-%m").replace(tzinfo=pytz.UTC)
 
         # get the facility so we can get its asset_id
-        facility_obj = self.facilities_service.get_facility_by_id(facility_id)
+        facility_obj = self.facilities_service.get_facility_with_id(facility_id)
         if not facility_obj:
             return
 
@@ -364,7 +364,7 @@ class EMS:
             end_date = datetime.strptime(end_date, "%Y-%m").replace(tzinfo=pytz.UTC)
 
         # get the facility so we can get its asset_id
-        facility_obj = self.facilities_service.get_facility_by_id(facility_id)
+        facility_obj = self.facilities_service.get_facility_with_id(facility_id)
         if not facility_obj:
             return
 

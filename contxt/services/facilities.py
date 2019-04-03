@@ -27,13 +27,13 @@ class FacilitiesService(ConfiguredApiService):
         # TODO: handle not found errors here, and return None instead of raising an error
         return [Facility.from_api(rec) for rec in resp]
 
-    def get_facility_by_id(self, facility_id: int):
+    def get_facility_with_id(self, facility_id: int):
         logger.debug(f"Fetching facility {facility_id}")
         resp = self.get(f"facilities/{facility_id}")
         # TODO: handle not found errors here, and return None instead of raising an error
         return Facility.from_api(resp)
 
-    def get_facility_by_name(self, name: str, organization_id: Optional[str] = None):
+    def get_facility_with_name(self, name: str, organization_id: Optional[str] = None):
         logger.debug(f"Fetching facility {name}")
         facilities = self.get_facilities(organization_id=organization_id)
         for facility in facilities:
@@ -41,9 +41,9 @@ class FacilitiesService(ConfiguredApiService):
                 return facility
         logger.warning(f"Failed to find facility with name {name}")
 
-    def get_facility_by_asset_id(self,
-                                 asset_id: str,
-                                 organization_id: Optional[str] = None):
+    def get_facility_with_asset_id(self,
+                                   asset_id: str,
+                                   organization_id: Optional[str] = None):
         logger.debug(f"Fetching facility {asset_id}")
         facilities = self.get_facilities(organization_id=organization_id)
         for facility in facilities:
