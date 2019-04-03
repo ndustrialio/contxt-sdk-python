@@ -16,7 +16,7 @@ REQUIRES_PYTHON = ">=3.6.0"
 # Requirements
 REQUIRED = [
     "argcomplete",
-    "auth0-python",
+    "auth0-python>=3",
     "dash-core-components",
     "dash-html-components",
     "dash",
