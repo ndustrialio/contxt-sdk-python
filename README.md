@@ -1,6 +1,7 @@
 # Contxt Python SDK
 
-This project **requires** Python 3.5+.
+## Dependencies
+This project **requires** Python 3.6+.
 
 ## Installation 
 To install `contxt-sdk`, just use pip:
