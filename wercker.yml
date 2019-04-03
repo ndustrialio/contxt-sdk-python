@@ -1,0 +1,19 @@
+box: python:3.6
+build:
+  steps:
+    - install-packages:
+        packages: git
+        
+    - pip-install:
+      pip_command: pip install -e .[dev]
+
+    - script:
+        name: echo python information
+        code: |
+          echo "python version $(python --version) running"
+          echo "pip version $(pip --version) running"
+          echo "pip list $(pip list)"
+    - script:
+        name: python unit test
+        code: |
+          pytest
