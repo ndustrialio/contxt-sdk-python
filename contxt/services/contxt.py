@@ -30,6 +30,14 @@ class ContxtService(ConfiguredApiService):
         resp = self.get("organizations")
         return [Organization.from_api(rec) for rec in resp]
 
+    def get_organization_with_name(self, name: str):
+        logger.debug(f"Fetching organization {name}")
+        organizations = self.get_organizations()
+        for organization in organizations:
+            if organization.name.lower() == name.lower():
+                return organization
+        logger.warning(f"Failed to find organization with name {name}")
+
     def create_organization(self, organization: Organization) -> Organization:
         data = organization.post()
         logger.debug(f"Creating organization with {data}")
