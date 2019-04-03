@@ -35,9 +35,8 @@ class FacilitiesService(ConfiguredApiService):
 
     def get_facility_with_name(self, name: str, organization_id: Optional[str] = None):
         logger.debug(f"Fetching facility {name}")
-        facilities = self.get_facilities(organization_id=organization_id)
         # Filter by name
-        for facility in facilities:
+        for facility in self.get_facilities(organization_id=organization_id):
             if facility.name.lower() == name.lower():
                 return facility
         logger.warning(f"Failed to find facility with name {name}")
@@ -46,9 +45,8 @@ class FacilitiesService(ConfiguredApiService):
                                    asset_id: str,
                                    organization_id: Optional[str] = None):
         logger.debug(f"Fetching facility {asset_id}")
-        facilities = self.get_facilities(organization_id=organization_id)
         # Filter by asset_id
-        for facility in facilities:
+        for facility in self.get_facilities(organization_id=organization_id):
             if facility.asset_id == asset_id:
                 return facility
         logger.warning(f"Failed to find facility with asset_id {asset_id}")

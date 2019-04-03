@@ -32,8 +32,7 @@ class ContxtService(ConfiguredApiService):
 
     def get_organization_with_name(self, name: str):
         logger.debug(f"Fetching organization {name}")
-        organizations = self.get_organizations()
-        for organization in organizations:
+        for organization in self.get_organizations():
             if organization.name.lower() == name.lower():
                 return organization
         logger.warning(f"Failed to find organization with name {name}")

@@ -226,8 +226,7 @@ class AssetsService(ConfiguredApiService):
     ) -> Optional[Asset]:
         asset_type_id = self.asset_type_with_label(
             asset_type_label).id if asset_type_label else None
-        assets = self.get_assets(asset_type_id=asset_type_id)
-        for asset in assets:
+        for asset in self.get_assets(asset_type_id=asset_type_id):
             if asset.label.upper() == asset_label.upper():
                 return asset
         return None
@@ -239,8 +238,7 @@ class AssetsService(ConfiguredApiService):
     ) -> Optional[Asset]:
         asset_type_id = self.asset_type_with_label(
             asset_type_label).id if asset_type_label else None
-        assets = self.get_assets_for_organization(asset_type_id=asset_type_id)
-        for asset in assets:
+        for asset in self.get_assets_for_organization(asset_type_id=asset_type_id):
             if asset.label.upper() == asset_label.upper():
                 return asset
         return None
