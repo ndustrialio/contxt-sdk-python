@@ -14,6 +14,6 @@ build:
           echo "pip version $(pip --version) running"
           echo "pip list $(pip list)"
     - script:
-        name: python unit test
+        name: pytest - python unit test
         code: |
           pytest
