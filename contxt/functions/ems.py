@@ -1,15 +1,14 @@
 import csv
-from datetime import datetime
 import traceback
+from datetime import datetime
 
-from tqdm import tqdm
 import dateutil.parser
 import pytz
+from tqdm import tqdm
 
 from contxt.exceptions import UnauthorizedException
-from contxt.functions.organizations import find_organization_by_name
 from contxt.functions.assets import Assets
-
+from contxt.functions.organizations import find_organization_by_name
 from contxt.services.contxt import ContxtService
 from contxt.services.ems import EMSService
 from contxt.services.facilities import FacilitiesService
@@ -44,6 +43,9 @@ class EMS:
             return
 
         facility_obj = self.facilities_service.get_facility_by_id(facility_id)
+        if not facility_obj:
+            return
+
         facility_timezone = pytz.timezone(facility_obj.timezone)
 
         main_services = self.ems_service.get_main_services(facility_id, resource_type)
@@ -292,6 +294,8 @@ class EMS:
 
         # get the facility so we can get its asset_id
         facility_obj = self.facilities_service.get_facility_by_id(facility_id)
+        if not facility_obj:
+            return
 
         # get its list of metrics for the asset so we can make sure the user is asking for a valid metric
         asset_obj = self.asset_functions.get_asset_info(asset_id=facility_obj.asset_id,
@@ -361,6 +365,8 @@ class EMS:
 
         # get the facility so we can get its asset_id
         facility_obj = self.facilities_service.get_facility_by_id(facility_id)
+        if not facility_obj:
+            return
 
         # get its list of metrics for the asset so we can make sure the user is asking for a valid metric
         asset_obj = self.asset_functions.get_asset_info(asset_id=facility_obj.asset_id,
