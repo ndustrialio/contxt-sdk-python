@@ -1,3 +1,0 @@
-  id    feed_type_id  down_after    key               facility_id  timezone                           token                             status      degraded_threshold    critical_threshold  status_event_id                       created_at
-----  --------------  ------------  --------------  -------------  ---------------------------------  --------------------------------  --------  --------------------  --------------------  ------------------------------------  ------------------------
-1127               6                123-ngest-demo            191  Eastern Standard Time (UTC -4:00)  c9cb05664edd17bfe67b97c6313a9eed  Active                     0.8                   0.2  7dd32a32-ce2e-430f-a299-f6cc21971362  2019-03-19T19:06:34.820Z
