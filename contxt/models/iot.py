@@ -2,8 +2,12 @@ from contxt.legacy.services import APIObject, APIObjectCollection
 
 
 class FieldGrouping(APIObject):
-
-    def __init__(self, grouping_api_object, owner_obj, category_obj, field_obj_list, keys_to_ignore=None):
+    def __init__(self,
+                 grouping_api_object,
+                 owner_obj,
+                 category_obj,
+                 field_obj_list,
+                 keys_to_ignore=None):
         super().__init__(
             keys_to_ignore=keys_to_ignore if keys_to_ignore is not None else [
                 'owner_id', 'is_public', 'created_at', 'updated_at', 'owner',
@@ -26,14 +30,14 @@ class FieldGrouping(APIObject):
 
     def get_dict(self):
         return {
-            **super().get_dict(),
-            'field_category_name': self.category.name if self.category else None,
-            'field_count': len(self.fields)
+            **super().get_dict(), 'field_category_name':
+            self.category.name if self.category else None,
+            'field_count':
+            len(self.fields)
         }
 
 
 class UnprovisionedField(APIObject):
-
     def __init__(self, unprovisioned_api_object):
         super().__init__()
 
@@ -42,7 +46,6 @@ class UnprovisionedField(APIObject):
 
 
 class FieldCategory(APIObject):
-
     def __init__(self, category_api_object):
         super().__init__()
 
@@ -56,7 +59,6 @@ class FieldCategory(APIObject):
 
 
 class FieldGroupingOwner(APIObject):
-
     def __init__(self, owner_api_object):
         super().__init__()
 
@@ -66,7 +68,6 @@ class FieldGroupingOwner(APIObject):
 
 
 class Field(APIObject):
-
     def __init__(self, field_api_object):
         super().__init__()
 
@@ -75,13 +76,14 @@ class Field(APIObject):
         self.output_id = field_api_object['output_id']
         self.field_descriptor = field_api_object['field_descriptor']
         self.field_human_name = field_api_object['field_human_name']
-        self.is_hidden = field_api_object['is_hidden'] if 'is_hidden' in field_api_object else None
-        self.status = field_api_object['status'] if 'status' in field_api_object else None
+        self.is_hidden = field_api_object[
+            'is_hidden'] if 'is_hidden' in field_api_object else None
+        self.status = field_api_object[
+            'status'] if 'status' in field_api_object else None
         self.units = field_api_object['units']
 
 
 class Feed(APIObject):
-
     def __init__(self, feed_api_object):
         super().__init__()
 

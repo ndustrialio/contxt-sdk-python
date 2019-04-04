@@ -1,4 +1,5 @@
-from contxt.legacy.services import APIObject, APIObjectCollection
+from contxt.legacy.services import (APIObject, APIObjectCollection,
+                                    APIObjectDict)
 
 
 class Channel(APIObject):
@@ -78,7 +79,10 @@ class SubscriberStats(APIObject):
         self.blocked_subscription_on_unacked_msgs = subscriber_stats_object['blockedSubscriptionOnUnackedMsgs']
         self.unacked_messages = subscriber_stats_object['unackedMessages']
 
-        self.consumers = ConsumerStatsCollection([ConsumerStats(consumer) for consumer in subscriber_stats_object['consumers'] ])
+        self.consumers = ConsumerStatsCollection([
+            ConsumerStats(consumer)
+            for consumer in subscriber_stats_object['consumers']
+        ])
 
     def __str__(self):
         return self.pretty_print()

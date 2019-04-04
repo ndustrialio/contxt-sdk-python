@@ -1,8 +1,8 @@
 from contxt.legacy.services import APIObject, APIObjectCollection
+from contxt.models.iot import Field
 
 
 class FacilityUtilitySpend(APIObject):
-
     def __init__(self, spend_api_object, keys_to_ignore=None):
         super().__init__(keys_to_ignore=keys_to_ignore)
 
@@ -13,18 +13,18 @@ class FacilityUtilitySpend(APIObject):
         self.spend_periods = APIObjectCollection(periods)
 
     def __str__(self):
-        print(f'Utility Spend -> Type: {self.type} -- Currency: {self.currency}')
+        print(
+            f'Utility Spend -> Type: {self.type} -- Currency: {self.currency}')
         return self.spend_periods.__str__()
 
     def get_dict(self):
         return {
-            **super().get_dict(),
-            'spend_periods': self.spend_periods.get_dicts()
+            **super().get_dict(), 'spend_periods':
+            self.spend_periods.get_dicts()
         }
 
 
 class UtilitySpendPeriod(APIObject):
-
     def __init__(self, spend_api_object, keys_to_ignore=None):
         super().__init__(keys_to_ignore=keys_to_ignore)
 
@@ -40,7 +40,6 @@ class UtilitySpendPeriod(APIObject):
 
 
 class UtilityUsagePeriod(APIObject):
-
     def __init__(self, spend_api_object, keys_to_ignore=None):
         super().__init__(keys_to_ignore=keys_to_ignore)
 
@@ -56,7 +55,6 @@ class UtilityUsagePeriod(APIObject):
 
 
 class FacilityUtilityUsage(APIObject):
-
     def __init__(self, spend_api_object, keys_to_ignore=None):
         super().__init__(keys_to_ignore=keys_to_ignore)
 
@@ -67,18 +65,18 @@ class FacilityUtilityUsage(APIObject):
         self.usage_periods = APIObjectCollection(periods)
 
     def __str__(self):
-        print('Utility Usage -> Type: {} -- Units: {}'.format(self.type, self.unit))
+        print('Utility Usage -> Type: {} -- Units: {}'.format(
+            self.type, self.unit))
         return self.usage_periods.__str__()
 
     def get_dict(self):
         return {
-            **super().get_dict(),
-            'spend_periods': self.usage_periods.get_dicts()
+            **super().get_dict(), 'spend_periods':
+            self.usage_periods.get_dicts()
         }
 
 
 class FacilityMainService(APIObject):
-
     def __init__(self, facility_main_object, keys_to_ignore=None):
         super().__init__(keys_to_ignore=keys_to_ignore)
 
@@ -86,16 +84,21 @@ class FacilityMainService(APIObject):
         self.facility_id = facility_main_object['facility_id']
         self.name = facility_main_object['name']
         self.type = facility_main_object['type']
-        self.demand_field = Field(facility_main_object['demand_field']) if facility_main_object['demand_field'] else None
-        self.usage_field = Field(facility_main_object['usage_field']) if facility_main_object['usage_field'] else None
+        self.demand_field = Field(
+            facility_main_object['demand_field']
+        ) if facility_main_object['demand_field'] else None
+        self.usage_field = Field(
+            facility_main_object['usage_field']
+        ) if facility_main_object['usage_field'] else None
 
     def get_values(self):
-        return [self.facility_id,
-                self.name,
-                self.type,
-                self.demand_field.id if self.demand_field else None,
-                self.usage_field.id if self.usage_field else None
-                ]
+        return [
+            self.facility_id, self.name, self.type,
+            self.demand_field.id if self.demand_field else None,
+            self.usage_field.id if self.usage_field else None
+        ]
 
     def get_keys(self):
-        return ['facility_id', 'name', 'type', 'demand_field_id', 'usage_field_id']
+        return [
+            'facility_id', 'name', 'type', 'demand_field_id', 'usage_field_id'
+        ]

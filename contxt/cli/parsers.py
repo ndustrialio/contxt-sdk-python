@@ -1,8 +1,8 @@
-from tabulate import tabulate
 import csv
 import os
 from datetime import datetime
 
+from tabulate import tabulate
 
 from contxt.utils import make_logger
 
@@ -140,7 +140,7 @@ class IotParser(ArgParser):
 
     def _collection_to_csv(self, filename, api_collection_data):
 
-        with open(os.path.join('.',filename), 'w') as f:
+        with open(os.path.join('.', filename), 'w') as f:
 
             fields = api_collection_data.get_keys()
 
@@ -253,7 +253,6 @@ class EmsParser(ArgParser):
 
         mains = ems.get_main_services(facility_id=args.facility_id, type=args.resource_type)
         print(mains)
-
 
     def _get_main_data(self, args, auth):
         from contxt.functions.ems import EMS

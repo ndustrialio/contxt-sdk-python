@@ -65,5 +65,3 @@ class ContxtAuthService(Service):
                                     .authorize(False), execute=True)
 
             return response['access_token']
-
-

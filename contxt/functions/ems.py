@@ -28,7 +28,7 @@ class EMS:
         self.ems_service = EMSService(self.auth)
         self.contxt_service = ContxtService(self.auth)
         self.iot_service = IOTService(self.auth)
-        self.facilities_service = FacilitiesService(self.auth, environment='production')
+        self.facilities_service = FacilitiesService(self.auth)
 
         self.asset_functions = Assets(self.auth)
 
@@ -82,11 +82,13 @@ class EMS:
 
         if interval == 'monthly':
 
-            return reversed(self.ems_service.get_monthly_utility_spend(facility_id=facility_id,
-                                                              type=resource_type,
-                                                              date_start=start_date,
-                                                              date_end=end_date,
-                                                              pro_forma=pro_forma))
+            return reversed(
+                self.ems_service.get_monthly_utility_spend(
+                    facility_id=facility_id,
+                    type=resource_type,
+                    date_start=start_date,
+                    date_end=end_date,
+                    pro_forma=pro_forma))
 
         elif interval == 'daily':
             pass
