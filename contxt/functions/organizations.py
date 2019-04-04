@@ -55,7 +55,7 @@ class Organizations:
                                                              organization_name=organization_name,
                                                              contxt_service=self.contxt_service)
 
-        return self.contxt_service.get_organization_users(organization_id)
+        return self.contxt_service.get_users_for_organization(organization_id)
 
     def create_organization(self, organization_name):
 
