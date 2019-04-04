@@ -1,0 +1,18 @@
+{
+    "fields": {
+        "22-20": {
+            "filename": "export_test-grouping_2019-04-03_22:27:21/22-20.csv",
+            "row_count": 282,
+            "field_id": 133877,
+            "units": "KWh"
+        }
+    },
+    "parameters": {
+        "field_list": [
+            "22-20"
+        ],
+        "start_date": "2019-04",
+        "end_date": null,
+        "window": 900
+    }
+}
