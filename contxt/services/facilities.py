@@ -11,7 +11,7 @@ logger = make_logger(__name__)
 
 class FacilitiesService(ConfiguredApiService):
     """
-    Service to interact with our Facilities api.
+    Service to interact with our Facilities API.
 
     NOTE: The facility_id in this service is the legacy integer id.
     """

@@ -5,6 +5,7 @@ from datetime import datetime
 from tabulate import tabulate
 
 from contxt.utils import make_logger
+from contxt.utils.serializer import Serializer
 
 logger = make_logger(__name__)
 
@@ -714,7 +715,7 @@ class BusParser(ArgParser):
             service_id=args.service_id,
             organization_id=args.org_id,
             organization_name=args.org_name)
-        print(channels)
+        print(Serializer.to_table(channels))
 
     def _stats(self, args, auth):
         from contxt.functions.bus import Bus
