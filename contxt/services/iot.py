@@ -113,12 +113,7 @@ class IOTService(Service):
 
         params = {"limit": limit, "offset": offset}
 
-        return DataResponse(
-            data=self.execute(
-                GET(uri=f"feeds/{feed_id}/fields").params(params), execute=True
-            ),
-            client=self.client,
-        )
+        return self.execute(GET(uri=f"feeds/{feed_id}/fields").params(params), execute=True)
 
     def get_feeds_collection(self, facility_id=None, key=None):
         assert isinstance(facility_id, (type(None), int))
