@@ -18,6 +18,9 @@ CONFIGS_BY_ENVIRONMENT = {
 
 
 class EMSService(Service):
+    """
+    Service to interact with our EMS API.
+    """
 
     def __init__(self, auth_module, environment='production'):
 

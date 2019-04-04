@@ -11,7 +11,7 @@ logger = make_logger(__name__)
 
 class AssetsService(ConfiguredApiService):
     """
-    Service to interact with our Assets service.
+    Service to interact with our Assets API.
     """
 
     __marker = object()

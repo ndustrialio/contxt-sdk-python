@@ -16,6 +16,9 @@ class AuthConfigurationError(Exception):
 
 
 class ContxtAuthService(Service):
+    """
+    Service to interact with our Contxt Auth API.
+    """
 
     def __init__(self, access_token, client_id=None, client_secret=None, environment='production'):
 

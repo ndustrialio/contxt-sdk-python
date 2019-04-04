@@ -11,6 +11,9 @@ logger = make_logger(__name__)
 
 
 class ContxtService(ConfiguredApiService):
+    """
+    Service to interact with our Contxt API.
+    """
     _configs = (
         ApiServiceConfig(
             name="production",

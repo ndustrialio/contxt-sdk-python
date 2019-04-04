@@ -16,6 +16,9 @@ CONFIGS_BY_ENVIRONMENT = {
 
 
 class IOTService(Service):
+    """
+    Service to interact with our IOT API.
+    """
 
     def __init__(self, auth_module, environment='production'):
 

@@ -10,6 +10,9 @@ logger = make_logger(__name__)
 
 
 class EventsService(ConfiguredApiService):
+    """
+    Service to interact with our Events API.
+    """
     _configs = (
         ApiServiceConfig(
             name="production",

@@ -15,8 +15,8 @@ class MessageBusService(ConfiguredApiService):
     _configs = (
         ApiServiceConfig(
             name="production",
-            # base_url="https://bus.ndustrial.io",
-            base_url="http://bus.lineageapi.com/",
+            base_url="https://bus.ndustrial.io",
+            # base_url="http://bus.lineageapi.com/",
             audience="T62CR77ouw4I6VPlSSlLT9VpVA1ebByx"),
         ApiServiceConfig(
             name="staging",
