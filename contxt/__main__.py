@@ -5,7 +5,7 @@ from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
 
 from argcomplete import autocomplete
 
-from contxt.__version__ import __version__
+from contxt import __version__
 from contxt.cli.parsers import ArgParser
 
 
