@@ -1,7 +1,9 @@
 from datetime import datetime
+from typing import Any, Dict, List, Optional, Set, Tuple, Union
 
-from contxt.services import GET, APIObject, APIObjectCollection, Service
-from contxt.services.iot import Field
+from contxt.legacy.services import GET, APIObjectCollection, Service
+from contxt.models.ems import (FacilityMainService, FacilityUtilitySpend,
+                               FacilityUtilityUsage)
 
 CONFIGS_BY_ENVIRONMENT = {
     'production': {
@@ -29,9 +31,7 @@ class EMSService(Service):
             access_token=auth_module.get_token_for_audience(
                 self.env['audience']))
 
-    def get_main_services(self, facility_id, type=None):
-
-        assert isinstance(facility_id, int)
+    def get_main_services(self, facility_id: int, type: Optional[str] = None):
 
         response = self.execute(
             GET(uri=f'facilities/{facility_id}'),
@@ -49,13 +49,15 @@ class EMSService(Service):
 
         return APIObjectCollection([FacilityMainService(row) for row in rows])
 
-    def get_monthly_utility_spend(self, facility_id, type, date_start, date_end, pro_forma=False, exclude_account_charges=False):
-
-        assert isinstance(facility_id, int)
-        assert isinstance(type, str)
-        assert isinstance(date_start, datetime)
-        assert isinstance(date_end, datetime)
-
+    def get_monthly_utility_spend(
+            self,
+            facility_id: int,
+            type: str,
+            date_start: datetime,
+            date_end: datetime,
+            pro_forma: Optional[bool] = False,
+            exclude_account_charges: Optional[bool] = False,
+    ):
         params = {
             'type': type,
             'date_start': date_start.strftime('%Y-%m'),
@@ -71,12 +73,14 @@ class EMSService(Service):
 
         return FacilityUtilitySpend(response)
 
-    def get_monthly_utility_usage(self, facility_id, type, date_start, date_end, pro_forma=False):
-
-        assert isinstance(facility_id, int)
-        assert isinstance(type, str)
-        assert isinstance(date_start, datetime)
-        assert isinstance(date_end, datetime)
+    def get_monthly_utility_usage(
+            self,
+            facility_id: int,
+            type: str,
+            date_start: datetime,
+            date_end: datetime,
+            pro_forma: Optional[bool] = False,
+    ):
 
         params = {
             'type': type,
@@ -89,103 +93,3 @@ class EMSService(Service):
                                 execute=True)
 
         return FacilityUtilityUsage(response)
-
-
-class FacilityUtilitySpend(APIObject):
-
-    def __init__(self, spend_api_object, keys_to_ignore=None):
-        super().__init__(keys_to_ignore=keys_to_ignore)
-
-        self.type = spend_api_object['type']
-        self.currency = spend_api_object['currency']
-
-        periods = [UtilitySpendPeriod(s) for s in spend_api_object['values']]
-        self.spend_periods = APIObjectCollection(periods)
-
-    def __str__(self):
-        print(f'Utility Spend -> Type: {self.type} -- Currency: {self.currency}')
-        return self.spend_periods.__str__()
-
-    def get_dict(self):
-        return {
-            **super().get_dict(),
-            'spend_periods': self.spend_periods.get_dicts()
-        }
-
-
-class UtilitySpendPeriod(APIObject):
-
-    def __init__(self, spend_api_object, keys_to_ignore=None):
-        super().__init__(keys_to_ignore=keys_to_ignore)
-
-        self.date = spend_api_object['date']
-        self.spend = spend_api_object['value']
-        self.pro_forma_date = spend_api_object.get('pro_forma_date')
-
-    def get_values(self):
-        return [self.date, self.spend, self.pro_forma_date]
-
-    def get_keys(self):
-        return ['date', 'value', 'pro_forma_date']
-
-
-class UtilityUsagePeriod(APIObject):
-
-    def __init__(self, spend_api_object, keys_to_ignore=None):
-        super().__init__(keys_to_ignore=keys_to_ignore)
-
-        self.date = spend_api_object['date']
-        self.value = spend_api_object['value']
-        self.pro_forma_date = spend_api_object.get('pro_forma_date')
-
-    def get_values(self):
-        return [self.date, self.value, self.pro_forma_date]
-
-    def get_keys(self):
-        return ['date', 'value', 'pro_forma_date']
-
-
-class FacilityUtilityUsage(APIObject):
-
-    def __init__(self, spend_api_object, keys_to_ignore=None):
-        super().__init__(keys_to_ignore=keys_to_ignore)
-
-        self.type = spend_api_object['type']
-        self.unit = spend_api_object['unit']
-
-        periods = [UtilityUsagePeriod(s) for s in spend_api_object['values']]
-        self.usage_periods = APIObjectCollection(periods)
-
-    def __str__(self):
-        print('Utility Usage -> Type: {} -- Units: {}'.format(self.type, self.unit))
-        return self.usage_periods.__str__()
-
-    def get_dict(self):
-        return {
-            **super().get_dict(),
-            'spend_periods': self.usage_periods.get_dicts()
-        }
-
-
-class FacilityMainService(APIObject):
-
-    def __init__(self, facility_main_object, keys_to_ignore=None):
-        super().__init__(keys_to_ignore=keys_to_ignore)
-
-        self.id = facility_main_object['id']
-        self.facility_id = facility_main_object['facility_id']
-        self.name = facility_main_object['name']
-        self.type = facility_main_object['type']
-        self.demand_field = Field(facility_main_object['demand_field']) if facility_main_object['demand_field'] else None
-        self.usage_field = Field(facility_main_object['usage_field']) if facility_main_object['usage_field'] else None
-
-    def get_values(self):
-        return [self.facility_id,
-                self.name,
-                self.type,
-                self.demand_field.id if self.demand_field else None,
-                self.usage_field.id if self.usage_field else None
-                ]
-
-    def get_keys(self):
-        return ['facility_id', 'name', 'type', 'demand_field_id', 'usage_field_id']
