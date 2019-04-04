@@ -1,104 +1,162 @@
-from contxt.legacy.services import (APIObject, APIObjectCollection,
-                                    APIObjectDict)
+from pprint import pformat
+from typing import Any, Dict, List, Optional, Set, Tuple, Union
+
+from contxt.services.api import ApiField, ApiObject
+from contxt.utils.serializer import Serializer
 
 
-class Channel(APIObject):
+def pretty_print(obj):
+    d = Serializer.to_dict(obj)
+    return pformat(d, indent=4)
 
-    def __init__(self, channel_api_object):
 
+class PublisherStats(ApiObject):
+    _api_fields = (
+        ApiField("msgRateIn", attr_key="msg_rate_in"),
+        ApiField("producerId", attr_key="producer_id"),
+        ApiField("connectedSince", attr_key="connected_since"),
+    )
+
+    def __init__(
+            self,
+            msg_rate_in: str,
+            producer_id: str,
+            connected_since: str,
+    ):
         super().__init__()
-
-        self.id = channel_api_object['id']
-        self.name = channel_api_object['name']
-        self.organization_id = channel_api_object['organization_id']
-        self.service_id = channel_api_object['service_id']
+        self.msg_rate_in = msg_rate_in
+        self.producer_id = producer_id
+        self.connected_since = connected_since
 
     def __str__(self):
-        return self.pretty_print()
+        return pretty_print(self)
 
 
-class PublisherStatsCollection(APIObjectCollection):
+class ConsumerStats(ApiObject):
+    _api_fields = (
+        ApiField("msgRateOut", attr_key="msg_rate_out", type=float),
+        ApiField("msgRateRedeliver", attr_key="msg_rate_redeliver", type=float),
+        ApiField("unackedMessages", attr_key="unacked_messages", type=int),
+        ApiField("blockedConsumerOnUnackedMsgs", attr_key="blocked_consumer_on_unacked_msgs", type=bool),
+        ApiField("connectedSince", attr_key="connected_since"),
+    )
 
-    def __str__(self):
-        return self.pretty_print()
-
-
-class ChannelStats(APIObject):
-
-    def __init__(self, channel_stats_object):
-
+    def __init__(
+            self,
+            msg_rate_out: float,
+            msg_rate_redeliver: float,
+            unacked_messages: int,
+            blocked_consumer_on_unacked_msgs: bool,
+            connected_since: str,
+    ):
         super().__init__()
-
-        self.msg_rate_in = channel_stats_object['msgRateIn']
-        self.msg_rate_out = channel_stats_object['msgRateOut']
-        self.average_msg_size = channel_stats_object['averageMsgSize']
-        self.storage_size = channel_stats_object['storageSize']
-        self.publishers = PublisherStatsCollection([PublisherStats(publisher) for publisher in channel_stats_object['publishers']])
-
-        self.subscriptions = SubscriptionsDict({key: SubscriberStats(channel_stats_object['subscriptions'][key]) for key in channel_stats_object['subscriptions']})
+        self.msg_rate_out = msg_rate_out
+        self.msg_rate_redeliver = msg_rate_redeliver
+        self.unacked_messages = unacked_messages
+        self.blocked_consumer_on_unacked_msgs = blocked_consumer_on_unacked_msgs
+        self.connected_since = connected_since
 
     def __str__(self):
-        return self.pretty_print()
+        return pretty_print(self)
 
 
-class SubscriptionsDict(APIObjectDict):
+class SubscriberStats(ApiObject):
+    _api_fields = (
+        ApiField("name", optional=True),
+        ApiField("msgRateOut", attr_key="msg_rate_out", type=float),
+        ApiField("msgRateRedeliver", attr_key="msg_rate_redeliver", type=float),
+        ApiField("msgBacklog", attr_key="msg_backlog", type=int),
+        ApiField("blockedSubscriptionOnUnackedMsgs", attr_key="blocked_subscription_on_unacked_msgs", type=bool),
+        ApiField("unackedMessages", attr_key="unacked_messages", type=int),
+        ApiField("consumers", type=ConsumerStats)
+    )
 
-    def __str__(self):
-        return self.pretty_print()
-
-
-class PublisherStats(APIObject):
-
-    def __init__(self, publisher_stats_object):
-
+    def __init__(
+            self,
+            msg_rate_out: float,
+            msg_rate_redeliver: float,
+            msg_backlog: int,
+            blocked_subscription_on_unacked_msgs: bool,
+            unacked_messages: int,
+            consumers: List[ConsumerStats],
+            name: Optional[str] = None
+    ):
         super().__init__()
-
-        self.msg_rate_in = publisher_stats_object['msgRateIn']
-        self.producer_id = publisher_stats_object['producerId']
-        self.connected_since = publisher_stats_object['connectedSince']
-
-    def __str__(self):
-        return self.pretty_print()
-
-
-class ConsumerStatsCollection(APIObjectCollection):
+        self.name = name
+        self.msg_rate_out = msg_rate_out
+        self.msg_rate_redeliver = msg_rate_redeliver
+        self.msg_backlog = msg_backlog
+        self.blocked_subscription_on_unacked_msgs = blocked_subscription_on_unacked_msgs
+        self.unacked_messages = unacked_messages
+        self.consumers = consumers
 
     def __str__(self):
-        return self.pretty_print()
+        return pretty_print(self)
 
 
-class SubscriberStats(APIObject):
+class Channel(ApiObject):
+    _api_fields = (
+        ApiField("id"),
+        ApiField("name"),
+        ApiField("organization_id"),
+        ApiField("service_id"),
+    )
 
-    def __init__(self, subscriber_stats_object):
-
+    def __init__(
+            self,
+            id: str,
+            name: str,
+            organization_id: str,
+            service_id: str,
+    ):
         super().__init__()
-
-        self.msg_rate_out = subscriber_stats_object['msgRateOut']
-        self.msg_rate_redeliver = subscriber_stats_object['msgRateRedeliver']
-        self.msg_backlog = subscriber_stats_object['msgBacklog']
-        self.blocked_subscription_on_unacked_msgs = subscriber_stats_object['blockedSubscriptionOnUnackedMsgs']
-        self.unacked_messages = subscriber_stats_object['unackedMessages']
-
-        self.consumers = ConsumerStatsCollection([
-            ConsumerStats(consumer)
-            for consumer in subscriber_stats_object['consumers']
-        ])
+        self.id = id
+        self.name = name
+        self.organization_id = organization_id
+        self.service_id = service_id
 
     def __str__(self):
-        return self.pretty_print()
+        return pretty_print(self)
 
 
-class ConsumerStats(APIObject):
+class ChannelStats(ApiObject):
+    _api_fields = (
+        ApiField("msgRateIn", attr_key="msg_rate_in", type=float),
+        ApiField("msgRateOut", attr_key="msg_rate_out", type=float),
+        ApiField("msgThroughputIn", attr_key="msg_throughput_in", type=float),
+        ApiField("msgThroughputOut", attr_key="msg_throughput_out", type=float),
+        ApiField("averageMsgSize", attr_key="avg_msg_size", type=float),
+        ApiField("storageSize", attr_key="storage_size", type=float),
+        ApiField("replication", type=dict),
+        ApiField("deduplicationStatus", attr_key="deduplication_status"),
+        ApiField("publishers", type=PublisherStats),
+        ApiField("subscriptions", type=lambda o: [SubscriberStats.from_api({**v, "name": k}) for k, v in o.items()]),
+    )
 
-    def __init__(self, consumer_stats_object):
-
+    def __init__(
+            self,
+            msg_rate_in: float,
+            msg_rate_out: float,
+            msg_throughput_in: float,
+            msg_throughput_out: float,
+            avg_msg_size: float,
+            storage_size: float,
+            replication: Any,
+            deduplication_status: str,
+            publishers: List[PublisherStats],
+            subscriptions: List[SubscriberStats],
+    ):
         super().__init__()
-
-        self.msg_rate_out = consumer_stats_object['msgRateOut']
-        self.msg_rate_redeliver = consumer_stats_object['msgRateRedeliver']
-        self.unacked_messages = consumer_stats_object['unackedMessages']
-        self.blocked_consumer_on_unacked_msgs = consumer_stats_object['blockedConsumerOnUnackedMsgs']
-        self.connected_since = consumer_stats_object['connectedSince']
+        self.msg_rate_in = msg_rate_in
+        self.msg_rate_out = msg_rate_out
+        self.msg_throughput_in = msg_throughput_in
+        self.msg_throughput_out = msg_throughput_out
+        self.avg_msg_size = avg_msg_size
+        self.storage_size = storage_size
+        self.replication = replication
+        self.deduplication_status = deduplication_status
+        self.publishers = publishers
+        self.subscriptions = subscriptions
 
     def __str__(self):
-        return self.pretty_print()
+        return pretty_print(self)

@@ -1,49 +1,69 @@
-from contxt.legacy.services import (GET, APIObject, APIObjectCollection,
-                                    APIObjectDict, Service)
+from typing import Dict, List, Optional, Set, Tuple
+
+from contxt.auth import BaseAuth
 from contxt.models.bus import Channel, ChannelStats
+from contxt.services.api import ApiServiceConfig, ConfiguredApiService
+from contxt.utils import make_logger
 
-CONFIGS_BY_ENVIRONMENT = {
-    'production': {
-        'base_url': 'https://bus.ndustrial.io/',
-        'audience': 'T62CR77ouw4I6VPlSSlLT9VpVA1ebByx'
-    },
-    'staging': {
-        'base_url': 'https://bus-staging.ndustrial.io/',
-        'audience': 'YHCtC2dZAvvt2SdxUVwWpVdm4fSOkUdL'
-    },
-}
+logger = make_logger(__name__)
 
 
-class MessageBusService(Service):
+class MessageBusService(ConfiguredApiService):
+    """
+    Service to interact with our Message Bus API.
+    """
+    _configs = (
+        ApiServiceConfig(
+            name="production",
+            # base_url="https://bus.ndustrial.io",
+            base_url="http://bus.lineageapi.com/",
+            audience="T62CR77ouw4I6VPlSSlLT9VpVA1ebByx"),
+        ApiServiceConfig(
+            name="staging",
+            base_url="https://bus-staging.ndustrial.io",
+            audience="YHCtC2dZAvvt2SdxUVwWpVdm4fSOkUdL"),
+    )
 
-    def __init__(self, auth_module, environment='staging'):
+    def __init__(
+            self,
+            auth: BaseAuth,
+            organization_id: str,
+            env: Optional[str] = "production",
+    ):
+        super().__init__(auth, env, api_version=None)
+        self.organization_id = organization_id
 
-        if environment not in CONFIGS_BY_ENVIRONMENT:
-            raise Exception('Invalid environment specified')
+    def _channels_url(self, service_id):
+        return f"organizations/{self.organization_id}/services/{service_id}/channels"
 
-        self.env = CONFIGS_BY_ENVIRONMENT[environment]
+    def get_channel_for_service(self, channel_id: str, service_id: str):
+        logger.debug(f"Fetching channel {channel_id} for service {service_id}")
+        resp = self.get(f"{self._channels_url(service_id)}/{channel_id}")
+        return Channel.from_api(resp)
 
-        super().__init__(
-            base_url=self.env['base_url'],
-            access_token=auth_module.get_token_for_audience(
-                self.env['audience']))
+    def get_channels_for_service(self, service_id: str):
+        logger.debug(f"Fetching channels for service {service_id}")
+        resp = self.get(self._channels_url(service_id))
+        return [Channel.from_api(rec) for rec in resp]
 
-    def get_channels(self, service_id: str, organization_id: str):
+    def get_schema_for_channel_and_service(self, schema_id: str, channel_id: str, service_id: str):
+        logger.debug(f"Fetching channel {channel_id} for service {service_id}")
+        resp = self.get(
+            f"{self._channels_url(service_id)}/{channel_id}/schemas")
+        return resp
 
-        req = GET(uri=f'organizations/{organization_id}/services/{service_id}/channels')
-        req.api_version = None
+    def get_schemas_for_channel_and_service(self, channel_id: str, service_id: str):
+        logger.debug(
+            f"Fetching schemas for channel {channel_id} and service {service_id}"
+        )
+        resp = self.get(
+            f"{self._channels_url(service_id)}/{channel_id}/schemas")
+        return resp
 
-        response = self.execute(req)
-
-        channels = [Channel(record) for record in response]
-
-        return APIObjectCollection(channels)
-
-    def get_stats(self, service_id: str, organization_id: str, channel_id: str):
-
-        req = GET(uri=f'organizations/{organization_id}/services/{service_id}/channels/{channel_id}/statistics')
-        req.api_version = None
-
-        response = self.execute(req)
-
-        return ChannelStats(response)
+    def get_stats_for_channel_and_service(self, channel_id: str, service_id: str):
+        logger.debug(
+            f"Fetching stats for channel {channel_id} and service {service_id}"
+        )
+        resp = self.get(
+            f"{self._channels_url(service_id)}/{channel_id}/statistics")
+        return ChannelStats.from_api(resp)
