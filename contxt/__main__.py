@@ -6,11 +6,10 @@ from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
 from argcomplete import autocomplete
 
 from contxt import __version__
-from contxt.cli.parsers import ArgParser
+from contxt.cli.parsers import ContxtArgParser
 
 
 def create_parser():
-
     # Setup parser
     root_parser = ArgumentParser(
         description="Contxt CLI", formatter_class=ArgumentDefaultsHelpFormatter
@@ -18,10 +17,11 @@ def create_parser():
     root_parser.add_argument(
         "-v", "--version", action="version", version=f"%(prog)s {__version__}"
     )
+    root_parser.set_defaults(func=lambda auth, args: root_parser.print_help())
 
-    # Setup our subparsers, which are subclassed from ArgParser
+    # Setup our subparsers, which are subclassed from ContxtArgParser
     parsers = root_parser.add_subparsers(title="subcommands", dest="command")
-    subparsers = [cls(parsers) for cls in ArgParser.__subclasses__()]
+    subparsers = [cls(parsers) for cls in ContxtArgParser.__subclasses__()]
 
     # Setup tab autocompletion
     autocomplete(root_parser)
@@ -39,10 +39,6 @@ def main():
 
         auth = CLIAuth()
         args.func(args, auth)
-    else:
-        # Subcommand not specified, print all subparser usages as help
-        for p in subparsers:
-            p.parser.print_usage()
 
 
 if __name__ == "__main__":

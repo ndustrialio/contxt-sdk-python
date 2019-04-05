@@ -10,7 +10,7 @@ from contxt.utils.serializer import Serializer
 logger = make_logger(__name__)
 
 
-class ArgParser:
+class ContxtArgParser:
 
     def __init__(self, subparsers):
         self.parser = self._init_parser(subparsers)
@@ -18,15 +18,19 @@ class ArgParser:
     def _init_parser(self, subparsers):
         raise NotImplementedError
 
+    def _help(self, args, auth):
+        self.parser.print_help()
+
     def parse(self, args, auth):
         if "func" in args:
             args.func(args, auth)
 
 
-class AuthParser(ArgParser):
+class AuthParser(ContxtArgParser):
 
     def _init_parser(self, subparsers):
         parser = subparsers.add_parser("auth", help="Authentication")
+        parser.set_defaults(func=self._help)
         _subparsers = parser.add_subparsers(title="subcommands", dest="subcommand")
 
         # Login
@@ -47,10 +51,11 @@ class AuthParser(ArgParser):
         auth.reset()
 
 
-class IotParser(ArgParser):
+class IotParser(ContxtArgParser):
 
     def _init_parser(self, subparsers):
         parser = subparsers.add_parser("iot", help="IOT service")
+        parser.set_defaults(func=self._help)
         _subparsers = parser.add_subparsers(title="subcommands", dest="subcommand")
 
         # Groupings
@@ -155,10 +160,11 @@ class IotParser(ArgParser):
 RESOURCE_TYPES = ["electric", "gas", "combined"]
 
 
-class EmsParser(ArgParser):
+class EmsParser(ContxtArgParser):
 
     def _init_parser(self, subparsers):
         parser = subparsers.add_parser("ems", help="EMS service")
+        parser.set_defaults(func=self._help)
         _subparsers = parser.add_subparsers(title="subcommands", dest="subcommand")
 
         # Main Services
@@ -464,10 +470,11 @@ class EmsParser(ArgParser):
                 writer.writerow(row)
 
 
-class AssetsParser(ArgParser):
+class AssetsParser(ContxtArgParser):
 
     def _init_parser(self, subparsers):
         parser = subparsers.add_parser("assets", help="Assets service")
+        parser.set_defaults(func=self._help)
         _subparsers = parser.add_subparsers(title="subcommands", dest="subcommand")
 
         # Facilities
@@ -625,10 +632,11 @@ class AssetsParser(ArgParser):
                 print(metric_values)
 
 
-class ContxtParser(ArgParser):
+class ContxtParser(ContxtArgParser):
 
     def _init_parser(self, subparsers):
         parser = subparsers.add_parser("contxt", help="Contxt service")
+        parser.set_defaults(func=self._help)
         _subparsers = parser.add_subparsers(title="subcommands", dest="subcommand")
 
         # Organizations
@@ -681,10 +689,11 @@ class ContxtParser(ArgParser):
             user_id=args.user_id, organization_id=args.org_id)
 
 
-class BusParser(ArgParser):
+class BusParser(ContxtArgParser):
 
     def _init_parser(self, subparsers):
         parser = subparsers.add_parser("bus", help="Message bus service")
+        parser.set_defaults(func=self._help)
         _subparsers = parser.add_subparsers(title="subcommands", dest="subcommand")
 
         # Channels
