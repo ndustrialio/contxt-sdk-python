@@ -1,8 +1,14 @@
+from requests.exceptions import HTTPError
+
 from contxt.auth.cli import CLIAuth
 from contxt.services.assets import AssetsService
+from contxt.services.bus import MessageBusService
 from contxt.services.contxt import ContxtService
 from contxt.services.events import EventsService
 from contxt.services.facilities import FacilitiesService
+from contxt.utils import make_logger
+
+logger = make_logger(__name__)
 
 if __name__ == "__main__":
     auth = CLIAuth()
@@ -21,4 +27,21 @@ if __name__ == "__main__":
     # event_type = event_service.get_event_types()
     triggered_event = event_service.get_triggered_event(triggered_event_id)
     event_definition = event_service.get_event_definition(triggered_event.event_id)
+    statement = event_service.event_definition_parameters_to_human_readable_format(event_definition)
+    print(statement)
+    # s = MessageBusService(auth, ll.id, env="production")
+    # service_id = "GCXd2bwE9fgvqxygrx2J7TkDJ3efXBKM"
+    # channels = s.get_channels_for_service(service_id)
+    # for channel in channels:
+    #     schemas = s.get_schemas_for_channel_and_service(channel.id, service_id)
+    #     try:
+    #         stats = s.get_stats_for_channel_and_service(channel.id, service_id)
+    #         schemas = s.get_schemas_for_channel_and_service(channel.id, service_id)
+    #         print(stats)
+    #     except HTTPError as e:
+    #         logger.exception(e)
+    #         pass
+    #     if schemas:
+    #         pass
     print("done")
+# python contxt bus stats -N "Lineage Logistics" -i "10941e01-505c-4f28-8cf9-3cf5dbfd89ce" GCXd2bwE9fgvqxygrx2J7TkDJ3efXBKM"
