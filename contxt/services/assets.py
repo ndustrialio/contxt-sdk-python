@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional, Set, Tuple
+from typing import Any, Dict, List, Optional, Set, Tuple
 
 from contxt.auth.cli import CLIAuth
 from contxt.models.assets import (Asset, AssetType, Attribute, AttributeValue,
@@ -269,9 +269,10 @@ class AssetsService(ConfiguredApiService):
             self,
             organization_id: Optional[str] = None,
             asset_type_id: Optional[str] = None,
+            asset_attribute_id: Optional[str] = None,
+            asset_attribute_value: Optional[str] = None,
     ) -> List[Asset]:
         # BUG: this endpoint returns globals when type_id is None
-        # TODO: we can add asset_attribute_id and asset_attribute_value as params
         organization_id = organization_id or self.organization_id
         logger.debug(
             f"Fetching assets for organization {organization_id} and asset_type {asset_type_id}"
@@ -279,7 +280,11 @@ class AssetsService(ConfiguredApiService):
         return [
             Asset.from_api(rec) for rec in self.get(
                 f"organizations/{organization_id}/assets",
-                params={"asset_type_id": asset_type_id})
+                params={
+                    "asset_type_id": asset_type_id,
+                    "asset_attribute_id": asset_attribute_id,
+                    "asset_attribute_value": asset_attribute_value
+                })
         ]
 
     def update_assets(self, assets: List[Asset]) -> None:
