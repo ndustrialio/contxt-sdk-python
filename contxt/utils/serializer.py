@@ -196,7 +196,9 @@ class Serializer:
 
         # If path unspecified, default to stdout
         if path is None:
-            print(obj)
+            obj_to_print = Serializer.to_table(obj) if isinstance(
+                obj, (list, tuple)) else Serializer.to_json(obj)
+            print(obj_to_print)
             return
 
         # Validate file extension
