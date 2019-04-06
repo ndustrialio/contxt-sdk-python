@@ -267,10 +267,10 @@ class AssetsService(ConfiguredApiService):
 
     def get_assets_for_organization(
             self,
-            organization_id: Optional[str] = None,
             asset_type_id: Optional[str] = None,
-            asset_attribute_id: Optional[str] = None,
-            asset_attribute_value: Optional[str] = None,
+            attribute_id: Optional[str] = None,
+            attribute_value: Optional[str] = None,
+            organization_id: Optional[str] = None,
     ) -> List[Asset]:
         # BUG: this endpoint returns globals when type_id is None
         organization_id = organization_id or self.organization_id
@@ -282,8 +282,35 @@ class AssetsService(ConfiguredApiService):
                 f"organizations/{organization_id}/assets",
                 params={
                     "asset_type_id": asset_type_id,
-                    "asset_attribute_id": asset_attribute_id,
-                    "asset_attribute_value": asset_attribute_value
+                    "asset_attribute_id": attribute_id,
+                    "asset_attribute_value": attribute_value
+                })
+        ]
+
+    def get_latest_assets_for_organization(
+            self,
+            asset_type_id: Optional[str] = None,
+            attribute_id: Optional[str] = None,
+            attribute_value: Optional[str] = None,
+            organization_id: Optional[str] = None,
+            limit: Optional[int] = None,
+            order_by: Optional[str] = "created_at",
+            reverse_order: Optional[bool] = True,
+    ) -> List[Asset]:
+        organization_id = organization_id or self.organization_id
+        logger.debug(
+            f"Fetching latest {limit} assets for organization {organization_id} and asset_type {asset_type_id}"
+        )
+        return [
+            Asset.from_api(rec) for rec in self.get(
+                f"organizations/{organization_id}/assets",
+                params={
+                    "asset_type_id": asset_type_id,
+                    "asset_attribute_id": attribute_id,
+                    "asset_attribute_value": attribute_value,
+                    "orderBy": order_by,
+                    "reverseOrder": reverse_order,
+                    "limit": limit
                 })
         ]
 
