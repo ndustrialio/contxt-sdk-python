@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional, Set, Tuple
+from typing import Any, Dict, List, Optional, Set, Tuple
 
 from contxt.auth.cli import CLIAuth
 from contxt.models.assets import (Asset, AssetType, Attribute, AttributeValue,
@@ -10,6 +10,10 @@ logger = make_logger(__name__)
 
 
 class AssetsService(ConfiguredApiService):
+    """
+    Service to interact with our Assets API.
+    """
+
     __marker = object()
     _configs = (
         ApiServiceConfig(
@@ -215,6 +219,30 @@ class AssetsService(ConfiguredApiService):
             asset.metric_values = self.get_metric_values(asset_id)
         return asset
 
+    def get_asset_with_label(
+            self,
+            asset_label: str,
+            asset_type_label: Optional[str] = None,
+    ) -> Optional[Asset]:
+        asset_type_id = self.asset_type_with_label(
+            asset_type_label).id if asset_type_label else None
+        for asset in self.get_assets(asset_type_id=asset_type_id):
+            if asset.label.upper() == asset_label.upper():
+                return asset
+        return None
+
+    def get_asset_for_organization_with_label(
+            self,
+            asset_label: str,
+            asset_type_label: Optional[str] = None,
+    ) -> Optional[Asset]:
+        asset_type_id = self.asset_type_with_label(
+            asset_type_label).id if asset_type_label else None
+        for asset in self.get_assets_for_organization(asset_type_id=asset_type_id):
+            if asset.label.upper() == asset_label.upper():
+                return asset
+        return None
+
     def update_asset(self, asset: Asset) -> None:
         data = asset.put()
         logger.debug(f"Updating asset {asset.id} with {data}")
@@ -230,24 +258,60 @@ class AssetsService(ConfiguredApiService):
         logger.debug(f"Creating {len(assets)} assets")
         return [self.create_asset(asset) for asset in assets]
 
-    def get_assets(self) -> List[Asset]:
+    def get_assets(self, asset_type_id: Optional[str] = None) -> List[Asset]:
         logger.debug(f"Fetching assets")
-        return [Asset.from_api(rec) for rec in self.get("assets")]
+        return [
+            Asset.from_api(rec) for rec in self.get(
+                "assets", params={"asset_type_id": asset_type_id})
+        ]
 
     def get_assets_for_organization(
             self,
-            organization_id: str,
             asset_type_id: Optional[str] = None,
+            attribute_id: Optional[str] = None,
+            attribute_value: Optional[str] = None,
+            organization_id: Optional[str] = None,
     ) -> List[Asset]:
         # BUG: this endpoint returns globals when type_id is None
-        # TODO: we can add asset_attribute_id and asset_attribute_value as params
+        organization_id = organization_id or self.organization_id
         logger.debug(
             f"Fetching assets for organization {organization_id} and asset_type {asset_type_id}"
         )
         return [
             Asset.from_api(rec) for rec in self.get(
                 f"organizations/{organization_id}/assets",
-                params={"asset_type_id": asset_type_id})
+                params={
+                    "asset_type_id": asset_type_id,
+                    "asset_attribute_id": attribute_id,
+                    "asset_attribute_value": attribute_value
+                })
+        ]
+
+    def get_latest_assets_for_organization(
+            self,
+            asset_type_id: Optional[str] = None,
+            attribute_id: Optional[str] = None,
+            attribute_value: Optional[str] = None,
+            organization_id: Optional[str] = None,
+            limit: Optional[int] = None,
+            order_by: Optional[str] = "created_at",
+            reverse_order: Optional[bool] = True,
+    ) -> List[Asset]:
+        organization_id = organization_id or self.organization_id
+        logger.debug(
+            f"Fetching latest {limit} assets for organization {organization_id} and asset_type {asset_type_id}"
+        )
+        return [
+            Asset.from_api(rec) for rec in self.get(
+                f"organizations/{organization_id}/assets",
+                params={
+                    "asset_type_id": asset_type_id,
+                    "asset_attribute_id": attribute_id,
+                    "asset_attribute_value": attribute_value,
+                    "orderBy": order_by,
+                    "reverseOrder": reverse_order,
+                    "limit": limit
+                })
         ]
 
     def update_assets(self, assets: List[Asset]) -> None:

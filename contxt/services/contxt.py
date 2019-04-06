@@ -11,6 +11,9 @@ logger = make_logger(__name__)
 
 
 class ContxtService(ConfiguredApiService):
+    """
+    Service to interact with our Contxt API.
+    """
     _configs = (
         ApiServiceConfig(
             name="production",
@@ -29,6 +32,13 @@ class ContxtService(ConfiguredApiService):
         logger.debug("Fetching organizations")
         resp = self.get("organizations")
         return [Organization.from_api(rec) for rec in resp]
+
+    def get_organization_with_name(self, name: str):
+        logger.debug(f"Fetching organization {name}")
+        for organization in self.get_organizations():
+            if organization.name.lower() == name.lower():
+                return organization
+        logger.warning(f"Failed to find organization with name {name}")
 
     def create_organization(self, organization: Organization) -> Organization:
         data = organization.post()

@@ -1,7 +1,9 @@
-from contxt.cli.parsers import ArgParser, AssetsParser, AuthParser
-import contxt.__main__ as contxt
-import pytest
 from unittest.mock import patch
+
+import pytest
+
+import contxt.__main__ as contxt
+from contxt.cli.parsers import AssetsParser, AuthParser, ContxtArgParser
 
 
 @pytest.fixture(scope="module")

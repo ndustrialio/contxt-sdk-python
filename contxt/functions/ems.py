@@ -1,15 +1,14 @@
 import csv
-from datetime import datetime
 import traceback
+from datetime import datetime
 
-from tqdm import tqdm
 import dateutil.parser
 import pytz
+from tqdm import tqdm
 
 from contxt.exceptions import UnauthorizedException
-from contxt.functions.organizations import find_organization_by_name
 from contxt.functions.assets import Assets
-
+from contxt.functions.organizations import find_organization_by_name
 from contxt.services.contxt import ContxtService
 from contxt.services.ems import EMSService
 from contxt.services.facilities import FacilitiesService
@@ -29,7 +28,7 @@ class EMS:
         self.ems_service = EMSService(self.auth)
         self.contxt_service = ContxtService(self.auth)
         self.iot_service = IOTService(self.auth)
-        self.facilities_service = FacilitiesService(self.auth, environment='production')
+        self.facilities_service = FacilitiesService(self.auth)
 
         self.asset_functions = Assets(self.auth)
 
@@ -43,7 +42,10 @@ class EMS:
             logger.critical("resource_type must be one of 'electrical','gas','combined'")
             return
 
-        facility_obj = self.facilities_service.get_facility_by_id(facility_id)
+        facility_obj = self.facilities_service.get_facility_with_id(facility_id)
+        if not facility_obj:
+            return
+
         facility_timezone = pytz.timezone(facility_obj.timezone)
 
         main_services = self.ems_service.get_main_services(facility_id, resource_type)
@@ -80,11 +82,13 @@ class EMS:
 
         if interval == 'monthly':
 
-            return reversed(self.ems_service.get_monthly_utility_spend(facility_id=facility_id,
-                                                              type=resource_type,
-                                                              date_start=start_date,
-                                                              date_end=end_date,
-                                                              pro_forma=pro_forma))
+            return reversed(
+                self.ems_service.get_monthly_utility_spend(
+                    facility_id=facility_id,
+                    type=resource_type,
+                    date_start=start_date,
+                    date_end=end_date,
+                    pro_forma=pro_forma))
 
         elif interval == 'daily':
             pass
@@ -291,7 +295,9 @@ class EMS:
             end_date = datetime.strptime(end_date, "%Y-%m").replace(tzinfo=pytz.UTC)
 
         # get the facility so we can get its asset_id
-        facility_obj = self.facilities_service.get_facility_by_id(facility_id)
+        facility_obj = self.facilities_service.get_facility_with_id(facility_id)
+        if not facility_obj:
+            return
 
         # get its list of metrics for the asset so we can make sure the user is asking for a valid metric
         asset_obj = self.asset_functions.get_asset_info(asset_id=facility_obj.asset_id,
@@ -360,7 +366,9 @@ class EMS:
             end_date = datetime.strptime(end_date, "%Y-%m").replace(tzinfo=pytz.UTC)
 
         # get the facility so we can get its asset_id
-        facility_obj = self.facilities_service.get_facility_by_id(facility_id)
+        facility_obj = self.facilities_service.get_facility_with_id(facility_id)
+        if not facility_obj:
+            return
 
         # get its list of metrics for the asset so we can make sure the user is asking for a valid metric
         asset_obj = self.asset_functions.get_asset_info(asset_id=facility_obj.asset_id,

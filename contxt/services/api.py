@@ -7,6 +7,7 @@ from importlib import import_module
 from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Union
 
 import requests
+from dateutil import parser
 from jwt import decode
 from pytz import UTC
 from requests import PreparedRequest, Response, Session
@@ -40,7 +41,7 @@ class Parsers:
     @staticmethod
     def parse_as_datetime(timestamp: str) -> datetime:
         return datetime.strptime(timestamp,
-                                 '%Y-%m-%dT%H:%M:%S.%fZ').replace(tzinfo=UTC)
+                                 "%Y-%m-%dT%H:%M:%S.%fZ").replace(tzinfo=UTC)
 
     @staticmethod
     def parse_as_date(datestamp: str) -> date:
@@ -54,10 +55,23 @@ class Parsers:
             return literal_eval(val)
         except (SyntaxError, ValueError) as e:
             pass
-        # Next, fall back to a date parser
+        # Next, fall back to a naive datetime parser
         try:
             return Parsers.parse_as_datetime(val)
         except (TypeError, ValueError) as e:
+            pass
+        # Next, fall back to a more powerful date/datetime parser
+        # TODO: this works fine, but for a tz-aware datetime, it sets
+        # tzinfo = tzutc(), not pytz.UTC, so equality checks will fail
+        try:
+            return parser.parse(val)
+        except (TypeError, ValueError) as e:
+            pass
+        # Next, convert yes/no strings to bool
+        try:
+            if val.lower() in ("yes", "no"):
+                return val.lower() == "yes"
+        except (AttributeError, TypeError, ValueError) as e:
             pass
         # Failed, return original value
         return val

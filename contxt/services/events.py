@@ -10,6 +10,9 @@ logger = make_logger(__name__)
 
 
 class EventsService(ConfiguredApiService):
+    """
+    Service to interact with our Events API.
+    """
     _configs = (
         ApiServiceConfig(
             name="production",
@@ -27,6 +30,17 @@ class EventsService(ConfiguredApiService):
             env: str = "production"
     ):
         super().__init__(auth, env)
+
+    def event_definition_parameters_to_human_readable_format(self, event_definition: EventDefinition):
+        statement = ""
+        for k, v in event_definition.parameters.items():
+            if k == "$chain":
+                for d1, d2 in zip(v[:-1], v[1:]):
+                    event1 = self.get_event(d1.get("event_id"))
+                    event2 = self.get_event(d2.get("event_id"))
+                    mins = d1.get("overlap_variance") / 60
+                    statement += f"Event {event1.name} overlaps with {event2.name} within {mins} min "
+        return statement
 
     def get_event_types(self) -> List[EventType]:
         resp = self.get("types")

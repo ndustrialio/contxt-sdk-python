@@ -8,8 +8,8 @@ from contxt.models.assets import (Asset, AssetType, Attribute, AttributeValue,
                                   DataTypes, Metric, MetricValue,
                                   TimeIntervals)
 from contxt.services.assets import AssetsService
-from contxt.tests.asset_schema import AssetSchemas
 from contxt.utils.assets_migration import AssetMigrationManager, AssetSchema
+from tests.static.asset_schema import AssetSchemas
 
 
 def init_schema():
