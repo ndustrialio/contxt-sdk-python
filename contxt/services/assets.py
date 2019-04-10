@@ -98,10 +98,12 @@ class AssetsService(ConfiguredApiService):
         return self.types[asset_type_label]
 
     # Abstractions
-    def get_complete_asset(self, asset_id: str):
+    def get_complete_asset(self,
+                           asset_id: str,
+                           with_metric_values: Optional[bool] = True):
         """High-level abstraction of an asset, complete with attributes,
         attribute values, metrics, and metric values."""
-        asset = self.get_asset(asset_id, with_metric_values=True)
+        asset = self.get_asset(asset_id, with_metric_values=with_metric_values)
         asset_type = self.asset_type_with_id(asset.asset_type_id)
         return CompleteAsset(asset, asset_type)
 
