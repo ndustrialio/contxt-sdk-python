@@ -1,11 +1,5 @@
-import csv
-import os
-from datetime import datetime
-
-from tabulate import tabulate
 
 from contxt.utils import make_logger
-from contxt.utils.serializer import Serializer
 
 logger = make_logger(__name__)
 
@@ -145,12 +139,14 @@ class IotParser(ContxtArgParser):
             plot=args.plot)
 
     def _collection_to_csv(self, filename, api_collection_data):
+        from csv import DictWriter
+        from pathlib import Path
 
-        with open(os.path.join('.', filename), 'w') as f:
+        with Path(filename).open('w') as f:
 
             fields = api_collection_data.get_keys()
 
-            writer = csv.DictWriter(f, fieldnames=fields)
+            writer = DictWriter(f, fieldnames=fields)
             writer.writeheader()
 
             for row in api_collection_data:
@@ -345,6 +341,7 @@ class EmsParser(ContxtArgParser):
         else:
 
             if not args.output:
+                # TODO: this requirement should be enforced by argparse
                 logger.critical("Please provide --output as an argument to specify report export file")
                 return
 
@@ -379,6 +376,7 @@ class EmsParser(ContxtArgParser):
         else:
 
             if not args.output:
+                # TODO: this requirement should be enforced by argparse
                 logger.critical("Please provide --output as an argument to specify report export file")
                 return
 
@@ -397,22 +395,23 @@ class EmsParser(ContxtArgParser):
 
     @staticmethod
     def to_csv_main_service_data(main_service_data):
+        from csv import DictWriter
+        from datetime import datetime
+        from pathlib import Path
 
-        output_dir = os.path.join('.', f"main_service_export_{datetime.now().strftime('%m-%d_%H_%M_%S')}")
-
-        os.makedirs(output_dir)
+        output_path = Path(f"main_service_export_{datetime.now().strftime('%m-%d_%H_%M_%S')}")
+        output_path.mkdir(parents=True, exist_ok=False)
 
         for service_name, data in main_service_data.items():
-            filename = os.path.join(output_dir, f"{service_name}.csv")
-
-            with open(filename, 'w') as f:
-                writer = csv.DictWriter(f, fieldnames=['event_time', 'value'])
-
+            filename = output_path / f"{service_name}.csv"
+            with filename.open('w') as f:
+                writer = DictWriter(f, fieldnames=['event_time', 'value'])
                 for row in reversed(data):
                     writer.writerow(row)
 
     @staticmethod
     def _print_facility_normalized_metrics(normalized_data_by_date, normalization_key):
+        from tabulate import tabulate
 
         normalized_to_print = []
 
@@ -430,6 +429,7 @@ class EmsParser(ContxtArgParser):
 
     @staticmethod
     def to_csv_organization_normalized_metric(filename, normalized_data_by_facility):
+        from csv import DictWriter
 
         to_csv_data = []
 
@@ -463,7 +463,7 @@ class EmsParser(ContxtArgParser):
             fields = ['facility_name']
             fields.extend(unique_dates)
 
-            writer = csv.DictWriter(f, fieldnames=fields)
+            writer = DictWriter(f, fieldnames=fields)
             writer.writeheader()
 
             for row in to_csv_data:
@@ -719,6 +719,7 @@ class BusParser(ContxtArgParser):
 
     def _channels(self, args, auth):
         from contxt.functions.bus import Bus
+        from contxt.utils.serializer import Serializer
         bus = Bus(auth)
         channels = bus.get_all_channels_for_service(
             service_id=args.service_id,
