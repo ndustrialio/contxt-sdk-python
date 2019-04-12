@@ -161,9 +161,10 @@ class ApiService:
         }
 
     def _log_response(self, response: Response, *args, **kwargs):
-        url = f"{response.url}/{response.request.body or ''}"
         t = response.elapsed.total_seconds()
-        logger.debug(f"Called {response.request.method} {url} ({t} s)")
+        logger.debug(
+            f"Called {response.request.method} {response.url} with body {response.request.body} ({t} s)"
+        )
 
     def _process_response(self, response: Response) -> Dict:
         # Handle any errors
