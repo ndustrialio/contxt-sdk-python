@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from ast import literal_eval
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from importlib import import_module
 from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Union
 
@@ -88,15 +88,18 @@ class Formatters:
     """
     Formatters needed to format a parsed response back to json
     """
+    ZERO_UTC_OFFSET = timedelta(0)
 
     @staticmethod
-    def format_datetime(datetime_: datetime, timezone_aware: Optional[bool] = True) -> str:
-        # if timezone_aware:
-        # TODO: validate
+    def format_datetime(datetime_: datetime) -> str:
+        # Require timezone to be UTC
+        if datetime_.utcoffset() != Formatters.ZERO_UTC_OFFSET:
+            raise AssertionError(
+                f"Datetime must be UTC, not {datetime_.tzinfo}"
+            )
         # NOTE: almost exactly the same as isoformat(), but ensures
         # microseconds are always represented
-        return datetime_.strftime("%Y-%m-%dT%H:%M:%S.%f%z").replace(
-            "+0000", "Z")
+        return datetime_.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
 
     @staticmethod
     def format_date(date_: date):
