@@ -66,12 +66,12 @@ class Serializer:
                 k: Serializer.to_dict(v, cls_key=cls_key)
                 for k, v in obj.items()
             }
-        elif isinstance(obj, date):
-            # Date
-            return Formatters.date(obj)
         elif isinstance(obj, datetime):
             # Datetime
             return Formatters.datetime(obj)
+        elif isinstance(obj, date):
+            # Date
+            return Formatters.date(obj)
         elif hasattr(obj, "_ast"):
             # Abstract syntax tree
             return Serializer.to_dict(obj._ast())
