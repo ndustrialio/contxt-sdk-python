@@ -7,7 +7,6 @@ from typing import Any, Callable, Dict, List, Optional, Set, Tuple
 import pandas as pd
 from tabulate import tabulate
 
-from contxt.services.api import Formatters
 from contxt.utils import make_logger
 
 logger = make_logger(__name__)
@@ -43,6 +42,7 @@ class Serializer:
         :return: dictionary
         :rtype: `dict`
         """
+        from contxt.services.api import Formatters
         # TODO: this may not return a dict but instead a list, or a native type
         # (for example, if passed an int, it will return it). this is likely
         # an unexpected behavior for callers
