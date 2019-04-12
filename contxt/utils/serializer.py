@@ -7,9 +7,11 @@ from typing import Any, Callable, Dict, List, Optional, Set, Tuple
 import pandas as pd
 from tabulate import tabulate
 
+from contxt.services.api import Formatters
 from contxt.utils import make_logger
 
 logger = make_logger(__name__)
+
 
 class Serializer:
     """
@@ -64,10 +66,12 @@ class Serializer:
                 k: Serializer.to_dict(v, cls_key=cls_key)
                 for k, v in obj.items()
             }
-        elif isinstance(obj, (date, datetime)):
-            # Date/datetime (default to iso)
-            # TODO: maybe call on DataParser
-            return obj.isoformat().replace("+00:00", "Z")
+        elif isinstance(obj, date):
+            # Date
+            return Formatters.date(obj)
+        elif isinstance(obj, datetime):
+            # Datetime
+            return Formatters.datetime(obj)
         elif hasattr(obj, "_ast"):
             # Abstract syntax tree
             return Serializer.to_dict(obj._ast())

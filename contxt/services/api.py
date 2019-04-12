@@ -93,7 +93,10 @@ class Formatters:
     def format_datetime(datetime_: datetime, timezone_aware: Optional[bool] = True) -> str:
         # if timezone_aware:
         # TODO: validate
-        return datetime_.isoformat().replace("+00:00", "Z")
+        # NOTE: almost exactly the same as isoformat(), but ensures
+        # microseconds are always represented
+        return datetime_.strftime("%Y-%m-%dT%H:%M:%S.%f%z").replace(
+            "+0000", "Z")
 
     @staticmethod
     def format_date(date_: date):
