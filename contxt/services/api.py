@@ -9,7 +9,7 @@ from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Union
 import requests
 from dateutil import parser
 from jwt import decode
-from pytz import UTC
+from pytz import UTC, ZERO
 from requests import PreparedRequest, Response, Session
 from requests.auth import AuthBase
 from requests.exceptions import HTTPError
@@ -88,12 +88,11 @@ class Formatters:
     """
     Formatters needed to format a parsed response back to json
     """
-    ZERO_UTC_OFFSET = timedelta(0)
 
     @staticmethod
     def format_datetime(datetime_: datetime) -> str:
         # Require timezone to be UTC
-        if datetime_.utcoffset() != Formatters.ZERO_UTC_OFFSET:
+        if datetime_.utcoffset() != ZERO:
             raise AssertionError(
                 f"Datetime must be UTC, not {datetime_.tzinfo}"
             )
