@@ -5,21 +5,21 @@ from contxt.services.api import ApiField, ApiObject, Parsers
 # Hide: address1, address2, geometry_id, tags, organization, info, weather_location_id
 class Facility(ApiObject):
     _api_fields = (
-        ApiField("id", type=int),
+        ApiField("id", data_type=int),
         ApiField("name"),
         ApiField("address1"),
         ApiField("address2"),
         ApiField("city"),
         ApiField("state"),
-        ApiField("zip", type=int),
+        ApiField("zip", data_type=int),
         ApiField("timezone"),
         ApiField("geometry_id"),
         ApiField("asset_id"),
         ApiField("tags"),
         ApiField("organization_id"),
-        ApiField("Organization", attr_key="organization", type=Organization),
-        ApiField("Info", attr_key="info", type=lambda o: {k: Parsers.unknown(v) for k, v in o.items()}),
-        ApiField("created_at", type=Parsers.datetime),
+        ApiField("Organization", attr_key="organization", data_type=Organization),
+        ApiField("Info", attr_key="info", data_type=lambda o: {k: Parsers.unknown(v) for k, v in o.items()}),
+        ApiField("created_at", data_type=Parsers.datetime),
         ApiField("weather_location_id"),
     )
 

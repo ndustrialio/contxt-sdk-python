@@ -12,9 +12,9 @@ class ConfigValue(ApiObject):
         ApiField("value"),
         ApiField("type"),
         ApiField("configuration_id"),
-        ApiField("is_hidden", type=bool),
-        ApiField("created_at", type=Parsers.datetime),
-        ApiField("updated_at", type=Parsers.datetime),
+        ApiField("is_hidden", data_type=bool),
+        ApiField("created_at", data_type=Parsers.datetime),
+        ApiField("updated_at", data_type=Parsers.datetime),
     )
 
     def __init__(
@@ -52,9 +52,9 @@ class Config(ApiObject):
         ApiField("name"),
         ApiField("description"),
         ApiField("environment_id"),
-        ApiField("ConfigurationValues", attr_key="config_values", type=ConfigValue),
-        ApiField("created_at", type=Parsers.datetime),
-        ApiField("updated_at", type=Parsers.datetime),
+        ApiField("ConfigurationValues", attr_key="config_values", data_type=ConfigValue),
+        ApiField("created_at", data_type=Parsers.datetime),
+        ApiField("updated_at", data_type=Parsers.datetime),
     )
 
     def __init__(
@@ -81,9 +81,9 @@ class OrganizationUser(ApiObject):
         ApiField("id"),
         ApiField("user_id"),
         ApiField("organization_id"),
-        ApiField("is_primary", type=bool),
-        ApiField("created_at", type=Parsers.datetime),
-        ApiField("updated_at", type=Parsers.datetime),
+        ApiField("is_primary", data_type=bool),
+        ApiField("created_at", data_type=Parsers.datetime),
+        ApiField("updated_at", data_type=Parsers.datetime),
     )
 
     def __init__(
@@ -110,9 +110,9 @@ class Organization(ApiObject):
         ApiField("id"),
         ApiField("name"),
         ApiField("legacy_organization_id", attr_key="legacy_id", optional=True),
-        ApiField("OrganizationUser", attr_key="organization_user", type=OrganizationUser, optional=True),
-        ApiField("created_at", type=Parsers.datetime),
-        ApiField("updated_at", type=Parsers.datetime),
+        ApiField("OrganizationUser", attr_key="organization_user", data_type=OrganizationUser, optional=True),
+        ApiField("created_at", data_type=Parsers.datetime),
+        ApiField("updated_at", data_type=Parsers.datetime),
     )
 
     def __init__(
@@ -138,9 +138,9 @@ class UserRole(ApiObject):
         ApiField("id"),
         ApiField("user_id"),
         ApiField("role_id"),
-        ApiField("mapped_from_external_group", type=bool),
-        ApiField("created_at", type=Parsers.datetime),
-        ApiField("updated_at", type=Parsers.datetime),
+        ApiField("mapped_from_external_group", data_type=bool),
+        ApiField("created_at", data_type=Parsers.datetime),
+        ApiField("updated_at", data_type=Parsers.datetime),
     )
 
     def __init__(
@@ -168,9 +168,9 @@ class Role(ApiObject):
         ApiField("name"),
         ApiField("description"),
         ApiField("organization_id"),
-        ApiField("UserRole", attr_key="user_role", type=UserRole),
-        ApiField("created_at", type=Parsers.datetime),
-        ApiField("updated_at", type=Parsers.datetime),
+        ApiField("UserRole", attr_key="user_role", data_type=UserRole),
+        ApiField("created_at", data_type=Parsers.datetime),
+        ApiField("updated_at", data_type=Parsers.datetime),
     )
 
     def __init__(
@@ -201,13 +201,13 @@ class User(ApiObject):
         ApiField("first_name"),
         ApiField("last_name"),
         ApiField("email"),
-        ApiField("is_activated", type=bool),
-        ApiField("Roles", attr_key="roles", type=Role),
+        ApiField("is_activated", data_type=bool),
+        ApiField("Roles", attr_key="roles", data_type=Role),
         ApiField("is_superuser"),
-        ApiField("organizations", type=Organization),
+        ApiField("organizations", data_type=Organization),
         ApiField("phone_number"),
-        ApiField("created_at", type=Parsers.datetime),
-        ApiField("updated_at", type=Parsers.datetime),
+        ApiField("created_at", data_type=Parsers.datetime),
+        ApiField("updated_at", data_type=Parsers.datetime),
     )
 
     def __init__(

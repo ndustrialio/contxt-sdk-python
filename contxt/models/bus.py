@@ -34,10 +34,10 @@ class PublisherStats(ApiObject):
 
 class ConsumerStats(ApiObject):
     _api_fields = (
-        ApiField("msgRateOut", attr_key="msg_rate_out", type=float),
-        ApiField("msgRateRedeliver", attr_key="msg_rate_redeliver", type=float),
-        ApiField("unackedMessages", attr_key="unacked_messages", type=int),
-        ApiField("blockedConsumerOnUnackedMsgs", attr_key="blocked_consumer_on_unacked_msgs", type=bool),
+        ApiField("msgRateOut", attr_key="msg_rate_out", data_type=float),
+        ApiField("msgRateRedeliver", attr_key="msg_rate_redeliver", data_type=float),
+        ApiField("unackedMessages", attr_key="unacked_messages", data_type=int),
+        ApiField("blockedConsumerOnUnackedMsgs", attr_key="blocked_consumer_on_unacked_msgs", data_type=bool),
         ApiField("connectedSince", attr_key="connected_since"),
     )
 
@@ -63,12 +63,12 @@ class ConsumerStats(ApiObject):
 class SubscriberStats(ApiObject):
     _api_fields = (
         ApiField("name", optional=True),
-        ApiField("msgRateOut", attr_key="msg_rate_out", type=float),
-        ApiField("msgRateRedeliver", attr_key="msg_rate_redeliver", type=float),
-        ApiField("msgBacklog", attr_key="msg_backlog", type=int),
-        ApiField("blockedSubscriptionOnUnackedMsgs", attr_key="blocked_subscription_on_unacked_msgs", type=bool),
-        ApiField("unackedMessages", attr_key="unacked_messages", type=int),
-        ApiField("consumers", type=ConsumerStats)
+        ApiField("msgRateOut", attr_key="msg_rate_out", data_type=float),
+        ApiField("msgRateRedeliver", attr_key="msg_rate_redeliver", data_type=float),
+        ApiField("msgBacklog", attr_key="msg_backlog", data_type=int),
+        ApiField("blockedSubscriptionOnUnackedMsgs", attr_key="blocked_subscription_on_unacked_msgs", data_type=bool),
+        ApiField("unackedMessages", attr_key="unacked_messages", data_type=int),
+        ApiField("consumers", data_type=ConsumerStats)
     )
 
     def __init__(
@@ -121,16 +121,16 @@ class Channel(ApiObject):
 
 class ChannelStats(ApiObject):
     _api_fields = (
-        ApiField("msgRateIn", attr_key="msg_rate_in", type=float),
-        ApiField("msgRateOut", attr_key="msg_rate_out", type=float),
-        ApiField("msgThroughputIn", attr_key="msg_throughput_in", type=float),
-        ApiField("msgThroughputOut", attr_key="msg_throughput_out", type=float),
-        ApiField("averageMsgSize", attr_key="avg_msg_size", type=float),
-        ApiField("storageSize", attr_key="storage_size", type=float),
-        ApiField("replication", type=dict),
+        ApiField("msgRateIn", attr_key="msg_rate_in", data_type=float),
+        ApiField("msgRateOut", attr_key="msg_rate_out", data_type=float),
+        ApiField("msgThroughputIn", attr_key="msg_throughput_in", data_type=float),
+        ApiField("msgThroughputOut", attr_key="msg_throughput_out", data_type=float),
+        ApiField("averageMsgSize", attr_key="avg_msg_size", data_type=float),
+        ApiField("storageSize", attr_key="storage_size", data_type=float),
+        ApiField("replication", data_type=dict),
         ApiField("deduplicationStatus", attr_key="deduplication_status"),
-        ApiField("publishers", type=PublisherStats),
-        ApiField("subscriptions", type=lambda o: [SubscriberStats.from_api({**v, "name": k}) for k, v in o.items()]),
+        ApiField("publishers", data_type=PublisherStats),
+        ApiField("subscriptions", data_type=lambda o: [SubscriberStats.from_api({**v, "name": k}) for k, v in o.items()]),
     )
 
     def __init__(

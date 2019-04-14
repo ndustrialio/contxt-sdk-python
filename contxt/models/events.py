@@ -17,11 +17,11 @@ class EventType(ApiObject):
         ApiField("slug", creatable=True),
         ApiField("description", creatable=True),
         ApiField("client_id", creatable=True),
-        ApiField("level", type=int, creatable=True),
-        ApiField("is_ongoing_event", type=bool),
-        ApiField("is_realtime_enabled", type=bool, creatable=True),
-        ApiField("created_at", type=Parsers.datetime),
-        ApiField("updated_at", type=Parsers.datetime)
+        ApiField("level", data_type=int, creatable=True),
+        ApiField("is_ongoing_event", data_type=bool),
+        ApiField("is_realtime_enabled", data_type=bool, creatable=True),
+        ApiField("created_at", data_type=Parsers.datetime),
+        ApiField("updated_at", data_type=Parsers.datetime)
     )
 
     def __init__(
@@ -62,9 +62,9 @@ class EventDefinition(ApiObject):
         ApiField("id"),
         ApiField("event_id"),
         ApiField("description"),
-        ApiField("parameters", type=lambda o: loads(o.replace('\"', '"'))),
-        ApiField("created_at", type=Parsers.datetime),
-        ApiField("updated_at", type=Parsers.datetime),
+        ApiField("parameters", data_type=lambda o: loads(o.replace('\"', '"'))),
+        ApiField("created_at", data_type=Parsers.datetime),
+        ApiField("updated_at", data_type=Parsers.datetime),
     )
 
     def __init__(
@@ -90,9 +90,9 @@ class Owner(ApiObject):
         ApiField("first_name"),
         ApiField("last_name"),
         ApiField("email"),
-        ApiField("is_machine_user", type=bool),
-        ApiField("created_at", type=Parsers.datetime),
-        ApiField("updated_at", type=Parsers.datetime),
+        ApiField("is_machine_user", data_type=bool),
+        ApiField("created_at", data_type=Parsers.datetime),
+        ApiField("updated_at", data_type=Parsers.datetime),
     )
 
     def __init__(
@@ -119,17 +119,17 @@ class Event(ApiObject):
         ApiField("id"),
         ApiField("name", creatable=True),
         ApiField("event_type_id", creatable=True),
-        ApiField("EventType", attr_key="event_type", type=EventType, optional=True),
+        ApiField("EventType", attr_key="event_type", data_type=EventType, optional=True),
         ApiField("organization_id", creatable=True),
-        ApiField("facility_id", type=int, creatable=True),
+        ApiField("facility_id", data_type=int, creatable=True),
         ApiField("owner_id"),
-        ApiField("Owner", attr_key="owner", type=Owner, optional=True),
+        ApiField("Owner", attr_key="owner", data_type=Owner, optional=True),
         ApiField("topic_arn", optional=True),
-        ApiField("allow_others_to_trigger", type=bool, creatable=True),
-        ApiField("is_public", type=bool, creatable=True),
-        ApiField("created_at", type=Parsers.datetime),
-        ApiField("updated_at", type=Parsers.datetime),
-        ApiField("deleted_at", type=Parsers.datetime),
+        ApiField("allow_others_to_trigger", data_type=bool, creatable=True),
+        ApiField("is_public", data_type=bool, creatable=True),
+        ApiField("created_at", data_type=Parsers.datetime),
+        ApiField("updated_at", data_type=Parsers.datetime),
+        ApiField("deleted_at", data_type=Parsers.datetime),
     )
 
     def __init__(
@@ -169,8 +169,8 @@ class TriggeredEventData(ApiObject):
     _api_fields = (
         ApiField("source_id"),
         ApiField("subchain_triggered_event_id"),
-        ApiField("trigger_start_at", type=Parsers.datetime),
-        ApiField("trigger_end_at", type=Parsers.datetime),
+        ApiField("trigger_start_at", data_type=Parsers.datetime),
+        ApiField("trigger_end_at", data_type=Parsers.datetime),
     )
 
     def __init__(
@@ -190,16 +190,16 @@ class TriggeredEvent(ApiObject):
     _api_fields = (
         ApiField("id"),
         ApiField("event_id", creatable=True),
-        ApiField("Event", type=Event, attr_key="event"),
+        ApiField("Event", data_type=Event, attr_key="event"),
         ApiField("owner_id"),
-        ApiField("Owner", type=dict, attr_key="owner"),
-        ApiField("is_public", type=bool),
-        ApiField("data", type=lambda o: [TriggeredEventData.from_api(d) for d in loads(o)], creatable=True, updatable=True),
-        ApiField("trigger_start_at", type=Parsers.datetime, creatable=True, updatable=True),
-        ApiField("trigger_end_at", type=Parsers.datetime, creatable=True, updatable=True),
-        ApiField("created_at", type=Parsers.datetime),
-        ApiField("updated_at", type=Parsers.datetime),
-        ApiField("deleted_at", type=Parsers.datetime),
+        ApiField("Owner", data_type=dict, attr_key="owner"),
+        ApiField("is_public", data_type=bool),
+        ApiField("data", data_type=lambda o: [TriggeredEventData.from_api(d) for d in loads(o)], creatable=True, updatable=True),
+        ApiField("trigger_start_at", data_type=Parsers.datetime, creatable=True, updatable=True),
+        ApiField("trigger_end_at", data_type=Parsers.datetime, creatable=True, updatable=True),
+        ApiField("created_at", data_type=Parsers.datetime),
+        ApiField("updated_at", data_type=Parsers.datetime),
+        ApiField("deleted_at", data_type=Parsers.datetime),
     )
 
     def __init__(

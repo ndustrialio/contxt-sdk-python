@@ -404,28 +404,28 @@ class ApiField:
             self,
             api_key: str,
             attr_key: Optional[str] = None,
-            type: Optional[Union[Callable, str]] = str,
+            data_type: Optional[Union[Callable, str]] = str,
             creatable: Optional[bool] = False,
             updatable: Optional[bool] = False,
             optional: Optional[bool] = False
     ):
         self.api_key = api_key
         self.attr_key = attr_key or api_key
-        self._type = type
+        self._data_type = data_type
         self.creatable = creatable
         self.updatable = updatable
         self.optional = optional
 
     @property
-    def type(self):
-        if isinstance(self._type, str):
+    def data_type(self):
+        if isinstance(self._data_type, str):
             # Load callable from str
             # NOTE: this is to delay the type assignment to instance creation,
             # as the type might not yet be defined at class creation
-            modname, qualname_separator, qualname = self._type.partition(":")
+            modname, qualname_separator, qualname = self._data_type.partition(":")
             obj = import_module(modname)
             if qualname_separator:
                 for attr in qualname.split("."):
                     obj = getattr(obj, attr)
-            self._type = obj
-        return self._type
+            self._data_type = obj
+        return self._data_type
