@@ -303,11 +303,15 @@ class ApiObject(ABC):
         # Set creatable, updateable fields for class (if not yet set)
         # HACK: move this somewhere more appropriate
         if not hasattr(cls, "_creatable_fields"):
-            cls._creatable_fields = tuple(
-                f for f in cls._api_fields if f.creatable)
+            cls._creatable_fields = {
+                f.attr_key: f
+                for f in cls._api_fields if f.creatable
+            }
         if not hasattr(cls, "_updatable_fields"):
-            cls._updatable_fields = tuple(
-                f for f in cls._api_fields if f.updatable)
+            cls._updatable_fields = {
+                f.attr_key: f
+                for f in cls._api_fields if f.updatable
+            }
 
     def __str__(self):
         return Serializer.to_table(self)
@@ -360,17 +364,29 @@ class ApiObject(ABC):
 
     def post(self):
         """Get data for a post request"""
-        return Serializer.to_dict(
-            self,
-            key_filter=lambda k: k in set(
-                f.api_key for f in self._creatable_fields))
+        # Transform api fields to dict
+        creatable_keys = set(self._creatable_fields.keys())
+        d = Serializer.to_dict(self, key_filter=lambda k: k in creatable_keys)
+        # Swap attr_keys for api_keys
+        api_dict = {}
+        for k, _ in d.items():
+            field = self._creatable_fields[k]
+            if k != field.api_key:
+                api_dict[field.api_key] = d[k]
+            else:
+                api_dict[k] = d[k]
+        return api_dict
 
     def put(self):
         """Get data for a put request"""
-        return Serializer.to_dict(
-            self,
-            key_filter=lambda k: k in set(
-                f.api_key for f in self._updatable_fields))
+        updatable_fields = set(self._updatable_fields.keys())
+        d = Serializer.to_dict(self, key_filter=lambda k: k in updatable_fields)
+        # Swap attr_keys for api_keys
+        for k, _ in d.items():
+            field = self._updatable_fields[k]
+            if k != field.api_key:
+                d[field.api_key] = d.pop(k)
+        return d
 
 
 # TODO: Need a way to track changed attributes

@@ -64,6 +64,7 @@ class PublishCommand(Command):
 
 
 setup(
+    # Package metadata
     name=about["__title__"],
     version=about["__version__"],
     description=about["__description__"],
@@ -104,7 +105,7 @@ setup(
     include_package_data=True,
     license=about["__license__"],
     classifiers=[
-        # Trove classifiers: https://pypi.python.org/pypi?%3Aaction=list_classifiers
+        # Trove classifiers: https://pypi.org/pypi?:action=list_classifiers
         "License :: OSI Approved :: ISC License (ISCL)",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",

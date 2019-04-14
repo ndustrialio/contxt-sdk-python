@@ -207,8 +207,14 @@ class AssetsService(ConfiguredApiService):
     def create_asset(self, asset: Asset) -> Asset:
         data = asset.post()
         logger.debug(f"Creating asset with {data}")
-        resp = self.post("assets", data=data)
-        return Asset.from_api(resp)
+        params = {"with_attribute_values": str(bool(asset.attribute_values)).lower()}
+        resp = self.post("assets", params=params, json=data)
+        new_asset = Asset.from_api(resp)
+        # Fetch attribute_values, if posted (needed because response does not
+        # contain them)
+        if asset.attribute_values:
+            new_asset.attribute_values = self.get_attribute_values(new_asset.id)
+        return new_asset
 
     def get_asset(self,
                   asset_id: str,

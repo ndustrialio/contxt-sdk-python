@@ -99,6 +99,7 @@ class AttributeValue(ApiObject):
             notes: str,
             value: Any,
             id: Optional[str] = None,
+            attribute: Optional[Attribute] = None,
             effective_date: Optional[datetime] = None,
             created_at: Optional[datetime] = None,
             updated_at: Optional[datetime] = None,
@@ -107,6 +108,7 @@ class AttributeValue(ApiObject):
         self.id = id
         self.asset_id = asset_id
         self.attribute_id = attribute_id
+        self.attribute = attribute
         self.effective_date = effective_date or date.today()
         self.notes = notes
         self.value = value
@@ -383,10 +385,12 @@ class Asset(ApiObject):
             attribute_values: Optional[List[MetricValue]] = None,
             metric_values: Optional[List[MetricValue]] = None,
             children: Optional[List[Asset]] = None,
+            asset_type: Optional[AssetType] = None,
     ):
         super().__init__()
         self.id = id
         self.asset_type_id = asset_type_id
+        self.asset_type = asset_type
         self.label = label
         self.description = description
         self.organization_id = organization_id
@@ -401,6 +405,17 @@ class Asset(ApiObject):
     @property
     def normalized_label(self):
         return self.label.lower().replace(' ', '_')
+
+    def post(self):
+        """Get data for a post request"""
+        d = super().post()
+        # HACK: add attribute_values
+        if self.attribute_values:
+            d.update({
+                "asset_attribute_values_to_create":
+                [av.post() for av in self.attribute_values]
+            })
+        return d
 
 
 class CompleteAsset(ApiObject):
