@@ -111,7 +111,10 @@ class AssetsService(ConfiguredApiService):
 
         # Repeat for each child
         for child in asset.children:
-            self._build_asset(child)
+            self._build_asset(
+                child,
+                with_attribute_values=with_attribute_values,
+                with_metric_values=with_metric_values)
 
         # TODO: should automatically check if we need to cache any attributes/metrics
 
