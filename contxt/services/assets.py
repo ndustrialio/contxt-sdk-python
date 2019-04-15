@@ -62,7 +62,7 @@ class AssetsService(ConfiguredApiService):
             with_metrics: Optional[bool] = False,
     ):
         # TODO: should we replace label with normalized label?
-        # Store asset_type by id, label, and normalized lable
+        # Store asset_type by id, label, and normalized label
         self.types_by_id[asset_type.id] = asset_type
         self.types[asset_type.label] = asset_type
         self.types[asset_type.normalized_label] = asset_type
