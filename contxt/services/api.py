@@ -148,7 +148,7 @@ class ApiService:
     def _init_base_url(self, base_url: str, api_version: str) -> str:
         return f"{base_url}/{api_version}" if api_version else base_url
 
-    def _get_url(self, uri: str) -> str:
+    def _url(self, uri: str) -> str:
         return f"{self.base_url}/{uri}"
 
     def _request_kwargs(self):
@@ -196,12 +196,15 @@ class ApiService:
     def get(self,
             uri,
             params: Optional[Dict[str, str]] = None,
-            records_only: Optional[bool] = True):
+            records_only: Optional[bool] = True,
+            **kwargs):
         if self.session:
-            response = self.session.get(self._get_url(uri), params=params)
+            response = self.session.get(
+                self._url(uri), params=params, **kwargs)
         else:
-            response = requests.get(
-                self._get_url(uri), params=params, **self._request_kwargs())
+            # Merge default options with method options
+            kwargs = {**self._request_kwargs(), **(kwargs or {})}
+            response = requests.get(self._url(uri), params=params, **kwargs)
 
         response_json = self._process_response(response)
 
@@ -216,33 +219,41 @@ class ApiService:
 
     def post(self,
              uri: str,
-             data: Optional[dict] = None,
-             json: Optional[dict] = None):
+             data: Optional[Dict] = None,
+             json: Optional[Dict] = None,
+             **kwargs):
         if self.session:
             response = self.session.post(
-                self._get_url(uri), data=data, json=json)
+                self._url(uri), data=data, json=json, **kwargs)
         else:
+            # Merge default options with method options
+            kwargs = {**self._request_kwargs(), **(kwargs or {})}
             response = requests.post(
-                self._get_url(uri),
-                data=data,
-                json=json,
-                **self._request_kwargs())
+                self._url(uri), data=data, json=json, **kwargs)
         return self._process_response(response)
 
-    def put(self, uri: str, data=None):
+    def put(self,
+            uri: str,
+            data: Optional[Dict] = None,
+            json: Optional[Dict] = None,
+            **kwargs):
         if self.session:
-            response = self.session.put(self._get_url(uri), data=data)
+            response = self.session.put(
+                self._url(uri), data=data, json=json, **kwargs)
         else:
+            # Merge default options with method options
+            kwargs = {**self._request_kwargs(), **(kwargs or {})}
             response = requests.put(
-                self._get_url(uri), data=data, **self._request_kwargs())
+                self._url(uri), data=data, json=json, **kwargs)
         return self._process_response(response)
 
-    def delete(self, uri: str):
+    def delete(self, uri: str, **kwargs):
         if self.session:
-            response = self.session.delete(self._get_url(uri))
+            response = self.session.delete(self._url(uri), **kwargs)
         else:
-            response = requests.delete(
-                self._get_url(uri), **self._request_kwargs())
+            # Merge default options with method options
+            kwargs = {**self._request_kwargs(), **(kwargs or {})}
+            response = requests.delete(self._url(uri), **kwargs)
         return self._process_response(response)
 
 
@@ -323,22 +334,22 @@ class ApiObject(ABC):
     #     pass
 
     @classmethod
-    def clean_api_value(cls, api_field, api_value):
+    def clean_api_value(cls, api_field: ApiField, api_value: Any):
         if api_value is None:
             # No value
             return api_value
         elif isinstance(api_value, (list, tuple,)):
             # Value is a list, clean each item
             return [cls.clean_api_value(api_field, v) for v in api_value]
-        elif callable(getattr(api_field.type, "from_api", None)):
+        elif callable(getattr(api_field.data_type, "from_api", None)):
             # Type is an ApiObject, apply from_api instead of init
-            return api_field.type.from_api(api_value)
+            return api_field.data_type.from_api(api_value)
         else:
             # Apply type
-            return api_field.type(api_value)
+            return api_field.data_type(api_value)
 
     @classmethod
-    def from_api(cls, api_dict: dict):
+    def from_api(cls, api_dict: Dict):
         # Create clean dictionary to pass to init
         clean_dict = {
             f.attr_key: cls.clean_api_value(

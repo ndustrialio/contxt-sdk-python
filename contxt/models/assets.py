@@ -117,6 +117,8 @@ class AttributeValue(ApiObject):
 
     def upsert(self):
         # HACK: handle special case of upserting attribute_values
+        # TODO: if upserting becomes common, this method be moved to the base
+        # class
         return {
             **self.put(), "id": self.id,
             "asset_attribute_id": self.attribute_id
