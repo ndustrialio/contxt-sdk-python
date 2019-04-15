@@ -380,7 +380,7 @@ class ApiObject(ABC):
         d = Serializer.to_dict(self, key_filter=lambda k: k in creatable_keys)
         # Swap attr_keys for api_keys
         api_dict = {}
-        for k, _ in d.items():
+        for k in d.keys():
             field = self._creatable_fields[k]
             if k != field.api_key:
                 api_dict[field.api_key] = d[k]
@@ -393,7 +393,7 @@ class ApiObject(ABC):
         updatable_fields = set(self._updatable_fields.keys())
         d = Serializer.to_dict(self, key_filter=lambda k: k in updatable_fields)
         # Swap attr_keys for api_keys
-        for k, _ in d.items():
+        for k in d.keys():
             field = self._updatable_fields[k]
             if k != field.api_key:
                 d[field.api_key] = d.pop(k)
