@@ -115,6 +115,13 @@ class AttributeValue(ApiObject):
         self.created_at = created_at
         self.updated_at = updated_at
 
+    def upsert(self):
+        # HACK: handle special case of upserting attribute_values
+        return {
+            **self.put(), "id": self.id,
+            "asset_attribute_id": self.attribute_id
+        }
+
 
 # TODO: need to fix global metric for POST
 class Metric(ApiObject):
@@ -409,7 +416,7 @@ class Asset(ApiObject):
     def post(self):
         """Get data for a post request"""
         d = super().post()
-        # HACK: add attribute_values
+        # HACK: handle special case of posting attribute_values
         if self.attribute_values:
             d.update({
                 "asset_attribute_values_to_create":

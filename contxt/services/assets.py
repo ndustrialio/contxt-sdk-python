@@ -444,6 +444,31 @@ class AssetsService(ConfiguredApiService):
         for attribute_value in attribute_values:
             self.update_attribute_value(attribute_value)
 
+    def upsert_attribute_values(self, attribute_values: List[AttributeValue]
+                                ) -> List[AttributeValue]:
+        logger.debug(f"Upserting {len(attribute_values)} attribute_values")
+        # Verify list is non-empty
+        if not attribute_values:
+            return []
+
+        # Verify list contains values of the same asset
+        asset_id = attribute_values[0].asset_id
+        if not all(asset_id == v.asset_id for v in attribute_values):
+            raise ValueError(
+                "Endpoint only supports attribute_values belonging to the same asset"
+            )
+
+        # Upsert values
+        # NOTE: response is [(json: Dict, created?: bool), ...]
+        return [
+            AttributeValue.from_api(rec[0]) for rec in self.put(
+                f"assets/{asset_id}/attributes/values",
+                json={
+                    "asset_attribute_values":
+                    [v.upsert() for v in attribute_values]
+                })
+        ]
+
     def delete_attribute_values(
             self, attribute_values: List[AttributeValue]) -> None:
         # TODO: batch delete
