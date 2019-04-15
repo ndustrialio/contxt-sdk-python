@@ -160,8 +160,8 @@ class AssetsService(ConfiguredApiService):
             v for v in asset.edited_attribute_values
             if v.id is not None and v.value is None
         ]
-        self.create_attribute_values(attribute_values_to_create)
-        self.update_attribute_values(attribute_values_to_update)
+        self.upsert_attribute_values(attribute_values_to_create +
+                                     attribute_values_to_update)
         self.delete_attribute_values(attribute_values_to_delete)
         asset.edited_attribute_values.clear()
 
