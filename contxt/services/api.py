@@ -9,7 +9,7 @@ from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Union
 import requests
 from dateutil import parser
 from jwt import decode
-from pytz import UTC
+from pytz import UTC, ZERO
 from requests import PreparedRequest, Response, Session
 from requests.auth import AuthBase
 from requests.exceptions import HTTPError
@@ -90,10 +90,15 @@ class Formatters:
     """
 
     @staticmethod
-    def format_datetime(datetime_: datetime, timezone_aware: Optional[bool] = True) -> str:
-        # if timezone_aware:
-        # TODO: validate
-        return datetime_.isoformat().replace("+00:00", "Z")
+    def format_datetime(datetime_: datetime) -> str:
+        # Require timezone to be UTC
+        if datetime_.utcoffset() != ZERO:
+            raise AssertionError(
+                f"Datetime must be UTC, not {datetime_.tzinfo}"
+            )
+        # NOTE: almost exactly the same as isoformat(), but ensures
+        # microseconds are always represented
+        return datetime_.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
 
     @staticmethod
     def format_date(date_: date):

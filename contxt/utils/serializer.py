@@ -11,6 +11,7 @@ from contxt.utils import make_logger
 
 logger = make_logger(__name__)
 
+
 class Serializer:
     """
     A general serializer to transform a Python object to common data formats.
@@ -41,6 +42,7 @@ class Serializer:
         :return: dictionary
         :rtype: `dict`
         """
+        from contxt.services.api import Formatters
         # TODO: this may not return a dict but instead a list, or a native type
         # (for example, if passed an int, it will return it). this is likely
         # an unexpected behavior for callers
@@ -64,10 +66,12 @@ class Serializer:
                 k: Serializer.to_dict(v, cls_key=cls_key)
                 for k, v in obj.items()
             }
-        elif isinstance(obj, (date, datetime)):
-            # Date/datetime (default to iso)
-            # TODO: maybe call on DataParser
-            return obj.isoformat().replace("+00:00", "Z")
+        elif isinstance(obj, datetime):
+            # Datetime
+            return Formatters.datetime(obj)
+        elif isinstance(obj, date):
+            # Date
+            return Formatters.date(obj)
         elif hasattr(obj, "_ast"):
             # Abstract syntax tree
             return Serializer.to_dict(obj._ast())
