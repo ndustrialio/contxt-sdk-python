@@ -108,7 +108,7 @@ class OrganizationUser(ApiObject):
 class Organization(ApiObject):
     _api_fields = (
         ApiField("id"),
-        ApiField("name"),
+        ApiField("name", creatable=True),
         ApiField("legacy_organization_id", attr_key="legacy_id", optional=True),
         ApiField("OrganizationUser", attr_key="organization_user", type=OrganizationUser, optional=True),
         ApiField("created_at", type=Parsers.datetime),

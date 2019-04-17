@@ -58,10 +58,10 @@ class Organizations:
         return self.contxt_service.get_users_for_organization(organization_id)
 
     def create_organization(self, organization_name):
-
+        from contxt.models.contxt import Organization
         current_user_id = self.contxt_service.get_logged_in_user_id()
 
-        new_organization = self.contxt_service.create_organization(organization_name=organization_name)
+        new_organization = self.contxt_service.create_organization(Organization(organization_name))
 
         print('Adding currently logged in user to list of organization users')
         print(self.contxt_service.add_user_to_organization(organization_id=new_organization.id,
