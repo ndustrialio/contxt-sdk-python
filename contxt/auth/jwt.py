@@ -48,24 +48,25 @@ class AuthTokenValidator(NamedTuple):
                                  " token."}, 401)
 
 
-class ContxtAuthTokenValidator:
-    AUTH0_ISSUER = "https://contxtauth.com/v1/"
-    AUTH0_JWKS_URL = f"{AUTH0_ISSUER}.well-known/jwks.json"
+CONTXT_AUTH0_ISSUER = "https://contxtauth.com/v1/"
+CONTXT_AUTH0_JWKS_URL = f"{CONTXT_AUTH0_ISSUER}.well-known/jwks.json"
 
-    AUTH0_JWKS = None
+
+def _get_jwks() -> str:
+    try:
+        return _get_jwks.jwks
+    except AttributeError:
+        # caching the jwks
+        resp = requests.get(CONTXT_AUTH0_JWKS_URL)
+        _get_jwks.jwks = resp.content
+        return _get_jwks.jwks
+
+
+class ContxtAuthTokenValidator:
 
     def __init__(self, audience: str):
-        self.delegate = AuthTokenValidator(audience=audience, issuer=ContxtAuthTokenValidator.AUTH0_ISSUER,
-                                           public_key=ContxtAuthTokenValidator._get_jwks())
-
-    @staticmethod
-    def _get_jwks() -> str:
-        global AUTH0_JWKS
-        global AUTH0_JWKS_URL
-        if AUTH0_JWKS is None:
-            resp = requests.get(AUTH0_JWKS_URL)
-            AUTH0_JWKS = resp.content
-        return AUTH0_JWKS
+        self.delegate = AuthTokenValidator(audience=audience, issuer=CONTXT_AUTH0_ISSUER,
+                                           public_key=_get_jwks())
 
     def validate(self, token: str) -> TokenPayload:
         return self.delegate.validate(token)

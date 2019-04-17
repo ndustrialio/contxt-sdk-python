@@ -1,7 +1,7 @@
 from jose import jwt
 from jose.constants import ALGORITHMS
 
-from contxt.auth.jwt import AuthTokenValidator
+from contxt.auth.jwt import AuthTokenValidator, ContxtAuthTokenValidator, AuthError
 
 
 def test_auth():
@@ -37,3 +37,16 @@ yOQ45SZ1Kbm0ILrYaLfl1yvFr6MqHrO07HWsiW9zoHDFU31sd2CoGJsu35fTils1
     validator = AuthTokenValidator(audience=audience, issuer=issuer, public_key=public_key)
     payload = validator.validate(token)
     assert claims == payload
+
+
+def test_contxt_auth():
+    token_validator = ContxtAuthTokenValidator(audience='foo_audience')
+    try:
+        token_validator.validate('bad_token')
+        raise AssertionError("Token validation should have raised a token error before")
+    except AuthError:
+        pass
+
+
+if __name__ == '__main__':
+    test_contxt_auth()
