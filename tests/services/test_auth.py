@@ -29,7 +29,7 @@ mkzuds/QPGxqhykAs5+3iIzgzJSLehb9LLrGNzufl2OPu5Bza8LEXpprO8sevajf
 yOQ45SZ1Kbm0ILrYaLfl1yvFr6MqHrO07HWsiW9zoHDFU31sd2CoGJsu35fTils1
 /9Cq7+oWErNfJ61ZPQIDAQAB
 -----END PUBLIC KEY-----
-    """
+"""
     audience = 'foo_audience'
     issuer = 'foo_issuer'
     claims = {'foo': 'bar', 'aud': audience, 'iss': issuer}
