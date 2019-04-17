@@ -179,7 +179,7 @@ class MetricValue(ApiObject):
     _api_fields = (
         ApiField("id"),
         ApiField("asset_id"),
-        ApiField("Asset", attr_key="asset", data_type=f"{__name__}:Asset"),
+        ApiField("Asset", attr_key="asset", data_type=f"{__name__}:Asset", optional=True),
         ApiField("asset_metric_id"),
         ApiField("effective_start_date", data_type=Parsers.datetime, creatable=True, updatable=True),
         ApiField("effective_end_date", data_type=Parsers.datetime, creatable=True, updatable=True),

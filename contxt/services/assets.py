@@ -247,12 +247,28 @@ class AssetsService(ConfiguredApiService):
         data = asset.post()
         logger.debug(f"Creating asset with {data}")
         params = {"with_attribute_values": str(bool(asset.attribute_values)).lower()}
+        # Create asset with attribute_values, if present
         resp = self.post("assets", params=params, json=data)
         new_asset = Asset.from_api(resp)
+
         # Fetch attribute_values, if posted (needed because response does not
         # contain them)
         if asset.attribute_values:
-            new_asset.attribute_values = self.get_attribute_values(new_asset.id)
+            new_asset.attribute_values = self.get_attribute_values(
+                new_asset.id)
+
+        # Create metric_values, if present
+        if asset.metric_values:
+            for metric_value in asset.metric_values:
+                metric_value.asset_id = new_asset.id
+            new_asset.metric_values = self.create_metric_values(asset.metric_values)
+
+        # Create children, if present
+        if asset.children:
+            for child in asset.children:
+                child.parent_id = new_asset.id
+            new_asset.children = self.create_assets(asset.children)
+
         return new_asset
 
     def get_asset(
