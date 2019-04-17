@@ -1,5 +1,6 @@
 from contxt.exceptions import (OrganizationArgumentException,
                                OrganizationNotFoundException)
+from contxt.models.contxt import Organization
 from contxt.services.contxt import ContxtService
 
 def find_organization_by_name(contxt_service, organization_name):
@@ -58,7 +59,6 @@ class Organizations:
         return self.contxt_service.get_users_for_organization(organization_id)
 
     def create_organization(self, organization_name):
-        from contxt.models.contxt import Organization
         current_user_id = self.contxt_service.get_logged_in_user_id()
 
         new_organization = self.contxt_service.create_organization(Organization(organization_name))
