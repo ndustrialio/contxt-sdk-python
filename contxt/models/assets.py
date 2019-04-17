@@ -39,11 +39,11 @@ class Attribute(ApiObject):
         ApiField("units", creatable=True, updatable=True),
         ApiField("organization_id", creatable=True),
         ApiField("data_type", creatable=True, updatable=True),
-        ApiField("is_required", type=bool, creatable=True, updatable=True),
-        ApiField("is_global", type=bool),
+        ApiField("is_required", data_type=bool, creatable=True, updatable=True),
+        ApiField("is_global", data_type=bool),
         ApiField("global_asset_attribute_parent_id"),
-        ApiField("created_at", type=Parsers.datetime),
-        ApiField("updated_at", type=Parsers.datetime),
+        ApiField("created_at", data_type=Parsers.datetime),
+        ApiField("updated_at", data_type=Parsers.datetime),
     )
 
     def __init__(
@@ -86,10 +86,10 @@ class AttributeValue(ApiObject):
         ApiField("asset_id"),
         ApiField("asset_attribute_id", attr_key="attribute_id", creatable=True),
         ApiField("notes", creatable=True, updatable=True),
-        ApiField("value", type=Parsers.unknown, creatable=True, updatable=True),
-        ApiField("effective_date", type=Parsers.date, creatable=True, updatable=True),
-        ApiField("created_at", type=Parsers.datetime),
-        ApiField("updated_at", type=Parsers.datetime),
+        ApiField("value", data_type=Parsers.unknown, creatable=True, updatable=True),
+        ApiField("effective_date", data_type=Parsers.date, creatable=True, updatable=True),
+        ApiField("created_at", data_type=Parsers.datetime),
+        ApiField("updated_at", data_type=Parsers.datetime),
     )
 
     def __init__(
@@ -99,6 +99,7 @@ class AttributeValue(ApiObject):
             notes: str,
             value: Any,
             id: Optional[str] = None,
+            attribute: Optional[Attribute] = None,
             effective_date: Optional[datetime] = None,
             created_at: Optional[datetime] = None,
             updated_at: Optional[datetime] = None,
@@ -107,11 +108,21 @@ class AttributeValue(ApiObject):
         self.id = id
         self.asset_id = asset_id
         self.attribute_id = attribute_id
+        self.attribute = attribute
         self.effective_date = effective_date or date.today()
         self.notes = notes
         self.value = value
         self.created_at = created_at
         self.updated_at = updated_at
+
+    def upsert(self):
+        # HACK: handle special case of upserting attribute_values
+        # TODO: if upserting becomes common, this method be moved to the base
+        # class
+        return {
+            **self.put(), "id": self.id,
+            "asset_attribute_id": self.attribute_id
+        }
 
 
 # TODO: need to fix global metric for POST
@@ -125,10 +136,10 @@ class Metric(ApiObject):
         ApiField("time_interval", creatable=True, updatable=True),
         ApiField("units", creatable=True, updatable=True),
         ApiField("global_asset_metric_parent_id"),
-        ApiField("is_global", type=bool, creatable=True),
-        ApiField("is_calculated", type=bool),
-        ApiField("created_at", type=Parsers.datetime),
-        ApiField("updated_at", type=Parsers.datetime),
+        ApiField("is_global", data_type=bool, creatable=True),
+        ApiField("is_calculated", data_type=bool),
+        ApiField("created_at", data_type=Parsers.datetime),
+        ApiField("updated_at", data_type=Parsers.datetime),
     )
 
     def __init__(
@@ -168,14 +179,14 @@ class MetricValue(ApiObject):
     _api_fields = (
         ApiField("id"),
         ApiField("asset_id"),
-        ApiField("Asset", attr_key="asset", type=f"{__name__}:Asset"),
+        ApiField("Asset", attr_key="asset", data_type=f"{__name__}:Asset", optional=True),
         ApiField("asset_metric_id"),
-        ApiField("effective_start_date", type=Parsers.datetime, creatable=True, updatable=True),
-        ApiField("effective_end_date", type=Parsers.datetime, creatable=True, updatable=True),
+        ApiField("effective_start_date", data_type=Parsers.datetime, creatable=True, updatable=True),
+        ApiField("effective_end_date", data_type=Parsers.datetime, creatable=True, updatable=True),
         ApiField("notes", creatable=True, updatable=True),
-        ApiField("value", type=float, creatable=True, updatable=True),
-        ApiField("created_at", type=Parsers.datetime),
-        ApiField("updated_at", type=Parsers.datetime),
+        ApiField("value", data_type=float, creatable=True, updatable=True),
+        ApiField("created_at", data_type=Parsers.datetime),
+        ApiField("updated_at", data_type=Parsers.datetime),
     )
 
     def __init__(
@@ -212,14 +223,14 @@ class AssetType(ApiObject):
         ApiField("description", creatable=True, updatable=True),
         ApiField("organization_id", creatable=True),
         ApiField("global_asset_type_parent_id"),
-        ApiField("is_global", type=bool),
+        ApiField("is_global", data_type=bool),
         ApiField("parent_id", creatable=True, updatable=True),
-        ApiField("hierarchy_level", type=int),
-        ApiField("asset_attributes", attr_key="attributes", type=Attribute, optional=True),
-        ApiField("asset_metrics", attr_key="metrics", type=Metric, optional=True),
-        ApiField("children", type=f"{__name__}:AssetType", optional=True),
-        ApiField("created_at", type=Parsers.datetime),
-        ApiField("updated_at", type=Parsers.datetime),
+        ApiField("hierarchy_level", data_type=int),
+        ApiField("asset_attributes", attr_key="attributes", data_type=Attribute, optional=True),
+        ApiField("asset_metrics", attr_key="metrics", data_type=Metric, optional=True),
+        ApiField("children", data_type=f"{__name__}:AssetType", optional=True),
+        ApiField("created_at", data_type=Parsers.datetime),
+        ApiField("updated_at", data_type=Parsers.datetime),
     )
 
     def __init__(
@@ -361,12 +372,12 @@ class Asset(ApiObject):
         ApiField("description", creatable=True, updatable=True),
         ApiField("organization_id", creatable=True),
         ApiField("parent_id", creatable=True, updatable=True),
-        ApiField("hierarchy_level", type=int),
-        ApiField("asset_attribute_values", attr_key="attribute_values", type=AttributeValue, optional=True),
-        ApiField("asset_metric_values", attr_key="metric_values", type=MetricValue, optional=True),
-        ApiField("children", type=f"{__name__}:Asset", optional=True),
-        ApiField("created_at", type=Parsers.datetime),
-        ApiField("updated_at", type=Parsers.datetime),
+        ApiField("hierarchy_level", data_type=int),
+        ApiField("asset_attribute_values", attr_key="attribute_values", data_type=AttributeValue, optional=True),
+        ApiField("asset_metric_values", attr_key="metric_values", data_type=MetricValue, optional=True),
+        ApiField("children", data_type=f"{__name__}:Asset", optional=True),
+        ApiField("created_at", data_type=Parsers.datetime),
+        ApiField("updated_at", data_type=Parsers.datetime),
     )
 
     def __init__(
@@ -383,10 +394,12 @@ class Asset(ApiObject):
             attribute_values: Optional[List[MetricValue]] = None,
             metric_values: Optional[List[MetricValue]] = None,
             children: Optional[List[Asset]] = None,
+            asset_type: Optional[AssetType] = None,
     ):
         super().__init__()
         self.id = id
         self.asset_type_id = asset_type_id
+        self.asset_type = asset_type
         self.label = label
         self.description = description
         self.organization_id = organization_id
@@ -401,6 +414,17 @@ class Asset(ApiObject):
     @property
     def normalized_label(self):
         return self.label.lower().replace(' ', '_')
+
+    def post(self):
+        """Get data for a post request"""
+        d = super().post()
+        # HACK: handle special case of posting attribute_values
+        if self.attribute_values:
+            d.update({
+                "asset_attribute_values_to_create":
+                [av.post() for av in self.attribute_values]
+            })
+        return d
 
 
 class CompleteAsset(ApiObject):

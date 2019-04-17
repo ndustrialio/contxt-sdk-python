@@ -153,7 +153,7 @@ class ApiService:
     def _init_base_url(self, base_url: str, api_version: str) -> str:
         return f"{base_url}/{api_version}" if api_version else base_url
 
-    def _get_url(self, uri: str) -> str:
+    def _url(self, uri: str) -> str:
         return f"{self.base_url}/{uri}"
 
     def _request_kwargs(self):
@@ -166,9 +166,10 @@ class ApiService:
         }
 
     def _log_response(self, response: Response, *args, **kwargs):
-        url = f"{response.url}/{response.request.body or ''}"
         t = response.elapsed.total_seconds()
-        logger.debug(f"Called {response.request.method} {url} ({t} s)")
+        logger.debug(
+            f"Called {response.request.method} {response.url} with body {response.request.body} ({t} s)"
+        )
 
     def _process_response(self, response: Response) -> Dict:
         # Handle any errors
@@ -200,12 +201,15 @@ class ApiService:
     def get(self,
             uri,
             params: Optional[Dict[str, str]] = None,
-            records_only: Optional[bool] = True):
+            records_only: Optional[bool] = True,
+            **kwargs):
         if self.session:
-            response = self.session.get(self._get_url(uri), params=params)
+            response = self.session.get(
+                self._url(uri), params=params, **kwargs)
         else:
-            response = requests.get(
-                self._get_url(uri), params=params, **self._request_kwargs())
+            # Merge default options with method options
+            kwargs = {**self._request_kwargs(), **(kwargs or {})}
+            response = requests.get(self._url(uri), params=params, **kwargs)
 
         response_json = self._process_response(response)
 
@@ -220,33 +224,41 @@ class ApiService:
 
     def post(self,
              uri: str,
-             data: Optional[dict] = None,
-             json: Optional[dict] = None):
+             data: Optional[Dict] = None,
+             json: Optional[Dict] = None,
+             **kwargs):
         if self.session:
             response = self.session.post(
-                self._get_url(uri), data=data, json=json)
+                self._url(uri), data=data, json=json, **kwargs)
         else:
+            # Merge default options with method options
+            kwargs = {**self._request_kwargs(), **(kwargs or {})}
             response = requests.post(
-                self._get_url(uri),
-                data=data,
-                json=json,
-                **self._request_kwargs())
+                self._url(uri), data=data, json=json, **kwargs)
         return self._process_response(response)
 
-    def put(self, uri: str, data=None):
+    def put(self,
+            uri: str,
+            data: Optional[Dict] = None,
+            json: Optional[Dict] = None,
+            **kwargs):
         if self.session:
-            response = self.session.put(self._get_url(uri), data=data)
+            response = self.session.put(
+                self._url(uri), data=data, json=json, **kwargs)
         else:
+            # Merge default options with method options
+            kwargs = {**self._request_kwargs(), **(kwargs or {})}
             response = requests.put(
-                self._get_url(uri), data=data, **self._request_kwargs())
+                self._url(uri), data=data, json=json, **kwargs)
         return self._process_response(response)
 
-    def delete(self, uri: str):
+    def delete(self, uri: str, **kwargs):
         if self.session:
-            response = self.session.delete(self._get_url(uri))
+            response = self.session.delete(self._url(uri), **kwargs)
         else:
-            response = requests.delete(
-                self._get_url(uri), **self._request_kwargs())
+            # Merge default options with method options
+            kwargs = {**self._request_kwargs(), **(kwargs or {})}
+            response = requests.delete(self._url(uri), **kwargs)
         return self._process_response(response)
 
 
@@ -307,11 +319,15 @@ class ApiObject(ABC):
         # Set creatable, updateable fields for class (if not yet set)
         # HACK: move this somewhere more appropriate
         if not hasattr(cls, "_creatable_fields"):
-            cls._creatable_fields = tuple(
-                f for f in cls._api_fields if f.creatable)
+            cls._creatable_fields = {
+                f.attr_key: f
+                for f in cls._api_fields if f.creatable
+            }
         if not hasattr(cls, "_updatable_fields"):
-            cls._updatable_fields = tuple(
-                f for f in cls._api_fields if f.updatable)
+            cls._updatable_fields = {
+                f.attr_key: f
+                for f in cls._api_fields if f.updatable
+            }
 
     def __str__(self):
         return Serializer.to_table(self)
@@ -323,22 +339,22 @@ class ApiObject(ABC):
     #     pass
 
     @classmethod
-    def clean_api_value(cls, api_field, api_value):
+    def clean_api_value(cls, api_field: ApiField, api_value: Any):
         if api_value is None:
             # No value
             return api_value
         elif isinstance(api_value, (list, tuple,)):
             # Value is a list, clean each item
             return [cls.clean_api_value(api_field, v) for v in api_value]
-        elif callable(getattr(api_field.type, "from_api", None)):
+        elif callable(getattr(api_field.data_type, "from_api", None)):
             # Type is an ApiObject, apply from_api instead of init
-            return api_field.type.from_api(api_value)
+            return api_field.data_type.from_api(api_value)
         else:
             # Apply type
-            return api_field.type(api_value)
+            return api_field.data_type(api_value)
 
     @classmethod
-    def from_api(cls, api_dict: dict):
+    def from_api(cls, api_dict: Dict):
         # Create clean dictionary to pass to init
         clean_dict = {
             f.attr_key: cls.clean_api_value(
@@ -363,18 +379,20 @@ class ApiObject(ABC):
         return Serializer.to_df(self)
 
     def post(self):
-        """Get data for a post request"""
-        return Serializer.to_dict(
-            self,
-            key_filter=lambda k: k in set(
-                f.api_key for f in self._creatable_fields))
+        """Get data for a POST request"""
+        # Transform api fields to dict
+        d = Serializer.to_dict(
+            self, key_filter=lambda k: k in set(self._creatable_fields.keys()))
+        # Swap attr_keys for api_keys
+        return {self._creatable_fields[k].api_key: v for k, v in d.items()}
 
     def put(self):
-        """Get data for a put request"""
-        return Serializer.to_dict(
-            self,
-            key_filter=lambda k: k in set(
-                f.api_key for f in self._updatable_fields))
+        """Get data for a PUT request"""
+        # Transform api fields to dict
+        d = Serializer.to_dict(
+            self, key_filter=lambda k: k in set(self._updatable_fields.keys()))
+        # Swap attr_keys for api_keys
+        return {self._updatable_fields[k].api_key: v for k, v in d.items()}
 
 
 # TODO: Need a way to track changed attributes
@@ -392,28 +410,28 @@ class ApiField:
             self,
             api_key: str,
             attr_key: Optional[str] = None,
-            type: Optional[Union[Callable, str]] = str,
+            data_type: Optional[Union[Callable, str]] = str,
             creatable: Optional[bool] = False,
             updatable: Optional[bool] = False,
             optional: Optional[bool] = False
     ):
         self.api_key = api_key
         self.attr_key = attr_key or api_key
-        self._type = type
+        self._data_type = data_type
         self.creatable = creatable
         self.updatable = updatable
         self.optional = optional
 
     @property
-    def type(self):
-        if isinstance(self._type, str):
+    def data_type(self):
+        if isinstance(self._data_type, str):
             # Load callable from str
             # NOTE: this is to delay the type assignment to instance creation,
             # as the type might not yet be defined at class creation
-            modname, qualname_separator, qualname = self._type.partition(":")
+            modname, qualname_separator, qualname = self._data_type.partition(":")
             obj = import_module(modname)
             if qualname_separator:
                 for attr in qualname.split("."):
                     obj = getattr(obj, attr)
-            self._type = obj
-        return self._type
+            self._data_type = obj
+        return self._data_type
