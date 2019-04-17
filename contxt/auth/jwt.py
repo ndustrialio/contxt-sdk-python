@@ -11,9 +11,8 @@ from jose.constants import ALGORITHMS
 
 # Error handler
 class AuthError(Exception):
-    def __init__(self, error, status_code):
-        self.error = error
-        self.status_code = status_code
+    def __init__(self, message):
+        self.message = message
 
 
 TokenPayload = dict
@@ -29,23 +28,13 @@ class AuthTokenValidator(NamedTuple):
             return jwt.decode(token=token, key=self.public_key, algorithms=ALGORITHMS.RS256, audience=self.audience,
                               issuer=self.issuer)
         except jwt.ExpiredSignatureError:
-            raise AuthError({"code": "token_expired",
-                             "description": "token is expired"}, 401)
+            raise AuthError("TOKEN_EXPIRED: token is expired")
         except jwt.JWTClaimsError:
-            raise AuthError({"code": "invalid_claims",
-                             "description":
-                                 "incorrect claims,"
-                                 "please check the audience and issuer"}, 401)
+            raise AuthError("INVALID_CLAIMS: please check the audience and issuer")
         except jwt.JWTError:
-            raise AuthError({"code": "invalid_token",
-                             "description":
-                                 "invalid token, "
-                                 "please check the token"}, 401)
+            raise AuthError("INVALID_TOKEN: please check the token")
         except Exception:
-            raise AuthError({"code": "invalid_header",
-                             "description":
-                                 "Unable to parse authentication"
-                                 " token."}, 401)
+            raise AuthError("INVALID_HEADER: Unable to parse authentication")
 
 
 CONTXT_AUTH0_ISSUER = "https://contxtauth.com/v1/"
