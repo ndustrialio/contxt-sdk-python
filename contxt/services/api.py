@@ -374,30 +374,20 @@ class ApiObject(ABC):
         return Serializer.to_df(self)
 
     def post(self):
-        """Get data for a post request"""
+        """Get data for a POST request"""
         # Transform api fields to dict
-        creatable_keys = set(self._creatable_fields.keys())
-        d = Serializer.to_dict(self, key_filter=lambda k: k in creatable_keys)
+        d = Serializer.to_dict(
+            self, key_filter=lambda k: k in set(self._creatable_fields.keys()))
         # Swap attr_keys for api_keys
-        api_dict = {}
-        for k in d.keys():
-            field = self._creatable_fields[k]
-            if k != field.api_key:
-                api_dict[field.api_key] = d[k]
-            else:
-                api_dict[k] = d[k]
-        return api_dict
+        return {self._creatable_fields[k].api_key: v for k, v in d.items()}
 
     def put(self):
-        """Get data for a put request"""
-        updatable_fields = set(self._updatable_fields.keys())
-        d = Serializer.to_dict(self, key_filter=lambda k: k in updatable_fields)
+        """Get data for a PUT request"""
+        # Transform api fields to dict
+        d = Serializer.to_dict(
+            self, key_filter=lambda k: k in set(self._updatable_fields.keys()))
         # Swap attr_keys for api_keys
-        for k in d.keys():
-            field = self._updatable_fields[k]
-            if k != field.api_key:
-                d[field.api_key] = d.pop(k)
-        return d
+        return {self._updatable_fields[k].api_key: v for k, v in d.items()}
 
 
 # TODO: Need a way to track changed attributes
