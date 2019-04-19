@@ -50,7 +50,7 @@ class Parsers:
     @staticmethod
     def parse_as_unknown(val: Any):
         # First, try a general parser (supports strings, numbers, tuples,
-        # lists, dicts, booleans, and None)
+        # lists, dicts, booleans (True/False strings only), and None)
         try:
             return literal_eval(val)
         except (SyntaxError, ValueError) as e:
@@ -67,10 +67,12 @@ class Parsers:
             return parser.parse(val)
         except (TypeError, ValueError) as e:
             pass
-        # Next, convert yes/no strings to bool
+        # Next, convert yes/no/true/false strings to bool
         try:
             if val.lower() in ("yes", "no"):
                 return val.lower() == "yes"
+            if val.lower() in ("true", "false"):
+                return val.lower() == "true"
         except (AttributeError, TypeError, ValueError) as e:
             pass
         # Failed, return original value
