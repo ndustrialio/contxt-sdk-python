@@ -139,7 +139,7 @@ class ColoredLogger(logging.Logger):
         self.addHandler(console)
 
 
-if (environ.get('WORKER_ENV') is not [Envs.production]) and (environ.get('ENV') not in [Envs.production, Envs.staging]):
+if (environ.get('WORKER_ENV') is not [Envs.production]) and (environ.get('ENV') not in ['production', 'staging']):
     logging.setLoggerClass(ColoredLogger)
 else:
     logging.basicConfig(format="%(asctime)s %(levelname)-8s [%(name)s]  %(message)s (%(filename)s:%(lineno)d)",
