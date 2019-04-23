@@ -49,4 +49,5 @@ def test_contxt_auth():
 
 
 if __name__ == '__main__':
+    test_auth()
     test_contxt_auth()
