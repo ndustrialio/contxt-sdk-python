@@ -26,13 +26,9 @@ class AssetMigrationManager:
     def create(self):
         logger.info(f"Creating assets_schema {self.schema.name}")
 
-        # Create asset types
+        # Create asset types (including attributes, metrics, and children)
         for asset_type in self.schema.asset_types:
-            new_asset_type = self.create_asset_type(asset_type)
-
-            # Create children
-            for child in asset_type.children:
-                self.create_asset_type(child, parent=new_asset_type)
+            self.create_asset_type(asset_type)
 
         # TODO: Create assets
         # for asset in self.schema.assets:
@@ -83,7 +79,9 @@ class AssetMigrationManager:
         for metric in asset_type.metrics:
             self.create_metric(existing_asset_type, metric)
 
-        return existing_asset_type
+        # Create children
+        for child in asset_type.children:
+            self.create_asset_type(child, parent=existing_asset_type)
 
     def create_attribute(self, asset_type: AssetType, attribute: Attribute):
         # For the existing asset_type, create the attribute
