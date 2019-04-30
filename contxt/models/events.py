@@ -18,7 +18,7 @@ class EventType(ApiObject):
         ApiField("description", creatable=True),
         ApiField("client_id", creatable=True),
         ApiField("level", data_type=int, creatable=True),
-        ApiField("is_ongoing_event", data_type=bool),
+        ApiField("is_ongoing_event", data_type=bool, optional=True),
         ApiField("is_realtime_enabled", data_type=bool, creatable=True),
         ApiField("created_at", data_type=Parsers.datetime),
         ApiField("updated_at", data_type=Parsers.datetime)
