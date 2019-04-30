@@ -73,15 +73,15 @@ class EventsService(ConfiguredApiService):
         logger.debug(f"Deleting event {event.id}")
         self.delete(f"events/{event.id}")
 
-    def get_events_for_type(self, event_type_id: str) -> List[EventType]:
+    def get_events_for_type(self, event_type_id: str) -> List[Event]:
         logger.debug(f"Fetching events for type {event_type_id}")
         resp = self.get(f"types/{event_type_id}/events")
-        return [EventType.from_api(rec) for rec in resp]
+        return [Event.from_api(rec) for rec in resp]
 
-    def get_events_for_client(self, client_id: str) -> List[EventType]:
+    def get_events_for_client(self, client_id: str) -> List[Event]:
         logger.debug(f"Fetching events for client {client_id}")
         resp = self.get(f"clients/{client_id}/events")
-        return [EventType.from_api(rec) for rec in resp]
+        return [Event.from_api(rec) for rec in resp]
 
     def get_event_definition(self, event_id: str) -> EventDefinition:
         logger.debug(f"Fetching definition for event {event_id}")
