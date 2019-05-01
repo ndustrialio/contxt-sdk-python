@@ -207,7 +207,7 @@ class ApiService:
     def get(self,
             uri,
             params: Optional[Dict[str, str]] = None,
-            records_only: Optional[bool] = True,
+            records_only: bool = True,
             **kwargs):
         if self.session:
             response = self.session.get(
