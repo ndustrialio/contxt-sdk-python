@@ -1,14 +1,8 @@
 from contxt.auth import BaseAuth
-from contxt.utils import Config, make_logger
-
-logger = make_logger(__name__)
 
 
+# TODO: remove this class, as its just an alias around BaseAuth
 class MachineAuth(BaseAuth):
     """
-    Authentication for a service or worker
+    Authentication for a non-human client, such as a service, api, or worker
     """
-
-    def __init__(self, client_id, client_secret):
-        super().__init__(client_id=client_id, client_secret=client_secret)
-        # self.get_auth_token()
