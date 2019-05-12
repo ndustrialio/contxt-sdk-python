@@ -6,7 +6,7 @@ from pathlib import Path
 import pandas as pd
 from tqdm import tqdm
 
-from contxt.services.iot import IOTService
+from contxt.services.iot import IOTService, FieldGrouping
 from contxt.utils import make_logger
 from contxt.utils.vis import DataVisualizer
 
@@ -51,6 +51,23 @@ class IOT:
             self.iot_service.provision_field_for_feed(feed_id=feed_id,
                                                       field_obj=field_obj)
             logger.info(f'Provisioned: {field_obj.field_descriptor}')
+
+    def create_grouping(self, facility_id, label, description, is_public=True, field_category_id=None):
+        return self.iot_service.create_grouping(FieldGrouping(
+            {
+                "facility_id": facility_id,
+                "label": label,
+                "description": description,
+                "is_public": is_public,
+                "field_category_id": field_category_id
+            },
+            owner_obj=None,
+            category_obj=None,
+            field_obj_list=[]
+        ))
+
+    def add_field_to_grouping(self, grouping_id, field_id):
+        return self.iot_service.add_field_to_grouping(grouping_id, field_id)
 
     def get_fields_for_grouping(self, grouping_id):
         return self.iot_service.get_single_grouping(grouping_id).fields

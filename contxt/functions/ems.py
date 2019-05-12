@@ -273,6 +273,7 @@ class EMS:
 
             except UnauthorizedException as e:
                 logger.warning(f"Unauthorized for facility {facility.id}")
+                logger.error(e)
                 continue
             except Exception as e:
                 traceback.print_exc()

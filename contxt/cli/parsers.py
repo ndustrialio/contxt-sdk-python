@@ -57,6 +57,21 @@ class IotParser(ArgParser):
         groupings_parser.add_argument("facility_id", type=int, help="Facility id")
         groupings_parser.set_defaults(func=self._groupings)
 
+        ## Create grouping
+        create_grouping_parser = _subparsers.add_parser("mk-grouping", help="Create a new IOT Grouping")
+        create_grouping_parser.add_argument("facility_id", type=int, help="Facility ID to create grouping under")
+        create_grouping_parser.add_argument("label", help="Human-readable label of the grouping")
+        create_grouping_parser.add_argument("description", help="Description of the grouping")
+        create_grouping_parser.add_argument("--is-private", action="store_true", help="Make this grouping NOT visible to other users")
+        create_grouping_parser.add_argument("--category-id", help="ID of the category to assign this grouping to")
+        create_grouping_parser.set_defaults(func=self._create_grouping)
+
+        ## Add field to grouping
+        add_field_to_grouping_parser = _subparsers.add_parser("add-grouping-field", help="Add field to grouping")
+        add_field_to_grouping_parser.add_argument("grouping_id", help="ID of the field grouping")
+        add_field_to_grouping_parser.add_argument("field_id", type=int, help="ID of field to add to grouping")
+        add_field_to_grouping_parser.set_defaults(func=self._add_field_to_grouping)
+
         # Feeds
         feeds_parser = _subparsers.add_parser("feeds", help="Get feeds")
         feeds_parser.add_argument("-f", "--facility-id", type=int, help="Facility id")
@@ -122,6 +137,29 @@ class IotParser(ArgParser):
             fields = iot.get_fields_for_grouping(args.grouping_id)
             print(fields)
 
+    def _create_grouping(self, args, auth):
+        from contxt.functions.iot import IOT
+        iot = IOT(auth)
+
+        grouping = iot.create_grouping(
+            facility_id=args.facility_id,
+            label=args.label,
+            description=args.description,
+            is_public=(not args.is_private),
+            field_category_id=args.category_id
+        )
+
+        print(grouping)
+
+    def _add_field_to_grouping(self, args, auth):
+        from contxt.functions.iot import IOT
+        iot = IOT(auth)
+
+        grouping_field = iot.add_field_to_grouping(grouping_id=args.grouping_id,
+                                                   field_id=args.field_id)
+
+        print(grouping_field)
+
     def _unprovisioned_fields(self, args, auth):
         from contxt.functions.iot import IOT
         iot = IOT(auth)
@@ -159,17 +197,27 @@ class IotParser(ArgParser):
 
     def _ingest_field_worksheet(self, args, auth):
         from contxt.functions.iot import IOT
-        from contxt.services.iot import Field
+        from contxt.services.iot import Field, IOTService
         iot_func = IOT(auth)
-        iot_service = IOT(auth)
+        iot_service = IOTService(auth)
 
-        feed = iot_service.get_feed_id_from_key(args.feed_key)
+        feed = iot_func.get_feed_id_from_key(args.feed_key)
 
         if not feed:
             logger.error(f"Feed with key {args.feed_key} does not exist")
             return
 
+        groupings_by_label = {}
+        groupings = iot_service.get_all_groupings(feed.facility_id)
+        for grouping in groupings:
+            groupings_by_label[grouping.label] = grouping
+
         field_objs = []
+
+        fields_for_feed = iot_service.get_fields_for_feed(feed_id=feed.id)
+        fields_descriptors_for_feed = [f.field_descriptor for f in fields_for_feed]
+
+        desired_groupings_by_field = {}
         with open(args.worksheet_file, 'r') as f:
 
             headers = ['Field Descriptor','Label','Data Type','Units','Scalar','Cumulative Value?','equipment group','Facility Main?']
@@ -180,17 +228,58 @@ class IotParser(ArgParser):
 
             # create a bunch of field objects
             for row in reader:
-                field_objs.append(Field({
-                    'label': row['equipment group'] + row['Label'],
-                    'field_descriptor': row['Field Descriptor'],
-                    'field_human_name': row['Field Descriptor'],
-                    'units': row['Units'],
-                    'value_type': 'numeric', # TODO change me
-                    'feed_key': args.feed_key,
-                    'is_hidden': False
-                }))
+                if row['Label'].replace(' ', '').startswith('-'):
+                    label = row['equipment group'] + row['Label']
+                else:
+                    label = row['Label']
 
+                if row['Field Descriptor'] in fields_descriptors_for_feed:
+                    print(f'Already provisioned field with descriptor {row["Field Descriptor"]}')
+                else:
+                    field_objs.append(Field({
+                        'label': label,
+                        'field_descriptor': row['Field Descriptor'],
+                        'field_human_name': row['Field Descriptor'],
+                        'units': row['Units'],
+                        'value_type': 'numeric', # TODO change me
+                        'feed_key': args.feed_key,
+                        'is_hidden': False
+                    }))
+
+                desired_groupings_by_field[row['Field Descriptor']] = row['equipment group']
+
+        # go provision the fields
         iot_func.provision_field_object_collection(feed.id, field_objs)
+
+        print('Done provisioning the fields')
+
+        # now that we have fields provisioned (and they now have IDs), let's add them to the groupings specified
+        fields_for_feed = iot_service.get_fields_for_feed(feed_id=feed.id)
+
+        # organize the fields by their grouping names
+        grouping_fields = {}
+        for field in fields_for_feed:
+            if field.field_descriptor in desired_groupings_by_field:
+                grouping_name = desired_groupings_by_field[field.field_descriptor]
+                if grouping_name.replace(' ','') == '':
+                    continue
+                if grouping_name not in grouping_fields:
+                    grouping_fields[grouping_name] = []
+                grouping_fields[grouping_name].append(field.id)
+
+        # go through the organized listing and create the grouping if necessary and update the fields for the grouping
+        for grouping_name, field_ids in grouping_fields.items():
+            grouping = groupings_by_label.get(grouping_name)
+
+            if not grouping:
+                print(f'Creating new grouping: {grouping_name}')
+                grouping = iot_func.create_grouping(facility_id=feed.facility_id,
+                                                    label=grouping_name,
+                                                    description=grouping_name,
+                                                    is_public=True)
+
+            print(f'Setting {len(field_ids)} fields to grouping {grouping_name}')
+            iot_service.set_fields_for_grouping(grouping.id, field_ids)
 
         print('Successful!')
 

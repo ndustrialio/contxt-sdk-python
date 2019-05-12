@@ -25,7 +25,9 @@ class IOTService(Service):
             base_url=self.env['base_url'],
             access_token=auth_module.get_token_for_audience(
                 self.env['audience']))
-
+    """
+    Groupings Operations
+    """
     def get_all_groupings(self, facility_id):
 
         assert isinstance(facility_id, int)
@@ -64,6 +66,31 @@ class IOTService(Service):
         else:
             return None
 
+    def create_grouping(self, grouping_obj):
+        assert isinstance(grouping_obj, FieldGrouping)
+
+        return FieldGrouping(self.execute(POST(uri=f'facilities/{grouping_obj.facility_id}/groupings')
+                                          .body(grouping_obj.get_create_dict())),
+                             owner_obj=None,
+                             category_obj=None,
+                             field_obj_list=[])
+
+    def add_field_to_grouping(self, grouping_id, field_id):
+
+        return self.execute(POST(uri=f'groupings/{grouping_id}/fields/{field_id}'))
+
+    def set_fields_for_grouping(self, grouping_id, field_list):
+        assert isinstance(grouping_id, str)
+        assert isinstance(field_list, list)
+
+        body = {'fields': field_list}
+
+        return self.execute(POST(uri=f'groupings/{grouping_id}/fields')
+                            .body(body))
+
+    """
+    Field Data Operations
+    """
     def get_data_for_field(self, output_id, field_human_name, start_time, window, end_time=None, limit=1000):
 
         assert isinstance(start_time, datetime)
@@ -110,6 +137,9 @@ class IOTService(Service):
 
         return APIObjectCollection([Feed(record) for record in response]) if response else None
 
+    """
+    Field Provisioning
+    """
     def get_all_fields(self, facility_id):
         response = PagedResponse(
             PagedEndpoint(
@@ -136,6 +166,17 @@ class IOTService(Service):
         return self.execute(POST(uri=f'feeds/{feed_id}/fields').body(field_obj.get_dict())
                             .content_type(ApiRequest.URLENCODED_CONTENT_TYPE))
 
+    def get_fields_for_feed(self, feed_id):
+
+        response = PagedResponse(
+            PagedEndpoint(
+                base_url=self.base_url,
+                client=self.client,
+                request=GET(uri=f'feeds/{feed_id}/fields'),
+                parameters={}))
+
+        return APIObjectCollection([Field(record) for record in response]) if response else None
+
 
 class FieldGrouping(APIObject):
 
@@ -146,16 +187,16 @@ class FieldGrouping(APIObject):
                 'category', 'fields'
             ])
 
-        self.id = grouping_api_object['id']
-        self.label = grouping_api_object['label']
-        self.slug = grouping_api_object['slug']
-        self.description = grouping_api_object['description']
-        self.facility_id = grouping_api_object['facility_id']
-        self.owner_id = grouping_api_object['owner_id']
-        self.is_public = grouping_api_object['is_public']
-        self.created_at = grouping_api_object['created_at']
-        self.updated_at = grouping_api_object['updated_at']
-        self.field_category_id = grouping_api_object['field_category_id']
+        self.id = grouping_api_object.get('id')
+        self.label = grouping_api_object.get('label')
+        self.slug = grouping_api_object.get('slug')
+        self.description = grouping_api_object.get('description')
+        self.facility_id = grouping_api_object.get('facility_id')
+        self.owner_id = grouping_api_object.get('owner_id')
+        self.is_public = grouping_api_object.get('is_public')
+        self.created_at = grouping_api_object.get('created_at')
+        self.updated_at = grouping_api_object.get('updated_at')
+        self.field_category_id = grouping_api_object.get('field_category_id')
         self.owner = owner_obj
         self.category = category_obj
         self.fields = APIObjectCollection(field_obj_list)
@@ -167,6 +208,18 @@ class FieldGrouping(APIObject):
             'field_count': len(self.fields)
         }
 
+    def get_create_dict(self):
+        create_dict = {
+            "label": self.label,
+            "description": self.description,
+            "is_public": self.is_public,
+        }
+
+        # API can't handle sending None / null for field_category_id at the moment. remove when able to
+        if self.field_category_id:
+            create_dict["field_category_id"] = self.field_category_id
+
+        return create_dict
 
 class UnprovisionedField(APIObject):
 
