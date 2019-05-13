@@ -1,6 +1,6 @@
-from typing import Any, Dict, List, Optional, Set, Tuple, Union
+from typing import List
 
-from contxt.auth.cli import CLIAuth
+from contxt.auth import BaseAuth
 from contxt.models.events import (Event, EventDefinition, EventType,
                                   TriggeredEvent)
 from contxt.services.api import ApiServiceConfig, ConfiguredApiService
@@ -26,7 +26,7 @@ class EventsService(ConfiguredApiService):
 
     def __init__(
             self,
-            auth: CLIAuth,
+            auth: BaseAuth,
             env: str = "production"
     ):
         super().__init__(auth, env)

@@ -1,6 +1,6 @@
 from typing import Any, Dict, List, Optional, Set, Tuple
 
-from contxt.auth.cli import CLIAuth
+from contxt.auth import BaseAuth
 from contxt.models.assets import (Asset, AssetType, Attribute, AttributeValue,
                                   CompleteAsset, Metric, MetricValue)
 from contxt.services.api import ApiServiceConfig, ConfiguredApiService
@@ -28,7 +28,7 @@ class AssetsService(ConfiguredApiService):
 
     def __init__(
             self,
-            auth: CLIAuth,
+            auth: BaseAuth,
             organization_id: str,
             env: str = "production",
             load_types: bool = True,

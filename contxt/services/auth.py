@@ -39,3 +39,6 @@ class AuthService(ConfiguredApiService):
             },
         )
         return response["access_token"]
+
+    def get_jwks(self) -> str:
+        return self.get(".well-known/jwks.json")

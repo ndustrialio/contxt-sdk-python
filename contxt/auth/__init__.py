@@ -32,35 +32,66 @@ class TokenProvider:
             datetime.now(UTC).timestamp() + within
         )
 
+    def _get_new_access_token(self) -> str:
+        return self.auth_service.get_oauth_token(
+            self.client_id, self.client_secret, self.audience
+        )
+
+    def _refresh_access_token(self) -> str:
+        return self._get_new_access_token()
+
     @property
     def access_token(self) -> str:
-        """Gets a valid access_token for audience `audience`"""
-        if self._access_token is None or self._token_expiring():
-            # Token either not set or expiring soon, fetch one
-            self.access_token = self.auth_service.get_oauth_token(
-                self.client_id, self.client_secret, self.audience
-            )
+        """Gets a valid access token for audience `audience`"""
+        if self._access_token is None:
+            # Token not yet set, fetch one
+            self.access_token = self._get_new_access_token()
+        elif self._token_expiring():
+            # Token expiring soon, refresh it
+            self.access_token = self._refresh_access_token()
         return self._access_token
 
     @access_token.setter
     def access_token(self, value: str) -> None:
-        """Sets both the `access_token` and the `decoded_access_token`"""
+        """Sets both the access token and the decoded access token"""
         self._access_token = value
         self._access_token_decoded = decode(self._access_token, verify=False)
 
     @property
     def decoded_access_token(self) -> Dict:
-        """Gets the `decoded_access_token`"""
+        """Gets the decoded access token"""
         if self._access_token_decoded is None:
             # Token not yet set, fetch it now
             self.access_token
         return self._access_token_decoded
 
 
+class DependentTokenProvider(TokenProvider):
+    """
+    Same as `TokenProvider`, except the `access_token` is retreived by
+    authenticating with a separate access token, rather than a client_id and
+    client_secret pair. Thus, it is dependent on a `TokenProvider`.
+
+    Note this is not the typical auth flow.
+    """
+
+    def __init__(self, token_provider: TokenProvider, audience: str):
+        self.token_provider = token_provider
+        self.audience = audience
+        self.auth_service = AuthService()
+        self._access_token: Optional[str] = None
+        self._access_token_decoded: Optional[Dict] = None
+
+    def _get_new_access_token(self) -> str:
+        return self.auth_service.get_token(
+            self.token_provider.access_token, self.audience
+        )
+
+
 class BaseAuth:
     """
     A client (service, worker, etc.) defined by `client_id` and `client_secret`.
-    When the client needs to authenicate to another client, use `get_token_provider`.
+    When the client needs to authenicate to another client, use `get_token_provider(...)`.
 
     Overload this class to return a custom `TokenProvider`.
     """

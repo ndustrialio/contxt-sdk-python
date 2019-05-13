@@ -1,6 +1,6 @@
 from requests.exceptions import HTTPError
 
-from contxt.auth.cli import CLIAuth
+from contxt.auth import CliAuth
 from contxt.services.assets import AssetsService
 from contxt.services.bus import MessageBusService
 from contxt.services.contxt import ContxtService
@@ -11,7 +11,7 @@ from contxt.utils import make_logger
 logger = make_logger(__name__)
 
 if __name__ == "__main__":
-    auth = CLIAuth()
+    auth = CliAuth()
     c = ContxtService(auth)
     ll = c.get_organization_with_name("Lineage Logistics")
     wpe = c.get_organization_with_name("Western Plains Energy")
