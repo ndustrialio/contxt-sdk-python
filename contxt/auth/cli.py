@@ -168,9 +168,17 @@ class CliAuth(BaseAuth):
         """Get `TokenProvider` for audience `audience`"""
         return DependentTokenProvider(self.token_provider, audience)
 
+    def logged_in(self) -> bool:
+        return bool(self.token_provider._access_token)
+
     def login(self) -> None:
-        """Prompt the user to login"""
-        pass
+        """Force a prompt for the user to login. Note this will happen automatically."""
+        if self.logged_in() and not self.query_user("Already logged in. Continue?"):
+            return None
+        # NOTE: this works by unsetting the current access token, and then
+        # calling the getter, which triggers a login prompt 
+        self.token_provider.reset()
+        self.token_provider.access_token
 
     def logout(self) -> None:
         """Logs the user out by clearing the cache"""
