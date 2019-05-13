@@ -9,7 +9,7 @@ from contxt.auth import BaseAuth, DependentTokenProvider, TokenProvider
 from contxt.services.auth import AuthService
 from contxt.utils import make_logger
 
-logger = make_logger(__name__, "debug")
+logger = make_logger(__name__)
 
 
 class Auth0TokenProvider(TokenProvider):
@@ -18,25 +18,63 @@ class Auth0TokenProvider(TokenProvider):
     username and password and granted for offline access, meaning expired tokens
     are refreshed with a refresh token. To do so, our own Auth API
     (i.e. `AuthService`) is replaced by Auth0's API.
+
+    If `cache_file` is specified, both the `access_token` and `refresh_token`
+    are cached there as a JSON blob.
     """
 
-    def __init__(self, client_id: str, client_secret: str, audience: str):
+    def __init__(
+        self,
+        client_id: str,
+        client_secret: str,
+        audience: str,
+        cache_file: Optional[Path] = None,
+    ):
         super().__init__(client_id, client_secret, audience)
         # Replace our auth api with auth0, and also store a refresh token
         self.auth_service = GetToken("ndustrial.auth0.com")
         self._refresh_token: Optional[str] = None
 
-    def _get_new_access_token(self) -> str:
-        token = self.login()
-        self.refresh_token = token["refresh_token"]
-        return token["access_token"]
+        # Initialize cache
+        self._cache_file = cache_file
+        self._init_from_cache()
 
-    def _refresh_access_token(self) -> str:
-        token = self.auth_service.refresh_token(
-            self.client_id, self.client_secret, self.refresh_token
-        )
-        self.refresh_token = token["refresh_token"]
-        return token["access_token"]
+    def _init_from_cache(self) -> None:
+        if self._cache_file:
+            # Load the cache
+            cache = self.read_cache()
+
+            if cache:
+                # Token exists in cache, set it
+                logger.debug(f"Setting token from cache")
+                self.access_token = cache["access_token"]
+                self.refresh_token = cache["refresh_token"]
+            else:
+                # Token not in cache
+                logger.debug(f"Token not found in cache")
+
+    @TokenProvider.access_token.getter
+    def access_token(self) -> str:
+        """Gets a valid access token for audience `audience`"""
+        if self._access_token is None:
+            # Token not yet set, fetch one
+            logger.debug(f"Fetching new access_token for {self.audience}")
+            token_info = self.login()
+            self.access_token = token_info["access_token"]
+            self.refresh_token = token_info["refresh_token"]
+            # Update cache
+            self.update_cache()
+        elif self._token_expiring():
+            # Token expiring soon, refresh it
+            logger.debug(f"Refreshing access_token for {self.audience}")
+            token_info = self.auth_service.refresh_token(
+                self.client_id, self.client_secret, self.refresh_token
+            )
+            self.access_token = token_info["access_token"]
+            self.refresh_token = token_info["refresh_token"]
+            # Update cache
+            self.update_cache()
+        return self._access_token
 
     @property
     def refresh_token(self) -> str:
@@ -67,6 +105,32 @@ class Auth0TokenProvider(TokenProvider):
             grant_type="password",
             realm="",
         )
+    
+    def reset(self):
+        super().reset()
+        self._refresh_token: Optional[str] = None
+
+    def read_cache(self) -> Dict:
+        if self._cache_file:
+            logger.debug(f"Reading cache {self._cache_file}")
+            if self._cache_file.is_file():
+                with self._cache_file.open("r") as f:
+                    return load(f)
+        return {}
+
+    def update_cache(self) -> None:
+        if self._cache_file:
+            logger.debug(f"Updating cache {self._cache_file}")
+            cache = {"access_token": self.access_token, "refresh_token": self.refresh_token}
+            self._cache_file.parent.mkdir(parents=True, exist_ok=True)
+            with self._cache_file.open("w") as f:
+                dump(cache, f, indent=4)
+
+    def clear_cache(self) -> None:
+        if self._cache_file:
+            logger.debug(f"Clearing cache {self._cache_file}")
+            if self._cache_file.is_file():
+                self._cache_file.unlink()
 
 
 class CliAuth(BaseAuth):
@@ -75,14 +139,14 @@ class CliAuth(BaseAuth):
     `Auth0TokenProvider` to authenticate requests to get an access token for
     target clients defined by `audience`.
 
-    If `enable_cache` is True, the access token from Auth0 will be cached in a
-    JSON file in a hidden directory, meaning that the user will only have to
-    authenticate with their credientials once.
+    The access token from Auth0 is cached in a JSON file in a hidden directory,
+    meaning that the user will only have to authenticate with their credientials
+    once.
 
     Auth Flow:
     1. User provides Contxt username/password credentials
-    2. Retrieve access token directly from Auth0 for our `AuthService`, authenticating with
-       above credientials
+    2. Retrieve access token directly from Auth0 for our `AuthService`, authenticating
+       with above credientials
     3. When authenticating to a service, retrieve access token from our `AuthService`
        for the target service, authenticating with the above Auth0 access token
     """
@@ -94,35 +158,25 @@ class CliAuth(BaseAuth):
         )
         self.auth_service = AuthService()
         self.token_provider = Auth0TokenProvider(
-            self.client_id, self.client_secret, self.auth_service.config.audience
+            client_id=self.client_id,
+            client_secret=self.client_secret,
+            audience=self.auth_service.config.audience,
+            cache_file=Path.home() / ".contxt" / "cli_token",
         )
-
-        # Initialize cache details
-        self._cache_file = Path.home() / ".contxt_new" / "tokens_v2"
-        self._cache = {}
-        self._init_cache()
 
     def get_token_provider(self, audience: str) -> DependentTokenProvider:
         """Get `TokenProvider` for audience `audience`"""
         return DependentTokenProvider(self.token_provider, audience)
 
-    def logged_in(self) -> bool:
-        return self.token_provider.audience in self._cache
-
     def login(self) -> None:
         """Prompt the user to login"""
         pass
-        # # Ensure we are in a logged out state
-        # self.logout()
-        # # Trigger a login prompt and update the cache
-        # # NOTE: This works by fetching the access token
-        # self._init_cache()
 
     def logout(self) -> None:
         """Logs the user out by clearing the cache"""
-        # Clear the cached and current access_token
-        self.token_provider._access_token = None
-        self.clear_cache()
+        # Reset both the instance and the cache
+        self.token_provider.reset()
+        self.token_provider.clear_cache()
 
     def query_user(self, question: str) -> bool:
         """Query the user with `question`, and return if user confirmed"""
@@ -132,41 +186,3 @@ class CliAuth(BaseAuth):
         while answer not in choices:
             answer = input(f"Please enter {' or '.join(choices)}. ").lower()[0:1]
         return answer == "y"
-
-    def _init_cache(self):
-        # Load the cache
-        self._cache = self.read_cache()
-
-        # Only cache the auth0 access_token, so we do not have to repeatedly
-        # query the user for their credentials
-        if self.token_provider.audience in self._cache:
-            # Token exists in cache, set it
-            token_info = self._cache[self.token_provider.audience]
-            self.token_provider.access_token = token_info["access_token"]
-            self.token_provider.refresh_token = token_info["refresh_token"]
-        else:
-            # Token not in cache, update it
-            # NOTE: this triggers a login prompt
-            self._cache[self.token_provider.audience] = {
-                "access_token": self.token_provider.access_token,
-                "refresh_token": self.token_provider.refresh_token
-            }
-            self.update_cache()
-
-    def read_cache(self) -> Dict:
-        logger.debug(f"Reading tokens from {self._cache_file}")
-        if self._cache_file.is_file():
-            with self._cache_file.open("r") as f:
-                return load(f)
-        return {}
-
-    def update_cache(self) -> None:
-        logger.debug(f"Updating tokens from {self._cache_file}")
-        self._cache_file.parent.mkdir(parents=True, exist_ok=True)
-        with self._cache_file.open("w") as f:
-            dump(self._cache, f, indent=4)
-
-    def clear_cache(self) -> None:
-        logger.debug(f"Clearing tokens from {self._cache_file}")
-        self._cache_file.unlink()
-        self._cache = {}

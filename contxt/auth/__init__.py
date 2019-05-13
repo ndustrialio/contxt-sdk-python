@@ -32,23 +32,15 @@ class TokenProvider:
             datetime.now(UTC).timestamp() + within
         )
 
-    def _get_new_access_token(self) -> str:
-        return self.auth_service.get_oauth_token(
-            self.client_id, self.client_secret, self.audience
-        )
-
-    def _refresh_access_token(self) -> str:
-        return self._get_new_access_token()
-
     @property
     def access_token(self) -> str:
         """Gets a valid access token for audience `audience`"""
-        if self._access_token is None:
-            # Token not yet set, fetch one
-            self.access_token = self._get_new_access_token()
-        elif self._token_expiring():
-            # Token expiring soon, refresh it
-            self.access_token = self._refresh_access_token()
+        if self._access_token is None or self._token_expiring():
+            # Token either not yet set or expiring soon, fetch one
+            logger.debug(f"Fetching new access_token for {self.audience}")
+            self.access_token = self.auth_service.get_oauth_token(
+                self.client_id, self.client_secret, self.audience
+            )
         return self._access_token
 
     @access_token.setter
@@ -64,6 +56,10 @@ class TokenProvider:
             # Token not yet set, fetch it now
             self.access_token
         return self._access_token_decoded
+
+    def reset(self):
+        self._access_token: Optional[str] = None
+        self._access_token_decoded: Optional[Dict] = None
 
 
 class DependentTokenProvider(TokenProvider):
@@ -82,10 +78,16 @@ class DependentTokenProvider(TokenProvider):
         self._access_token: Optional[str] = None
         self._access_token_decoded: Optional[Dict] = None
 
-    def _get_new_access_token(self) -> str:
-        return self.auth_service.get_token(
-            self.token_provider.access_token, self.audience
-        )
+    @TokenProvider.access_token.getter
+    def access_token(self) -> str:
+        """Gets a valid access token for audience `audience`"""
+        if self._access_token is None or self._token_expiring():
+            # Token either not yet set or expiring soon, fetch one
+            logger.debug(f"Fetching new access_token for {self.audience}")
+            self.access_token = self.auth_service.get_token(
+                self.token_provider.access_token, self.audience
+            )
+        return self._access_token
 
 
 class BaseAuth:
