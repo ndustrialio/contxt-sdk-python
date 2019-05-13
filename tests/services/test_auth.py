@@ -1,7 +1,8 @@
 from jose import jwt
 from jose.constants import ALGORITHMS
 
-from contxt.auth.jwt import AuthTokenValidator, ContxtAuthTokenValidator, AuthError
+from contxt.auth.jwt import (AuthError, AuthTokenValidator,
+                             ContxtAuthTokenValidator)
 
 
 def test_auth():
