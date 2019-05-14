@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 from datetime import datetime
 from typing import Dict, Optional
 
@@ -93,18 +94,19 @@ class DependentTokenProvider(TokenProvider):
         return self._access_token
 
 
-class BaseAuth:
+class BaseAuth(ABC):
     """
-    A client (service, worker, etc.) defined by `client_id` and `client_secret`.
-    When the client needs to authenicate to another client, use `get_token_provider(...)`.
+    An abstract base class for a client (user, service, worker, etc.) defined
+    by `client_id` and `client_secret`. When the client needs to authenticate
+    to another client, use `get_token_provider(...)`.
 
-    Overload this class to return a custom `TokenProvider`.
+    Overload this class to implement `get_token_provider(...)`.
     """
 
     def __init__(self, client_id: str, client_secret: str):
         self.client_id = client_id
         self.client_secret = client_secret
 
+    @abstractmethod
     def get_token_provider(self, audience: str) -> TokenProvider:
         """Get `TokenProvider` for audience `audience`"""
-        return TokenProvider(self.client_id, self.client_secret, audience)

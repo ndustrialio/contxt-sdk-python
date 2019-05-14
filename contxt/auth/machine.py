@@ -1,8 +1,16 @@
-from contxt.auth import BaseAuth
+from contxt.auth import BaseAuth, TokenProvider
 
 
-# TODO: remove this class, as its just an alias around BaseAuth
+class MachineTokenProvider(TokenProvider):
+    pass
+
+
 class MachineAuth(BaseAuth):
     """
-    Authentication for a non-human client, such as a service, api, or worker
+    Same as `BaseAuth`, but specifically for a non-human client, such as a
+    service, api, or worker.
     """
+
+    def get_token_provider(self, audience: str) -> MachineTokenProvider:
+        """Get `MachineTokenProvider` for audience `audience`"""
+        return MachineTokenProvider(self.client_id, self.client_secret, audience)
