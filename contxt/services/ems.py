@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, Dict, List, Optional, Set, Tuple, Union
+from typing import Optional
 
 from contxt.legacy.services import GET, APIObjectCollection, Service
 from contxt.models.ems import (FacilityMainService, FacilityUtilitySpend,
@@ -22,7 +22,7 @@ class EMSService(Service):
     Service to interact with our EMS API.
     """
 
-    def __init__(self, auth_module, environment='production'):
+    def __init__(self, auth, environment='production'):
 
         if environment not in CONFIGS_BY_ENVIRONMENT:
             raise Exception('Invalid environment specified')
@@ -31,8 +31,7 @@ class EMSService(Service):
 
         super().__init__(
             base_url=self.env['base_url'],
-            access_token=auth_module.get_token_for_audience(
-                self.env['audience']))
+            access_token=auth.get_token_provider(self.env['audience']))
 
     def get_main_services(self, facility_id: int, type: Optional[str] = None):
 
@@ -58,8 +57,8 @@ class EMSService(Service):
             type: str,
             date_start: datetime,
             date_end: datetime,
-            pro_forma: Optional[bool] = False,
-            exclude_account_charges: Optional[bool] = False,
+            pro_forma: bool = False,
+            exclude_account_charges: bool = False,
     ):
         params = {
             'type': type,
@@ -82,7 +81,7 @@ class EMSService(Service):
             type: str,
             date_start: datetime,
             date_end: datetime,
-            pro_forma: Optional[bool] = False,
+            pro_forma: bool = False,
     ):
 
         params = {

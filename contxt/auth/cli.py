@@ -105,7 +105,7 @@ class Auth0TokenProvider(TokenProvider):
             grant_type="password",
             realm="",
         )
-    
+
     def reset(self):
         super().reset()
         self._refresh_token: Optional[str] = None

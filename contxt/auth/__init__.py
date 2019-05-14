@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Dict, Optional
 
-from jwt import decode
+from jose.jwt import get_unverified_claims
 from pytz import UTC
 
 from contxt.services.auth import AuthService
@@ -47,7 +47,7 @@ class TokenProvider:
     def access_token(self, value: str) -> None:
         """Sets both the access token and the decoded access token"""
         self._access_token = value
-        self._access_token_decoded = decode(self._access_token, verify=False)
+        self._access_token_decoded = get_unverified_claims(self._access_token)
 
     @property
     def decoded_access_token(self) -> Dict:

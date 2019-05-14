@@ -1,3 +1,5 @@
+from typing import List, Union
+
 from contxt.services.api import ApiServiceConfig, ConfiguredApiService
 from contxt.utils import make_logger
 
@@ -20,10 +22,11 @@ class AuthService(ConfiguredApiService):
     def __init__(self, env: str = "production"):
         super().__init__(None, env)
 
-    def get_token(self, access_token: str, audience: str) -> str:
+    def get_token(self, access_token: str, audiences: Union[str, List[str]]) -> str:
+        audiences = [audiences] if isinstance(audiences, str) else audiences
         response = self.post(
             "token",
-            json={"audiences": [audience]},
+            json={"audiences": audiences},
             headers={"Authorization": f"Bearer {access_token}"},
         )
         return response["access_token"]
