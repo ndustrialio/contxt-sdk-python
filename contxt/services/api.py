@@ -4,22 +4,20 @@ from abc import ABC, abstractmethod
 from ast import literal_eval
 from datetime import date, datetime
 from importlib import import_module
-from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Union
+from typing import Any, Callable, Dict, Optional, Union
 
 import requests
 from dateutil import parser
-from jwt import decode
 from pytz import UTC, ZERO
 from requests import PreparedRequest, Response, Session
 from requests.auth import AuthBase
 from requests.exceptions import HTTPError
 
+from contxt.auth import TokenProvider
 from contxt.utils import make_logger
 from contxt.utils.serializer import Serializer
 
 logger = make_logger(__name__)
-
-API_VERSION = "v1"
 
 
 def warn_of_unexpected_api_keys(cls, kwargs):
@@ -116,55 +114,48 @@ class RequestAuth(AuthBase):
     Authorization passed to requests (sets bearer access token in request header)
     """
 
-    def __init__(self, access_token: str) -> None:
-        self.access_token = access_token
+    def __init__(self, token_provider: TokenProvider) -> None:
+        self.token_provider = token_provider
 
     def __call__(self, request: PreparedRequest):
-        request.headers['Authorization'] = f'Bearer {self.access_token}'
+        request.headers["Authorization"] = f"Bearer {self.token_provider.access_token}"
         return request
-
-
-class ApiClient:
-
-    def __init__(self, access_token: str) -> None:
-        self.access_token = access_token
 
 
 class ApiService:
     """
-    A service associated with an API
+    A service associated with an API.
+
+    If `token_provided` is specified, all requests with be authenticated with
+    the access_token it provides.
     """
     __marker = object()
 
-    def __init__(self,
-                 base_url: str,
-                 access_token: str,
-                 api_version: Optional[str] = __marker,
-                 use_session: Optional[bool] = True):
-        api_version = API_VERSION if api_version is self.__marker else api_version
-        self.client = ApiClient(access_token)
-        self.base_url = self._init_base_url(base_url, api_version)
+    def __init__(
+        self,
+        base_url: str,
+        token_provider: Optional[TokenProvider] = None,
+        use_session: Optional[bool] = True,
+    ):
+        self.base_url = base_url
+        self.token_provider = token_provider
         self.session = self._init_session() if use_session else None
 
     def _init_session(self):
         session = Session()
-        session.auth = RequestAuth(self.client.access_token)
+        if self.token_provider:
+            session.auth = RequestAuth(self.token_provider)
         session.hooks = {"response": self._log_response}
         return session
-
-    def _init_base_url(self, base_url: str, api_version: str) -> str:
-        return f"{base_url}/{api_version}" if api_version else base_url
 
     def _url(self, uri: str) -> str:
         return f"{self.base_url}/{uri}"
 
     def _request_kwargs(self):
         return {
-            "auth": RequestAuth(self.client.access_token),
+            "auth": RequestAuth(self.token_provider) if self.token_provider else None,
             # "timeout": 1,
-            "hooks": {
-                "response": self._log_response
-            }
+            "hooks": {"response": self._log_response},
         }
 
     def _log_response(self, response: Response, *args, **kwargs):
@@ -195,10 +186,11 @@ class ApiService:
         except ValueError as e:
             return {}
 
-    def get_logged_in_user_id(self) -> str:
+    def get_logged_in_user_id(self) -> Optional[str]:
+        if not self.token_provider:
+            return None
         # TODO do actual token verification
-        decoded_token = decode(self.client.access_token, verify=False)
-        return decoded_token['sub']
+        return self.token_provider.decoded_access_token["sub"]
 
     def get(self,
             uri,
@@ -275,7 +267,6 @@ class ApiServiceConfig:
         self.audience = audience
 
 
-# TODO: we should automatically refresh the access token here
 class ConfiguredApiService(ApiService, ABC):
     """
     An ApiService that has a list of configurations, selected by name
@@ -284,10 +275,12 @@ class ConfiguredApiService(ApiService, ABC):
     def __init__(self, auth, env: str, **kwargs):
         self.auth = auth
         self.config = self._init_config(env)
+        token_provider = (
+            self.auth.get_token_provider(self.config.audience) if self.auth else None
+        )
         super().__init__(
-            base_url=self.config.base_url,
-            access_token=auth.get_token_for_audience(self.config.audience),
-            **kwargs)
+            base_url=self.config.base_url, token_provider=token_provider, **kwargs
+        )
 
     @property
     @abstractmethod

@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Dict, List, Optional, Set, Tuple
+from typing import Optional
 
 from contxt.legacy.services import (GET, APIObjectCollection, DataResponse,
                                     PagedEndpoint, PagedResponse, Service)
@@ -20,7 +20,7 @@ class IOTService(Service):
     Service to interact with our IOT API.
     """
 
-    def __init__(self, auth_module, environment='production'):
+    def __init__(self, auth, environment='production'):
 
         if environment not in CONFIGS_BY_ENVIRONMENT:
             raise Exception("Invalid environment specified")
@@ -29,7 +29,7 @@ class IOTService(Service):
 
         super().__init__(
             base_url=self.env["base_url"],
-            access_token=auth_module.get_token_for_audience(self.env["audience"]),
+            access_token=auth.get_token_provider(self.env["audience"]),
         )
 
     def get_all_groupings(self, facility_id: int):
@@ -79,7 +79,7 @@ class IOTService(Service):
             start_time: datetime,
             window: int,
             end_time: Optional[datetime] = None,
-            limit: Optional[int] = 1000,
+            limit: int = 1000,
     ):
 
         params = {
