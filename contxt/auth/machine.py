@@ -33,7 +33,7 @@ class MachineTokenProvider(TokenProvider):
 class MachineAuth(Auth):
     """
     Same as `Auth`, but specifically for a non-human client, such as a service,
-    api, or worker.
+    API, or worker.
     """
 
     def get_token_provider(self, audience: str) -> MachineTokenProvider:
