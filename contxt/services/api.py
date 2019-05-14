@@ -13,7 +13,7 @@ from requests import PreparedRequest, Response, Session
 from requests.auth import AuthBase
 from requests.exceptions import HTTPError
 
-# from contxt.auth import TokenProvider
+from contxt.auth import TokenProvider
 from contxt.utils import make_logger
 from contxt.utils.serializer import Serializer
 
@@ -114,7 +114,7 @@ class RequestAuth(AuthBase):
     Authorization passed to requests (sets bearer access token in request header)
     """
 
-    def __init__(self, token_provider: "TokenProvider") -> None:
+    def __init__(self, token_provider: TokenProvider) -> None:
         self.token_provider = token_provider
 
     def __call__(self, request: PreparedRequest):
@@ -134,7 +134,7 @@ class ApiService:
     def __init__(
         self,
         base_url: str,
-        token_provider: Optional["TokenProvider"] = None,
+        token_provider: Optional[TokenProvider] = None,
         use_session: Optional[bool] = True,
     ):
         self.base_url = base_url

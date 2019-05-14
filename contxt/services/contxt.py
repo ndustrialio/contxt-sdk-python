@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import List
 
-from contxt.auth import BaseAuth
+from contxt.auth import Auth
 from contxt.models.contxt import (Config, ConfigValue, Organization,
                                   OrganizationUser, User)
 from contxt.services.api import ApiServiceConfig, ConfiguredApiService
@@ -25,7 +25,7 @@ class ContxtService(ConfiguredApiService):
             audience="8qY2xJob1JAxhmVhIDLCNnGriTM9bct8"),
     )
 
-    def __init__(self, auth: BaseAuth, env: str = "production"):
+    def __init__(self, auth: Auth, env: str = "production"):
         super().__init__(auth, env)
 
     def get_organizations(self) -> List[Organization]:

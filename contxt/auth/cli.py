@@ -5,14 +5,14 @@ from typing import Dict, Optional
 
 from auth0.v3.authentication import GetToken
 
-from contxt.auth import BaseAuth, DependentTokenProvider, TokenProvider
+from contxt.auth import Auth, TokenProvider
 from contxt.services.auth import AuthService
 from contxt.utils import make_logger
 
 logger = make_logger(__name__)
 
 
-class Auth0TokenProvider(TokenProvider):
+class UserIdentityProvider(TokenProvider):
     """
     Same as `TokenProvider`, but the access token provided is authenticated via
     username and password and granted for offline access, meaning expired tokens
@@ -30,8 +30,9 @@ class Auth0TokenProvider(TokenProvider):
         audience: str,
         cache_file: Optional[Path] = None,
     ):
-        super().__init__(client_id, client_secret, audience)
-        # Replace our auth api with auth0, and also store a refresh token
+        super().__init__(audience)
+        self.client_id = client_id
+        self.client_secret = client_secret
         self.auth_service = GetToken("ndustrial.auth0.com")
         self._refresh_token: Optional[str] = None
 
@@ -121,7 +122,10 @@ class Auth0TokenProvider(TokenProvider):
     def update_cache(self) -> None:
         if self._cache_file:
             logger.debug(f"Updating cache {self._cache_file}")
-            cache = {"access_token": self.access_token, "refresh_token": self.refresh_token}
+            cache = {
+                "access_token": self.access_token,
+                "refresh_token": self.refresh_token,
+            }
             self._cache_file.parent.mkdir(parents=True, exist_ok=True)
             with self._cache_file.open("w") as f:
                 dump(cache, f, indent=4)
@@ -133,10 +137,33 @@ class Auth0TokenProvider(TokenProvider):
                 self._cache_file.unlink()
 
 
-class CliAuth(BaseAuth):
+class UserTokenProvider(TokenProvider):
     """
-    Same as `BaseAuth`, but specifically for the client CLI. It uses
-    `Auth0TokenProvider` to authenticate requests to get an access token for
+    Same as `TokenProvider`, but specifically for a human client. In this case,
+    `identity_provider.access_token` serves as the identity provider for the client.
+    """
+
+    def __init__(self, identity_provider: UserIdentityProvider, audience: str):
+        super().__init__(audience)
+        self.identity_provider = identity_provider
+        self.auth_service = AuthService()
+
+    @TokenProvider.access_token.getter
+    def access_token(self) -> str:
+        """Gets a valid access token for audience `audience`"""
+        if self._access_token is None or self._token_expiring():
+            # Token either not yet set or expiring soon, fetch one
+            logger.debug(f"Fetching new access_token for {self.audience}")
+            self.access_token = self.auth_service.get_token(
+                self.identity_provider.access_token, self.audience
+            )
+        return self._access_token
+
+
+class CliAuth(Auth):
+    """
+    Same as `Auth`, but specifically for the client CLI. It uses
+    `UserTokenProvider` to authenticate requests to get an access token for
     target clients defined by `audience`.
 
     The access token from Auth0 is cached in a JSON file in a hidden directory,
@@ -157,34 +184,34 @@ class CliAuth(BaseAuth):
             client_secret="0s8VNQ26QrteS3H5KXIIPvkDcNL5PfT-_pWwAVNI4MpDaDg86O2XUH8lT19KLNiZ",
         )
         self.auth_service = AuthService()
-        self.token_provider = Auth0TokenProvider(
+        self.identity_provider = UserIdentityProvider(
             client_id=self.client_id,
             client_secret=self.client_secret,
             audience=self.auth_service.config.audience,
             cache_file=Path.home() / ".contxt" / "cli_token",
         )
 
-    def get_token_provider(self, audience: str) -> DependentTokenProvider:
+    def get_token_provider(self, audience: str) -> UserTokenProvider:
         """Get `TokenProvider` for audience `audience`"""
-        return DependentTokenProvider(self.token_provider, audience)
+        return UserTokenProvider(self.identity_provider, audience)
 
     def logged_in(self) -> bool:
-        return bool(self.token_provider._access_token)
+        return bool(self.identity_provider._access_token)
 
     def login(self) -> None:
         """Force a prompt for the user to login. Note this will happen automatically."""
         if self.logged_in() and not self.query_user("Already logged in. Continue?"):
             return None
         # NOTE: this works by unsetting the current access token, and then
-        # calling the getter, which triggers a login prompt 
-        self.token_provider.reset()
-        self.token_provider.access_token
+        # calling the getter, which triggers a login prompt
+        self.identity_provider.reset()
+        self.identity_provider.access_token
 
     def logout(self) -> None:
         """Logs the user out by clearing the cache"""
         # Reset both the instance and the cache
-        self.token_provider.reset()
-        self.token_provider.clear_cache()
+        self.identity_provider.reset()
+        self.identity_provider.clear_cache()
 
     def query_user(self, question: str) -> bool:
         """Query the user with `question`, and return if user confirmed"""

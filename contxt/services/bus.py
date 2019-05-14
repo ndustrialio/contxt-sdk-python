@@ -1,6 +1,6 @@
 from typing import Dict, List, Optional, Set, Tuple
 
-from contxt.auth import BaseAuth
+from contxt.auth import Auth
 from contxt.models.bus import Channel, ChannelStats
 from contxt.services.api import ApiServiceConfig, ConfiguredApiService
 from contxt.utils import make_logger
@@ -26,7 +26,7 @@ class MessageBusService(ConfiguredApiService):
 
     def __init__(
             self,
-            auth: BaseAuth,
+            auth: Auth,
             organization_id: str,
             env: Optional[str] = "production",
     ):

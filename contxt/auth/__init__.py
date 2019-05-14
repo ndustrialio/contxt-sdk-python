@@ -5,25 +5,21 @@ from typing import Dict, Optional
 from jose.jwt import get_unverified_claims
 from pytz import UTC
 
-from contxt.services.auth import AuthService
 from contxt.utils import make_logger
 
 logger = make_logger(__name__)
 
 
-class TokenProvider:
+class TokenProvider(ABC):
     """
-    Provides an unexpired `access_token` from the source client (defined by
-    `client_id` and `client_secret`) for the target client (defined by `audience`).
+    An abstact base class to provide an unexpired `access_token` from the source
+    client to the target client (defined by `audience`).
 
-    Overload this class to customize how the `access_token` is fetched and refreshed.
+    Overload this class to implement `access_token`.
     """
 
-    def __init__(self, client_id: str, client_secret: str, audience: str):
-        self.client_id = client_id
-        self.client_secret = client_secret
+    def __init__(self, audience: str):
         self.audience = audience
-        self.auth_service = AuthService()
         self._access_token: Optional[str] = None
         self._access_token_decoded: Optional[Dict] = None
 
@@ -37,15 +33,9 @@ class TokenProvider:
         return expiration <= datetime.now(UTC).timestamp() + within
 
     @property
+    @abstractmethod
     def access_token(self) -> str:
         """Gets a valid access token for audience `audience`"""
-        if self._access_token is None or self._token_expiring():
-            # Token either not yet set or expiring soon, fetch one
-            logger.debug(f"Fetching new access_token for {self.audience}")
-            self.access_token = self.auth_service.get_oauth_token(
-                self.client_id, self.client_secret, self.audience
-            )
-        return self._access_token
 
     @access_token.setter
     def access_token(self, value: str) -> None:
@@ -66,35 +56,7 @@ class TokenProvider:
         self._access_token_decoded: Optional[Dict] = None
 
 
-class DependentTokenProvider(TokenProvider):
-    """
-    Same as `TokenProvider`, except the `access_token` is retreived by
-    authenticating with a separate access token, rather than a client_id and
-    client_secret pair. Thus, it is dependent on a `TokenProvider`.
-
-    Note this is not the typical auth flow.
-    """
-
-    def __init__(self, token_provider: TokenProvider, audience: str):
-        self.token_provider = token_provider
-        self.audience = audience
-        self.auth_service = AuthService()
-        self._access_token: Optional[str] = None
-        self._access_token_decoded: Optional[Dict] = None
-
-    @TokenProvider.access_token.getter
-    def access_token(self) -> str:
-        """Gets a valid access token for audience `audience`"""
-        if self._access_token is None or self._token_expiring():
-            # Token either not yet set or expiring soon, fetch one
-            logger.debug(f"Fetching new access_token for {self.audience}")
-            self.access_token = self.auth_service.get_token(
-                self.token_provider.access_token, self.audience
-            )
-        return self._access_token
-
-
-class BaseAuth(ABC):
+class Auth(ABC):
     """
     An abstract base class for a client (user, service, worker, etc.) defined
     by `client_id` and `client_secret`. When the client needs to authenticate

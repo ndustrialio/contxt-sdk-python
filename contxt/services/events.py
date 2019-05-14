@@ -1,6 +1,6 @@
 from typing import List
 
-from contxt.auth import BaseAuth
+from contxt.auth import Auth
 from contxt.models.events import (Event, EventDefinition, EventType,
                                   TriggeredEvent)
 from contxt.services.api import ApiServiceConfig, ConfiguredApiService
@@ -26,7 +26,7 @@ class EventsService(ConfiguredApiService):
 
     def __init__(
             self,
-            auth: BaseAuth,
+            auth: Auth,
             env: str = "production"
     ):
         super().__init__(auth, env)
