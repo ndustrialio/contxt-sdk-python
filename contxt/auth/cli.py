@@ -163,7 +163,7 @@ class UserTokenProvider(TokenProvider):
 class CliAuth(Auth):
     """
     Same as `Auth`, but specifically for the client CLI. It uses
-    `UserTokenProvider` to authenticate requests to get an access token for
+    `UserIdentityProvider` to authenticate requests to get an access token for
     target clients defined by `audience`.
 
     The access token from Auth0 is cached in a JSON file in a hidden directory,

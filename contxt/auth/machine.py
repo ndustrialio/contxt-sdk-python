@@ -8,7 +8,7 @@ logger = make_logger(__name__)
 class MachineTokenProvider(TokenProvider):
     """
     Same as `TokenProvider`, but specifically for a non-human client. In this case,
-    `client_id` and `client_secret` serves as the identity provider for the source
+    `client_id` and `client_secret` serve as the identity provider for the source
     client.
     """
 
