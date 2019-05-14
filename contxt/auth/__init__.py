@@ -27,10 +27,13 @@ class TokenProvider:
         self._access_token_decoded: Optional[Dict] = None
 
     def _token_expiring(self, within: int = 60) -> bool:
-        """Returns if `access_token` is within `within` seconds of expiring"""
-        return self.decoded_access_token["exp"] <= (
-            datetime.now(UTC).timestamp() + within
-        )
+        """Returns if `access_token` is within `within` seconds of expiring.
+        Returns `False` if `exp` is not in the token's claims."""
+        expiration = self.decoded_access_token.get("exp")
+        if not expiration:
+            logger.debug("'exp' not in token's claims")
+            return False
+        return expiration <= datetime.now(UTC).timestamp() + within
 
     @property
     def access_token(self) -> str:
