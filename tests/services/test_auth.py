@@ -1,3 +1,5 @@
+from datetime import datetime, timedelta
+
 from jose import jwt
 from jose.constants import ALGORITHMS
 
@@ -32,7 +34,10 @@ yOQ45SZ1Kbm0ILrYaLfl1yvFr6MqHrO07HWsiW9zoHDFU31sd2CoGJsu35fTils1
 """
     audience = 'foo_audience'
     issuer = 'foo_issuer'
-    claims = {'foo': 'bar', 'aud': audience, 'iss': issuer}
+    claims = {
+        'foo': 'bar', 'aud': audience, 'iss': issuer,
+        'exp': datetime.utcnow() + timedelta(days=1)
+    }
     token = jwt.encode(claims, private_key, algorithm=ALGORITHMS.RS256)
     validator = AuthTokenValidator(audience=audience, issuer=issuer, public_key=public_key)
     payload = validator.validate(token)
