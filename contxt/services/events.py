@@ -16,11 +16,11 @@ class EventsService(ConfiguredApiService):
     _configs = (
         ApiServiceConfig(
             name="production",
-            base_url="http://events.api.ndustrial.io",
+            base_url="http://events.api.ndustrial.io/v1",
             audience="7jzwfE20O2XZ4aq3cO1wmk63G9GzNc8j"),
         ApiServiceConfig(
             name="staging",
-            base_url="http://events-staging.api.ndustrial.io",
+            base_url="http://events-staging.api.ndustrial.io/v1",
             audience="dn4MaocJFdKtsBy9sFFaTeuJWL1nt5xu"),
     )
 

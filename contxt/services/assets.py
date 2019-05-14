@@ -18,11 +18,11 @@ class AssetsService(ConfiguredApiService):
     _configs = (
         ApiServiceConfig(
             name="production",
-            base_url="https://facilities.api.ndustrial.io",
+            base_url="https://facilities.api.ndustrial.io/v1",
             audience="SgbCopArnGMa9PsRlCVUCVRwxocntlg0"),
         ApiServiceConfig(
             name="staging",
-            base_url="https://facilities-staging.api.ndustrial.io",
+            base_url="https://facilities-staging.api.ndustrial.io/v1",
             audience="xG775XHIOZVUn84seNeHXi0Qe55YuR5w"),
     )
 

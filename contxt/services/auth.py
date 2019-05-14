@@ -14,7 +14,7 @@ class AuthService(ConfiguredApiService):
     _configs = (
         ApiServiceConfig(
             name="production",
-            base_url="https://contxtauth.com",
+            base_url="https://contxtauth.com/v1",
             audience="75wT048QcpE7ujwBJPPjr263eTHl4gEX",
         ),
     )

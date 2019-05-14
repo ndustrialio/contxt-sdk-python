@@ -17,11 +17,11 @@ class ContxtService(ConfiguredApiService):
     _configs = (
         ApiServiceConfig(
             name="production",
-            base_url="https://contxt.api.ndustrial.io",
+            base_url="https://contxt.api.ndustrial.io/v1",
             audience="8qY2xJob1JAxhmVhIDLCNnGriTM9bct8"),
         ApiServiceConfig(
             name="staging",
-            base_url="https://contxt-staging.api.ndustrial.io",
+            base_url="https://contxt-staging.api.ndustrial.io/v1",
             audience="8qY2xJob1JAxhmVhIDLCNnGriTM9bct8"),
     )
 

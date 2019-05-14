@@ -19,8 +19,6 @@ from contxt.utils.serializer import Serializer
 
 logger = make_logger(__name__)
 
-API_VERSION = "v1"
-
 
 def warn_of_unexpected_api_keys(cls, kwargs):
     # Warn of unexpected kwargs
@@ -137,12 +135,10 @@ class ApiService:
         self,
         base_url: str,
         token_provider: Optional["TokenProvider"] = None,
-        api_version: Optional[str] = __marker,
         use_session: Optional[bool] = True,
     ):
-        api_version = API_VERSION if api_version is self.__marker else api_version
+        self.base_url = base_url
         self.token_provider = token_provider
-        self.base_url = self._init_base_url(base_url, api_version)
         self.session = self._init_session() if use_session else None
 
     def _init_session(self):
@@ -151,9 +147,6 @@ class ApiService:
             session.auth = RequestAuth(self.token_provider)
         session.hooks = {"response": self._log_response}
         return session
-
-    def _init_base_url(self, base_url: str, api_version: str) -> str:
-        return f"{base_url}/{api_version}" if api_version else base_url
 
     def _url(self, uri: str) -> str:
         return f"{self.base_url}/{uri}"
