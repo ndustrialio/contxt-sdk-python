@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from contxt.auth import Auth
 from contxt.models.events import (Event, EventDefinition, EventType,
