@@ -89,7 +89,6 @@ setup(
         "inflect",
         "pandas",
         "plotly",
-        "pyjwt",
         "python-dateutil",
         "pytz",
         "requests",

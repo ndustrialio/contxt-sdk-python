@@ -1,70 +1,47 @@
-from contxt.legacy.services import POST, ApiRequest, Service
-from contxt.utils import make_logger
+from typing import List, Union
 
-CONFIGS_BY_ENVIRONMENT = {
-    'production': {
-        'base_url': 'https://contxtauth.com',
-        'audience': '75wT048QcpE7ujwBJPPjr263eTHl4gEX'
-    }
-}
+from contxt.services.api import ApiServiceConfig, ConfiguredApiService
+from contxt.utils import make_logger
 
 logger = make_logger(__name__)
 
 
-class AuthConfigurationError(Exception):
-    pass
-
-
-class ContxtAuthService(Service):
+class AuthService(ConfiguredApiService):
     """
-    Service to interact with our Contxt Auth API.
+    Service to interact with our Auth API.
     """
 
-    def __init__(self, access_token, client_id=None, client_secret=None, environment='production'):
+    _configs = (
+        ApiServiceConfig(
+            name="production",
+            base_url="https://contxtauth.com/v1",
+            audience="75wT048QcpE7ujwBJPPjr263eTHl4gEX",
+        ),
+    )
 
-        if environment not in CONFIGS_BY_ENVIRONMENT:
-            raise Exception('Invalid environment specified')
+    def __init__(self, env: str = "production"):
+        super().__init__(None, env)
 
-        self.env = CONFIGS_BY_ENVIRONMENT[environment]
+    def get_token(self, access_token: str, audiences: Union[str, List[str]]) -> str:
+        audiences = [audiences] if isinstance(audiences, str) else audiences
+        response = self.post(
+            "token",
+            json={"audiences": audiences},
+            headers={"Authorization": f"Bearer {access_token}"},
+        )
+        return response["access_token"]
 
-        # can imply if access_token is none, then we need to use client_id/client_secret to get tokens
-        self.access_token = access_token
-        self.client_id = client_id
-        self.client_secret = client_secret
+    def get_oauth_token(self, client_id: str, client_secret: str, audience: str) -> str:
+        response = self.post(
+            "oauth/token",
+            json={
+                "client_id": client_id,
+                "client_secret": client_secret,
+                "audience": audience,
+                "grant_type": "client_credentials",
+            },
+        )
+        return response["access_token"]
 
-        if self.access_token is None:
-            logger.info("Implying machine-based authentication")
-
-            if self.client_id is None or self.client_secret is None:
-                raise AuthConfigurationError("Misconfiguration authentication. When implying machine-based "
-                                             "authentication client_id and client_secret must be provided")
-
-        super().__init__(
-            base_url=self.env['base_url'], access_token=access_token)
-
-    def get_new_token_for_audience(self, audience):
-
-        if not self.client_id:
-            body = {
-                'audiences': [audience]
-            }
-
-            response = self.execute(POST(uri='token').body(body)
-                                    .content_type(ApiRequest.URLENCODED_CONTENT_TYPE), execute=True)
-
-            return response['access_token']
-
-        else:
-
-            body = {
-                'client_id': self.client_id,
-                'client_secret': self.client_secret,
-                'audience': audience,
-                'grant_type': 'client_credentials'
-            }
-
-            response = self.execute(POST(uri='oauth/token').body(body)
-                                    .content_type(ApiRequest.URLENCODED_CONTENT_TYPE)
-                                    .authorize(False), execute=True)
-
-            return response['access_token']
+    def get_jwks(self) -> str:
+        return self.get(".well-known/jwks.json")

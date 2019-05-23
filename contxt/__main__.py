@@ -35,9 +35,9 @@ def main():
 
     # Launch the command
     if "func" in args:
-        from contxt.auth.cli import CLIAuth
+        from contxt.auth.cli import CliAuth
 
-        auth = CLIAuth()
+        auth = CliAuth()
         args.func(args, auth)
 
 

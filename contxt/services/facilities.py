@@ -1,6 +1,6 @@
-from typing import Any, Callable, Dict, List, Optional, Set, Tuple
+from typing import Optional
 
-from contxt.auth.cli import CLIAuth
+from contxt.auth import Auth
 from contxt.models.facilities import Facility
 from contxt.services.api import ConfiguredApiService
 from contxt.services.assets import AssetsService
@@ -17,7 +17,7 @@ class FacilitiesService(ConfiguredApiService):
     """
     _configs = AssetsService._configs
 
-    def __init__(self, auth: CLIAuth, env: str = "production"):
+    def __init__(self, auth: Auth, env: str = "production"):
         super().__init__(auth, env)
 
     def get_facilities(self, organization_id: Optional[str] = None):

@@ -1,6 +1,6 @@
 from typing import Dict, List, Optional, Set, Tuple
 
-from contxt.auth import BaseAuth
+from contxt.auth import Auth
 from contxt.models.bus import Channel, ChannelStats
 from contxt.services.api import ApiServiceConfig, ConfiguredApiService
 from contxt.utils import make_logger
@@ -16,7 +16,7 @@ class MessageBusService(ConfiguredApiService):
         ApiServiceConfig(
             name="production",
             base_url="https://bus.ndustrial.io",
-            # base_url="http://bus.lineageapi.com/",
+            # base_url="http://bus.lineageapi.com",
             audience="T62CR77ouw4I6VPlSSlLT9VpVA1ebByx"),
         ApiServiceConfig(
             name="staging",
@@ -26,11 +26,11 @@ class MessageBusService(ConfiguredApiService):
 
     def __init__(
             self,
-            auth: BaseAuth,
+            auth: Auth,
             organization_id: str,
             env: Optional[str] = "production",
     ):
-        super().__init__(auth, env, api_version=None)
+        super().__init__(auth, env)
         self.organization_id = organization_id
 
     def _channels_url(self, service_id):

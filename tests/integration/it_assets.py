@@ -3,7 +3,7 @@ from datetime import date, datetime, timedelta
 import pytest
 from pytz import UTC
 
-from contxt.auth.cli import CLIAuth
+from contxt.auth import CliAuth
 from contxt.models.assets import (Asset, AssetType, Attribute, AttributeValue,
                                   DataTypes, Metric, MetricValue,
                                   TimeIntervals)
@@ -15,7 +15,7 @@ from tests.static.asset_schema import AssetSchemas
 def init_schema():
     organization_id = "02efa741-a96f-4124-a463-ae13a704b8fc"
     asset_framework = AssetsService(
-        auth=CLIAuth(),
+        auth=CliAuth(),
         organization_id=organization_id,
         env="staging",
         load_types=True)
@@ -42,11 +42,11 @@ TEST_ASSET = init_schema()
 
 @pytest.fixture
 def cli_auth():
-    return CLIAuth()
+    return CliAuth()
 
 
 @pytest.fixture
-def asset_framework(cli_auth: CLIAuth,
+def asset_framework(cli_auth: CliAuth,
                     organization_id="02efa741-a96f-4124-a463-ae13a704b8fc"):
     return AssetsService(cli_auth, organization_id, env="staging", load_types=True, types_to_fully_load=['TestParentType'])
 
@@ -310,6 +310,6 @@ class TestAssetsService:
 
 
 if __name__ == "__main__":
-    auth = CLIAuth()
+    auth = CliAuth()
     organization_id = "02efa741-a96f-4124-a463-ae13a704b8fc"
     af = AssetsService(auth, organization_id, env="staging")

@@ -42,7 +42,7 @@ class AuthParser(ContxtArgParser):
         auth.login()
 
     def _logout(self, args, auth):
-        auth.reset()
+        auth.logout()
 
 
 class IotParser(ContxtArgParser):

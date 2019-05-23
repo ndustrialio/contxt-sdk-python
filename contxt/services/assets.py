@@ -1,6 +1,6 @@
 from typing import Any, Dict, List, Optional, Set, Tuple
 
-from contxt.auth.cli import CLIAuth
+from contxt.auth import Auth
 from contxt.models.assets import (Asset, AssetType, Attribute, AttributeValue,
                                   CompleteAsset, Metric, MetricValue)
 from contxt.services.api import ApiServiceConfig, ConfiguredApiService
@@ -18,17 +18,17 @@ class AssetsService(ConfiguredApiService):
     _configs = (
         ApiServiceConfig(
             name="production",
-            base_url="https://facilities.api.ndustrial.io",
+            base_url="https://facilities.api.ndustrial.io/v1",
             audience="SgbCopArnGMa9PsRlCVUCVRwxocntlg0"),
         ApiServiceConfig(
             name="staging",
-            base_url="https://facilities-staging.api.ndustrial.io",
+            base_url="https://facilities-staging.api.ndustrial.io/v1",
             audience="xG775XHIOZVUn84seNeHXi0Qe55YuR5w"),
     )
 
     def __init__(
             self,
-            auth: CLIAuth,
+            auth: Auth,
             organization_id: str,
             env: str = "production",
             load_types: bool = True,
