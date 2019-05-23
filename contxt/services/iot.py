@@ -29,7 +29,7 @@ class IOTService(Service):
 
         super().__init__(
             base_url=self.env["base_url"],
-            access_token=auth.get_token_provider(self.env["audience"]),
+            access_token=auth.get_token_provider(self.env["audience"]).access_token,
         )
 
     def get_all_groupings(self, facility_id: int):
