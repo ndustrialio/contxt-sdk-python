@@ -88,6 +88,7 @@ class BaseAuth:
                 self.authenticate_to_service(audience)
 
         access_token = self.tokens[audience]['token']
+        logger.debug(f"Got token for client {audience}: \n{access_token}")
         return access_token
 
     def token_is_expired_for_audience(self, audience):

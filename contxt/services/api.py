@@ -126,8 +126,12 @@ class RequestAuth(AuthBase):
 
 class ApiClient:
 
-    def __init__(self, access_token: str) -> None:
-        self.access_token = access_token
+    def __init__(self, token_provider: Callable[[], str]) -> None:
+        self.token_provider = token_provider
+
+    @property
+    def access_token(self):
+        return self.token_provider()
 
 
 class ApiService:
@@ -138,11 +142,11 @@ class ApiService:
 
     def __init__(self,
                  base_url: str,
-                 access_token: str,
+                 token_provider: Callable[[], str],
                  api_version: Optional[str] = __marker,
                  use_session: Optional[bool] = True):
         api_version = API_VERSION if api_version is self.__marker else api_version
-        self.client = ApiClient(access_token)
+        self.client = ApiClient(token_provider)
         self.base_url = self._init_base_url(base_url, api_version)
         self.session = self._init_session() if use_session else None
 
@@ -203,7 +207,7 @@ class ApiService:
     def get(self,
             uri,
             params: Optional[Dict[str, str]] = None,
-            records_only: Optional[bool] = True,
+            records_only: bool = True,
             **kwargs):
         if self.session:
             response = self.session.get(
@@ -286,7 +290,7 @@ class ConfiguredApiService(ApiService, ABC):
         self.config = self._init_config(env)
         super().__init__(
             base_url=self.config.base_url,
-            access_token=auth.get_token_for_audience(self.config.audience),
+            token_provider=lambda: auth.get_token_for_audience(self.config.audience),
             **kwargs)
 
     @property
