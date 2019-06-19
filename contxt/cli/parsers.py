@@ -665,9 +665,10 @@ class ContxtParser(ContxtArgParser):
 
     def _organizations(self, args, auth):
         from contxt.services.contxt import ContxtService
+        from contxt.utils.serializer import Serializer
         contxt_service = ContxtService(auth)
         orgs = contxt_service.get_organizations()
-        print(orgs)
+        print(Serializer.to_table(orgs))
 
     def _create_organization(self, args, auth):
         from contxt.functions.organizations import Organizations
