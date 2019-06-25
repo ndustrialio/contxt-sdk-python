@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from contxt.legacy.services import (GET, POST, APIObject, APIObjectCollection, DataResponse,
+from contxt.legacy.services import (GET, POST, DELETE, APIObject, APIObjectCollection, DataResponse,
                              PagedEndpoint, PagedResponse, Service, ApiRequest)
 from contxt.utils import Utils
 
@@ -168,6 +168,7 @@ class IOTService(Service):
 
     def get_fields_for_feed(self, feed_id):
 
+        assert isinstance(feed_id, int)
         response = PagedResponse(
             PagedEndpoint(
                 base_url=self.base_url,
@@ -177,6 +178,11 @@ class IOTService(Service):
 
         return APIObjectCollection([Field(record) for record in response]) if response else None
 
+    def unprovision_field(self, field_id):
+
+        assert isinstance(field_id, int)
+
+        return self.execute(DELETE(uri=f'fields/{field_id}'))
 
 class FieldGrouping(APIObject):
 

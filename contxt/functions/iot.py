@@ -3,6 +3,8 @@ import json
 from datetime import datetime
 from pathlib import Path
 
+from typing import List
+
 import pandas as pd
 from tqdm import tqdm
 
@@ -32,6 +34,31 @@ class IOT:
             return feeds[0]
         else:
             return None
+
+    def unprovision_fields(self, field_list: List[int]):
+        for field_id in field_list:
+            logger.info(f"Unprovisioning {field_id}")
+            self.iot_service.unprovision_field(field_id)
+
+    def unprovision_all_fields_in_feed(self, feed_id=None, feed_key=None):
+        if feed_id is None and feed_key is None:
+            raise FeedArgumentException("Must provide either feed_key or feed_id")
+
+        if feed_id is None:
+            feed = self.get_feed_id_from_key(feed_key)
+            if not feed:
+                raise FeedNotFoundException(f"Feed with key {feed_key} not found")
+            feed_id = feed.id
+
+        fields = self.iot_service.get_fields_for_feed(feed_id)
+
+        if len(fields) == 0:
+            logger.error("No fields to unprovision for feed")
+            return
+
+        logger.info(f"Unprovisioning {len(fields)} fields")
+        self.unprovision_fields([field.id for field in fields])
+
 
     def get_unprovisioned_fields_for_feed(self, feed_id=None, feed_key=None):
 

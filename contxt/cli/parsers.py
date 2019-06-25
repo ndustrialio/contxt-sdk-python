@@ -2,7 +2,7 @@ from tabulate import tabulate
 import csv
 import os
 from datetime import datetime
-
+import re
 
 from contxt.utils import make_logger
 
@@ -82,7 +82,18 @@ class IotParser(ArgParser):
         fields_group = fields_parser.add_mutually_exclusive_group(required=True)
         fields_group.add_argument("-f", "--facility-id", type=int, help="Facility id")
         fields_group.add_argument("-g", "--grouping-id", help="Grouping id")
+        fields_group.add_argument("-d", "--feed-key", help="Feed Key")
         fields_parser.set_defaults(func=self._fields)
+
+        ## Unprovision fields
+        unprovision_parser = _subparsers.add_parser("unprovision-fields", help="Unprovision fields")
+        unprovision_parser.add_argument("field_id_list", help="Comma-delimited list of field IDs to unprovision")
+        unprovision_parser.set_defaults(func=self._unprovision_fields)
+
+        ## Unprovision feed
+        unprovision_feed = _subparsers.add_parser("unprovision-feed", help="Unprovision all fields in feed")
+        unprovision_feed.add_argument("feed_key", help="The feed key")
+        unprovision_feed.set_defaults(func=self._unprovision_feed)
 
         # Unprovisioned Fields
         unprovisioned_fields_parser = _subparsers.add_parser("unprovisioned", help="Unprovisioned fields")
@@ -90,7 +101,7 @@ class IotParser(ArgParser):
         feeds_group.add_argument("--feed_key", help="Provide feed key")
         feeds_group.add_argument("--feed_id", type=int, help="Provide feed id")
         unprovisioned_fields_parser.add_argument("--output", help="Dump results to csv if desired")
-        unprovisioned_fields_parser.set_defaults(func=self._unprovisioned_fields)
+        unprovisioned_fields_parser.set_defaults(func=self._list_unprovisioned_fields)
 
         # Field Worksheets
         create_worksheets_parser = _subparsers.add_parser("create-worksheet", help="Field Worksheets")
@@ -132,10 +143,19 @@ class IotParser(ArgParser):
             # Get fields for facility
             fields = iot.iot_service.get_all_fields(args.facility_id)
             print(fields)
-        else:
+        elif args.grouping_id:
             # Get fields for grouping
             fields = iot.get_fields_for_grouping(args.grouping_id)
             print(fields)
+        else:
+            # Get fields for feed key
+            feed = iot.get_feed_id_from_key(args.feed_key)
+            if feed:
+                fields = iot.iot_service.get_fields_for_feed(feed.id)
+                print(fields)
+            else:
+                logger.error("Feed not found for provided Feed Key")
+                return
 
     def _create_grouping(self, args, auth):
         from contxt.functions.iot import IOT
@@ -160,7 +180,32 @@ class IotParser(ArgParser):
 
         print(grouping_field)
 
-    def _unprovisioned_fields(self, args, auth):
+    def _unprovision_fields(self, args, auth):
+        from contxt.functions.iot import IOT
+        iot = IOT(auth)
+
+        pattern = re.compile('[0-9]+(,[0-9]+)*')
+
+        # get the list of field ids and remove all spaces
+        field_id_list = args.field_id_list.replace(' ', '')
+
+        match = pattern.match(field_id_list)
+
+        # check to see if the string matches the pattern
+        if match and len(field_id_list) == match.span()[1]:
+            # call the function to unprovision (after splitting)
+            iot.unprovision_fields([int(i) for i in field_id_list.split(',')])
+        else:
+            logger.error(f"Argument must be a single field ID or a comma-separated list of field IDs")
+            return
+
+    def _unprovision_feed(self, args, auth):
+        from contxt.functions.iot import IOT
+        iot = IOT(auth)
+
+        iot.unprovision_all_fields_in_feed(feed_key=args.feed_key)
+
+    def _list_unprovisioned_fields(self, args, auth):
         from contxt.functions.iot import IOT
         iot = IOT(auth)
         fields = iot.get_unprovisioned_fields_for_feed(
