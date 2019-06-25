@@ -4,7 +4,7 @@ from datetime import datetime
 import inflect
 
 from contxt.legacy.services import (GET, POST, PUT, APIObject, PagedEndpoint,
-                             PagedResponse, Service)
+                                    PagedResponse, Service)
 
 p = inflect.engine()
 

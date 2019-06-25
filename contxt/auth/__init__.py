@@ -1,11 +1,12 @@
-import json
 from datetime import datetime
-import jwt
-from auth0.v3.authentication import GetToken
+from json import dump, load
 from pathlib import Path
 
-from contxt.utils import Utils, make_logger
+from auth0.v3.authentication import GetToken
+from jwt import decode
+
 from contxt.services.auth import ContxtAuthService
+from contxt.utils import Utils, make_logger
 
 logger = make_logger(__name__)
 
@@ -78,7 +79,7 @@ class BaseAuth:
 
         # check to see if have the token, but needs to be refreshed
         if self.token_is_expired_for_audience(audience):
-            logger.warn(f'Token expired for client {audience} -- Refreshing')
+            logger.warn(f"Refreshing expired token for client {audience}...")
 
             # if it's the contxt auth client, we need to follow the other refresh route via Auth0
             if audience == AUTH_AUDIENCE:
@@ -87,6 +88,7 @@ class BaseAuth:
                 self.authenticate_to_service(audience)
 
         access_token = self.tokens[audience]['token']
+        logger.debug(f"Got token for client {audience}: \n{access_token}")
         return access_token
 
     def token_is_expired_for_audience(self, audience):
@@ -94,7 +96,7 @@ class BaseAuth:
         if not self.tokens.get(audience):
             return True
         access_token = self.tokens[audience]['token']
-        decoded_token = jwt.decode(access_token, verify=False)
+        decoded_token = decode(access_token, verify=False)
         token_expiration_epoch = decoded_token['exp']
 
         return token_expiration_epoch <= Utils.get_epoch_time(datetime.now())
@@ -105,26 +107,20 @@ class BaseAuth:
 
         try:
             with self.token_file.open('r') as f:
-                tokens = json.load(f)
+                return load(f)
         except FileNotFoundError:
-            logger.debug('Token file has not been created yet')
+            logger.debug("Token file does not yet exist")
             return {}
-
-        return tokens
 
     def load_tokens(self):
-
         all_tokens = self.read_token_file()
-
-        if self.client_id not in all_tokens:
-            return {}
-
-        return all_tokens[self.client_id]
+        return all_tokens.get(self.client_id, {})
 
     def store_service_token(self, audience, access_token, refresh_token=None):
 
-        if self.client_id not in self.tokens:
-            self.tokens[self.client_id] = {}
+        self.tokens.setdefault(self.client_id, {})
+        # if self.client_id not in self.tokens:
+        #     self.tokens[self.client_id] = {}
 
         self.tokens[audience] = {
             'token': access_token,
@@ -139,8 +135,8 @@ class BaseAuth:
         all_tokens = self.read_token_file()
         all_tokens[self.client_id] = tokens_for_client
 
-        with self.token_file.open('w') as f:
-            json.dump(all_tokens, f, indent=4)
+        with self.token_file.open("w") as f:
+            dump(all_tokens, f, indent=4)
 
     def clear_tokens(self):
         logger.debug(f"Removing toke file {self.token_file}")

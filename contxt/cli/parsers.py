@@ -1,7 +1,5 @@
-from tabulate import tabulate
 import csv
 import os
-from datetime import datetime
 import re
 
 from contxt.utils import make_logger
@@ -9,7 +7,7 @@ from contxt.utils import make_logger
 logger = make_logger(__name__)
 
 
-class ArgParser:
+class ContxtArgParser:
 
     def __init__(self, subparsers):
         self.parser = self._init_parser(subparsers)
@@ -17,15 +15,19 @@ class ArgParser:
     def _init_parser(self, subparsers):
         raise NotImplementedError
 
+    def _help(self, args, auth):
+        self.parser.print_help()
+
     def parse(self, args, auth):
         if "func" in args:
             args.func(args, auth)
 
 
-class AuthParser(ArgParser):
+class AuthParser(ContxtArgParser):
 
     def _init_parser(self, subparsers):
         parser = subparsers.add_parser("auth", help="Authentication")
+        parser.set_defaults(func=self._help)
         _subparsers = parser.add_subparsers(title="subcommands", dest="subcommand")
 
         # Login
@@ -46,10 +48,11 @@ class AuthParser(ArgParser):
         auth.reset()
 
 
-class IotParser(ArgParser):
+class IotParser(ContxtArgParser):
 
     def _init_parser(self, subparsers):
         parser = subparsers.add_parser("iot", help="IOT service")
+        parser.set_defaults(func=self._help)
         _subparsers = parser.add_subparsers(title="subcommands", dest="subcommand")
 
         # Groupings
@@ -328,7 +331,6 @@ class IotParser(ArgParser):
 
         print('Successful!')
 
-
     def _field_data(self, args, auth):
         from contxt.functions.iot import IOT
         iot = IOT(auth)
@@ -341,12 +343,14 @@ class IotParser(ArgParser):
             plot=args.plot)
 
     def _collection_to_csv(self, filename, api_collection_data):
+        from csv import DictWriter
+        from pathlib import Path
 
-        with open(os.path.join('.',filename), 'w') as f:
+        with Path(filename).open('w') as f:
 
             fields = api_collection_data.get_keys()
 
-            writer = csv.DictWriter(f, fieldnames=fields)
+            writer = DictWriter(f, fieldnames=fields)
             writer.writeheader()
 
             for row in api_collection_data:
@@ -356,10 +360,11 @@ class IotParser(ArgParser):
 RESOURCE_TYPES = ["electric", "gas", "combined"]
 
 
-class EmsParser(ArgParser):
+class EmsParser(ContxtArgParser):
 
     def _init_parser(self, subparsers):
         parser = subparsers.add_parser("ems", help="EMS service")
+        parser.set_defaults(func=self._help)
         _subparsers = parser.add_subparsers(title="subcommands", dest="subcommand")
 
         # Main Services
@@ -456,7 +461,6 @@ class EmsParser(ArgParser):
         mains = ems.get_main_services(facility_id=args.facility_id, type=args.resource_type)
         print(mains)
 
-
     def _get_main_data(self, args, auth):
         from contxt.functions.ems import EMS
         ems = EMS(auth)
@@ -541,6 +545,7 @@ class EmsParser(ArgParser):
         else:
 
             if not args.output:
+                # TODO: this requirement should be enforced by argparse
                 logger.critical("Please provide --output as an argument to specify report export file")
                 return
 
@@ -575,6 +580,7 @@ class EmsParser(ArgParser):
         else:
 
             if not args.output:
+                # TODO: this requirement should be enforced by argparse
                 logger.critical("Please provide --output as an argument to specify report export file")
                 return
 
@@ -593,22 +599,23 @@ class EmsParser(ArgParser):
 
     @staticmethod
     def to_csv_main_service_data(main_service_data):
+        from csv import DictWriter
+        from datetime import datetime
+        from pathlib import Path
 
-        output_dir = os.path.join('.', f"main_service_export_{datetime.now().strftime('%m-%d_%H_%M_%S')}")
-
-        os.makedirs(output_dir)
+        output_path = Path(f"main_service_export_{datetime.now().strftime('%m-%d_%H_%M_%S')}")
+        output_path.mkdir(parents=True, exist_ok=False)
 
         for service_name, data in main_service_data.items():
-            filename = os.path.join(output_dir, f"{service_name}.csv")
-
-            with open(filename, 'w') as f:
-                writer = csv.DictWriter(f, fieldnames=['event_time', 'value'])
-
+            filename = output_path / f"{service_name}.csv"
+            with filename.open('w') as f:
+                writer = DictWriter(f, fieldnames=['event_time', 'value'])
                 for row in reversed(data):
                     writer.writerow(row)
 
     @staticmethod
     def _print_facility_normalized_metrics(normalized_data_by_date, normalization_key):
+        from tabulate import tabulate
 
         normalized_to_print = []
 
@@ -626,6 +633,7 @@ class EmsParser(ArgParser):
 
     @staticmethod
     def to_csv_organization_normalized_metric(filename, normalized_data_by_facility):
+        from csv import DictWriter
 
         to_csv_data = []
 
@@ -659,17 +667,18 @@ class EmsParser(ArgParser):
             fields = ['facility_name']
             fields.extend(unique_dates)
 
-            writer = csv.DictWriter(f, fieldnames=fields)
+            writer = DictWriter(f, fieldnames=fields)
             writer.writeheader()
 
             for row in to_csv_data:
                 writer.writerow(row)
 
 
-class AssetsParser(ArgParser):
+class AssetsParser(ContxtArgParser):
 
     def _init_parser(self, subparsers):
         parser = subparsers.add_parser("assets", help="Assets service")
+        parser.set_defaults(func=self._help)
         _subparsers = parser.add_subparsers(title="subcommands", dest="subcommand")
 
         # Facilities
@@ -827,10 +836,11 @@ class AssetsParser(ArgParser):
                 print(metric_values)
 
 
-class ContxtParser(ArgParser):
+class ContxtParser(ContxtArgParser):
 
     def _init_parser(self, subparsers):
         parser = subparsers.add_parser("contxt", help="Contxt service")
+        parser.set_defaults(func=self._help)
         _subparsers = parser.add_subparsers(title="subcommands", dest="subcommand")
 
         # Organizations
@@ -859,9 +869,10 @@ class ContxtParser(ArgParser):
 
     def _organizations(self, args, auth):
         from contxt.services.contxt import ContxtService
+        from contxt.utils.serializer import Serializer
         contxt_service = ContxtService(auth)
         orgs = contxt_service.get_organizations()
-        print(orgs)
+        print(Serializer.to_table(orgs))
 
     def _create_organization(self, args, auth):
         from contxt.functions.organizations import Organizations
@@ -883,10 +894,11 @@ class ContxtParser(ArgParser):
             user_id=args.user_id, organization_id=args.org_id)
 
 
-class BusParser(ArgParser):
+class BusParser(ContxtArgParser):
 
     def _init_parser(self, subparsers):
         parser = subparsers.add_parser("bus", help="Message bus service")
+        parser.set_defaults(func=self._help)
         _subparsers = parser.add_subparsers(title="subcommands", dest="subcommand")
 
         # Channels
@@ -912,12 +924,13 @@ class BusParser(ArgParser):
 
     def _channels(self, args, auth):
         from contxt.functions.bus import Bus
+        from contxt.utils.serializer import Serializer
         bus = Bus(auth)
         channels = bus.get_all_channels_for_service(
             service_id=args.service_id,
             organization_id=args.org_id,
             organization_name=args.org_name)
-        print(channels)
+        print(Serializer.to_table(channels))
 
     def _stats(self, args, auth):
         from contxt.functions.bus import Bus

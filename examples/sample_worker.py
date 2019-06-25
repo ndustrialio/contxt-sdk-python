@@ -1,4 +1,4 @@
-from contxt.utils.workers import BaseWorker
+from contxt.workers import BaseWorker
 
 from contxt.functions.facilities import Facilities
 

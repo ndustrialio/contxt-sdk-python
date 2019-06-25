@@ -1,11 +1,9 @@
 from typing import Dict, List, Optional, Set, Tuple, Union
 
-from contxt.services.asset_framework import AssetFramework
-from contxt.services.asset_models import (Asset, AssetType, Attribute,
-                                          AttributeValue, DataTypes, Metric,
-                                          MetricValue, TimeIntervals)
-from contxt.utils import Config, make_logger
-from contxt.utils.auth.cli import CLIAuth
+from contxt.models.assets import (Asset, AssetType, Attribute, AttributeValue,
+                                  Metric, MetricValue)
+from contxt.services.assets import AssetsService
+from contxt.utils import make_logger
 
 logger = make_logger(__name__)
 
@@ -13,7 +11,7 @@ logger = make_logger(__name__)
 # TODO: methods for creating assets, attribute_values, metric_values
 class AssetSchema:
 
-    def __init__(self, name, asset_types: List[AssetType], assets: Optional[List[Asset]] = None):
+    def __init__(self, name: str, asset_types: List[AssetType], assets: Optional[List[Asset]] = None):
         self.name = name
         self.asset_types = asset_types
         self.assets = assets
@@ -21,30 +19,18 @@ class AssetSchema:
 
 class AssetMigrationManager:
 
-    def __init__(self, assets_service: AssetFramework, asset_schema: AssetSchema):
+    def __init__(self, assets_service: AssetsService, asset_schema: AssetSchema):
         self.assets_service = assets_service
         self.schema = asset_schema
 
     def create(self):
         logger.info(f"Creating assets_schema {self.schema.name}")
 
-        # Create asset types
+        # Create asset types (including attributes, metrics, and children)
         for asset_type in self.schema.asset_types:
-            new_asset_type = self.create_asset_type(asset_type)
+            self.create_asset_type(asset_type)
 
-            # Create attributes
-            for attribute in asset_type.attributes:
-                self.create_attribute(new_asset_type, attribute)
-
-            # Create metrics
-            for metric in asset_type.metrics:
-                self.create_metric(new_asset_type, metric)
-
-            # Create children
-            for child in asset_type.children:
-                self.create_asset_type(child, parent=new_asset_type)
-
-        # Create assets
+        # TODO: Create assets
         # for asset in self.schema.assets:
         #     new_asset = self.create_asset(asset)
 
@@ -85,7 +71,17 @@ class AssetMigrationManager:
         self.assets_service._cache_attributes(existing_asset_type)
         self.assets_service._cache_metrics(existing_asset_type)
 
-        return existing_asset_type
+        # Create attributes
+        for attribute in asset_type.attributes:
+            self.create_attribute(existing_asset_type, attribute)
+
+        # Create metrics
+        for metric in asset_type.metrics:
+            self.create_metric(existing_asset_type, metric)
+
+        # Create children
+        for child in asset_type.children:
+            self.create_asset_type(child, parent=existing_asset_type)
 
     def create_attribute(self, asset_type: AssetType, attribute: Attribute):
         # For the existing asset_type, create the attribute

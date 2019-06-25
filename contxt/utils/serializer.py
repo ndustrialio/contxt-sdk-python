@@ -7,6 +7,10 @@ from typing import Any, Callable, Dict, List, Optional, Set, Tuple
 import pandas as pd
 from tabulate import tabulate
 
+from contxt.utils import make_logger
+
+logger = make_logger(__name__)
+
 
 class Serializer:
     """
@@ -38,6 +42,7 @@ class Serializer:
         :return: dictionary
         :rtype: `dict`
         """
+        from contxt.services.api import Formatters
         # TODO: this may not return a dict but instead a list, or a native type
         # (for example, if passed an int, it will return it). this is likely
         # an unexpected behavior for callers
@@ -61,10 +66,12 @@ class Serializer:
                 k: Serializer.to_dict(v, cls_key=cls_key)
                 for k, v in obj.items()
             }
-        elif isinstance(obj, (date, datetime)):
-            # Date/datetime (default to iso)
-            # TODO: maybe call on DataParser
-            return obj.isoformat().replace("+00:00", "Z")
+        elif isinstance(obj, datetime):
+            # Datetime
+            return Formatters.datetime(obj)
+        elif isinstance(obj, date):
+            # Date
+            return Formatters.date(obj)
         elif hasattr(obj, "_ast"):
             # Abstract syntax tree
             return Serializer.to_dict(obj._ast())
@@ -105,15 +112,16 @@ class Serializer:
         if path:
             with path.open("w") as f:
                 return dump(d, f, **kwargs)
-        else:
-            return dumps(d, **kwargs)
+        return dumps(d, **kwargs)
 
     @staticmethod
-    def to_table(obj: Any, **kwargs):
+    def to_table(obj: Any, path: Optional[Path] = None, **kwargs):
         """Serializes `obj` to a table.
         
         :param obj: object to serialize
         :type obj: Any
+        :param path: path for dumping, defaults to None
+        :param path: Path, optional
         :return: table
         :rtype: tabulate
         """
@@ -124,7 +132,11 @@ class Serializer:
         if not isinstance(d, (list, tuple)):
             d = [d]
 
-        return tabulate(d, headers="keys", **kwargs)
+        table = tabulate(d, headers="keys", **kwargs)
+        if path:
+            with path.open("w") as f:
+                return f.write(table)
+        return table
 
     @staticmethod
     def to_csv(obj: Any, path: Path, header: bool = True, **kwargs):
@@ -166,3 +178,45 @@ class Serializer:
 
         d = Serializer.to_dict(obj)
         return pd.DataFrame(d, columns=Serializer._keys(d), **kwargs)
+
+    @staticmethod
+    def to_file(obj: Any,
+                path: Optional[Path] = None,
+                valid_exts: Optional[List[str]] = (".csv", ".json", ".txt")):
+        """Write an object to a file (or stdout). 
+
+        If path is not provided, `obj` is sent to stdout. Otherwise, the file 
+        extension is used to determine the data format of `obj` before exporting.
+        Supported file extensions are csv (calls `Serializer.to_csv`), 
+        json (calls `Serializer.to_json`), or txt (calls `Serializer.to_table`).
+
+        :param obj: object to output
+        :type obj: Any
+        :param path: path to export, defaults to None
+        :param path: Optional[Path], optional
+        :param valid_exts: supported file extensions, defaults to (".csv", ".json", ".txt")
+        :param valid_exts: Optional[List[str]], optional
+        """
+
+        # If path unspecified, default to stdout
+        if path is None:
+            obj_to_print = Serializer.to_table(obj) if isinstance(
+                obj, (list, tuple)) else Serializer.to_json(obj)
+            print(obj_to_print)
+            return
+
+        # Validate file extension
+        if path.suffix not in valid_exts:
+            logger.critical(
+                f"Unsupported filetype: '{path.suffix}'. Choose from {', '.join(valid_exts)}"
+            )
+            return
+
+        # Dump to file
+        logger.debug(f"Writing {obj.__class__.__name__} to {path}")
+        if path.suffix == ".csv":
+            Serializer.to_csv(obj, path)
+        elif path.suffix == ".json":
+            Serializer.to_json(obj, path)
+        else:
+            Serializer.to_table(obj, path)

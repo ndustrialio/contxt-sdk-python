@@ -1,6 +1,7 @@
 # Contxt Python SDK
 
-This project **requires** Python 3.5+.
+## Dependencies
+This project **requires** Python 3.6+.
 
 ## Installation 
 To install `contxt-sdk`, just use pip:
@@ -161,7 +162,7 @@ major no-no as these should be regarded the same as user credentials
 so setting this up in development will make it seamless upon deployment
 
 ```
-from contxt.utils.workers import BaseWorker
+from contxt.workers import BaseWorker
 
 from contxt.functions.facilities import Facilities
 
