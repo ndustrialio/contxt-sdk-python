@@ -36,6 +36,19 @@ class FieldGrouping(APIObject):
             len(self.fields)
         }
 
+    def get_create_dict(self):
+        create_dict = {
+            "label": self.label,
+            "description": self.description,
+            "is_public": self.is_public,
+        }
+
+        # API can't handle sending None / null for field_category_id at the moment. remove when able to
+        if self.field_category_id:
+            create_dict["field_category_id"] = self.field_category_id
+
+        return create_dict
+
 
 class UnprovisionedField(APIObject):
     def __init__(self, unprovisioned_api_object):
