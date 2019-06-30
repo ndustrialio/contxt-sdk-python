@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from datetime import date, datetime, timedelta
 from typing import Any, List, Optional
 
@@ -211,7 +209,7 @@ class MetricValue(ApiObject):
         notes: str,
         value: str,
         id: Optional[str] = None,
-        asset: Optional[Asset] = None,
+        asset: Optional["Asset"] = None,
         created_at: Optional[datetime] = None,
         updated_at: Optional[datetime] = None,
     ):
@@ -263,7 +261,7 @@ class AssetType(ApiObject):
         hierarchy_level: Optional[int] = None,
         attributes: Optional[List[Attribute]] = None,
         metrics: Optional[List[Metric]] = None,
-        children: Optional[List[AssetType]] = None,
+        children: Optional[List["AssetType"]] = None,
         created_at: Optional[datetime] = None,
         updated_at: Optional[datetime] = None,
     ) -> None:
@@ -324,11 +322,11 @@ class AssetType(ApiObject):
             self._metrics_by_label[metric.normalized_label] = metric
 
     @property
-    def children(self) -> List[AssetType]:
+    def children(self) -> List["AssetType"]:
         return self._children
 
     @children.setter
-    def children(self, children: List[AssetType]) -> None:
+    def children(self, children: List["AssetType"]) -> None:
         self._children = children
         self._children_by_id = {}
         self._children_by_label = {}
@@ -366,14 +364,14 @@ class AssetType(ApiObject):
             return default
         return self._metrics_by_label[metric_label]
 
-    def child_with_id(self, child_id: str, default=__marker) -> AssetType:
+    def child_with_id(self, child_id: str, default=__marker) -> "AssetType":
         if child_id not in self._children_by_id:
             if default is self.__marker:
                 raise KeyError(f"Child {child_id} not found.")
             return default
         return self._children_by_id[child_id]
 
-    def child_with_label(self, child_label: str, default=__marker) -> AssetType:
+    def child_with_label(self, child_label: str, default=__marker) -> "AssetType":
         if child_label not in self._children_by_label:
             if default is self.__marker:
                 raise KeyError(f"Child {child_label} not found.")
@@ -420,7 +418,7 @@ class Asset(ApiObject):
         hierarchy_level: Optional[str] = None,
         attribute_values: Optional[List[MetricValue]] = None,
         metric_values: Optional[List[MetricValue]] = None,
-        children: Optional[List[Asset]] = None,
+        children: Optional[List["Asset"]] = None,
         asset_type: Optional[AssetType] = None,
     ):
         super().__init__()

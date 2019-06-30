@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from abc import ABC, abstractmethod
 from ast import literal_eval
 from datetime import date, datetime
@@ -306,6 +304,48 @@ class ConfiguredApiService(ApiService, ABC):
         return self._configs_by_env[env]
 
 
+# TODO: Need a way to track changed attributes
+# TODO: This custom schema-validation can be replaced by a more robust
+# (although slower) implementation: see https://github.com/marshmallow-code/marshmallow
+class ApiField:
+    """
+    A field retrieved from an API service.
+
+    Contains the expected key, the desired class attribute key, the object type,
+    and if it is a creatable or updatable field.
+    """
+
+    def __init__(
+        self,
+        api_key: str,
+        attr_key: Optional[str] = None,
+        data_type: Optional[Union[Callable, str]] = str,
+        creatable: Optional[bool] = False,
+        updatable: Optional[bool] = False,
+        optional: Optional[bool] = False,
+    ):
+        self.api_key = api_key
+        self.attr_key = attr_key or api_key
+        self._data_type = data_type
+        self.creatable = creatable
+        self.updatable = updatable
+        self.optional = optional
+
+    @property
+    def data_type(self):
+        if isinstance(self._data_type, str):
+            # Load callable from str
+            # NOTE: this is to delay the type assignment to instance creation,
+            # as the type might not yet be defined at class creation
+            modname, qualname_separator, qualname = self._data_type.partition(":")
+            obj = import_module(modname)
+            if qualname_separator:
+                for attr in qualname.split("."):
+                    obj = getattr(obj, attr)
+            self._data_type = obj
+        return self._data_type
+
+
 class ApiObject(ABC):
     """
     An abstract base class for a response from an API. This class serves to
@@ -395,45 +435,3 @@ class ApiObject(ABC):
         )
         # Swap attr_keys for api_keys
         return {self._updatable_fields[k].api_key: v for k, v in d.items()}
-
-
-# TODO: Need a way to track changed attributes
-# TODO: This custom schema-validation can be replaced by a more robust
-# (although slower) implementation: see https://github.com/marshmallow-code/marshmallow
-class ApiField:
-    """
-    A field retrieved from an API service.
-
-    Contains the expected key, the desired class attribute key, the object type,
-    and if it is a creatable or updatable field.
-    """
-
-    def __init__(
-        self,
-        api_key: str,
-        attr_key: Optional[str] = None,
-        data_type: Optional[Union[Callable, str]] = str,
-        creatable: Optional[bool] = False,
-        updatable: Optional[bool] = False,
-        optional: Optional[bool] = False,
-    ):
-        self.api_key = api_key
-        self.attr_key = attr_key or api_key
-        self._data_type = data_type
-        self.creatable = creatable
-        self.updatable = updatable
-        self.optional = optional
-
-    @property
-    def data_type(self):
-        if isinstance(self._data_type, str):
-            # Load callable from str
-            # NOTE: this is to delay the type assignment to instance creation,
-            # as the type might not yet be defined at class creation
-            modname, qualname_separator, qualname = self._data_type.partition(":")
-            obj = import_module(modname)
-            if qualname_separator:
-                for attr in qualname.split("."):
-                    obj = getattr(obj, attr)
-            self._data_type = obj
-        return self._data_type

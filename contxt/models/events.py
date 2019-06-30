@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from datetime import datetime
 from json import loads
 from typing import Optional
@@ -47,15 +45,6 @@ class EventType(ApiObject):
         self.is_realtime_enabled = is_realtime_enabled
         self.created_at = created_at
         self.updated_at = updated_at
-
-
-# class EventDefinitionParameter(ApiObject):
-#     _api_fields = (
-
-#     )
-
-#     def __init__(self):
-#         pass
 
 
 class EventDefinition(ApiObject):
