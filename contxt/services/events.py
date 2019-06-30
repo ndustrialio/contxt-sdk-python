@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from contxt.auth import Auth
 from contxt.models.events import (Event, EventDefinition, EventType,
@@ -73,15 +73,15 @@ class EventsService(ConfiguredApiService):
         logger.debug(f"Deleting event {event.id}")
         self.delete(f"events/{event.id}")
 
-    def get_events_for_type(self, event_type_id: str) -> List[EventType]:
+    def get_events_for_type(self, event_type_id: str) -> List[Event]:
         logger.debug(f"Fetching events for type {event_type_id}")
         resp = self.get(f"types/{event_type_id}/events")
-        return [EventType.from_api(rec) for rec in resp]
+        return [Event.from_api(rec) for rec in resp]
 
-    def get_events_for_client(self, client_id: str) -> List[EventType]:
+    def get_events_for_client(self, client_id: str) -> List[Event]:
         logger.debug(f"Fetching events for client {client_id}")
         resp = self.get(f"clients/{client_id}/events")
-        return [EventType.from_api(rec) for rec in resp]
+        return [Event.from_api(rec) for rec in resp]
 
     def get_event_definition(self, event_id: str) -> EventDefinition:
         logger.debug(f"Fetching definition for event {event_id}")
@@ -112,9 +112,36 @@ class EventsService(ConfiguredApiService):
         self.delete(f"triggered/{triggered_event.id}")
 
     def get_triggered_events_for_event(self,
-                                       event_id: str) -> List[TriggeredEvent]:
+                                       event_id: str,
+                                       limit: int = 1000,
+                                       offset: int = 0,
+                                       order_by: Optional[str] = None,
+                                       reverse_order: Optional[bool] = None
+                                       ) -> List[TriggeredEvent]:
+        """
+        getTriggeredEvents
+
+        - event_id - ID of the event object
+
+        Get a list of triggered events for a particular event object
+
+        Returns a list of triggered events
+        """
         logger.debug(f"Fetching triggered_events for event {event_id}")
-        resp = self.get(f"events/{event_id}/triggered")
+
+        assert isinstance(event_id, str)
+
+        params = {'limit': limit,
+                  'offset': offset}
+
+        if order_by is not None:
+            assert isinstance(order_by, str)
+            params['orderBy'] = order_by
+
+        if reverse_order is not None:
+            assert isinstance(reverse_order, bool)
+            params['reverseOrder'] = reverse_order
+        resp = self.get(uri=f"events/{event_id}/triggered", params=params)
         return [TriggeredEvent.from_api(rec) for rec in resp]
 
     def get_triggered_events_for_field(self, field_id):

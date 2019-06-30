@@ -34,7 +34,8 @@ class AssetsService(ConfiguredApiService):
             load_types: bool = True,
             types_to_fully_load: Optional[List[str]] = None,
     ):
-        super().__init__(auth, env)
+        # FIXME: setting use_session to False for the time being, until token renewal is handled
+        super().__init__(auth, env, use_session=False)
         # TODO: handle multiple orgs
         self.organization_id = organization_id
         self.types = {}
@@ -365,12 +366,12 @@ class AssetsService(ConfiguredApiService):
                 Asset.from_api(rec),
                 with_attribute_values=with_attribute_values,
                 with_metric_values=with_metric_values) for rec in self.get(
-                    f"organizations/{organization_id}/assets",
-                    params={
-                        "asset_type_id": asset_type_id,
-                        "asset_attribute_id": attribute_id,
-                        "asset_attribute_value": attribute_value
-                    })
+                f"organizations/{organization_id}/assets",
+                params={
+                    "asset_type_id": asset_type_id,
+                    "asset_attribute_id": attribute_id,
+                    "asset_attribute_value": attribute_value
+                })
         ]
 
     def get_latest_assets_for_organization(
@@ -543,7 +544,7 @@ class AssetsService(ConfiguredApiService):
                 f"assets/{asset_id}/attributes/values",
                 json={
                     "asset_attribute_values":
-                    [v.upsert() for v in attribute_values]
+                        [v.upsert() for v in attribute_values]
                 })
         ]
 

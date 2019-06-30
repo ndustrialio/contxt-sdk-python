@@ -1,5 +1,6 @@
 import logging
 from datetime import datetime
+from os import environ
 from sys import stdout
 from time import time
 
@@ -106,6 +107,9 @@ class ColoredFormatter(logging.Formatter):
         return log
 
 
+DEFAULT_LOGGING_LEVEL = environ.get('LOG_LEVEL', logging.INFO)
+
+
 # Custom logger class with multiple destinations
 class ColoredLogger(logging.Logger):
     FORMAT = (
@@ -115,7 +119,7 @@ class ColoredLogger(logging.Logger):
     COLOR_FORMAT = formatter_message(FORMAT, True)
 
     def __init__(self, name):
-        logging.Logger.__init__(self, name, logging.INFO)
+        logging.Logger.__init__(self, name, DEFAULT_LOGGING_LEVEL)
 
         color_formatter = ColoredFormatter(self.COLOR_FORMAT)
 
@@ -131,5 +135,4 @@ else:
     logging.basicConfig(
         format="%(asctime)s %(levelname)-8s [%(name)s]  %(message)s (%(filename)s:%(lineno)d)",
         stream=stdout,
-        level=logging.INFO,
-    )
+        level=DEFAULT_LOGGING_LEVEL)

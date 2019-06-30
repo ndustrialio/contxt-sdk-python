@@ -72,7 +72,6 @@ class UserIdentityProvider(TokenProvider):
                 self.client_id, self.client_secret, self.refresh_token
             )
             self.access_token = token_info["access_token"]
-            self.refresh_token = token_info["refresh_token"]
             # Update cache
             self.update_cache()
         return self._access_token
