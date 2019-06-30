@@ -12,23 +12,23 @@ class MessageBusService(ConfiguredApiService):
     """
     Service to interact with our Message Bus API.
     """
+
     _configs = (
         ApiServiceConfig(
             name="production",
             base_url="https://bus.ndustrial.io",
             # base_url="http://bus.lineageapi.com",
-            audience="T62CR77ouw4I6VPlSSlLT9VpVA1ebByx"),
+            audience="T62CR77ouw4I6VPlSSlLT9VpVA1ebByx",
+        ),
         ApiServiceConfig(
             name="staging",
             base_url="https://bus-staging.ndustrial.io",
-            audience="YHCtC2dZAvvt2SdxUVwWpVdm4fSOkUdL"),
+            audience="YHCtC2dZAvvt2SdxUVwWpVdm4fSOkUdL",
+        ),
     )
 
     def __init__(
-            self,
-            auth: Auth,
-            organization_id: str,
-            env: Optional[str] = "production",
+        self, auth: Auth, organization_id: str, env: Optional[str] = "production"
     ):
         super().__init__(auth, env)
         self.organization_id = organization_id
@@ -46,24 +46,23 @@ class MessageBusService(ConfiguredApiService):
         resp = self.get(self._channels_url(service_id))
         return [Channel.from_api(rec) for rec in resp]
 
-    def get_schema_for_channel_and_service(self, schema_id: str, channel_id: str, service_id: str):
+    def get_schema_for_channel_and_service(
+        self, schema_id: str, channel_id: str, service_id: str
+    ):
         logger.debug(f"Fetching channel {channel_id} for service {service_id}")
-        resp = self.get(
-            f"{self._channels_url(service_id)}/{channel_id}/schemas")
+        resp = self.get(f"{self._channels_url(service_id)}/{channel_id}/schemas")
         return resp
 
     def get_schemas_for_channel_and_service(self, channel_id: str, service_id: str):
         logger.debug(
             f"Fetching schemas for channel {channel_id} and service {service_id}"
         )
-        resp = self.get(
-            f"{self._channels_url(service_id)}/{channel_id}/schemas")
+        resp = self.get(f"{self._channels_url(service_id)}/{channel_id}/schemas")
         return resp
 
     def get_stats_for_channel_and_service(self, channel_id: str, service_id: str):
         logger.debug(
             f"Fetching stats for channel {channel_id} and service {service_id}"
         )
-        resp = self.get(
-            f"{self._channels_url(service_id)}/{channel_id}/statistics")
+        resp = self.get(f"{self._channels_url(service_id)}/{channel_id}/statistics")
         return ChannelStats.from_api(resp)

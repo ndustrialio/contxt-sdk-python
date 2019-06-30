@@ -5,9 +5,9 @@ from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Set, Tuple
 
 import pandas as pd
-from tabulate import tabulate
 
 from contxt.utils import make_logger
+from tabulate import tabulate
 
 logger = make_logger(__name__)
 
@@ -27,9 +27,7 @@ class Serializer:
             return []
 
     @staticmethod
-    def to_dict(obj: Any,
-                cls_key: str = None,
-                key_filter: Callable = None):
+    def to_dict(obj: Any, cls_key: str = None, key_filter: Callable = None):
         """Serializes `obj` to a `dict`. To use a custom format, overload
         `obj.to_dict()`.
 
@@ -43,6 +41,7 @@ class Serializer:
         :rtype: `dict`
         """
         from contxt.services.api import Formatters
+
         # TODO: this may not return a dict but instead a list, or a native type
         # (for example, if passed an int, it will return it). this is likely
         # an unexpected behavior for callers
@@ -62,10 +61,7 @@ class Serializer:
             return obj.to_dict()
         if isinstance(obj, dict):
             # Dictionary
-            return {
-                k: Serializer.to_dict(v, cls_key=cls_key)
-                for k, v in obj.items()
-            }
+            return {k: Serializer.to_dict(v, cls_key=cls_key) for k, v in obj.items()}
         elif isinstance(obj, datetime):
             # Datetime
             return Formatters.datetime(obj)
@@ -180,9 +176,11 @@ class Serializer:
         return pd.DataFrame(d, columns=Serializer._keys(d), **kwargs)
 
     @staticmethod
-    def to_file(obj: Any,
-                path: Optional[Path] = None,
-                valid_exts: Optional[List[str]] = (".csv", ".json", ".txt")):
+    def to_file(
+        obj: Any,
+        path: Optional[Path] = None,
+        valid_exts: Optional[List[str]] = (".csv", ".json", ".txt"),
+    ):
         """Write an object to a file (or stdout). 
 
         If path is not provided, `obj` is sent to stdout. Otherwise, the file 
@@ -200,8 +198,11 @@ class Serializer:
 
         # If path unspecified, default to stdout
         if path is None:
-            obj_to_print = Serializer.to_table(obj) if isinstance(
-                obj, (list, tuple)) else Serializer.to_json(obj)
+            obj_to_print = (
+                Serializer.to_table(obj)
+                if isinstance(obj, (list, tuple))
+                else Serializer.to_json(obj)
+            )
             print(obj_to_print)
             return
 

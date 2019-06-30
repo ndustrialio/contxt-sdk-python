@@ -1,10 +1,22 @@
 from datetime import datetime
 from typing import Optional
 
-from contxt.legacy.services import (GET, APIObjectCollection, DataResponse,
-                                    PagedEndpoint, PagedResponse, Service)
-from contxt.models.iot import (Feed, Field, FieldCategory, FieldGrouping,
-                               FieldGroupingOwner, UnprovisionedField)
+from contxt.legacy.services import (
+    GET,
+    APIObjectCollection,
+    DataResponse,
+    PagedEndpoint,
+    PagedResponse,
+    Service,
+)
+from contxt.models.iot import (
+    Feed,
+    Field,
+    FieldCategory,
+    FieldGrouping,
+    FieldGroupingOwner,
+    UnprovisionedField,
+)
 from contxt.utils import Utils
 
 CONFIGS_BY_ENVIRONMENT = {
@@ -20,7 +32,7 @@ class IOTService(Service):
     Service to interact with our IOT API.
     """
 
-    def __init__(self, auth, environment='production'):
+    def __init__(self, auth, environment="production"):
 
         if environment not in CONFIGS_BY_ENVIRONMENT:
             raise Exception("Invalid environment specified")
@@ -73,13 +85,13 @@ class IOTService(Service):
             return None
 
     def get_data_for_field(
-            self,
-            output_id: int,
-            field_human_name: str,
-            start_time: datetime,
-            window: int,
-            end_time: Optional[datetime] = None,
-            limit: int = 1000,
+        self,
+        output_id: int,
+        field_human_name: str,
+        start_time: datetime,
+        window: int,
+        end_time: Optional[datetime] = None,
+        limit: int = 1000,
     ):
 
         params = {
@@ -89,7 +101,7 @@ class IOTService(Service):
         }
 
         if end_time:
-            params['timeEnd'] = str(Utils.get_epoch_time(end_time))
+            params["timeEnd"] = str(Utils.get_epoch_time(end_time))
 
         return DataResponse(
             data=self.execute(
@@ -108,9 +120,13 @@ class IOTService(Service):
 
         params = {"limit": limit, "offset": offset}
 
-        return self.execute(GET(uri=f"feeds/{feed_id}/fields").params(params), execute=True)
+        return self.execute(
+            GET(uri=f"feeds/{feed_id}/fields").params(params), execute=True
+        )
 
-    def get_feeds_collection(self, facility_id: Optional[int] = None, key: Optional[str] = None):
+    def get_feeds_collection(
+        self, facility_id: Optional[int] = None, key: Optional[str] = None
+    ):
 
         params = {}
 
@@ -152,6 +168,10 @@ class IOTService(Service):
         )
 
     def get_unprovisioned_fields(self, feed_id: int):
-        response = self.execute(GET(uri=f'feeds/{feed_id}/fields/unprovisioned'))
+        response = self.execute(GET(uri=f"feeds/{feed_id}/fields/unprovisioned"))
 
-        return APIObjectCollection([UnprovisionedField(record) for record in response]) if response else None
+        return (
+            APIObjectCollection([UnprovisionedField(record) for record in response])
+            if response
+            else None
+        )

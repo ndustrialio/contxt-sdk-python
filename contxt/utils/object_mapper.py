@@ -40,14 +40,18 @@ class ObjectMapper:
                 attrs = getattr(annotation, "__args__")
                 assert len(attrs) == 1
                 generic_param = attrs[0]
-                return [ObjectMapper.tree_to_object(item, generic_param) for item in tree]
+                return [
+                    ObjectMapper.tree_to_object(item, generic_param) for item in tree
+                ]
             elif origin is dict:
                 assert isinstance(tree, dict)
                 attrs = getattr(annotation, "__args__")
                 assert len(attrs) == 2
                 key_ann, value_ann = attrs
                 return {
-                    ObjectMapper.tree_to_object(k, key_ann): ObjectMapper.tree_to_object(v, value_ann)
+                    ObjectMapper.tree_to_object(
+                        k, key_ann
+                    ): ObjectMapper.tree_to_object(v, value_ann)
                     for k, v in tree.items()
                 }
         elif inspect.isclass(annotation):
@@ -67,10 +71,14 @@ class ObjectMapper:
                     if raw is Null:
                         assert param.default is not inspect.Parameter.empty, (
                             f"Missing value for required parameter; "
-                            f"type: {annotation}, param: {param}, tree: {tree}." + " " + failure_msg()
+                            f"type: {annotation}, param: {param}, tree: {tree}."
+                            + " "
+                            + failure_msg()
                         )
                     else:
-                        args[param.name] = ObjectMapper.tree_to_object(raw, param.annotation)
+                        args[param.name] = ObjectMapper.tree_to_object(
+                            raw, param.annotation
+                        )
                 if len(tree) > len(args):
                     # there seem to be some extraneous keys
                     extraneous_keys = [k for k in tree.keys() if k not in args]
@@ -101,5 +109,6 @@ class ObjectMapper:
         else:
             dic = obj if isinstance(obj, dict) else vars(obj)
             return {
-                ObjectMapper.object_to_tree(k): ObjectMapper.object_to_tree(v) for k, v in dic.items()
+                ObjectMapper.object_to_tree(k): ObjectMapper.object_to_tree(v)
+                for k, v in dic.items()
             }

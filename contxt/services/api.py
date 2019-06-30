@@ -38,8 +38,7 @@ class Parsers:
 
     @staticmethod
     def parse_as_datetime(timestamp: str) -> datetime:
-        return datetime.strptime(timestamp,
-                                 "%Y-%m-%dT%H:%M:%S.%fZ").replace(tzinfo=UTC)
+        return datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%S.%fZ").replace(tzinfo=UTC)
 
     @staticmethod
     def parse_as_date(datestamp: str) -> date:
@@ -93,9 +92,7 @@ class Formatters:
     def format_datetime(datetime_: datetime) -> str:
         # Require timezone to be UTC
         if datetime_.utcoffset() != ZERO:
-            raise AssertionError(
-                f"Datetime must be UTC, not {datetime_.tzinfo}"
-            )
+            raise AssertionError(f"Datetime must be UTC, not {datetime_.tzinfo}")
         # NOTE: almost exactly the same as isoformat(), but ensures
         # microseconds are always represented
         return datetime_.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
@@ -129,6 +126,7 @@ class ApiService:
     If `token_provided` is specified, all requests with be authenticated with
     the access_token it provides.
     """
+
     __marker = object()
 
     def __init__(
@@ -173,7 +171,7 @@ class ApiService:
             # Catch the error, to log the response's message, and reraise
             # Try to decode the response as json, else fall back to raw text
             response_json = self._get_json(response)
-            msg = response_json.get('message') or response_json or response.text
+            msg = response_json.get("message") or response_json or response.text
             logger.error(f"HTTP Error: {response.reason} - {msg}")
             raise
 
@@ -192,14 +190,15 @@ class ApiService:
         # TODO do actual token verification
         return self.token_provider.decoded_access_token["sub"]
 
-    def get(self,
-            uri,
-            params: Optional[Dict[str, str]] = None,
-            records_only: bool = True,
-            **kwargs):
+    def get(
+        self,
+        uri,
+        params: Optional[Dict[str, str]] = None,
+        records_only: bool = True,
+        **kwargs,
+    ):
         if self.session:
-            response = self.session.get(
-                self._url(uri), params=params, **kwargs)
+            response = self.session.get(self._url(uri), params=params, **kwargs)
         else:
             # Merge default options with method options
             kwargs = {**self._request_kwargs(), **(kwargs or {})}
@@ -208,42 +207,43 @@ class ApiService:
         response_json = self._process_response(response)
 
         # Return just records, if requested and available
-        records = response_json.get("records") if isinstance(
-            response_json, dict) else None
+        records = (
+            response_json.get("records") if isinstance(response_json, dict) else None
+        )
         if records_only and records is not None:
             return records
 
         # Return entire response
         return response_json
 
-    def post(self,
-             uri: str,
-             data: Optional[Dict] = None,
-             json: Optional[Dict] = None,
-             **kwargs):
+    def post(
+        self,
+        uri: str,
+        data: Optional[Dict] = None,
+        json: Optional[Dict] = None,
+        **kwargs,
+    ):
         if self.session:
-            response = self.session.post(
-                self._url(uri), data=data, json=json, **kwargs)
+            response = self.session.post(self._url(uri), data=data, json=json, **kwargs)
         else:
             # Merge default options with method options
             kwargs = {**self._request_kwargs(), **(kwargs or {})}
-            response = requests.post(
-                self._url(uri), data=data, json=json, **kwargs)
+            response = requests.post(self._url(uri), data=data, json=json, **kwargs)
         return self._process_response(response)
 
-    def put(self,
-            uri: str,
-            data: Optional[Dict] = None,
-            json: Optional[Dict] = None,
-            **kwargs):
+    def put(
+        self,
+        uri: str,
+        data: Optional[Dict] = None,
+        json: Optional[Dict] = None,
+        **kwargs,
+    ):
         if self.session:
-            response = self.session.put(
-                self._url(uri), data=data, json=json, **kwargs)
+            response = self.session.put(self._url(uri), data=data, json=json, **kwargs)
         else:
             # Merge default options with method options
             kwargs = {**self._request_kwargs(), **(kwargs or {})}
-            response = requests.put(
-                self._url(uri), data=data, json=json, **kwargs)
+            response = requests.put(self._url(uri), data=data, json=json, **kwargs)
         return self._process_response(response)
 
     def delete(self, uri: str, **kwargs):
@@ -307,6 +307,7 @@ class ApiObject(ABC):
     An abstract base class for a response from an API. This class serves to
     take a raw response from an API and create a parsed Python object.
     """
+
     _api_fields = NotImplemented
 
     def __init__(self):
@@ -315,13 +316,11 @@ class ApiObject(ABC):
         # HACK: move this somewhere more appropriate
         if not hasattr(cls, "_creatable_fields"):
             cls._creatable_fields = {
-                f.attr_key: f
-                for f in cls._api_fields if f.creatable
+                f.attr_key: f for f in cls._api_fields if f.creatable
             }
         if not hasattr(cls, "_updatable_fields"):
             cls._updatable_fields = {
-                f.attr_key: f
-                for f in cls._api_fields if f.updatable
+                f.attr_key: f for f in cls._api_fields if f.updatable
             }
 
     def __str__(self):
@@ -338,7 +337,7 @@ class ApiObject(ABC):
         if api_value is None:
             # No value
             return api_value
-        elif isinstance(api_value, (list, tuple,)):
+        elif isinstance(api_value, (list, tuple)):
             # Value is a list, clean each item
             return [cls.clean_api_value(api_field, v) for v in api_value]
         elif callable(getattr(api_field.data_type, "from_api", None)):
@@ -355,7 +354,9 @@ class ApiObject(ABC):
             f.attr_key: cls.clean_api_value(
                 api_field=f,
                 api_value=api_dict.pop(f.api_key, None)
-                if f.optional else api_dict.pop(f.api_key))
+                if f.optional
+                else api_dict.pop(f.api_key),
+            )
             for f in cls._api_fields
         }
 
@@ -377,7 +378,8 @@ class ApiObject(ABC):
         """Get data for a POST request"""
         # Transform api fields to dict
         d = Serializer.to_dict(
-            self, key_filter=lambda k: k in set(self._creatable_fields.keys()))
+            self, key_filter=lambda k: k in set(self._creatable_fields.keys())
+        )
         # Swap attr_keys for api_keys
         return {self._creatable_fields[k].api_key: v for k, v in d.items()}
 
@@ -385,7 +387,8 @@ class ApiObject(ABC):
         """Get data for a PUT request"""
         # Transform api fields to dict
         d = Serializer.to_dict(
-            self, key_filter=lambda k: k in set(self._updatable_fields.keys()))
+            self, key_filter=lambda k: k in set(self._updatable_fields.keys())
+        )
         # Swap attr_keys for api_keys
         return {self._updatable_fields[k].api_key: v for k, v in d.items()}
 
@@ -402,13 +405,13 @@ class ApiField:
     """
 
     def __init__(
-            self,
-            api_key: str,
-            attr_key: Optional[str] = None,
-            data_type: Optional[Union[Callable, str]] = str,
-            creatable: Optional[bool] = False,
-            updatable: Optional[bool] = False,
-            optional: Optional[bool] = False
+        self,
+        api_key: str,
+        attr_key: Optional[str] = None,
+        data_type: Optional[Union[Callable, str]] = str,
+        creatable: Optional[bool] = False,
+        updatable: Optional[bool] = False,
+        optional: Optional[bool] = False,
     ):
         self.api_key = api_key
         self.attr_key = attr_key or api_key

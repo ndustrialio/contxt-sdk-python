@@ -63,7 +63,7 @@ class EventDefinition(ApiObject):
         ApiField("id"),
         ApiField("event_id"),
         ApiField("description"),
-        ApiField("parameters", data_type=lambda o: loads(o.replace('\"', '"'))),
+        ApiField("parameters", data_type=lambda o: loads(o.replace('"', '"'))),
         ApiField("created_at", data_type=Parsers.datetime),
         ApiField("updated_at", data_type=Parsers.datetime),
     )

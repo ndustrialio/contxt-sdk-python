@@ -21,13 +21,15 @@ if __name__ == "__main__":
 
     s = AssetsService(auth, wpe.id, types_to_fully_load="EthanolProcessBatch")
     complete_asset = s.get_complete_asset(batch_id)
-    triggered_event_id = complete_asset.attributes['batch_triggered_event_id']
+    triggered_event_id = complete_asset.attributes["batch_triggered_event_id"]
 
     event_service = EventsService(auth)
     # event_type = event_service.get_event_types()
     triggered_event = event_service.get_triggered_event(triggered_event_id)
     event_definition = event_service.get_event_definition(triggered_event.event_id)
-    statement = event_service.event_definition_parameters_to_human_readable_format(event_definition)
+    statement = event_service.event_definition_parameters_to_human_readable_format(
+        event_definition
+    )
     print(statement)
     # s = MessageBusService(auth, ll.id, env="production")
     # service_id = "GCXd2bwE9fgvqxygrx2J7TkDJ3efXBKM"

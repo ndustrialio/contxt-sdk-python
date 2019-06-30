@@ -15,6 +15,7 @@ class FacilitiesService(ConfiguredApiService):
 
     NOTE: The facility_id in this service is the legacy integer id.
     """
+
     _configs = AssetsService._configs
 
     def __init__(self, auth: Auth, env: str = "production"):
@@ -22,7 +23,11 @@ class FacilitiesService(ConfiguredApiService):
 
     def get_facilities(self, organization_id: Optional[str] = None):
         logger.debug(f"Fetching facilities for organization {organization_id}")
-        uri = f"organizations/{organization_id}/facilities" if organization_id is not None else "facilities"
+        uri = (
+            f"organizations/{organization_id}/facilities"
+            if organization_id is not None
+            else "facilities"
+        )
         resp = self.get(uri)
         # TODO: handle not found errors here, and return None instead of raising an error
         return [Facility.from_api(rec) for rec in resp]
@@ -41,9 +46,9 @@ class FacilitiesService(ConfiguredApiService):
                 return facility
         logger.warning(f"Failed to find facility with name {name}")
 
-    def get_facility_with_asset_id(self,
-                                   asset_id: str,
-                                   organization_id: Optional[str] = None):
+    def get_facility_with_asset_id(
+        self, asset_id: str, organization_id: Optional[str] = None
+    ):
         logger.debug(f"Fetching facility {asset_id}")
         # Filter by asset_id
         for facility in self.get_facilities(organization_id=organization_id):

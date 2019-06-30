@@ -4,7 +4,6 @@ import requests
 from jose import jwt
 from jose.constants import ALGORITHMS
 
-
 # NOTE: this code was originally stolen from https://auth0.com/docs/quickstart/backend/python/01-authorization
 #       then tweaked for convenience
 
@@ -25,8 +24,13 @@ class AuthTokenValidator(NamedTuple):
 
     def validate(self, token: str) -> TokenPayload:
         try:
-            return jwt.decode(token=token, key=self.public_key, algorithms=ALGORITHMS.RS256, audience=self.audience,
-                              issuer=self.issuer)
+            return jwt.decode(
+                token=token,
+                key=self.public_key,
+                algorithms=ALGORITHMS.RS256,
+                audience=self.audience,
+                issuer=self.issuer,
+            )
         except jwt.ExpiredSignatureError:
             raise AuthError("TOKEN_EXPIRED: token is expired")
         except jwt.JWTClaimsError:
@@ -52,10 +56,10 @@ def _get_jwks() -> str:
 
 
 class ContxtAuthTokenValidator:
-
     def __init__(self, audience: str):
-        self.delegate = AuthTokenValidator(audience=audience, issuer=CONTXT_AUTH0_ISSUER,
-                                           public_key=_get_jwks())
+        self.delegate = AuthTokenValidator(
+            audience=audience, issuer=CONTXT_AUTH0_ISSUER, public_key=_get_jwks()
+        )
 
     def validate(self, token: str) -> TokenPayload:
         return self.delegate.validate(token)

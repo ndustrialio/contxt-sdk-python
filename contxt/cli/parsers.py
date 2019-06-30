@@ -1,11 +1,9 @@
-
 from contxt.utils import make_logger
 
 logger = make_logger(__name__)
 
 
 class ContxtArgParser:
-
     def __init__(self, subparsers):
         self.parser = self._init_parser(subparsers)
 
@@ -21,7 +19,6 @@ class ContxtArgParser:
 
 
 class AuthParser(ContxtArgParser):
-
     def _init_parser(self, subparsers):
         parser = subparsers.add_parser("auth", help="Authentication")
         parser.set_defaults(func=self._help)
@@ -46,7 +43,6 @@ class AuthParser(ContxtArgParser):
 
 
 class IotParser(ContxtArgParser):
-
     def _init_parser(self, subparsers):
         parser = subparsers.add_parser("iot", help="IOT service")
         parser.set_defaults(func=self._help)
@@ -70,40 +66,53 @@ class IotParser(ContxtArgParser):
         fields_parser.set_defaults(func=self._fields)
 
         # Unprovisioned Fields
-        unprovisioned_fields_parser = _subparsers.add_parser("unprovisioned", help="Unprovisioned fields")
+        unprovisioned_fields_parser = _subparsers.add_parser(
+            "unprovisioned", help="Unprovisioned fields"
+        )
 
-        feeds_group = unprovisioned_fields_parser.add_mutually_exclusive_group(required=True)
+        feeds_group = unprovisioned_fields_parser.add_mutually_exclusive_group(
+            required=True
+        )
         feeds_group.add_argument("--feed_key", help="Provide feed key")
         feeds_group.add_argument("--feed_id", type=int, help="Provide feed id")
 
-        unprovisioned_fields_parser.add_argument("--output", help="Dump results to csv if desired")
+        unprovisioned_fields_parser.add_argument(
+            "--output", help="Dump results to csv if desired"
+        )
         unprovisioned_fields_parser.set_defaults(func=self._unprovisioned_fields)
 
         # Field data
         field_data_parser = _subparsers.add_parser("field-data", help="Get field data")
         field_data_parser.add_argument("grouping_id", help="Grouping id")
         field_data_parser.add_argument("start_date", help="Data start date")
-        field_data_parser.add_argument("window", type=int, choices=[0, 60, 900, 3600], help="Data windowing period")
+        field_data_parser.add_argument(
+            "window", type=int, choices=[0, 60, 900, 3600], help="Data windowing period"
+        )
         field_data_parser.add_argument("-e", "--end-date", help="Data end date")
-        field_data_parser.add_argument("-p", "--plot", action="store_true", help="Plot data")
+        field_data_parser.add_argument(
+            "-p", "--plot", action="store_true", help="Plot data"
+        )
         field_data_parser.set_defaults(func=self._field_data)
 
         return parser
 
     def _groupings(self, args, auth):
         from contxt.functions.iot import IOT
+
         iot = IOT(auth)
         groupings = iot.iot_service.get_all_groupings(args.facility_id)
         print(groupings)
 
     def _feeds(self, args, auth):
         from contxt.functions.iot import IOT
+
         iot = IOT(auth)
         feeds = iot.iot_service.get_feeds_collection(args.facility_id)
         print(feeds)
 
     def _fields(self, args, auth):
         from contxt.functions.iot import IOT
+
         iot = IOT(auth)
         if args.facility_id:
             # Get fields for facility
@@ -116,10 +125,10 @@ class IotParser(ContxtArgParser):
 
     def _unprovisioned_fields(self, args, auth):
         from contxt.functions.iot import IOT
+
         iot = IOT(auth)
         fields = iot.get_unprovisioned_fields_for_feed(
-            feed_id=args.feed_id,
-            feed_key=args.feed_key
+            feed_id=args.feed_id, feed_key=args.feed_key
         )
 
         if args.output:
@@ -129,6 +138,7 @@ class IotParser(ContxtArgParser):
 
     def _field_data(self, args, auth):
         from contxt.functions.iot import IOT
+
         iot = IOT(auth)
         # TODO: may want to control dumping/plotting from here
         iot.get_field_data_for_grouping(
@@ -136,13 +146,14 @@ class IotParser(ContxtArgParser):
             start_date=args.start_date,
             window=args.window,
             end_date=args.end_date,
-            plot=args.plot)
+            plot=args.plot,
+        )
 
     def _collection_to_csv(self, filename, api_collection_data):
         from csv import DictWriter
         from pathlib import Path
 
-        with Path(filename).open('w') as f:
+        with Path(filename).open("w") as f:
 
             fields = api_collection_data.get_keys()
 
@@ -157,7 +168,6 @@ RESOURCE_TYPES = ["electric", "gas", "combined"]
 
 
 class EmsParser(ContxtArgParser):
-
     def _init_parser(self, subparsers):
         parser = subparsers.add_parser("ems", help="EMS service")
         parser.set_defaults(func=self._help)
@@ -165,12 +175,18 @@ class EmsParser(ContxtArgParser):
 
         # Main Services
         mains_parser = _subparsers.add_parser("mains", help="Get Main Services")
-        mains_parser.add_argument("facility_id", type=int, help="Facility to get main services for")
-        mains_parser.add_argument("--resource_type", choices=RESOURCE_TYPES, help="Filter by type of resource")
+        mains_parser.add_argument(
+            "facility_id", type=int, help="Facility to get main services for"
+        )
+        mains_parser.add_argument(
+            "--resource_type", choices=RESOURCE_TYPES, help="Filter by type of resource"
+        )
         mains_parser.set_defaults(func=self._get_mains)
 
         # Get Main Service Data
-        md_parser = _subparsers.add_parser("main-data", help="Get main service data for a facility")
+        md_parser = _subparsers.add_parser(
+            "main-data", help="Get main service data for a facility"
+        )
         md_parser.add_argument("facility_id", type=int, help="Facility ID")
         md_parser.add_argument("resource_type", choices=RESOURCE_TYPES)
         md_parser.add_argument("start_date", help="Start month (YYYY-MM)")
@@ -179,8 +195,12 @@ class EmsParser(ContxtArgParser):
 
         # Spend
         spend_parser = _subparsers.add_parser("util-spend", help="Utility spend")
-        spend_parser.add_argument("interval", choices=["daily", "monthly"], help="Time interval")
-        spend_parser.add_argument("resource_type", choices=RESOURCE_TYPES, help="Type of resource")
+        spend_parser.add_argument(
+            "interval", choices=["daily", "monthly"], help="Time interval"
+        )
+        spend_parser.add_argument(
+            "resource_type", choices=RESOURCE_TYPES, help="Type of resource"
+        )
         spend_parser.add_argument("start_date", help="Start month (YYYY-MM)")
         spend_parser.add_argument("end_date", help="End month (YYYY-MM)")
 
@@ -190,13 +210,24 @@ class EmsParser(ContxtArgParser):
         spend_group.add_argument("-n", "--org-name", help="Organization name")
 
         spend_parser.add_argument("-o", "--output", help="Filename to save data (csv)")
-        spend_parser.add_argument("-p", "--pro-forma", action="store_true", help="Include pro forma calculations")
+        spend_parser.add_argument(
+            "-p",
+            "--pro-forma",
+            action="store_true",
+            help="Include pro forma calculations",
+        )
         spend_parser.set_defaults(func=self._utility_spend)
 
         # Usage
         usage_parser = _subparsers.add_parser("util-usage", help="Utility usage")
-        usage_parser.add_argument("interval", choices=["daily", "monthly"], help="Time interval")
-        usage_parser.add_argument("resource_type", choices=["electric", "gas", "combined"], help="Type of resource")
+        usage_parser.add_argument(
+            "interval", choices=["daily", "monthly"], help="Time interval"
+        )
+        usage_parser.add_argument(
+            "resource_type",
+            choices=["electric", "gas", "combined"],
+            help="Type of resource",
+        )
         usage_parser.add_argument("start_date", help="Start month (YYYY-MM)")
         usage_parser.add_argument("end_date", help="End month (YYYY-MM)")
 
@@ -206,70 +237,131 @@ class EmsParser(ContxtArgParser):
         usage_group.add_argument("-n", "--org-name", help="Organization name")
 
         usage_parser.add_argument("-o", "--output", help="Filename to save data (csv)")
-        usage_parser.add_argument("-p", "--pro-forma", action="store_true", help="Include pro forma calculations")
+        usage_parser.add_argument(
+            "-p",
+            "--pro-forma",
+            action="store_true",
+            help="Include pro forma calculations",
+        )
         usage_parser.set_defaults(func=self._utility_usage)
 
         # Spend Metric Normalization
-        spend_metrics_parser = _subparsers.add_parser("util-spend-metrics", help="Utility spend metrics")
+        spend_metrics_parser = _subparsers.add_parser(
+            "util-spend-metrics", help="Utility spend metrics"
+        )
 
-        spend_metrics_parser.add_argument("metric", help="Provide the metric you want to normalize against")
-        spend_metrics_parser.add_argument("interval", choices=["daily", "monthly"], help="Time interval")
-        spend_metrics_parser.add_argument("resource_type", choices=["electric", "gas", "combined"], help="Type of resource")
+        spend_metrics_parser.add_argument(
+            "metric", help="Provide the metric you want to normalize against"
+        )
+        spend_metrics_parser.add_argument(
+            "interval", choices=["daily", "monthly"], help="Time interval"
+        )
+        spend_metrics_parser.add_argument(
+            "resource_type",
+            choices=["electric", "gas", "combined"],
+            help="Type of resource",
+        )
         spend_metrics_parser.add_argument("start_date", help="Start month (YYYY-MM)")
         spend_metrics_parser.add_argument("end_date", help="End month (YYYY-MM)")
 
-        spend_metrics_group = spend_metrics_parser.add_mutually_exclusive_group(required=True)
-        spend_metrics_group.add_argument("-f", "--facility-id", type=int, help="Facility id")
+        spend_metrics_group = spend_metrics_parser.add_mutually_exclusive_group(
+            required=True
+        )
+        spend_metrics_group.add_argument(
+            "-f", "--facility-id", type=int, help="Facility id"
+        )
         spend_metrics_group.add_argument("-g", "--org-id", help="Organization id")
         spend_metrics_group.add_argument("-n", "--org-name", help="Organization name")
 
-        spend_metrics_parser.add_argument("-o", "--output", help="Filename to save data (csv)")
-        spend_metrics_parser.add_argument("-p", "--pro-forma", action="store_true", help="Include pro forma calculations")
-        spend_metrics_parser.add_argument("--metric-scalar", type=float, help="Optionally scale the normalized metric by a float")
+        spend_metrics_parser.add_argument(
+            "-o", "--output", help="Filename to save data (csv)"
+        )
+        spend_metrics_parser.add_argument(
+            "-p",
+            "--pro-forma",
+            action="store_true",
+            help="Include pro forma calculations",
+        )
+        spend_metrics_parser.add_argument(
+            "--metric-scalar",
+            type=float,
+            help="Optionally scale the normalized metric by a float",
+        )
         spend_metrics_parser.set_defaults(func=self._utility_spend_metrics)
 
         # Usage Metric Normalization
-        usage_metrics_parser = _subparsers.add_parser("util-usage-metrics", help="Utility usage metrics")
+        usage_metrics_parser = _subparsers.add_parser(
+            "util-usage-metrics", help="Utility usage metrics"
+        )
 
-        usage_metrics_parser.add_argument("metric", help="Provide the metric you want to normalize against")
-        usage_metrics_parser.add_argument("interval", choices=["daily", "monthly"], help="Time interval")
-        usage_metrics_parser.add_argument("resource_type", choices=["electric", "gas", "combined"],
-                                          help="Type of resource")
+        usage_metrics_parser.add_argument(
+            "metric", help="Provide the metric you want to normalize against"
+        )
+        usage_metrics_parser.add_argument(
+            "interval", choices=["daily", "monthly"], help="Time interval"
+        )
+        usage_metrics_parser.add_argument(
+            "resource_type",
+            choices=["electric", "gas", "combined"],
+            help="Type of resource",
+        )
         usage_metrics_parser.add_argument("start_date", help="Start month (YYYY-MM)")
         usage_metrics_parser.add_argument("end_date", help="End month (YYYY-MM)")
 
-        usage_metrics_group = usage_metrics_parser.add_mutually_exclusive_group(required=True)
-        usage_metrics_group.add_argument("-f", "--facility-id", type=int, help="Facility id")
+        usage_metrics_group = usage_metrics_parser.add_mutually_exclusive_group(
+            required=True
+        )
+        usage_metrics_group.add_argument(
+            "-f", "--facility-id", type=int, help="Facility id"
+        )
         usage_metrics_group.add_argument("-g", "--org-id", help="Organization id")
         usage_metrics_group.add_argument("-n", "--org-name", help="Organization name")
 
-        usage_metrics_parser.add_argument("-o", "--output", help="Filename to save data (csv)")
-        usage_metrics_parser.add_argument("-p", "--pro-forma", action="store_true", help="Include pro forma calculations")
-        usage_metrics_parser.add_argument("--metric-scalar", type=float, help="Optionally scale the normalized metric by a float")
+        usage_metrics_parser.add_argument(
+            "-o", "--output", help="Filename to save data (csv)"
+        )
+        usage_metrics_parser.add_argument(
+            "-p",
+            "--pro-forma",
+            action="store_true",
+            help="Include pro forma calculations",
+        )
+        usage_metrics_parser.add_argument(
+            "--metric-scalar",
+            type=float,
+            help="Optionally scale the normalized metric by a float",
+        )
         usage_metrics_parser.set_defaults(func=self._utility_usage_metrics)
 
         return parser
 
     def _get_mains(self, args, auth):
         from contxt.services.ems import EMSService
+
         ems = EMSService(auth)
 
-        mains = ems.get_main_services(facility_id=args.facility_id, type=args.resource_type)
+        mains = ems.get_main_services(
+            facility_id=args.facility_id, type=args.resource_type
+        )
         print(mains)
 
     def _get_main_data(self, args, auth):
         from contxt.functions.ems import EMS
+
         ems = EMS(auth)
 
-        data = ems.get_facility_main_data(facility_id=args.facility_id,
-                                          resource_type=args.resource_type,
-                                          start_date=args.start_date,
-                                          end_date=args.end_date)
+        data = ems.get_facility_main_data(
+            facility_id=args.facility_id,
+            resource_type=args.resource_type,
+            start_date=args.start_date,
+            end_date=args.end_date,
+        )
 
         self.to_csv_main_service_data(data)
 
     def _utility_spend(self, args, auth):
         from contxt.functions.ems import EMS
+
         ems = EMS(auth)
         if args.facility_id:
             # Get facility spend
@@ -279,7 +371,8 @@ class EmsParser(ContxtArgParser):
                 resource_type=args.resource_type,
                 start_date=args.start_date,
                 end_date=args.end_date,
-                pro_forma=args.pro_forma)
+                pro_forma=args.pro_forma,
+            )
             print(spend)
         else:
             # Get organization spend
@@ -290,13 +383,15 @@ class EmsParser(ContxtArgParser):
                 end_date=args.end_date,
                 pro_forma=args.pro_forma,
                 organization_id=args.org_id,
-                organization_name=args.org_name)
+                organization_name=args.org_name,
+            )
 
             # always write to file
             ems.write_organization_utility_data_to_file(org_spend, args.output)
 
     def _utility_usage(self, args, auth):
         from contxt.functions.ems import EMS
+
         ems = EMS(auth)
         if args.facility_id:
             # get facility usage
@@ -306,7 +401,7 @@ class EmsParser(ContxtArgParser):
                 resource_type=args.resource_type,
                 start_date=args.start_date,
                 end_date=args.end_date,
-                pro_forma=args.pro_forma
+                pro_forma=args.pro_forma,
             )
             print(usage)
         else:
@@ -317,7 +412,7 @@ class EmsParser(ContxtArgParser):
                 end_date=args.end_date,
                 pro_forma=args.pro_forma,
                 organization_id=args.org_id,
-                organization_name=args.org_name
+                organization_name=args.org_name,
             )
 
             # always write to file
@@ -325,6 +420,7 @@ class EmsParser(ContxtArgParser):
 
     def _utility_spend_metrics(self, args, auth):
         from contxt.functions.ems import EMS
+
         ems = EMS(auth)
         if args.facility_id:
             normalized_spend = ems.get_facility_spend_vs_monthly_metric(
@@ -335,14 +431,16 @@ class EmsParser(ContxtArgParser):
                 metric=args.metric,
                 resource_type=args.resource_type,
                 pro_forma=args.pro_forma,
-                metric_scalar=args.metric_scalar or 1
+                metric_scalar=args.metric_scalar or 1,
             )
-            self._print_facility_normalized_metrics(normalized_spend, 'spend')
+            self._print_facility_normalized_metrics(normalized_spend, "spend")
         else:
 
             if not args.output:
                 # TODO: this requirement should be enforced by argparse
-                logger.critical("Please provide --output as an argument to specify report export file")
+                logger.critical(
+                    "Please provide --output as an argument to specify report export file"
+                )
                 return
 
             normalized_spend = ems.get_organization_spend_vs_monthly_metric(
@@ -354,12 +452,13 @@ class EmsParser(ContxtArgParser):
                 resource_type=args.resource_type,
                 pro_forma=args.pro_forma,
                 interval=args.interval,
-                metric_scalar=args.metric_scalar or 1
+                metric_scalar=args.metric_scalar or 1,
             )
             self.to_csv_organization_normalized_metric(args.output, normalized_spend)
 
     def _utility_usage_metrics(self, args, auth):
         from contxt.functions.ems import EMS
+
         ems = EMS(auth)
         if args.facility_id:
             normalized_usage = ems.get_facility_usage_vs_monthly_metric(
@@ -370,14 +469,16 @@ class EmsParser(ContxtArgParser):
                 metric=args.metric,
                 resource_type=args.resource_type,
                 pro_forma=args.pro_forma,
-                metric_scalar=args.metric_scalar or 1
+                metric_scalar=args.metric_scalar or 1,
             )
-            self._print_facility_normalized_metrics(normalized_usage, 'usage')
+            self._print_facility_normalized_metrics(normalized_usage, "usage")
         else:
 
             if not args.output:
                 # TODO: this requirement should be enforced by argparse
-                logger.critical("Please provide --output as an argument to specify report export file")
+                logger.critical(
+                    "Please provide --output as an argument to specify report export file"
+                )
                 return
 
             normalized_usage = ems.get_organization_usage_vs_monthly_metric(
@@ -389,7 +490,7 @@ class EmsParser(ContxtArgParser):
                 resource_type=args.resource_type,
                 pro_forma=args.pro_forma,
                 interval=args.interval,
-                metric_scalar=args.metric_scalar or 1
+                metric_scalar=args.metric_scalar or 1,
             )
             self.to_csv_organization_normalized_metric(args.output, normalized_usage)
 
@@ -399,13 +500,15 @@ class EmsParser(ContxtArgParser):
         from datetime import datetime
         from pathlib import Path
 
-        output_path = Path(f"main_service_export_{datetime.now().strftime('%m-%d_%H_%M_%S')}")
+        output_path = Path(
+            f"main_service_export_{datetime.now().strftime('%m-%d_%H_%M_%S')}"
+        )
         output_path.mkdir(parents=True, exist_ok=False)
 
         for service_name, data in main_service_data.items():
             filename = output_path / f"{service_name}.csv"
-            with filename.open('w') as f:
-                writer = DictWriter(f, fieldnames=['event_time', 'value'])
+            with filename.open("w") as f:
+                writer = DictWriter(f, fieldnames=["event_time", "value"])
                 for row in reversed(data):
                     writer.writerow(row)
 
@@ -418,14 +521,28 @@ class EmsParser(ContxtArgParser):
         for date, data in normalized_data_by_date.items():
             # TODO clean this up when we can properly filter metric value data by start->end date
             if normalization_key in data:
-                normalized_to_print.append([date.strftime('%Y-%m'),
-                                            data[normalization_key],
-                                            data['metric_value'] if 'metric_value' in data else None,
-                                            data['normalized'],
-                                            data['pro_forma_date']])
+                normalized_to_print.append(
+                    [
+                        date.strftime("%Y-%m"),
+                        data[normalization_key],
+                        data["metric_value"] if "metric_value" in data else None,
+                        data["normalized"],
+                        data["pro_forma_date"],
+                    ]
+                )
 
-        print(tabulate(normalized_to_print,
-                       headers=['date', normalization_key, 'metric-value', 'normalized', 'pro_forma_date']))
+        print(
+            tabulate(
+                normalized_to_print,
+                headers=[
+                    "date",
+                    normalization_key,
+                    "metric-value",
+                    "normalized",
+                    "pro_forma_date",
+                ],
+            )
+        )
 
     @staticmethod
     def to_csv_organization_normalized_metric(filename, normalized_data_by_facility):
@@ -445,7 +562,7 @@ class EmsParser(ContxtArgParser):
                 if date not in unique_dates:
                     unique_dates.append(date)
 
-                by_facility[facility_name][date] = spend.get('normalized', 'N/A')
+                by_facility[facility_name][date] = spend.get("normalized", "N/A")
 
         facility_data = {}
         for date in reversed(sorted(unique_dates)):
@@ -455,12 +572,12 @@ class EmsParser(ContxtArgParser):
                 facility_data[facility_name][date] = date_data.get(date)
 
         for facility, date_dict in facility_data.items():
-            date_dict['facility_name'] = facility
+            date_dict["facility_name"] = facility
             to_csv_data.append(date_dict)
 
-        with open(filename, 'w') as f:
+        with open(filename, "w") as f:
 
-            fields = ['facility_name']
+            fields = ["facility_name"]
             fields.extend(unique_dates)
 
             writer = DictWriter(f, fieldnames=fields)
@@ -471,7 +588,6 @@ class EmsParser(ContxtArgParser):
 
 
 class AssetsParser(ContxtArgParser):
-
     def _init_parser(self, subparsers):
         parser = subparsers.add_parser("assets", help="Assets service")
         parser.set_defaults(func=self._help)
@@ -506,7 +622,9 @@ class AssetsParser(ContxtArgParser):
         attr_parser.set_defaults(func=self._attributes)
 
         # TODO: Attribute values
-        attr_vals_parser = _subparsers.add_parser("attr-vals", help="Get asset attribute values")
+        attr_vals_parser = _subparsers.add_parser(
+            "attr-vals", help="Get asset attribute values"
+        )
         attr_vals_parser.set_defaults(func=self._attribute_values)
 
         # TODO: Metrics
@@ -514,15 +632,21 @@ class AssetsParser(ContxtArgParser):
         metrics_parser.set_defaults(func=self._metrics)
 
         # Metric values
-        metric_vals_parser = _subparsers.add_parser("metric-vals", help="Get asset metric values")
+        metric_vals_parser = _subparsers.add_parser(
+            "metric-vals", help="Get asset metric values"
+        )
         metrics_group1 = metric_vals_parser.add_mutually_exclusive_group(required=True)
         metrics_group1.add_argument("-i", "--org_id", help="Organization id")
         metrics_group1.add_argument("-n", "--org_name", help="Organization name")
         metrics_group2 = metric_vals_parser.add_mutually_exclusive_group(required=True)
         metrics_group2.add_argument("-a", "--asset_id", help="Asset id")
         metrics_group2.add_argument("-t", "--type_label", help="Asset type label")
-        metric_vals_parser.add_argument("--metric_label", nargs="+", help="Metric label")
-        metric_vals_parser.add_argument("-p", "--plot", action="store_true", help="Plot the values")
+        metric_vals_parser.add_argument(
+            "--metric_label", nargs="+", help="Metric label"
+        )
+        metric_vals_parser.add_argument(
+            "-p", "--plot", action="store_true", help="Plot the values"
+        )
         metric_vals_parser.set_defaults(func=self._metric_values)
 
         return parser
@@ -530,6 +654,7 @@ class AssetsParser(ContxtArgParser):
     # TODO: move these print utilities to the classes themselves
     def _print_asset_type(self, asset_type):
         from contxt.legacy.services import APIObjectCollection
+
         print(f"Type Information:\n{asset_type}")
         attrs = APIObjectCollection(list(asset_type.attributes.values()))
         print(f"\nAttributes:\n{attrs}")
@@ -548,43 +673,48 @@ class AssetsParser(ContxtArgParser):
 
         if len(metric_values) > 0:
             keys = metric_values[0].get_keys()
-            keys.extend(['label', 'units'])
+            keys.extend(["label", "units"])
             print(tabulate(items, headers=keys))
         else:
             print(metric_values)
 
     def _facilities(self, args, auth):
         from contxt.functions.facilities import Facilities
+
         facs = Facilities(auth)
         facilities = facs.get_all_facilities(
-            organization_id=args.org_id,
-            organization_name=args.org_name)
+            organization_id=args.org_id, organization_name=args.org_name
+        )
         print(facilities)
 
     def _types(self, args, auth):
         from contxt.functions.assets import Assets
+
         assets = Assets(auth)
         if not args.type_label:
             # Get all asset types
             types = assets.get_asset_types(
-                organization_id=args.org_id,
-                organization_name=args.org_name)
+                organization_id=args.org_id, organization_name=args.org_name
+            )
             print(types)
         else:
             # Get single asset type
             type_ = assets.get_asset_type_info(
                 type=args.type_label,
                 organization_id=args.org_id,
-                organization_name=args.org_name)
+                organization_name=args.org_name,
+            )
             self._print_asset_type(type_)
 
     def _assets(self, args, auth):
         from contxt.functions.assets import Assets
+
         assets = Assets(auth)
         assets_of_type = assets.get_assets_for_type(
             type=args.type_label,
             organization_id=args.org_id,
-            organization_name=args.org_name)
+            organization_name=args.org_name,
+        )
         print(assets_of_type)
 
     def _attributes(self, args, auth):
@@ -600,13 +730,15 @@ class AssetsParser(ContxtArgParser):
         if args.asset_id:
             # Get metric values for single asset
             from contxt.functions.assets import Assets
+
             assets = Assets(auth)
             metric_value_pairs = [
                 assets.get_metric_values_for_asset(
                     metric=metric_label,
                     asset_id=args.asset_id,
                     organization_id=args.org_id,
-                    organization_name=args.org_name)
+                    organization_name=args.org_name,
+                )
                 for metric_label in args.metric_label
             ]
             if args.plot:
@@ -617,13 +749,15 @@ class AssetsParser(ContxtArgParser):
         else:
             # Get metric values for all assets of the specified type(s)
             from contxt.functions.assets import Assets
+
             assets = Assets(auth)
             metric_values = {
                 metric_label: assets.get_metric_values_for_asset_type(
                     asset_type_label=args.type_label,
                     metric_label=metric_label,
                     organization_id=args.org_id,
-                    organization_name=args.org_name)
+                    organization_name=args.org_name,
+                )
                 for metric_label in args.metric_label
             }
             if args.plot:
@@ -633,7 +767,6 @@ class AssetsParser(ContxtArgParser):
 
 
 class ContxtParser(ContxtArgParser):
-
     def _init_parser(self, subparsers):
         parser = subparsers.add_parser("contxt", help="Contxt service")
         parser.set_defaults(func=self._help)
@@ -656,7 +789,9 @@ class ContxtParser(ContxtArgParser):
         users_parser.set_defaults(func=self._users)
 
         # Add users
-        add_user_parser = _subparsers.add_parser("add-user", help="Add user to an organization")
+        add_user_parser = _subparsers.add_parser(
+            "add-user", help="Add user to an organization"
+        )
         add_user_parser.add_argument("org_id", help="Organization id")
         add_user_parser.add_argument("user_id", help="User id")
         add_user_parser.set_defaults(func=self._add_user)
@@ -666,32 +801,36 @@ class ContxtParser(ContxtArgParser):
     def _organizations(self, args, auth):
         from contxt.services.contxt import ContxtService
         from contxt.utils.serializer import Serializer
+
         contxt_service = ContxtService(auth)
         orgs = contxt_service.get_organizations()
         print(Serializer.to_table(orgs))
 
     def _create_organization(self, args, auth):
         from contxt.functions.organizations import Organizations
+
         orgs = Organizations(auth)
         orgs.create_organization(args.org_name)
 
     def _users(self, args, auth):
         from contxt.functions.organizations import Organizations
+
         orgs = Organizations(auth)
         users = orgs.get_organization_users(
-            organization_id=args.org_id,
-            organization_name=args.org_name)
+            organization_id=args.org_id, organization_name=args.org_name
+        )
         print(users)
 
     def _add_user(self, args, auth):
         from contxt.services.contxt import ContxtService
+
         contxt_service = ContxtService(auth)
         contxt_service.add_user_to_organization(
-            user_id=args.user_id, organization_id=args.org_id)
+            user_id=args.user_id, organization_id=args.org_id
+        )
 
 
 class BusParser(ContxtArgParser):
-
     def _init_parser(self, subparsers):
         parser = subparsers.add_parser("bus", help="Message bus service")
         parser.set_defaults(func=self._help)
@@ -706,10 +845,16 @@ class BusParser(ContxtArgParser):
         channel_parser.set_defaults(func=self._channels)
 
         # Stats
-        stats_parser = _subparsers.add_parser("stats", help="View Message Bus Channel statistics")
-        stats_organization_group = stats_parser.add_mutually_exclusive_group(required=True)
+        stats_parser = _subparsers.add_parser(
+            "stats", help="View Message Bus Channel statistics"
+        )
+        stats_organization_group = stats_parser.add_mutually_exclusive_group(
+            required=True
+        )
         stats_organization_group.add_argument("-I", "--org-id", help="Organization id")
-        stats_organization_group.add_argument("-N", "--org-name", help="Organization name")
+        stats_organization_group.add_argument(
+            "-N", "--org-name", help="Organization name"
+        )
         stats_channel_group = stats_parser.add_mutually_exclusive_group(required=True)
         stats_channel_group.add_argument("-i", "--channel-id", help="Channel id")
         stats_channel_group.add_argument("-n", "--channel-name", help="Channel name")
@@ -721,15 +866,18 @@ class BusParser(ContxtArgParser):
     def _channels(self, args, auth):
         from contxt.functions.bus import Bus
         from contxt.utils.serializer import Serializer
+
         bus = Bus(auth)
         channels = bus.get_all_channels_for_service(
             service_id=args.service_id,
             organization_id=args.org_id,
-            organization_name=args.org_name)
+            organization_name=args.org_name,
+        )
         print(Serializer.to_table(channels))
 
     def _stats(self, args, auth):
         from contxt.functions.bus import Bus
+
         bus = Bus(auth)
         stats = bus.get_stats_for_channel(
             organization_id=args.org_id,

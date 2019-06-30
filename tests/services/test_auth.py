@@ -5,8 +5,7 @@ from jose.constants import ALGORITHMS
 from pytz import UTC
 
 from contxt.auth import TokenProvider
-from contxt.auth.jwt import (AuthError, AuthTokenValidator,
-                             ContxtAuthTokenValidator)
+from contxt.auth.jwt import AuthError, AuthTokenValidator, ContxtAuthTokenValidator
 
 PRIVATE_KEY = """\
 -----BEGIN RSA PRIVATE KEY-----

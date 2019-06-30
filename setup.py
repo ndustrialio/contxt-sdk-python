@@ -75,10 +75,8 @@ setup(
     url=about["__url__"],
     # Python requirement
     python_requires=">=3.6.0",
-    packages=find_packages(exclude=("tests", )),
-    entry_points={
-        "console_scripts": ["contxt=contxt.__main__:main"],
-    },
+    packages=find_packages(exclude=("tests",)),
+    entry_points={"console_scripts": ["contxt=contxt.__main__:main"]},
     install_requires=[
         # Requirements
         "argcomplete",
@@ -100,7 +98,7 @@ setup(
     ],
     extras_require={
         # Optional requirements
-        "dev": ["black", "flake8", "isort", "mypy", "pytest"],
+        "dev": ["black", "flake8", "isort", "mypy", "pytest"]
     },
     include_package_data=True,
     license=about["__license__"],
@@ -113,6 +111,6 @@ setup(
     cmdclass={
         # $ python setup.py publish
         # NOTE: requires twine ($ pip install twine)
-        "publish": PublishCommand,
+        "publish": PublishCommand
     },
 )
