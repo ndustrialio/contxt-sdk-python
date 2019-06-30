@@ -1,19 +1,24 @@
 box: python:3.6
 build:
   steps:
-    - install-packages:
-        packages: git
-        
+    # Install package
     - pip-install:
       extra_args: .[dev]
 
+    # Run formatters
     - script:
-        name: echo python information
-        code: |
-          echo "python version $(python --version) running"
-          echo "pip version $(pip --version) running"
-          echo "pip list $(pip list)"
+      name: run formatters
+      code: |
+        isort --check-only
+        black --check .
+
+    # Run linters
     - script:
-        name: pytest - python unit test
-        code: |
-          pytest
+      name: run linters
+      code: flake8
+
+    # Run tests
+    - script:
+      name: run unit tests
+      code: pytest tests/unit
+
