@@ -85,6 +85,7 @@ setup(
         "dash-html-components",
         "dash",
         "inflect",
+        "jwt",
         "pandas",
         "plotly",
         "python-dateutil",

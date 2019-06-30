@@ -2,13 +2,13 @@ import json
 from datetime import datetime
 from pprint import pformat
 
+import jwt
 import pandas as pd
 import pytz
 import requests
-
-import jwt
-from contxt.exceptions import UnauthorizedException
 from tabulate import tabulate
+
+from contxt.exceptions import UnauthorizedException
 
 API_VERSION = "v1"
 

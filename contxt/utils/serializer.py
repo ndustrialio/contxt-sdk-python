@@ -5,9 +5,9 @@ from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Set, Tuple
 
 import pandas as pd
+from tabulate import tabulate
 
 from contxt.utils import make_logger
-from tabulate import tabulate
 
 logger = make_logger(__name__)
 
