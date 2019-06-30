@@ -16,13 +16,15 @@ class ObjectMapper:
     @staticmethod
     def tree_to_object(tree: object, annotation: Type[T]) -> T:
         """
-        Maps a JSON like tree to an object of the class specified by the type annotation `annotation`
-        :param tree: input object to recursively parse, tree should have a JSON-like structure:
+        Maps a JSON like tree to an object of the class specified by the type
+        annotation `annotation`
+        :param tree: input object to recursively parse, tree should have a
+            JSON-like structure:
             - List
             - Dict
             - Primitive
         :param annotation: output type description to use for parsing,
-                if a string is received a type with the given name will be parsed
+        if a string is received a type with the given name will be parsed
         :return: parsed object
         """
 

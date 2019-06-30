@@ -29,13 +29,15 @@ class FacilitiesService(ConfiguredApiService):
             else "facilities"
         )
         resp = self.get(uri)
-        # TODO: handle not found errors here, and return None instead of raising an error
+        # TODO: handle not found errors here, and return None instead of
+        # raising an error
         return [Facility.from_api(rec) for rec in resp]
 
     def get_facility_with_id(self, facility_id: int):
         logger.debug(f"Fetching facility {facility_id}")
         resp = self.get(f"facilities/{facility_id}")
-        # TODO: handle not found errors here, and return None instead of raising an error
+        # TODO: handle not found errors here, and return None instead of
+        # raising an error
         return Facility.from_api(resp)
 
     def get_facility_with_name(self, name: str, organization_id: Optional[str] = None):

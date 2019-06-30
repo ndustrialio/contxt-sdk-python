@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from os import environ
-from typing import Any, Callable, Dict, List, Optional, Set, Tuple
+from typing import Optional
 
 from contxt.auth.machine import MachineAuth
 from contxt.exceptions import WorkerConfigurationError
@@ -28,11 +28,13 @@ class BaseWorker(ABC):
         # will raise an exception for us
         if self.client_id is None:
             raise WorkerConfigurationError(
-                f"CLIENT_ID must be provided (as a parameter or environment variable) to instantiate {self.__class__.__name__} class."
+                f"CLIENT_ID must be provided (as a parameter or environment variable)"
+                " to instantiate {self.__class__.__name__} class."
             )
         if self.client_secret is None:
             raise WorkerConfigurationError(
-                f"CLIENT_SECRET must be provided (as a parameter or environment variable) to instantiate {self.__class__.__name__} class."
+                f"CLIENT_SECRET must be provided (as a parameter or environment"
+                f" variable) to instantiate {self.__class__.__name__} class."
             )
 
         self.auth = MachineAuth(self.client_id, self.client_secret)

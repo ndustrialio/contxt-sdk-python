@@ -1,4 +1,4 @@
-from datetime import date, datetime, timedelta
+from datetime import datetime, timedelta
 
 import pytest
 from pytz import UTC
@@ -15,7 +15,7 @@ from contxt.models.assets import (
     TimeIntervals,
 )
 from contxt.services.assets import AssetsService
-from contxt.utils.assets_migration import AssetMigrationManager, AssetSchema
+from contxt.utils.assets_migration import AssetMigrationManager
 from tests.static.asset_schema import AssetSchemas
 
 
@@ -140,7 +140,7 @@ class TestAssetsService:
         # Test delete_asset_type
         asset_framework.delete_asset_type(updated_asset_type)
         # Check the asset type was actually deleted
-        with pytest.raises(Exception) as e:
+        with pytest.raises(Exception):
             asset_framework.get_asset_type(updated_asset_type.id)
         # Check the cached type was also removed from the AssetsService instance
         assert asset_framework.asset_type_with_id(created_asset_type.id, None) is None
@@ -185,7 +185,7 @@ class TestAssetsService:
         # Test delete_asset
         asset_framework.delete_asset(updated_asset)
         # Check the asset was actually deleted
-        with pytest.raises(Exception) as e:
+        with pytest.raises(Exception):
             asset_framework.get_asset(updated_asset.id)
 
     def test_attribute_crud_endpoints(self, asset_framework, parent_asset_type):
@@ -227,7 +227,7 @@ class TestAssetsService:
         # Test delete_asset
         asset_framework.delete_attribute(updated_attribute)
         # Check the asset was actually deleted
-        with pytest.raises(Exception) as e:
+        with pytest.raises(Exception):
             asset_framework.get_asset(updated_attribute.id)
 
     def test_attribute_value_crud_endpoints(
@@ -261,7 +261,10 @@ class TestAssetsService:
         )
         assert updated_attribute_value.notes == created_attribute_value.notes
         assert updated_attribute_value.value == created_attribute_value.value
-        # assert updated_attribute_value.effective_date == created_attribute_value.effective_date
+        # assert (
+        #     updated_attribute_value.effective_date
+        #     == created_attribute_value.effective_date
+        # )
 
         # Test delete_attribute_value
         asset_framework.delete_attribute_value(updated_attribute_value)
@@ -305,7 +308,7 @@ class TestAssetsService:
         # Test delete_metric
         asset_framework.delete_metric(updated_metric)
         # Check the asset was actually deleted
-        with pytest.raises(Exception) as e:
+        with pytest.raises(Exception):
             asset_framework.get_asset(updated_metric.id)
 
     def test_metric_value_crud_endpoints(self, asset_framework, metric):

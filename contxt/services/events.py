@@ -39,7 +39,10 @@ class EventsService(ConfiguredApiService):
                     event1 = self.get_event(d1.get("event_id"))
                     event2 = self.get_event(d2.get("event_id"))
                     mins = d1.get("overlap_variance") / 60
-                    statement += f"Event {event1.name} overlaps with {event2.name} within {mins} min "
+                    statement += (
+                        f"Event {event1.name} overlaps with {event2.name}"
+                        f" within {mins} min "
+                    )
         return statement
 
     def get_event_types(self) -> List[EventType]:

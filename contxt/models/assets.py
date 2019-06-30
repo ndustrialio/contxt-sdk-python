@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from datetime import date, datetime, timedelta
-from typing import Any, Dict, List, Optional, Set, Tuple, Union
+from typing import Any, List, Optional
 
 from inflect import engine
 
@@ -545,7 +545,8 @@ class CompleteAsset(ApiObject):
             # Validate attribute label
             if label not in self._attribute_values_by_label:
                 raise KeyError(
-                    f"Attribute {label} does not exist for AssetType {self.asset_type.normalized_label}"
+                    f"Attribute {label} does not exist for AssetType"
+                    f" {self.asset_type.normalized_label}"
                 )
 
             # Make the change, and mark as changed
@@ -597,7 +598,8 @@ class CompleteAsset(ApiObject):
             # Validate metric label
             if label not in self._metric_values_by_label:
                 raise KeyError(
-                    f"Metric {label} does not exist for AssetType {self.asset_type.normalized_label}"
+                    f"Metric {label} does not exist for AssetType"
+                    f" {self.asset_type.normalized_label}"
                 )
 
             # Determine metric values that changed

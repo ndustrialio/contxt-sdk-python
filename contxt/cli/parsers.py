@@ -439,7 +439,8 @@ class EmsParser(ContxtArgParser):
             if not args.output:
                 # TODO: this requirement should be enforced by argparse
                 logger.critical(
-                    "Please provide --output as an argument to specify report export file"
+                    "Please provide --output as an argument to specify report"
+                    " export file"
                 )
                 return
 
@@ -477,7 +478,8 @@ class EmsParser(ContxtArgParser):
             if not args.output:
                 # TODO: this requirement should be enforced by argparse
                 logger.critical(
-                    "Please provide --output as an argument to specify report export file"
+                    "Please provide --output as an argument to specify report"
+                    " export file"
                 )
                 return
 
@@ -519,7 +521,8 @@ class EmsParser(ContxtArgParser):
         normalized_to_print = []
 
         for date, data in normalized_data_by_date.items():
-            # TODO clean this up when we can properly filter metric value data by start->end date
+            # TODO clean this up when we can properly filter metric value data
+            # by start->end date
             if normalization_key in data:
                 normalized_to_print.append(
                     [

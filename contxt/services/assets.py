@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import List, Optional
 
 from contxt.auth import Auth
 from contxt.models.assets import (
@@ -43,7 +43,8 @@ class AssetsService(ConfiguredApiService):
         load_types: bool = True,
         types_to_fully_load: Optional[List[str]] = None,
     ):
-        # FIXME: setting use_session to False for the time being, until token renewal is handled
+        # FIXME: setting use_session to False for the time being, until token
+        # renewal is handled
         super().__init__(auth, env, use_session=False)
         # TODO: handle multiple orgs
         self.organization_id = organization_id
@@ -382,7 +383,8 @@ class AssetsService(ConfiguredApiService):
         # BUG: this endpoint returns globals when type_id is None
         organization_id = organization_id or self.organization_id
         logger.debug(
-            f"Fetching assets for organization {organization_id} and asset_type {asset_type_id}"
+            f"Fetching assets for organization {organization_id} and asset_type"
+            f" {asset_type_id}"
         )
         return [
             self._build_asset(
@@ -412,7 +414,8 @@ class AssetsService(ConfiguredApiService):
     ) -> List[Asset]:
         organization_id = organization_id or self.organization_id
         logger.debug(
-            f"Fetching latest {limit} assets for organization {organization_id} and asset_type {asset_type_id}"
+            f"Fetching latest {limit} assets for organization {organization_id}"
+            f" and asset_type {asset_type_id}"
         )
         return [
             Asset.from_api(rec)
@@ -494,7 +497,10 @@ class AssetsService(ConfiguredApiService):
         data = attribute_value.post()
         logger.debug(f"Creating attribute_value with {data}")
         resp = self.post(
-            f"assets/{attribute_value.asset_id}/attributes/{attribute_value.attribute_id}/values",
+            (
+                f"assets/{attribute_value.asset_id}/attributes"
+                f"/{attribute_value.attribute_id}/values"
+            ),
             data=data,
         )
         return AttributeValue.from_api(resp)
@@ -635,7 +641,10 @@ class AssetsService(ConfiguredApiService):
         data = metric_value.post()
         logger.debug(f"Creating metric_value with {data}")
         resp = self.post(
-            f"assets/{metric_value.asset_id}/metrics/{metric_value.asset_metric_id}/values",
+            (
+                f"assets/{metric_value.asset_id}/metrics"
+                f"/{metric_value.asset_metric_id}/values"
+            ),
             data=data,
         )
         return MetricValue.from_api(resp)

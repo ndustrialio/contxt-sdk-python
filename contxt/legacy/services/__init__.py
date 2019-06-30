@@ -74,7 +74,10 @@ class ApiClient:
             )
 
         elif 500 < response.status_code < 600:
-            http_error_msg = f"{response.status_code} Server Error: {response.reason} - {response.text}"
+            http_error_msg = (
+                f"{response.status_code} Server Error: {response.reason}"
+                f" - {response.text}"
+            )
 
         if http_error_msg:
             raise requests.exceptions.HTTPError(http_error_msg, response=self)

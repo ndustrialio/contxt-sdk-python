@@ -4,8 +4,9 @@ import requests
 from jose import jwt
 from jose.constants import ALGORITHMS
 
-# NOTE: this code was originally stolen from https://auth0.com/docs/quickstart/backend/python/01-authorization
-#       then tweaked for convenience
+# NOTE: this code was originally stolen from
+# https://auth0.com/docs/quickstart/backend/python/01-authorization
+# then tweaked for convenience
 
 
 # Error handler

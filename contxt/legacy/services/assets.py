@@ -101,7 +101,9 @@ class AssetAttributeValue:
 
     def set(self, value, effective_date=None):
         print(
-            f"Setting new value for Attribute {self.asset_attribute_obj.label} of Asset {self.asset_obj.label} as {value} with effective_date {effective_date}"
+            f"Setting new value for Attribute {self.asset_attribute_obj.label}"
+            f" of Asset {self.asset_obj.label} as {value} with effective_date"
+            f" {effective_date}"
         )
 
         body = {
@@ -153,7 +155,7 @@ class Asset:
             body = {
                 "value": value,
                 "effective_date": str(datetime(year=2018, month=1, day=1))
-                ## set this for now until FM-200 is fixed
+                # set this for now until FM-200 is fixed
             }
             # returns an AssetAttributeValue object
             self.attribute_values[key] = self.assets_instance.create_attribute_value(
@@ -183,10 +185,16 @@ class Asset:
         return self.attribute_values
 
     def __str__(self):
-        return f"<Asset: asset_id: '{self.id}', label: '{self.label}', description: '{self.description}', attributes: {self.attribute_values}>"
+        return (
+            f"<Asset: asset_id: '{self.id}', label: '{self.label}', description:"
+            f" '{self.description}', attributes: {self.attribute_values}>"
+        )
 
     def __repr__(self):
-        return f"<Asset: asset_id: '{self.id}', label: '{self.label}', description: '{self.description}', attributes: {self.attribute_values}>"
+        return (
+            f"<Asset: asset_id: '{self.id}', label: '{self.label}', description:"
+            f" '{self.description}', attributes: {self.attribute_values}>"
+        )
 
     def get_values(self):
         return [self.id, self.label, self.description]
@@ -226,9 +234,15 @@ class AssetType(APIObject):
         """
         # Set attributes
         self.attributes = {}
-        for key, value in config['attributes'].items():
-            self.attributes[key] = AssetAttribute(id=value['id'], asset_type_obj=self, type=value['type'], label=key,
-                                                  description=None, is_required=False)
+        for key, value in config["attributes"].items():
+            self.attributes[key] = AssetAttribute(
+                id=value["id"],
+                asset_type_obj=self,
+                type=value["type"],
+                label=key,
+                description=None,
+                is_required=False,
+            )
         """
 
     def set_attributes(self, attribute_objs):
@@ -255,7 +269,8 @@ class AssetType(APIObject):
     def getAll(self, force_fetch=False):
         if force_fetch or len(self.assets) == 0:
             print(
-                f"Getting all {self.label_plural} for organization_id {self.organization_id}"
+                f"Getting all {self.label_plural} for organization_id"
+                f" {self.organization_id}"
             )
             self.assets = self.assets_instance.get_assets_for_type(self)
         return self.assets
@@ -510,13 +525,9 @@ class Assets(Service):
 
     def _get_all_assets(self):
         parameters = {"organization_id": self.organization_id}
-        assets = PagedResponse(
+        return PagedResponse(
             self.execute(GET(uri="assets").params(parameters), execute=True)
         )
-        return [Asset]
 
     def hasType(self, type_name):
         return hasattr(self, type_name)
-
-    def newType(self, type_name, description):
-        type = AssetType(assets_instance=self, organization_id=self.organization_id)

@@ -111,8 +111,8 @@ class AssetNode:
         intersect = set(asset_core_fields).intersection(set(self.attributes.iterkeys()))
         if intersect:
             logger.warn(
-                f"Non empty intersection between core fields and attributes: {intersect}."
-                " Attributes will be overwritten by core fields"
+                f"Non empty intersection between core fields and attributes:"
+                f" {intersect}. Attributes will be overwritten by core fields"
             )
 
     def add_child(self, child):
@@ -134,7 +134,6 @@ class LazyAssetsService(Assets):
     def __init__(self, organization_id, auth_module, environment="production"):
         self.types_by_label = {}
         self.types_by_uid = {}  # NOTE: Assets clears types_by_id
-        # logger.info(f"Initializing {type(self).__name__} for organization {organization_id} targeting {environment}")
         Assets.__init__(
             self,
             auth_module=auth_module,
@@ -185,7 +184,8 @@ class LazyAssetsService(Assets):
     def load_type_attributes(self, type_class_obj):
         if not type_class_obj.attributes:
             logger.info(
-                f"LazyAssetsService fetching attributes for type '{type_class_obj.label}'"
+                f"LazyAssetsService fetching attributes for type"
+                f" '{type_class_obj.label}'"
             )
             type_class_obj.set_attributes(self.get_attributes_for_type(type_class_obj))
             type_class_obj.attributes_by_id = {
@@ -222,14 +222,16 @@ class LazyAssetsService(Assets):
     def asset_attribute_with_id(self, asset_type, asset_attribute_id):
         if asset_attribute_id not in asset_type.attributes_by_id:
             raise AssertionError(
-                f"Asset Attribute with id '{asset_attribute_id}' not found. Was it loaded?"
+                f"Asset Attribute with id '{asset_attribute_id}' not found."
+                f" Was it loaded?"
             )
         return asset_type.attributes_by_id[asset_attribute_id]
 
     def asset_attribute_with_label(self, asset_type, asset_attribute_label):
         if asset_attribute_label not in asset_type.attributes:
             raise AssertionError(
-                f"Asset Attribute with label '{asset_attribute_label}' not found. Was it loaded?"
+                f"Asset Attribute with label '{asset_attribute_label}' not found."
+                f" Was it loaded?"
             )
         return asset_type.attributes[asset_attribute_label]
 
@@ -243,7 +245,8 @@ class LazyAssetsService(Assets):
     def asset_metric_with_label(self, asset_type, asset_metric_label):
         if asset_metric_label not in asset_type.metrics:
             raise AssertionError(
-                f"Asset Metric with label '{asset_metric_label}' not found. Was it loaded?"
+                f"Asset Metric with label '{asset_metric_label}' not found."
+                f" Was it loaded?"
             )
         return asset_type.metrics[asset_metric_label]
 
@@ -295,7 +298,8 @@ class LazyAssetsService(Assets):
                 create_attr_value_dict(k, v) for k, v in clean_attr_values_dict.items()
             ],
         }
-        # TODO: there is a bug in the ApiServices class, where .params doesn't cast boolean types to json (thus ignoring parameter)
+        # TODO: there is a bug in the ApiServices class, where .params doesn't cast
+        # boolean types to json (thus ignoring parameter)
         response = self.execute(
             POST(uri="assets?with_attribute_values=true").body(api_body), execute=True
         )
@@ -355,7 +359,8 @@ class LazyAssetsService(Assets):
         self.load_type_full(asset_type)
         asset = Asset(self, asset_type, asset_json)
         # pre fetch attributes
-        # todo: revisit this attr prefetching, may be replaced by the attributes coming in the asset_json
+        # todo: revisit this attr prefetching, may be replaced by the attributes
+        # coming in the asset_json
         asset.attributes()
         return asset
 
@@ -408,7 +413,11 @@ class LazyAssetsService(Assets):
                 base_url=self.base_url,
                 client=self.client,
                 request=GET(
-                    uri=f"organizations/{self.organization_id}/assets?asset_attribute_id={attr.id}&asset_attribute_value={attr_value}"
+                    uri=(
+                        f"organizations/{self.organization_id}/assets"
+                        f"?asset_attribute_id={attr.id}"
+                        f"&asset_attribute_value={attr_value}"
+                    )
                 ),
                 parameters={},
             )

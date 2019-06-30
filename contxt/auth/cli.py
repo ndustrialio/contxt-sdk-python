@@ -180,7 +180,9 @@ class CliAuth(Auth):
     def __init__(self):
         super().__init__(
             client_id="bleED0RUwb7CJ9j7D48tqSiSZRZn29AV",
-            client_secret="0s8VNQ26QrteS3H5KXIIPvkDcNL5PfT-_pWwAVNI4MpDaDg86O2XUH8lT19KLNiZ",
+            client_secret=(
+                "0s8VNQ26QrteS3H5KXIIPvkDcNL5PfT-_pWwAVNI4MpDaDg86O2XUH8lT19KLNiZ"
+            ),
         )
         self.auth_service = AuthService()
         self.identity_provider = UserIdentityProvider(

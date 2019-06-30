@@ -106,7 +106,7 @@ class DataVisualizer:
             xaxis=dict(title=x_label),
             yaxis=dict(title=y_label),
             showlegend=True,
-            margin=go.layout.Margin(l=80, r=80, t=80, b=80),
+            # margin=go.layout.Margin(l=80, r=80, t=80, b=80),
         )
 
 

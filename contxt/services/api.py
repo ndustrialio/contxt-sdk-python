@@ -27,7 +27,8 @@ def warn_of_unexpected_api_keys(cls, kwargs):
     # Warn of a present global (for asset service)
     if getattr(cls, "is_global", False):
         logger.warning(
-            f"{cls.__name__}: received global (id {getattr(cls, 'id', None)}, label {getattr(cls, 'label', None)})"
+            f"{cls.__name__}: received global (id {getattr(cls, 'id', None)},"
+            f" label {getattr(cls, 'label', None)})"
         )
 
 
@@ -50,19 +51,19 @@ class Parsers:
         # lists, dicts, booleans (True/False strings only), and None)
         try:
             return literal_eval(val)
-        except (SyntaxError, ValueError) as e:
+        except (SyntaxError, ValueError):
             pass
         # Next, fall back to a naive datetime parser
         try:
             return Parsers.parse_as_datetime(val)
-        except (TypeError, ValueError) as e:
+        except (TypeError, ValueError):
             pass
         # Next, fall back to a more powerful date/datetime parser
         # TODO: this works fine, but for a tz-aware datetime, it sets
         # tzinfo = tzutc(), not pytz.UTC, so equality checks will fail
         try:
             return parser.parse(val)
-        except (TypeError, ValueError) as e:
+        except (TypeError, ValueError):
             pass
         # Next, convert yes/no/true/false strings to bool
         try:
@@ -70,7 +71,7 @@ class Parsers:
                 return val.lower() == "yes"
             if val.lower() in ("true", "false"):
                 return val.lower() == "true"
-        except (AttributeError, TypeError, ValueError) as e:
+        except (AttributeError, TypeError, ValueError):
             pass
         # Failed, return original value
         return val
@@ -101,7 +102,8 @@ class Formatters:
     def format_date(date_: date):
         return date_.isoformat()
 
-    # Delay binding the functions to simple names to avoid overshadowing the datetime modules
+    # Delay binding the functions to simple names to avoid overshadowing the
+    # datetime modules
     datetime = format_datetime
     date = format_date
 
@@ -159,7 +161,8 @@ class ApiService:
     def _log_response(self, response: Response, *args, **kwargs):
         t = response.elapsed.total_seconds()
         logger.debug(
-            f"Called {response.request.method} {response.url} with body {response.request.body} ({t} s)"
+            f"Called {response.request.method} {response.url} with body"
+            f" {response.request.body} ({t} s)"
         )
 
     def _process_response(self, response: Response) -> Dict:
@@ -167,7 +170,7 @@ class ApiService:
         try:
             # Raise any error
             response.raise_for_status()
-        except HTTPError as e:
+        except HTTPError:
             # Catch the error, to log the response's message, and reraise
             # Try to decode the response as json, else fall back to raw text
             response_json = self._get_json(response)
@@ -181,7 +184,7 @@ class ApiService:
     def _get_json(self, response: Response) -> Dict:
         try:
             return response.json()
-        except ValueError as e:
+        except ValueError:
             return {}
 
     def get_logged_in_user_id(self) -> Optional[str]:
@@ -297,7 +300,8 @@ class ConfiguredApiService(ApiService, ABC):
         self._init_configs_by_env()
         if env not in self._configs_by_env:
             raise KeyError(
-                f"Invalid environment '{env}'. Expected one of {', '.join(self._configs_by_env.keys())}."
+                f"Invalid environment '{env}'. Expected one of"
+                f" {', '.join(self._configs_by_env.keys())}."
             )
         return self._configs_by_env[env]
 

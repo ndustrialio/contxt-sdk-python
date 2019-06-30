@@ -54,9 +54,9 @@ class EMS:
         data_by_main = {}
         for service in main_services:
             print(
-                f"Getting data for main service {service.name}. IOT Info -> "
-                f"{service.demand_field.field_human_name} and output {service.demand_field.output_id} "
-                f"from {start_date} to {end_date}"
+                f"Getting data for main service {service.name}. IOT Info ->"
+                f" {service.demand_field.field_human_name} and output"
+                f" {service.demand_field.output_id} from {start_date} to {end_date}"
             )
             data = self.iot_service.get_data_for_field(
                 output_id=service.demand_field.output_id,
@@ -193,7 +193,7 @@ class EMS:
                     date_end=end_date,
                     pro_forma=pro_forma,
                 )
-            except UnauthorizedException as e:
+            except UnauthorizedException:
                 logger.warning(f"Unauthorized for facility {facility.id}")
                 continue
 
@@ -248,7 +248,7 @@ class EMS:
                     date_end=end_date,
                     pro_forma=pro_forma,
                 )
-            except UnauthorizedException as e:
+            except UnauthorizedException:
                 logger.warning(f"Unauthorized for facility {facility.id}")
                 continue
             except Exception as e:
@@ -278,7 +278,8 @@ class EMS:
         metric_scalar=1,
     ):
 
-        # initialize an instance of the asset service to use for this, so we can speed things up
+        # initialize an instance of the asset service to use for this,
+        # so we can speed things up
         asset_service, organization_id = self.asset_functions.initialize_asset_service(
             organization_id=organization_id, organization_name=organization_name
         )
@@ -304,7 +305,7 @@ class EMS:
 
                 facility_normalized_metrics[facility.name] = normalized_usage
 
-            except UnauthorizedException as e:
+            except UnauthorizedException:
                 logger.warning(f"Unauthorized for facility {facility.id}")
                 continue
             except Exception as e:
@@ -327,7 +328,8 @@ class EMS:
         metric_scalar=1,
     ):
 
-        # initialize an instance of the asset service to use for this, so we can speed things up
+        # initialize an instance of the asset service to use for this,
+        # so we can speed things up
         asset_service, organization_id = self.asset_functions.initialize_asset_service(
             organization_id=organization_id, organization_name=organization_name
         )
@@ -353,7 +355,7 @@ class EMS:
 
                 facility_normalized_metrics[facility.name] = normalized_spend
 
-            except UnauthorizedException as e:
+            except UnauthorizedException:
                 logger.warning(f"Unauthorized for facility {facility.id}")
                 continue
             except Exception as e:
@@ -387,7 +389,8 @@ class EMS:
         if not facility_obj:
             return
 
-        # get its list of metrics for the asset so we can make sure the user is asking for a valid metric
+        # get its list of metrics for the asset so we can make sure the user is
+        # asking for a valid metric
         asset_obj = self.asset_functions.get_asset_info(
             asset_id=facility_obj.asset_id,
             organization_id=facility_obj.organization_id,
@@ -403,7 +406,8 @@ class EMS:
 
         if metric_obj.time_interval != "monthly":
             logger.critical(
-                "Invalid time interval for metric {metric_obj.time_interval}. Must be a monthly metric"
+                f"Invalid time interval for metric {metric_obj.time_interval}."
+                f" Must be a monthly metric"
             )
             return
 
@@ -482,7 +486,8 @@ class EMS:
         if not facility_obj:
             return
 
-        # get its list of metrics for the asset so we can make sure the user is asking for a valid metric
+        # get its list of metrics for the asset so we can make sure the user is
+        # asking for a valid metric
         asset_obj = self.asset_functions.get_asset_info(
             asset_id=facility_obj.asset_id,
             organization_id=facility_obj.organization_id,
@@ -498,7 +503,8 @@ class EMS:
 
         if metric_obj.time_interval != "monthly":
             logger.critical(
-                "Invalid time interval for metric {metric_obj.time_interval}. Must be a monthly metric"
+                f"Invalid time interval for metric {metric_obj.time_interval}."
+                " Must be a monthly metric"
             )
             return
 

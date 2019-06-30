@@ -3,7 +3,6 @@ from unittest.mock import patch
 import pytest
 
 import contxt.__main__ as contxt
-from contxt.cli.parsers import AssetsParser, AuthParser, ContxtArgParser
 
 
 @pytest.fixture(scope="module")
@@ -31,7 +30,7 @@ def test_auth_parser_login(mock_login):
 
 
 @patch("contxt.cli.parsers.AuthParser._logout", return_value=True)
-def test_auth_parser_login(mock_logout):
+def test_auth_parser_logout(mock_logout):
     parser, subparsers = contxt.create_parser()
     logout_cmd = parser.parse_args(["auth", "logout"])
     logout_cmd.func(logout_cmd)
@@ -44,7 +43,7 @@ def test_iot_groupings_parser(setup_parser_args):
 
 def test_iot_feeds_parser(setup_parser_args):
     setup_parser_args.parse_args(["iot"])
-    args = setup_parser_args.parse_args(["iot", "feeds", "-f", "100"])
+    setup_parser_args.parse_args(["iot", "feeds", "-f", "100"])
     setup_parser_args.parse_args(["iot", "feeds", "--facility-id", "100"])
 
 
