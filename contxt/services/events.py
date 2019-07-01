@@ -2,32 +2,32 @@ from typing import List, Optional
 
 from contxt.auth import Auth
 from contxt.models.events import Event, EventDefinition, EventType, TriggeredEvent
-from contxt.services.api import ApiServiceConfig, ConfiguredApiService
+from contxt.services.api import ApiEnvironment, ConfiguredApi
 from contxt.utils import make_logger
 
 logger = make_logger(__name__)
 
 
-class EventsService(ConfiguredApiService):
+class EventsService(ConfiguredApi):
     """
     Service to interact with our Events API.
     """
 
-    _configs = (
-        ApiServiceConfig(
+    _envs = (
+        ApiEnvironment(
             name="production",
             base_url="http://events.api.ndustrial.io/v1",
-            audience="7jzwfE20O2XZ4aq3cO1wmk63G9GzNc8j",
+            client_id="7jzwfE20O2XZ4aq3cO1wmk63G9GzNc8j",
         ),
-        ApiServiceConfig(
+        ApiEnvironment(
             name="staging",
             base_url="http://events-staging.api.ndustrial.io/v1",
-            audience="dn4MaocJFdKtsBy9sFFaTeuJWL1nt5xu",
+            client_id="dn4MaocJFdKtsBy9sFFaTeuJWL1nt5xu",
         ),
     )
 
     def __init__(self, auth: Auth, env: str = "production"):
-        super().__init__(auth, env)
+        super().__init__(env, auth)
 
     def event_definition_parameters_to_human_readable_format(
         self, event_definition: EventDefinition

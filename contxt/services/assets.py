@@ -10,28 +10,28 @@ from contxt.models.assets import (
     Metric,
     MetricValue,
 )
-from contxt.services.api import ApiServiceConfig, ConfiguredApiService
+from contxt.services.api import ApiEnvironment, ConfiguredApi
 from contxt.utils import make_logger
 
 logger = make_logger(__name__)
 
 
-class AssetsService(ConfiguredApiService):
+class AssetsService(ConfiguredApi):
     """
     Service to interact with our Assets API.
     """
 
     __marker = object()
-    _configs = (
-        ApiServiceConfig(
+    _envs = (
+        ApiEnvironment(
             name="production",
             base_url="https://facilities.api.ndustrial.io/v1",
-            audience="SgbCopArnGMa9PsRlCVUCVRwxocntlg0",
+            client_id="SgbCopArnGMa9PsRlCVUCVRwxocntlg0",
         ),
-        ApiServiceConfig(
+        ApiEnvironment(
             name="staging",
             base_url="https://facilities-staging.api.ndustrial.io/v1",
-            audience="xG775XHIOZVUn84seNeHXi0Qe55YuR5w",
+            client_id="xG775XHIOZVUn84seNeHXi0Qe55YuR5w",
         ),
     )
 
@@ -43,9 +43,7 @@ class AssetsService(ConfiguredApiService):
         load_types: bool = True,
         types_to_fully_load: Optional[List[str]] = None,
     ):
-        # FIXME: setting use_session to False for the time being, until token
-        # renewal is handled
-        super().__init__(auth, env, use_session=False)
+        super().__init__(env, auth)
         # TODO: handle multiple orgs
         self.organization_id = organization_id
         self.types = {}

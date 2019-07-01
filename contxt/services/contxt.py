@@ -9,32 +9,32 @@ from contxt.models.contxt import (
     OrganizationUser,
     User,
 )
-from contxt.services.api import ApiServiceConfig, ConfiguredApiService
+from contxt.services.api import ApiEnvironment, ConfiguredApi
 from contxt.utils import make_logger
 
 logger = make_logger(__name__)
 
 
-class ContxtService(ConfiguredApiService):
+class ContxtService(ConfiguredApi):
     """
     Service to interact with our Contxt API.
     """
 
-    _configs = (
-        ApiServiceConfig(
+    _envs = (
+        ApiEnvironment(
             name="production",
             base_url="https://contxt.api.ndustrial.io/v1",
-            audience="8qY2xJob1JAxhmVhIDLCNnGriTM9bct8",
+            client_id="8qY2xJob1JAxhmVhIDLCNnGriTM9bct8",
         ),
-        ApiServiceConfig(
+        ApiEnvironment(
             name="staging",
             base_url="https://contxt-staging.api.ndustrial.io/v1",
-            audience="8qY2xJob1JAxhmVhIDLCNnGriTM9bct8",
+            client_id="8qY2xJob1JAxhmVhIDLCNnGriTM9bct8",
         ),
     )
 
     def __init__(self, auth: Auth, env: str = "production"):
-        super().__init__(auth, env)
+        super().__init__(env, auth)
 
     def get_organizations(self) -> List[Organization]:
         logger.debug("Fetching organizations")

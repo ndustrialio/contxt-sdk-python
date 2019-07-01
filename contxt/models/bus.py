@@ -1,7 +1,7 @@
 from pprint import pformat
 from typing import Any, List, Optional
 
-from contxt.services.api import ApiField, ApiObject
+from contxt.models import ApiField, ApiObject
 from contxt.utils.serializer import Serializer
 
 

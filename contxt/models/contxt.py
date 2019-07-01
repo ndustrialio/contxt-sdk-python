@@ -2,7 +2,7 @@ from datetime import datetime
 from json import loads
 from typing import List, Optional
 
-from contxt.services.api import ApiField, ApiObject, Parsers
+from contxt.models import ApiField, ApiObject, Parsers
 
 
 class ConfigValue(ApiObject):

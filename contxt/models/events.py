@@ -2,7 +2,7 @@ from datetime import datetime
 from json import loads
 from typing import Optional
 
-from contxt.services.api import ApiField, ApiObject, Parsers
+from contxt.models import ApiField, ApiObject, Parsers
 from contxt.utils import make_logger
 
 logger = make_logger(__name__)

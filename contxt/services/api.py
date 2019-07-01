@@ -1,162 +1,49 @@
 from abc import ABC, abstractmethod
-from ast import literal_eval
-from datetime import date, datetime
-from importlib import import_module
-from typing import Any, Callable, Dict, Optional, Union
+from dataclasses import dataclass
+from typing import Dict, Optional, Tuple
 
-import requests
-from dateutil import parser
-from pytz import UTC, ZERO
 from requests import PreparedRequest, Response, Session
 from requests.auth import AuthBase
 from requests.exceptions import HTTPError
 
-from contxt.auth import TokenProvider
+from contxt.auth import Auth, TokenProvider
 from contxt.utils import make_logger
-from contxt.utils.serializer import Serializer
 
 logger = make_logger(__name__)
 
 
-def warn_of_unexpected_api_keys(cls, kwargs):
-    # Warn of unexpected kwargs
-    for k, v in kwargs.items():
-        logger.warning(f"{cls.__name__}: Unexpected key from api {k}")
-    # Warn of a present global (for asset service)
-    if getattr(cls, "is_global", False):
-        logger.warning(
-            f"{cls.__name__}: received global (id {getattr(cls, 'id', None)},"
-            f" label {getattr(cls, 'label', None)})"
-        )
-
-
-class Parsers:
+class BearerTokenAuth(AuthBase):
     """
-    Parsers needed to parse an API's response as the appropriate Python object
-    """
-
-    @staticmethod
-    def parse_as_datetime(timestamp: str) -> datetime:
-        return datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%S.%fZ").replace(tzinfo=UTC)
-
-    @staticmethod
-    def parse_as_date(datestamp: str) -> date:
-        return date.fromisoformat(datestamp)
-
-    @staticmethod
-    def parse_as_unknown(val: Any):
-        # First, try a general parser (supports strings, numbers, tuples,
-        # lists, dicts, booleans (True/False strings only), and None)
-        try:
-            return literal_eval(val)
-        except (SyntaxError, ValueError):
-            pass
-        # Next, fall back to a naive datetime parser
-        try:
-            return Parsers.parse_as_datetime(val)
-        except (TypeError, ValueError):
-            pass
-        # Next, fall back to a more powerful date/datetime parser
-        # TODO: this works fine, but for a tz-aware datetime, it sets
-        # tzinfo = tzutc(), not pytz.UTC, so equality checks will fail
-        try:
-            return parser.parse(val)
-        except (TypeError, ValueError):
-            pass
-        # Next, convert yes/no/true/false strings to bool
-        try:
-            if val.lower() in ("yes", "no"):
-                return val.lower() == "yes"
-            if val.lower() in ("true", "false"):
-                return val.lower() == "true"
-        except (AttributeError, TypeError, ValueError):
-            pass
-        # Failed, return original value
-        return val
-
-    boolean = bool
-    datetime = parse_as_datetime
-    date = parse_as_date
-    number = float
-    string = str
-    unknown = parse_as_unknown
-
-
-class Formatters:
-    """
-    Formatters needed to format a parsed response back to json
-    """
-
-    @staticmethod
-    def format_datetime(datetime_: datetime) -> str:
-        # Require timezone to be UTC
-        if datetime_.utcoffset() != ZERO:
-            raise AssertionError(f"Datetime must be UTC, not {datetime_.tzinfo}")
-        # NOTE: almost exactly the same as isoformat(), but ensures
-        # microseconds are always represented
-        return datetime_.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
-
-    @staticmethod
-    def format_date(date_: date):
-        return date_.isoformat()
-
-    # Delay binding the functions to simple names to avoid overshadowing the
-    # datetime modules
-    datetime = format_datetime
-    date = format_date
-
-
-class RequestAuth(AuthBase):
-    """
-    Authorization passed to requests (sets bearer access token in request header)
+    Bearer token to authorize requests.
     """
 
     def __init__(self, token_provider: TokenProvider) -> None:
         self.token_provider = token_provider
 
-    def __call__(self, request: PreparedRequest):
+    def __call__(self, request: PreparedRequest) -> PreparedRequest:
         request.headers["Authorization"] = f"Bearer {self.token_provider.access_token}"
         return request
 
 
-class ApiService:
+class Api:
     """
-    A service associated with an API.
+    An API with url `base_url`.
 
-    If `token_provided` is specified, all requests with be authenticated with
-    the access_token it provides.
+    If `token_provider` is specified, all requests will be authenticated with
+    the access token it provides.
     """
 
-    __marker = object()
-
-    def __init__(
-        self,
-        base_url: str,
-        token_provider: Optional[TokenProvider] = None,
-        use_session: Optional[bool] = True,
-    ):
-        self.base_url = base_url
-        self.token_provider = token_provider
-        self.session = self._init_session() if use_session else None
-
-    def _init_session(self):
-        session = Session()
-        if self.token_provider:
-            session.auth = RequestAuth(self.token_provider)
-        session.hooks = {"response": self._log_response}
-        return session
+    def __init__(self, base_url: str, token_provider: Optional[TokenProvider] = None):
+        self.base_url = base_url if base_url.endswith("/") else f"{base_url}/"
+        # Initialize session
+        self.session = Session()
+        self.session.auth = BearerTokenAuth(token_provider) if token_provider else None
+        self.session.hooks = {"response": self._log_response}
 
     def _url(self, uri: str) -> str:
-        return f"{self.base_url}/{uri}"
+        return f"{self.base_url}{uri}"
 
-    def _request_kwargs(self):
-        return {
-            "auth": RequestAuth(self.token_provider) if self.token_provider else None,
-            # "timeout": 1,
-            "hooks": {"response": self._log_response},
-        }
-
-    def _log_response(self, response: Response, *args, **kwargs):
+    def _log_response(self, response: Response, *args, **kwargs) -> None:
         t = response.elapsed.total_seconds()
         logger.debug(
             f"Called {response.request.method} {response.url} with body"
@@ -164,7 +51,6 @@ class ApiService:
         )
 
     def _process_response(self, response: Response) -> Dict:
-        # Handle any errors
         try:
             # Raise any error
             response.raise_for_status()
@@ -185,28 +71,18 @@ class ApiService:
         except ValueError:
             return {}
 
-    def get_logged_in_user_id(self) -> Optional[str]:
-        if not self.token_provider:
-            return None
-        # TODO do actual token verification
-        return self.token_provider.decoded_access_token["sub"]
-
     def get(
         self,
-        uri,
-        params: Optional[Dict[str, str]] = None,
+        uri: str,
+        params: Optional[Dict] = None,
         records_only: bool = True,
         **kwargs,
-    ):
-        if self.session:
-            response = self.session.get(self._url(uri), params=params, **kwargs)
-        else:
-            # Merge default options with method options
-            kwargs = {**self._request_kwargs(), **(kwargs or {})}
-            response = requests.get(self._url(uri), params=params, **kwargs)
-
+    ) -> Dict:
+        """Sends a GET request"""
+        response = self.session.get(url=self._url(uri), params=params, **kwargs)
         response_json = self._process_response(response)
 
+        # TODO: remove `records_only` in favor of pagination support
         # Return just records, if requested and available
         records = (
             response_json.get("records") if isinstance(response_json, dict) else None
@@ -223,13 +99,9 @@ class ApiService:
         data: Optional[Dict] = None,
         json: Optional[Dict] = None,
         **kwargs,
-    ):
-        if self.session:
-            response = self.session.post(self._url(uri), data=data, json=json, **kwargs)
-        else:
-            # Merge default options with method options
-            kwargs = {**self._request_kwargs(), **(kwargs or {})}
-            response = requests.post(self._url(uri), data=data, json=json, **kwargs)
+    ) -> Dict:
+        """Sends a POST request"""
+        response = self.session.post(url=self._url(uri), data=data, json=json, **kwargs)
         return self._process_response(response)
 
     def put(
@@ -238,200 +110,57 @@ class ApiService:
         data: Optional[Dict] = None,
         json: Optional[Dict] = None,
         **kwargs,
-    ):
-        if self.session:
-            response = self.session.put(self._url(uri), data=data, json=json, **kwargs)
-        else:
-            # Merge default options with method options
-            kwargs = {**self._request_kwargs(), **(kwargs or {})}
-            response = requests.put(self._url(uri), data=data, json=json, **kwargs)
+    ) -> Dict:
+        """Sends a PUT request"""
+        response = self.session.put(url=self._url(uri), data=data, json=json, **kwargs)
         return self._process_response(response)
 
-    def delete(self, uri: str, **kwargs):
-        if self.session:
-            response = self.session.delete(self._url(uri), **kwargs)
-        else:
-            # Merge default options with method options
-            kwargs = {**self._request_kwargs(), **(kwargs or {})}
-            response = requests.delete(self._url(uri), **kwargs)
+    def delete(self, uri: str, **kwargs) -> Dict:
+        """Sends a DELETE request"""
+        response = self.session.delete(url=self._url(uri), **kwargs)
         return self._process_response(response)
 
 
-class ApiServiceConfig:
+@dataclass
+class ApiEnvironment:
     """
-    A configuration to specify the API's name, url, and audience
-    """
+    An environment for an API.
 
-    def __init__(self, name: str, base_url: str, audience: str):
-        self.name = name
-        self.base_url = base_url
-        self.audience = audience
-
-
-class ConfiguredApiService(ApiService, ABC):
-    """
-    An ApiService that has a list of configurations, selected by name
+    Note `client_id` is only needed if authentication is required.
     """
 
-    def __init__(self, auth, env: str, **kwargs):
-        self.auth = auth
-        self.config = self._init_config(env)
-        token_provider = (
-            self.auth.get_token_provider(self.config.audience) if self.auth else None
-        )
-        super().__init__(
-            base_url=self.config.base_url, token_provider=token_provider, **kwargs
-        )
+    name: str
+    base_url: str
+    client_id: str
 
-    @property
-    @abstractmethod
-    def _configs(self):
-        pass
+
+class ConfiguredApi(Api, ABC):
+    """
+    An `Api` configured for multiple environments, such as staging and production.
+    Available environments are expressed by `_envs` and the desired environment is
+    specified by its name `env`.
+
+    Overload this class to implement `_envs`.
+    """
+
+    def __init__(self, env: str, auth: Optional[Auth] = None):
+        self.env = self._get_env(env)
+        token_provider = auth.get_token_provider(self.env.client_id) if auth else None
+        super().__init__(base_url=self.env.base_url, token_provider=token_provider)
 
     @classmethod
-    def _init_configs_by_env(cls):
-        if hasattr(cls, "_configs_by_env"):
-            return
-        cls._configs_by_env = {c.name: c for c in cls._configs}
-
-    def _init_config(self, env: str):
-        self._init_configs_by_env()
-        if env not in self._configs_by_env:
+    def _get_env(cls, name: str) -> ApiEnvironment:
+        """Get environment with name `name`."""
+        envs = {e.name: e for e in cls._envs}
+        if name not in envs:
             raise KeyError(
-                f"Invalid environment '{env}'. Expected one of"
-                f" {', '.join(self._configs_by_env.keys())}."
+                f"Invalid environment '{name}'. Choose from {list(envs.keys())}."
             )
-        return self._configs_by_env[env]
-
-
-# TODO: Need a way to track changed attributes
-# TODO: This custom schema-validation can be replaced by a more robust
-# (although slower) implementation: see https://github.com/marshmallow-code/marshmallow
-class ApiField:
-    """
-    A field retrieved from an API service.
-
-    Contains the expected key, the desired class attribute key, the object type,
-    and if it is a creatable or updatable field.
-    """
-
-    def __init__(
-        self,
-        api_key: str,
-        attr_key: Optional[str] = None,
-        data_type: Optional[Union[Callable, str]] = str,
-        creatable: Optional[bool] = False,
-        updatable: Optional[bool] = False,
-        optional: Optional[bool] = False,
-    ):
-        self.api_key = api_key
-        self.attr_key = attr_key or api_key
-        self._data_type = data_type
-        self.creatable = creatable
-        self.updatable = updatable
-        self.optional = optional
+        return envs[name]
 
     @property
-    def data_type(self):
-        if isinstance(self._data_type, str):
-            # Load callable from str
-            # NOTE: this is to delay the type assignment to instance creation,
-            # as the type might not yet be defined at class creation
-            modname, qualname_separator, qualname = self._data_type.partition(":")
-            obj = import_module(modname)
-            if qualname_separator:
-                for attr in qualname.split("."):
-                    obj = getattr(obj, attr)
-            self._data_type = obj
-        return self._data_type
-
-
-class ApiObject(ABC):
-    """
-    An abstract base class for a response from an API. This class serves to
-    take a raw response from an API and create a parsed Python object.
-    """
-
-    _api_fields = NotImplemented
-
-    def __init__(self):
-        cls = self.__class__
-        # Set creatable, updateable fields for class (if not yet set)
-        # HACK: move this somewhere more appropriate
-        if not hasattr(cls, "_creatable_fields"):
-            cls._creatable_fields = {
-                f.attr_key: f for f in cls._api_fields if f.creatable
-            }
-        if not hasattr(cls, "_updatable_fields"):
-            cls._updatable_fields = {
-                f.attr_key: f for f in cls._api_fields if f.updatable
-            }
-
-    def __str__(self):
-        return Serializer.to_table(self)
-
-    # @property
-    # @classmethod
-    # @abstractmethod
-    # def _api_fields(cls):
-    #     pass
-
     @classmethod
-    def clean_api_value(cls, api_field: ApiField, api_value: Any):
-        if api_value is None:
-            # No value
-            return api_value
-        elif isinstance(api_value, (list, tuple)):
-            # Value is a list, clean each item
-            return [cls.clean_api_value(api_field, v) for v in api_value]
-        elif callable(getattr(api_field.data_type, "from_api", None)):
-            # Type is an ApiObject, apply from_api instead of init
-            return api_field.data_type.from_api(api_value)
-        else:
-            # Apply type
-            return api_field.data_type(api_value)
-
-    @classmethod
-    def from_api(cls, api_dict: Dict):
-        # Create clean dictionary to pass to init
-        clean_dict = {
-            f.attr_key: cls.clean_api_value(
-                api_field=f,
-                api_value=api_dict.pop(f.api_key, None)
-                if f.optional
-                else api_dict.pop(f.api_key),
-            )
-            for f in cls._api_fields
-        }
-
-        # Warn of any unused keys
-        warn_of_unexpected_api_keys(cls, api_dict)
-
-        # Return new instance
-        return cls(**clean_dict)
-
-    def get_dict(self):
-        # TODO: deprecate, call Serializer directly
-        return Serializer.to_dict(self)
-
-    def get_df(self):
-        # TODO: deprecate, call Serializer directly
-        return Serializer.to_df(self)
-
-    def post(self):
-        """Get data for a POST request"""
-        # Transform api fields to dict
-        d = Serializer.to_dict(
-            self, key_filter=lambda k: k in set(self._creatable_fields.keys())
-        )
-        # Swap attr_keys for api_keys
-        return {self._creatable_fields[k].api_key: v for k, v in d.items()}
-
-    def put(self):
-        """Get data for a PUT request"""
-        # Transform api fields to dict
-        d = Serializer.to_dict(
-            self, key_filter=lambda k: k in set(self._updatable_fields.keys())
-        )
-        # Swap attr_keys for api_keys
-        return {self._updatable_fields[k].api_key: v for k, v in d.items()}
+    @abstractmethod
+    def _envs(cls) -> Tuple[ApiEnvironment, ...]:
+        """Lists available environments."""
+        pass

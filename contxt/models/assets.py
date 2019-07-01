@@ -3,7 +3,7 @@ from typing import Any, List, Optional
 
 from inflect import engine
 
-from contxt.services.api import ApiField, ApiObject, Parsers
+from contxt.models import ApiField, ApiObject, Parsers
 from contxt.utils import Utils, make_logger
 
 p = engine()

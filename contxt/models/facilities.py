@@ -1,5 +1,5 @@
+from contxt.models import ApiField, ApiObject, Parsers
 from contxt.models.contxt import Organization
-from contxt.services.api import ApiField, ApiObject, Parsers
 
 
 # Hide: address1, address2, geometry_id, tags, organization, info, weather_location_id

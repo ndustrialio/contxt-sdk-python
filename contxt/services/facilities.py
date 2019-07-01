@@ -2,24 +2,24 @@ from typing import Optional
 
 from contxt.auth import Auth
 from contxt.models.facilities import Facility
-from contxt.services.api import ConfiguredApiService
+from contxt.services.api import ConfiguredApi
 from contxt.services.assets import AssetsService
 from contxt.utils import make_logger
 
 logger = make_logger(__name__)
 
 
-class FacilitiesService(ConfiguredApiService):
+class FacilitiesService(ConfiguredApi):
     """
     Service to interact with our Facilities API.
 
     NOTE: The facility_id in this service is the legacy integer id.
     """
 
-    _configs = AssetsService._configs
+    _envs = AssetsService._envs
 
     def __init__(self, auth: Auth, env: str = "production"):
-        super().__init__(auth, env)
+        super().__init__(env, auth)
 
     def get_facilities(self, organization_id: Optional[str] = None):
         logger.debug(f"Fetching facilities for organization {organization_id}")

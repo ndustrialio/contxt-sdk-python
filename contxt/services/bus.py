@@ -1,36 +1,31 @@
-from typing import Optional
-
 from contxt.auth import Auth
 from contxt.models.bus import Channel, ChannelStats
-from contxt.services.api import ApiServiceConfig, ConfiguredApiService
+from contxt.services.api import ApiEnvironment, ConfiguredApi
 from contxt.utils import make_logger
 
 logger = make_logger(__name__)
 
 
-class MessageBusService(ConfiguredApiService):
+class MessageBusService(ConfiguredApi):
     """
     Service to interact with our Message Bus API.
     """
 
-    _configs = (
-        ApiServiceConfig(
+    _envs = (
+        ApiEnvironment(
             name="production",
             base_url="https://bus.ndustrial.io",
-            # base_url="http://bus.lineageapi.com",
-            audience="T62CR77ouw4I6VPlSSlLT9VpVA1ebByx",
+            client_id="T62CR77ouw4I6VPlSSlLT9VpVA1ebByx",
         ),
-        ApiServiceConfig(
+        ApiEnvironment(
             name="staging",
             base_url="https://bus-staging.ndustrial.io",
-            audience="YHCtC2dZAvvt2SdxUVwWpVdm4fSOkUdL",
+            client_id="YHCtC2dZAvvt2SdxUVwWpVdm4fSOkUdL",
         ),
     )
 
-    def __init__(
-        self, auth: Auth, organization_id: str, env: Optional[str] = "production"
-    ):
-        super().__init__(auth, env)
+    def __init__(self, auth: Auth, organization_id: str, env: str = "production"):
+        super().__init__(env, auth)
         self.organization_id = organization_id
 
     def _channels_url(self, service_id):
