@@ -5,9 +5,9 @@ from contxt.auth import Auth
 from contxt.models.ems import (
     Facility,
     MainService,
+    ResourceType,
     UtilitySpend,
     UtilityUsage,
-    ResourceType,
 )
 from contxt.services.api import ApiEnvironment, ConfiguredApi
 
@@ -98,4 +98,3 @@ class EmsService(ConfiguredApi):
             },
         )
         return UtilityUsage.from_api(resp)
-

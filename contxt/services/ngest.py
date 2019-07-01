@@ -5,7 +5,7 @@ from typing import Dict, List
 from pytz import UTC
 
 from contxt.services.api import ApiEnvironment, ConfiguredApi
-from contxt.utils import make_logger, is_datetime_aware
+from contxt.utils import is_datetime_aware, make_logger
 
 logger = make_logger(__name__)
 

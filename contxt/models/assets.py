@@ -336,7 +336,9 @@ class AssetType(ApiObject):
             return default
         return self._attributes_by_id[attribute_id]
 
-    def attribute_with_label(self, attribute_label: str, default: Any = ...) -> Attribute:
+    def attribute_with_label(
+        self, attribute_label: str, default: Any = ...
+    ) -> Attribute:
         if attribute_label not in self._attributes_by_label:
             if default is ...:
                 raise KeyError(f"Attribute {attribute_label} not found.")
@@ -492,7 +494,9 @@ class CompleteAsset(ApiObject):
 
         return metric_values_by_label
 
-    def _effective_end_date(self, effective_start_date: date, time_interval: str) -> date:
+    def _effective_end_date(
+        self, effective_start_date: date, time_interval: str
+    ) -> date:
         delta = timedelta()
         if time_interval == TimeIntervals.hourly:
             delta = timedelta(hours=1) - timedelta(milliseconds=1)

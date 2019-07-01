@@ -8,7 +8,6 @@ from typing import Any, Callable, Dict, Optional, Tuple, Union
 from dateutil import parser
 from pytz import UTC, ZERO
 
-from contxt.services.api import Api
 from contxt.utils import make_logger
 from contxt.utils.serializer import Serializer
 

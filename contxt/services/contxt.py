@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, List, Optional, Dict
+from typing import Any, Dict, List, Optional
 
 from contxt.auth import Auth
 from contxt.models.contxt import (

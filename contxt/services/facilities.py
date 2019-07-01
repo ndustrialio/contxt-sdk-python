@@ -1,4 +1,4 @@
-from typing import Optional, List
+from typing import List, Optional
 
 from contxt.auth import Auth
 from contxt.models.facilities import Facility

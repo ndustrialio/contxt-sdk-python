@@ -1,6 +1,6 @@
 from datetime import datetime
 from enum import Enum
-from typing import List, Optional, Dict
+from typing import Dict, List, Optional
 
 from contxt.models import ApiField, ApiObject, Parsers
 from contxt.models.iot import Field

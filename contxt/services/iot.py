@@ -1,8 +1,7 @@
 from datetime import datetime
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 from contxt.auth import Auth
-from contxt.models import Parsers
 from contxt.models.iot import Feed, Field, FieldGrouping, UnprovisionedField, Window
 from contxt.services.api import ApiEnvironment, ConfiguredApi
 
@@ -37,9 +36,7 @@ class IotService(ConfiguredApi):
             return None
         elif len(feeds) == 1:
             return feeds[0]
-        raise KeyError(
-            f"Expected singleton feed for key {key}, not {len(feeds)}
-        )
+        raise KeyError(f"Expected singleton feed with key {key}, not {len(feeds)}")
 
     def get_feeds(
         self, facility_id: Optional[int] = None, key: Optional[str] = None

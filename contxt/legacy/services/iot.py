@@ -1,14 +1,6 @@
 from datetime import datetime
 from typing import Optional
 
-from contxt.legacy.services import (
-    GET,
-    APIObjectCollection,
-    DataResponse,
-    PagedEndpoint,
-    PagedResponse,
-    Service,
-)
 from contxt.legacy.models.iot import (
     Feed,
     Field,
@@ -16,6 +8,14 @@ from contxt.legacy.models.iot import (
     FieldGrouping,
     FieldGroupingOwner,
     UnprovisionedField,
+)
+from contxt.legacy.services import (
+    GET,
+    APIObjectCollection,
+    DataResponse,
+    PagedEndpoint,
+    PagedResponse,
+    Service,
 )
 from contxt.utils import Utils
 

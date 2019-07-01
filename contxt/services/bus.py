@@ -1,8 +1,9 @@
+from typing import Dict, List
+
 from contxt.auth import Auth
 from contxt.models.bus import Channel, ChannelStats
 from contxt.services.api import ApiEnvironment, ConfiguredApi
 from contxt.utils import make_logger
-from typing import List, Dict
 
 logger = make_logger(__name__)
 
