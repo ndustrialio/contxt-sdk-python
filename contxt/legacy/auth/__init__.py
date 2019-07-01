@@ -42,7 +42,8 @@ class BaseAuth:
                 client_secret=self.client_secret,
             )
         else:
-            # if there is no token for auth, then we need to go ask the user to login so we can get one
+            # if there is no token for auth, then we need to go ask the user
+            # to login so we can get one
             if not self.auth_access_token:
                 self.login()
                 self.auth_access_token = (
@@ -97,7 +98,8 @@ class BaseAuth:
         if self.token_is_expired_for_audience(audience):
             logger.warn(f"Refreshing expired token for client {audience}...")
 
-            # if it's the contxt auth client, we need to follow the other refresh route via Auth0
+            # if it's the contxt auth client, we need to follow the other
+            # refresh route via Auth0
             if audience == self.AUTH_AUDIENCE:
                 self.refresh_contxt_auth_token()
             else:

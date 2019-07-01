@@ -12,15 +12,16 @@ from contxt.utils.vis import DataVisualizer
 
 logger = make_logger(__name__)
 
+
 class FeedArgumentException(Exception):
     pass
+
 
 class FeedNotFoundException(Exception):
     pass
 
 
 class IOT:
-
     def __init__(self, auth):
         self.iot_service = IOTService(auth)
 
@@ -47,13 +48,9 @@ class IOT:
     def get_fields_for_grouping(self, grouping_id):
         return self.iot_service.get_single_grouping(grouping_id).fields
 
-    def get_field_data_for_grouping(self,
-                                    grouping_id,
-                                    start_date,
-                                    window,
-                                    end_date=None,
-                                    plot=False):
-
+    def get_field_data_for_grouping(
+        self, grouping_id, start_date, window, end_date=None, plot=False
+    ):
         def parse_date_str(date_str):
             return datetime.strptime(date_str, "%Y-%m")
 
@@ -76,7 +73,9 @@ class IOT:
                 start_time=iso_start_date,
                 window=window,
                 end_time=iso_end_date,
-                limit=5000) for f in tqdm(grouping.fields)
+                limit=5000,
+            )
+            for f in tqdm(grouping.fields)
         ]
 
         # Plot or dump to csv
@@ -91,15 +90,12 @@ class IOT:
                 data_list=field_data,
                 start_date=start_date,
                 end_date=end_date,
-                window=window)
+                window=window,
+            )
 
-    def export_field_data(self,
-                          export_path,
-                          field_list,
-                          data_list,
-                          start_date,
-                          end_date,
-                          window):
+    def export_field_data(
+        self, export_path, field_list, data_list, start_date, end_date, window
+    ):
         logger.info(f"Writing files to {export_path}")
         export_path.mkdir(parents=True)
 
@@ -108,7 +104,7 @@ class IOT:
         for field, data in zip(field_list, data_list):
             filepath = export_path / f"{field.field_descriptor}.csv"
             row_counter = 0
-            with filepath.open('w') as f:
+            with filepath.open("w") as f:
                 writer = csv.DictWriter(f, fieldnames=["event_time", "value"])
                 writer.writeheader()
                 for record in data:
@@ -117,25 +113,25 @@ class IOT:
 
             logger.info(f"Wrote {row_counter} rows to csv")
             field_meta[field.field_human_name] = {
-                'filename': str(filepath),
-                'row_count': row_counter,
-                'field_id': field.id,
-                'units': field.units
+                "filename": str(filepath),
+                "row_count": row_counter,
+                "field_id": field.id,
+                "units": field.units,
             }
 
         # Write metadata file
         meta = {
-            'fields': field_meta,
-            'parameters': {
-                'field_list': [field.field_human_name for field in field_list],
-                'start_date': str(start_date),
-                'end_date': str(end_date) if end_date is not None else None,
-                'window': window
-            }
+            "fields": field_meta,
+            "parameters": {
+                "field_list": [field.field_human_name for field in field_list],
+                "start_date": str(start_date),
+                "end_date": str(end_date) if end_date is not None else None,
+                "window": window,
+            },
         }
 
-        meta_filepath = export_path / 'meta.json'
-        with meta_filepath.open('w') as f:
+        meta_filepath = export_path / "meta.json"
+        with meta_filepath.open("w") as f:
             json.dump(meta, f, indent=4)
 
     def plot_field_data(self, fields, field_data):
@@ -145,12 +141,13 @@ class IOT:
         labeled_graphs = {
             f.field_human_name: data_vis._create_scatter_plot(
                 df=pd.DataFrame.from_dict(d.records),
-                x_label='event_time',
-                y_label='value',
+                x_label="event_time",
+                y_label="value",
                 name=f.field_human_name,
-                line=dict(shape='spline'))
+                line=dict(shape="spline"),
+            )
             for f, d in zip(fields, field_data)
         }
 
         # Plot
-        data_vis.run(labeled_graphs, title='IOT Field Data')
+        data_vis.run(labeled_graphs, title="IOT Field Data")

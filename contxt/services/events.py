@@ -1,8 +1,7 @@
 from typing import List, Optional
 
 from contxt.auth import Auth
-from contxt.models.events import (Event, EventDefinition, EventType,
-                                  TriggeredEvent)
+from contxt.models.events import Event, EventDefinition, EventType, TriggeredEvent
 from contxt.services.api import ApiServiceConfig, ConfiguredApiService
 from contxt.utils import make_logger
 
@@ -13,25 +12,26 @@ class EventsService(ConfiguredApiService):
     """
     Service to interact with our Events API.
     """
+
     _configs = (
         ApiServiceConfig(
             name="production",
             base_url="http://events.api.ndustrial.io/v1",
-            audience="7jzwfE20O2XZ4aq3cO1wmk63G9GzNc8j"),
+            audience="7jzwfE20O2XZ4aq3cO1wmk63G9GzNc8j",
+        ),
         ApiServiceConfig(
             name="staging",
             base_url="http://events-staging.api.ndustrial.io/v1",
-            audience="dn4MaocJFdKtsBy9sFFaTeuJWL1nt5xu"),
+            audience="dn4MaocJFdKtsBy9sFFaTeuJWL1nt5xu",
+        ),
     )
 
-    def __init__(
-            self,
-            auth: Auth,
-            env: str = "production"
-    ):
+    def __init__(self, auth: Auth, env: str = "production"):
         super().__init__(auth, env)
 
-    def event_definition_parameters_to_human_readable_format(self, event_definition: EventDefinition):
+    def event_definition_parameters_to_human_readable_format(
+        self, event_definition: EventDefinition
+    ):
         statement = ""
         for k, v in event_definition.parameters.items():
             if k == "$chain":
@@ -39,7 +39,10 @@ class EventsService(ConfiguredApiService):
                     event1 = self.get_event(d1.get("event_id"))
                     event2 = self.get_event(d2.get("event_id"))
                     mins = d1.get("overlap_variance") / 60
-                    statement += f"Event {event1.name} overlaps with {event2.name} within {mins} min "
+                    statement += (
+                        f"Event {event1.name} overlaps with {event2.name}"
+                        f" within {mins} min "
+                    )
         return statement
 
     def get_event_types(self) -> List[EventType]:
@@ -88,12 +91,10 @@ class EventsService(ConfiguredApiService):
         resp = self.get(f"events/{event_id}/definition")
         return EventDefinition.from_api(resp)
 
-    def create_triggered_event(
-            self, triggered_event: TriggeredEvent) -> TriggeredEvent:
+    def create_triggered_event(self, triggered_event: TriggeredEvent) -> TriggeredEvent:
         data = triggered_event.post()
         logger.debug(f"Creating triggered_event with {data}")
-        resp = self.post(
-            f"events/{triggered_event.event_id}/trigger", data=data)
+        resp = self.post(f"events/{triggered_event.event_id}/trigger", data=data)
         return TriggeredEvent.from_api(resp)
 
     def get_triggered_event(self, triggered_event_id: str) -> TriggeredEvent:
@@ -103,21 +104,21 @@ class EventsService(ConfiguredApiService):
 
     def update_triggered_event(self, triggered_event):
         data = triggered_event.put()
-        logger.debug(
-            f"Updating triggered_event {triggered_event.id} with {data}")
+        logger.debug(f"Updating triggered_event {triggered_event.id} with {data}")
         self.put(f"triggered/{triggered_event.id}", data=data)
 
     def delete_triggered_event(self, triggered_event: TriggeredEvent):
         logger.debug(f"Deleting triggered_event {triggered_event.id}")
         self.delete(f"triggered/{triggered_event.id}")
 
-    def get_triggered_events_for_event(self,
-                                       event_id: str,
-                                       limit: int = 1000,
-                                       offset: int = 0,
-                                       order_by: Optional[str] = None,
-                                       reverse_order: Optional[bool] = None
-                                       ) -> List[TriggeredEvent]:
+    def get_triggered_events_for_event(
+        self,
+        event_id: str,
+        limit: int = 1000,
+        offset: int = 0,
+        order_by: Optional[str] = None,
+        reverse_order: Optional[bool] = None,
+    ) -> List[TriggeredEvent]:
         """
         getTriggeredEvents
 
@@ -131,16 +132,15 @@ class EventsService(ConfiguredApiService):
 
         assert isinstance(event_id, str)
 
-        params = {'limit': limit,
-                  'offset': offset}
+        params = {"limit": limit, "offset": offset}
 
         if order_by is not None:
             assert isinstance(order_by, str)
-            params['orderBy'] = order_by
+            params["orderBy"] = order_by
 
         if reverse_order is not None:
             assert isinstance(reverse_order, bool)
-            params['reverseOrder'] = reverse_order
+            params["reverseOrder"] = reverse_order
         resp = self.get(uri=f"events/{event_id}/triggered", params=params)
         return [TriggeredEvent.from_api(rec) for rec in resp]
 

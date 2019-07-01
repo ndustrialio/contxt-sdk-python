@@ -107,14 +107,14 @@ class ColoredFormatter(logging.Formatter):
         return log
 
 
-DEFAULT_LOGGING_LEVEL = environ.get('LOG_LEVEL', logging.INFO)
+DEFAULT_LOGGING_LEVEL = environ.get("LOG_LEVEL", logging.INFO)
 
 
 # Custom logger class with multiple destinations
 class ColoredLogger(logging.Logger):
     FORMAT = (
-        "$COLOR%(asctime)s $BOLD$COLOR%(levelname)-8s$RESET$COLOR [%(name)s]  %(message)s (%(filename)s:%("
-        "lineno)d)$RESET "
+        "$COLOR%(asctime)s $BOLD$COLOR%(levelname)-8s$RESET$COLOR [%(name)s]"
+        "  %(message)s (%(filename)s:%(lineno)d)$RESET "
     )
     COLOR_FORMAT = formatter_message(FORMAT, True)
 
@@ -133,6 +133,10 @@ if True:
     logging.setLoggerClass(ColoredLogger)
 else:
     logging.basicConfig(
-        format="%(asctime)s %(levelname)-8s [%(name)s]  %(message)s (%(filename)s:%(lineno)d)",
+        format=(
+            "%(asctime)s %(levelname)-8s [%(name)s]  %(message)s"
+            " (%(filename)s:%(lineno)d)"
+        ),
         stream=stdout,
-        level=DEFAULT_LOGGING_LEVEL)
+        level=DEFAULT_LOGGING_LEVEL,
+    )

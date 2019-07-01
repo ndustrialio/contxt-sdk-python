@@ -1,17 +1,21 @@
-from contxt.models.assets import (Asset, AssetType, Attribute, AttributeValue,
-                                  DataTypes, Metric, MetricValue,
-                                  TimeIntervals)
+from contxt.models.assets import (
+    Asset,
+    AssetType,
+    Attribute,
+    DataTypes,
+    Metric,
+    TimeIntervals,
+)
 from contxt.utils.assets_migration import AssetSchema
 
 
 class AssetSchemas:
-
     def __init__(self, organization_id):
 
         # Build temporary list
         schemas = [
             AssetSchema(
-                name='TestSchema',
+                name="TestSchema",
                 asset_types=[
                     AssetType(
                         label="TestParentType",
@@ -25,7 +29,8 @@ class AssetSchemas:
                                 units="?",
                                 organization_id=organization_id,
                                 data_type=DataTypes.string,
-                                is_required=False)
+                                is_required=False,
+                            )
                         ],
                         metrics=[
                             Metric(
@@ -34,14 +39,17 @@ class AssetSchemas:
                                 description="Test description",
                                 organization_id=organization_id,
                                 time_interval=TimeIntervals.weekly,
-                                units="?")
+                                units="?",
+                            )
                         ],
                         children=[
                             AssetType(
                                 label="TestChildType",
                                 description="Test description",
-                                organization_id=organization_id)
-                        ])
+                                organization_id=organization_id,
+                            )
+                        ],
+                    )
                 ],
                 assets=[
                     # TODO: how to link asset to types, values to attrs/metrics?
@@ -55,8 +63,10 @@ class AssetSchemas:
                         ],
                         metric_values=[
                             # MetricValue(notes=, value=)
-                        ])
-                ])
+                        ],
+                    )
+                ],
+            )
         ]
 
         # Store schemas in dictionary

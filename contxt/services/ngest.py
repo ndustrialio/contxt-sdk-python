@@ -8,8 +8,6 @@ class NgestService(Service):
 
     def sendData(self, feedToken, feedKey, data, execute=True):
         return self.execute(
-            POST(uri=f"{feedToken}/ngest/{feedKey}")
-            .body(data)
-            .authorize(False),
+            POST(uri=f"{feedToken}/ngest/{feedKey}").body(data).authorize(False),
             execute=execute,
         )

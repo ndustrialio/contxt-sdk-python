@@ -1,6 +1,6 @@
 from datetime import datetime
 from json import loads
-from typing import Any, Callable, Dict, List, Optional, Set, Tuple
+from typing import List, Optional
 
 from contxt.services.api import ApiField, ApiObject, Parsers
 
@@ -18,15 +18,15 @@ class ConfigValue(ApiObject):
     )
 
     def __init__(
-            self,
-            id: str,
-            key: str,
-            value: str,
-            type: str,
-            configuration_id: str,
-            is_hidden: bool,
-            created_at: Optional[datetime] = None,
-            updated_at: Optional[datetime] = None,
+        self,
+        id: str,
+        key: str,
+        value: str,
+        type: str,
+        configuration_id: str,
+        is_hidden: bool,
+        created_at: Optional[datetime] = None,
+        updated_at: Optional[datetime] = None,
     ):
         self.id = id
         self.key = key
@@ -52,20 +52,22 @@ class Config(ApiObject):
         ApiField("name"),
         ApiField("description"),
         ApiField("environment_id"),
-        ApiField("ConfigurationValues", attr_key="config_values", data_type=ConfigValue),
+        ApiField(
+            "ConfigurationValues", attr_key="config_values", data_type=ConfigValue
+        ),
         ApiField("created_at", data_type=Parsers.datetime),
         ApiField("updated_at", data_type=Parsers.datetime),
     )
 
     def __init__(
-            self,
-            id: str,
-            name: str,
-            description: str,
-            environment_id: str,
-            config_values: List[ConfigValue],
-            created_at: Optional[datetime] = None,
-            updated_at: Optional[datetime] = None,
+        self,
+        id: str,
+        name: str,
+        description: str,
+        environment_id: str,
+        config_values: List[ConfigValue],
+        created_at: Optional[datetime] = None,
+        updated_at: Optional[datetime] = None,
     ):
         self.id = id
         self.name = name
@@ -87,13 +89,13 @@ class OrganizationUser(ApiObject):
     )
 
     def __init__(
-            self,
-            id: str,
-            user_id: str,
-            organization_id: str,
-            is_primary: bool,
-            created_at: Optional[datetime] = None,
-            updated_at: Optional[datetime] = None,
+        self,
+        id: str,
+        user_id: str,
+        organization_id: str,
+        is_primary: bool,
+        created_at: Optional[datetime] = None,
+        updated_at: Optional[datetime] = None,
     ):
         super().__init__()
         self.id = id
@@ -110,19 +112,24 @@ class Organization(ApiObject):
         ApiField("id"),
         ApiField("name", creatable=True),
         ApiField("legacy_organization_id", attr_key="legacy_id", optional=True),
-        ApiField("OrganizationUser", attr_key="organization_user", data_type=OrganizationUser, optional=True),
+        ApiField(
+            "OrganizationUser",
+            attr_key="organization_user",
+            data_type=OrganizationUser,
+            optional=True,
+        ),
         ApiField("created_at", data_type=Parsers.datetime),
         ApiField("updated_at", data_type=Parsers.datetime),
     )
 
     def __init__(
-            self,
-            name: str,
-            id: Optional[str] = None,
-            legacy_id: Optional[int] = None,
-            organization_user: Optional[OrganizationUser] = None,
-            created_at: Optional[datetime] = None,
-            updated_at: Optional[datetime] = None,
+        self,
+        name: str,
+        id: Optional[str] = None,
+        legacy_id: Optional[int] = None,
+        organization_user: Optional[OrganizationUser] = None,
+        created_at: Optional[datetime] = None,
+        updated_at: Optional[datetime] = None,
     ):
         super().__init__()
         self.id = id
@@ -144,13 +151,13 @@ class UserRole(ApiObject):
     )
 
     def __init__(
-            self,
-            user_id: str,
-            role_id: str,
-            mapped_from_external_group: bool,
-            id: Optional[str] = None,
-            created_at: Optional[datetime] = None,
-            updated_at: Optional[datetime] = None,
+        self,
+        user_id: str,
+        role_id: str,
+        mapped_from_external_group: bool,
+        id: Optional[str] = None,
+        created_at: Optional[datetime] = None,
+        updated_at: Optional[datetime] = None,
     ):
         super().__init__()
         self.id = id
@@ -174,14 +181,14 @@ class Role(ApiObject):
     )
 
     def __init__(
-            self,
-            name: str,
-            description: str,
-            organization_id: str,
-            user_role: UserRole,
-            id: Optional[str] = None,
-            created_at: Optional[datetime] = None,
-            updated_at: Optional[datetime] = None,
+        self,
+        name: str,
+        description: str,
+        organization_id: str,
+        user_role: UserRole,
+        id: Optional[str] = None,
+        created_at: Optional[datetime] = None,
+        updated_at: Optional[datetime] = None,
     ):
         super().__init__()
         self.id = id
@@ -211,18 +218,18 @@ class User(ApiObject):
     )
 
     def __init__(
-            self,
-            first_name: str,
-            last_name: str,
-            email: str,
-            phone_number: str,
-            is_activated: bool,
-            is_superuser: bool,
-            roles: List[Role],
-            organizations: List[Organization],
-            id: Optional[str] = None,
-            created_at: Optional[datetime] = None,
-            updated_at: Optional[datetime] = None,
+        self,
+        first_name: str,
+        last_name: str,
+        email: str,
+        phone_number: str,
+        is_activated: bool,
+        is_superuser: bool,
+        roles: List[Role],
+        organizations: List[Organization],
+        id: Optional[str] = None,
+        created_at: Optional[datetime] = None,
+        updated_at: Optional[datetime] = None,
     ):
         super().__init__()
         self.id = id

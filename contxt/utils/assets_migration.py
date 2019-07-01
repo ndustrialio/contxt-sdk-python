@@ -1,7 +1,13 @@
-from typing import Dict, List, Optional, Set, Tuple, Union
+from typing import List, Optional
 
-from contxt.models.assets import (Asset, AssetType, Attribute, AttributeValue,
-                                  Metric, MetricValue)
+from contxt.models.assets import (
+    Asset,
+    AssetType,
+    Attribute,
+    AttributeValue,
+    Metric,
+    MetricValue,
+)
 from contxt.services.assets import AssetsService
 from contxt.utils import make_logger
 
@@ -10,15 +16,18 @@ logger = make_logger(__name__)
 
 # TODO: methods for creating assets, attribute_values, metric_values
 class AssetSchema:
-
-    def __init__(self, name: str, asset_types: List[AssetType], assets: Optional[List[Asset]] = None):
+    def __init__(
+        self,
+        name: str,
+        asset_types: List[AssetType],
+        assets: Optional[List[Asset]] = None,
+    ):
         self.name = name
         self.asset_types = asset_types
         self.assets = assets
 
 
 class AssetMigrationManager:
-
     def __init__(self, assets_service: AssetsService, asset_schema: AssetSchema):
         self.assets_service = assets_service
         self.schema = asset_schema
@@ -46,7 +55,8 @@ class AssetMigrationManager:
         # Check if asset_type already exists
         logger.info(f"Processing asset_type {asset_type.label}")
         existing_asset_type = self.assets_service.asset_type_with_label(
-            asset_type.label, None)
+            asset_type.label, None
+        )
 
         if existing_asset_type:
             # Asset type already exists, just check parent link
@@ -64,8 +74,7 @@ class AssetMigrationManager:
                 asset_type.parent_id = parent.id
                 parent_msg = f" with parent {parent.label}"
             logger.info(f"Creating asset_type {asset_type.label}{parent_msg}")
-            existing_asset_type = self.assets_service.create_asset_type(
-                asset_type)
+            existing_asset_type = self.assets_service.create_asset_type(asset_type)
 
         # Cache the attributes and metrics
         self.assets_service._cache_attributes(existing_asset_type)
@@ -86,8 +95,7 @@ class AssetMigrationManager:
     def create_attribute(self, asset_type: AssetType, attribute: Attribute):
         # For the existing asset_type, create the attribute
         if attribute.label not in asset_type._attributes_by_label:
-            logger.info(
-                f"Creating attribute {asset_type.label}::{attribute.label}")
+            logger.info(f"Creating attribute {asset_type.label}::{attribute.label}")
             attribute.asset_type_id = asset_type.id
             self.assets_service.create_attribute(attribute)
         else:
@@ -98,14 +106,11 @@ class AssetMigrationManager:
     def create_metric(self, asset_type: AssetType, metric: Metric):
         # For the existing asset_type, create the metric
         if metric.label not in asset_type._metrics_by_label:
-            logger.info(
-                f"Creating metric {asset_type.label}::{metric.label}")
+            logger.info(f"Creating metric {asset_type.label}::{metric.label}")
             metric.asset_type_id = asset_type.id
             self.assets_service.create_metric(metric)
         else:
-            logger.info(
-                f"Metric {asset_type.label}::{metric.label} already exists"
-            )
+            logger.info(f"Metric {asset_type.label}::{metric.label} already exists")
 
     def create_asset(self, asset: Asset):
         pass
@@ -128,5 +133,6 @@ class AssetMigrationManager:
 
             # Delete parent
             created_asset_type = self.assets_service.asset_type_with_label(
-                asset_type.label)
+                asset_type.label
+            )
             self.assets_service.delete_asset_type(created_asset_type)

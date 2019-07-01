@@ -29,7 +29,8 @@ class ContxtAuthService(Service):
 
         self.env = CONFIGS_BY_ENVIRONMENT[environment]
 
-        # can imply if access_token is none, then we need to use client_id/client_secret to get tokens
+        # can imply if access_token is none, then we need to use
+        # client_id/client_secret to get tokens
         self.access_token = access_token
         self.client_id = client_id
         self.client_secret = client_secret

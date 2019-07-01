@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from datetime import datetime
 from json import loads
 from typing import Optional
@@ -49,21 +47,12 @@ class EventType(ApiObject):
         self.updated_at = updated_at
 
 
-# class EventDefinitionParameter(ApiObject):
-#     _api_fields = (
-
-#     )
-
-#     def __init__(self):
-#         pass
-
-
 class EventDefinition(ApiObject):
     _api_fields = (
         ApiField("id"),
         ApiField("event_id"),
         ApiField("description"),
-        ApiField("parameters", data_type=lambda o: loads(o.replace('\"', '"'))),
+        ApiField("parameters", data_type=lambda o: loads(o.replace('"', '"'))),
         ApiField("created_at", data_type=Parsers.datetime),
         ApiField("updated_at", data_type=Parsers.datetime),
     )
