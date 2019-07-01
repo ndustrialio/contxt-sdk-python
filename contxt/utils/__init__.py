@@ -26,8 +26,6 @@ def timed(func):
 
 
 class Utils:
-    __marker = object()
-
     @staticmethod
     def delocalize_datetime(dt_object):
         localized_dt = get_localzone().localize(dt_object)

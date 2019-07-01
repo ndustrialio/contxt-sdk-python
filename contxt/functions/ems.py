@@ -10,7 +10,7 @@ from contxt.exceptions import UnauthorizedException
 from contxt.functions.assets import Assets
 from contxt.functions.organizations import find_organization_by_name
 from contxt.services.contxt import ContxtService
-from contxt.services.ems import EMSService
+from contxt.legacy.services.ems import EMSService
 from contxt.services.facilities import FacilitiesService
 from contxt.services.iot import IOTService
 from contxt.utils import make_logger
