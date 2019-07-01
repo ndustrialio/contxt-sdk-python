@@ -1,5 +1,5 @@
 from contxt.legacy.services import APIObject, APIObjectCollection
-from contxt.models.iot import Field
+from contxt.legacy.models.iot import Field
 
 
 class FacilityUtilitySpend(APIObject):

@@ -6,7 +6,7 @@ from pathlib import Path
 import pandas as pd
 from tqdm import tqdm
 
-from contxt.services.iot import IOTService
+from contxt.legacy.services.iot import IOTService
 from contxt.utils import make_logger
 from contxt.utils.vis import DataVisualizer
 
