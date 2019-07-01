@@ -7,10 +7,10 @@ from contxt.models.iot import Field
 
 
 class ResourceType(Enum):
-    combined = "combined"
-    electric = "electric"
-    gas = "gas"
-    water = "water"
+    COMBINED = "combined"
+    ELECTRIC = "electric"
+    GAS = "gas"
+    WATER = "water"
 
 
 class MainService(ApiObject):

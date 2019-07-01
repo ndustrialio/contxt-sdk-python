@@ -54,7 +54,7 @@ class EmsService(ConfiguredApi):
     def get_monthly_utility_spend(
         self,
         facility_id: int,
-        resource_type: ResourceType = ResourceType.electric,
+        resource_type: ResourceType = ResourceType.ELECTRIC,
         start_date: date = date.today() - timedelta(days=3600),
         end_date: date = date.today(),
         pro_forma: bool = False,
@@ -67,7 +67,7 @@ class EmsService(ConfiguredApi):
         resp = self.get(
             f"facilities/{facility_id}/utility/spend/monthly",
             params={
-                "type": resource_type,
+                "type": resource_type.value,
                 "date_start": start_date.strftime("%Y-%m"),
                 "date_end": end_date.strftime("%Y-%m"),
                 "pro_forma": pro_forma,
@@ -79,7 +79,7 @@ class EmsService(ConfiguredApi):
     def get_monthly_utility_usage(
         self,
         facility_id: int,
-        resource_type: ResourceType = ResourceType.electric,
+        resource_type: ResourceType = ResourceType.ELECTRIC,
         start_date: date = date.today() - timedelta(days=3600),
         end_date: date = date.today(),
         pro_forma: bool = False,
@@ -91,7 +91,7 @@ class EmsService(ConfiguredApi):
         resp = self.get(
             f"facilities/{facility_id}/utility/usage/monthly",
             params={
-                "type": resource_type,
+                "type": resource_type.value,
                 "date_start": start_date.strftime("%Y-%m"),
                 "date_end": end_date.strftime("%Y-%m"),
                 "pro_forma": pro_forma,
