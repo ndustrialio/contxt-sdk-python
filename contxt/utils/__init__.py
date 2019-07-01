@@ -25,6 +25,10 @@ def timed(func):
     return wrapper
 
 
+def is_datetime_aware(dt: datetime) -> bool:
+    return dt.tzinfo is not None and dt.tzinfo.utcoffset(dt) is not None
+
+
 class Utils:
     @staticmethod
     def delocalize_datetime(dt_object):
