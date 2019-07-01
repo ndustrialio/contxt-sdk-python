@@ -33,7 +33,9 @@ class Api:
     the access token it provides.
     """
 
-    def __init__(self, base_url: str, token_provider: Optional[TokenProvider] = None):
+    def __init__(
+        self, base_url: str, token_provider: Optional[TokenProvider] = None
+    ) -> None:
         self.base_url = base_url if base_url.endswith("/") else f"{base_url}/"
         # Initialize session
         self.session = Session()
@@ -143,7 +145,7 @@ class ConfiguredApi(Api, ABC):
     Overload this class to implement `_envs`.
     """
 
-    def __init__(self, env: str, auth: Optional[Auth] = None):
+    def __init__(self, env: str, auth: Optional[Auth] = None) -> None:
         self.env = self._get_env(env)
         token_provider = auth.get_token_provider(self.env.client_id) if auth else None
         super().__init__(base_url=self.env.base_url, token_provider=token_provider)

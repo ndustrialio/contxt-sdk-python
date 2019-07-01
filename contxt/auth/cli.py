@@ -155,7 +155,7 @@ class UserTokenProvider(TokenProvider):
             logger.debug(f"Fetching new access_token for {self.audience}")
             self.access_token = self.auth_service.get_token(
                 self.identity_provider.access_token, self.audience
-            )
+            )["access_token"]
         return self._access_token
 
 

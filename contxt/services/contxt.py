@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List
+from typing import Any, List, Optional, Dict
 
 from contxt.auth import Auth
 from contxt.models.contxt import (
@@ -33,7 +33,7 @@ class ContxtService(ConfiguredApi):
         ),
     )
 
-    def __init__(self, auth: Auth, env: str = "production"):
+    def __init__(self, auth: Auth, env: str = "production") -> None:
         super().__init__(env, auth)
 
     def get_organizations(self) -> List[Organization]:
@@ -41,12 +41,13 @@ class ContxtService(ConfiguredApi):
         resp = self.get("organizations")
         return [Organization.from_api(rec) for rec in resp]
 
-    def get_organization_with_name(self, name: str):
+    def get_organization_with_name(self, name: str) -> Optional[Organization]:
         logger.debug(f"Fetching organization {name}")
         for organization in self.get_organizations():
             if organization.name.lower() == name.lower():
                 return organization
         logger.warning(f"Failed to find organization with name {name}")
+        return None
 
     def create_organization(self, organization: Organization) -> Organization:
         data = organization.post()
@@ -71,7 +72,7 @@ class ContxtService(ConfiguredApi):
         resp = self.get(f"configurations/{configuration_id}")
         return Config.from_api(resp)
 
-    def get_config_for_client(self, client_id: str, environment_id: str):
+    def get_config_for_client(self, client_id: str, environment_id: str) -> Config:
         params = {"environment_id": environment_id}
         logger.debug(f"Fetching configuration for client {client_id} with {params}")
         resp = self.get(f"clients/{client_id}/configurations", params=params)
@@ -90,7 +91,7 @@ class ContxtService(ConfiguredApi):
     #     self.put(
     #         f"configurations/{configuration_id}/values/{value_id}", data=data)
 
-    def delete_config_value(self, configuration_id, value_id):
+    def delete_config_value(self, configuration_id: str, value_id: str) -> None:
         # TODO: is this value_id or key?
         logger.debug(f"Deleting configuration_value {value_id}")
         self.delete(f"configurations/{configuration_id}/values{value_id}")
@@ -115,19 +116,19 @@ class ContxtService(ConfiguredApi):
         resp = self.get(f"workers/{worker_id}/configurations/values", params=params)
         return [ConfigValue.from_api(rec) for rec in resp]
 
-    def start_worker_run(self, client_id: str):
+    def start_worker_run(self, client_id: str) -> Dict:
         data = {"start_time": datetime.now()}
         logger.debug(f"Creating worker run with {data}")
         resp = self.post(f"clients/{client_id}/runs", data=data)
         # TODO: create a model for this response
         return resp
 
-    def end_worker_run(self, client_id: str, run_id: str):
+    def end_worker_run(self, client_id: str, run_id: str) -> None:
         data = {"end_time": datetime.now()}
         logger.debug(f"Updating run {run_id} with {data}")
         self.put(f"clients/{client_id}/runs/{run_id}", data=data)
 
-    def create_worker_run_metric(self, run_id, key, value):
+    def create_worker_run_metric(self, run_id: str, key: str, value: Any) -> Dict:
         data = {"key": key, "value": value}
         logger.debug(f"Creating worker_run_metric with {data}")
         resp = self.post(f"runs/{run_id}/metrics", data=data)

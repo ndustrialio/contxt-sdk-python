@@ -29,12 +29,13 @@ class EventType(ApiObject):
         description: str,
         client_id: str,
         level: int,
-        is_ongoing_event: Optional[bool] = None,
         id: Optional[str] = None,
-        is_realtime_enabled: Optional[bool] = False,
+        is_ongoing_event: Optional[bool] = None,
+        is_realtime_enabled: Optional[bool] = None,
         created_at: Optional[datetime] = None,
         updated_at: Optional[datetime] = None,
-    ):
+    ) -> None:
+        super().__init__()
         self.id = id
         self.name = name
         self.slug = slug
@@ -65,11 +66,14 @@ class EventDefinition(ApiObject):
         created_at: datetime,
         updated_at: datetime,
         id: Optional[str] = None,
-    ):
+        human_readable_parameters: Optional[str] = None,
+    ) -> None:
+        super().__init__()
         self.id = id
         self.event_id = event_id
         self.description = description
         self.parameters = parameters
+        self.human_readable_parameters = human_readable_parameters
         self.created_at = created_at
         self.updated_at = updated_at
 
@@ -94,7 +98,8 @@ class Owner(ApiObject):
         is_machine_user: bool,
         created_at: datetime,
         updated_at: datetime,
-    ):
+    ) -> None:
+        super().__init__()
         self.id = id
         self.first_name = first_name
         self.last_name = last_name
@@ -140,7 +145,8 @@ class Event(ApiObject):
         created_at: Optional[datetime] = None,
         updated_at: Optional[datetime] = None,
         deleted_at: Optional[datetime] = None,
-    ):
+    ) -> None:
+        super().__init__()
         self.id = id
         self.name = name
         self.event_type_id = event_type_id
@@ -171,7 +177,8 @@ class TriggeredEventData(ApiObject):
         subchain_triggered_event_id: str,
         trigger_start_at: datetime,
         trigger_end_at: datetime,
-    ):
+    ) -> None:
+        super().__init__()
         self.source_id = source_id
         self.subchain_triggered_event_id = subchain_triggered_event_id
         self.trigger_start_at = trigger_start_at
@@ -214,13 +221,14 @@ class TriggeredEvent(ApiObject):
         owner_id: Optional[str] = None,
         owner: Optional[Owner] = None,
         event: Optional[Event] = None,
-        is_public: Optional[bool] = False,
+        is_public: Optional[bool] = None,
         trigger_end_at: Optional[datetime] = None,
         data: Optional[dict] = None,
         created_at: Optional[datetime] = None,
         updated_at: Optional[datetime] = None,
         deleted_at: Optional[datetime] = None,
-    ):
+    ) -> None:
+        super().__init__()
         self.id = id
         self.event_id = event_id
         self.event = event

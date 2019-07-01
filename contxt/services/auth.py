@@ -1,4 +1,4 @@
-from typing import List, Union
+from typing import Dict, List, Union
 
 from contxt.services.api import ApiEnvironment, ConfiguredApi
 from contxt.utils import make_logger
@@ -22,17 +22,21 @@ class AuthService(ConfiguredApi):
     def __init__(self, env: str = "production"):
         super().__init__(env)
 
-    def get_token(self, access_token: str, audiences: Union[str, List[str]]) -> str:
+    def get_jwks(self) -> Dict:
+        return self.get(".well-known/jwks.json")
+
+    def get_token(self, access_token: str, audiences: Union[str, List[str]]) -> Dict:
         audiences = [audiences] if isinstance(audiences, str) else audiences
-        response = self.post(
+        return self.post(
             "token",
             json={"audiences": audiences},
             headers={"Authorization": f"Bearer {access_token}"},
         )
-        return response["access_token"]
 
-    def get_oauth_token(self, client_id: str, client_secret: str, audience: str) -> str:
-        response = self.post(
+    def get_oauth_token(
+        self, client_id: str, client_secret: str, audience: str
+    ) -> Dict:
+        return self.post(
             "oauth/token",
             json={
                 "client_id": client_id,
@@ -41,7 +45,3 @@ class AuthService(ConfiguredApi):
                 "grant_type": "client_credentials",
             },
         )
-        return response["access_token"]
-
-    def get_jwks(self) -> str:
-        return self.get(".well-known/jwks.json")

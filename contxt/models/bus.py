@@ -5,7 +5,7 @@ from contxt.models import ApiField, ApiObject
 from contxt.utils.serializer import Serializer
 
 
-def pretty_print(obj):
+def pretty_print(obj: Any) -> str:
     d = Serializer.to_dict(obj)
     return pformat(d, indent=4)
 
@@ -17,13 +17,15 @@ class PublisherStats(ApiObject):
         ApiField("connectedSince", attr_key="connected_since"),
     )
 
-    def __init__(self, msg_rate_in: str, producer_id: str, connected_since: str):
+    def __init__(
+        self, msg_rate_in: str, producer_id: str, connected_since: str
+    ) -> None:
         super().__init__()
         self.msg_rate_in = msg_rate_in
         self.producer_id = producer_id
         self.connected_since = connected_since
 
-    def __str__(self):
+    def __str__(self) -> str:
         return pretty_print(self)
 
 
@@ -47,7 +49,7 @@ class ConsumerStats(ApiObject):
         unacked_messages: int,
         blocked_consumer_on_unacked_msgs: bool,
         connected_since: str,
-    ):
+    ) -> None:
         super().__init__()
         self.msg_rate_out = msg_rate_out
         self.msg_rate_redeliver = msg_rate_redeliver
@@ -55,7 +57,7 @@ class ConsumerStats(ApiObject):
         self.blocked_consumer_on_unacked_msgs = blocked_consumer_on_unacked_msgs
         self.connected_since = connected_since
 
-    def __str__(self):
+    def __str__(self) -> str:
         return pretty_print(self)
 
 
@@ -83,7 +85,7 @@ class SubscriberStats(ApiObject):
         unacked_messages: int,
         consumers: List[ConsumerStats],
         name: Optional[str] = None,
-    ):
+    ) -> None:
         super().__init__()
         self.name = name
         self.msg_rate_out = msg_rate_out
@@ -93,7 +95,7 @@ class SubscriberStats(ApiObject):
         self.unacked_messages = unacked_messages
         self.consumers = consumers
 
-    def __str__(self):
+    def __str__(self) -> str:
         return pretty_print(self)
 
 
@@ -105,14 +107,16 @@ class Channel(ApiObject):
         ApiField("service_id"),
     )
 
-    def __init__(self, id: str, name: str, organization_id: str, service_id: str):
+    def __init__(
+        self, id: str, name: str, organization_id: str, service_id: str
+    ) -> None:
         super().__init__()
         self.id = id
         self.name = name
         self.organization_id = organization_id
         self.service_id = service_id
 
-    def __str__(self):
+    def __str__(self) -> str:
         return pretty_print(self)
 
 
@@ -147,7 +151,7 @@ class ChannelStats(ApiObject):
         deduplication_status: str,
         publishers: List[PublisherStats],
         subscriptions: List[SubscriberStats],
-    ):
+    ) -> None:
         super().__init__()
         self.msg_rate_in = msg_rate_in
         self.msg_rate_out = msg_rate_out
@@ -160,5 +164,5 @@ class ChannelStats(ApiObject):
         self.publishers = publishers
         self.subscriptions = subscriptions
 
-    def __str__(self):
+    def __str__(self) -> str:
         return pretty_print(self)
