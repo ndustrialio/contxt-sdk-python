@@ -87,8 +87,8 @@ class IotService(ConfiguredApi):
         # (coming soon)
         return resp
 
-    def get_field_data_for_grouping(self, grouping_id: str, **kwargs) -> List[Field]:
-        grouping = self.get_grouping(grouping_id)
+    def get_field_data_for_grouping(self, grouping_id: str, **kwargs) -> List[Dict]:
+        grouping = self.get_field_grouping(grouping_id)
         return [self.get_field_data(field=f, **kwargs) for f in grouping.fields]
 
     def get_unprovisioned_fields_for_feed_id(
