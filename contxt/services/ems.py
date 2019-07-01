@@ -83,7 +83,7 @@ class EmsService(ConfiguredApi):
         start_date: date = date.today() - timedelta(days=3600),
         end_date: date = date.today(),
         pro_forma: bool = False,
-    ) -> List[UtilityUsage]:
+    ) -> UtilityUsage:
         """Get monthly utility usage for facility `facility_id` and resource
         `resource_type` (for now, this must be "electric" but will be expanded).
         Note `start_date` defaults to 10 years ago (the API's maximum limit) and

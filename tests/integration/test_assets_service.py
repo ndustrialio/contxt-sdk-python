@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 import pytest
 from pytz import UTC
 
-from contxt.auth import CliAuth
+from contxt.auth.cli import CliAuth
 from contxt.models.assets import (
     Asset,
     AssetType,

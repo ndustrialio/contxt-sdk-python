@@ -3,12 +3,13 @@ from datetime import datetime
 from os import environ
 from sys import stdout
 from time import time
+from typing import Dict, Optional, Set
 
 from pytz import UTC
 from tzlocal import get_localzone
 
 
-def make_logger(name, level=None):
+def make_logger(name: str, level: Optional[str] = None):
     logger = logging.getLogger(name)
     if level:
         logger.setLevel(level.upper())
@@ -31,23 +32,23 @@ def is_datetime_aware(dt: datetime) -> bool:
 
 class Utils:
     @staticmethod
-    def delocalize_datetime(dt_object):
-        localized_dt = get_localzone().localize(dt_object)
+    def delocalize_datetime(dt: datetime) -> datetime:
+        localized_dt = get_localzone().localize(dt)
         return localized_dt.astimezone(UTC)
 
     @staticmethod
-    def get_epoch_time(dt_object):
-        if dt_object.tzinfo is None:
+    def get_epoch_time(dt: datetime) -> int:
+        if dt.tzinfo is None:
             # assuming an naive datetime is in the callers timezone
             # as set on the system,
-            dt_object = get_localzone().localize(dt_object)
+            dt = get_localzone().localize(dt)
 
         utc_1970 = datetime(1970, 1, 1).replace(tzinfo=UTC)
 
-        return int((dt_object.astimezone(UTC) - utc_1970).total_seconds())
+        return int((dt.astimezone(UTC) - utc_1970).total_seconds())
 
     @staticmethod
-    def dict_to_set(dict_):
+    def dict_to_set(dict_: Dict) -> Set:
         # TODO: this does not handle nested dicts
 
         def flatten(obj):
@@ -60,7 +61,7 @@ class Utils:
         return set(flatten(dict_))
 
     @staticmethod
-    def set_to_dict(set_):
+    def set_to_dict(set_: Set) -> Dict:
         def expand(obj):
             if isinstance(obj, (set, tuple)):
                 return {k: expand(v) for k, v in obj}
@@ -99,13 +100,13 @@ def formatter_message(message, use_color=True):
 
 
 class ColoredFormatter(logging.Formatter):
-    def __init__(self, msg, use_color=True):
-        logging.Formatter.__init__(self, msg)
+    def __init__(self, msg: str, use_color: bool = True) -> None:
+        super().__init__(msg)
         self.use_color = use_color
 
     def format(self, record):
         level_color = COLOR_SEQ % (30 + COLORS[record.levelname])
-        log = logging.Formatter.format(self, record).replace("$COLOR", level_color)
+        log = super().format(self, record).replace("$COLOR", level_color)
         return log
 
 
@@ -120,25 +121,9 @@ class ColoredLogger(logging.Logger):
     )
     COLOR_FORMAT = formatter_message(FORMAT, True)
 
-    def __init__(self, name):
-        logging.Logger.__init__(self, name, DEFAULT_LOGGING_LEVEL)
-
+    def __init__(self, name: str) -> None:
+        super().__init__(name, DEFAULT_LOGGING_LEVEL)
         color_formatter = ColoredFormatter(self.COLOR_FORMAT)
-
         console = logging.StreamHandler(stream=stdout)
         console.setFormatter(color_formatter)
-
         self.addHandler(console)
-
-
-if True:
-    logging.setLoggerClass(ColoredLogger)
-else:
-    logging.basicConfig(
-        format=(
-            "%(asctime)s %(levelname)-8s [%(name)s]  %(message)s"
-            " (%(filename)s:%(lineno)d)"
-        ),
-        stream=stdout,
-        level=DEFAULT_LOGGING_LEVEL,
-    )
