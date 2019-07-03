@@ -106,11 +106,8 @@ class ColoredFormatter(logging.Formatter):
 
     def format(self, record):
         level_color = COLOR_SEQ % (30 + COLORS[record.levelname])
-        log = super().format(self, record).replace("$COLOR", level_color)
+        log = super().format(record).replace("$COLOR", level_color)
         return log
-
-
-DEFAULT_LOGGING_LEVEL = environ.get("LOG_LEVEL", logging.INFO)
 
 
 # Custom logger class with multiple destinations
@@ -119,10 +116,11 @@ class ColoredLogger(logging.Logger):
         "$COLOR%(asctime)s $BOLD$COLOR%(levelname)-8s$RESET$COLOR [%(name)s]"
         "  %(message)s (%(filename)s:%(lineno)d)$RESET "
     )
-    COLOR_FORMAT = formatter_message(FORMAT, True)
+    COLOR_FORMAT = formatter_message(FORMAT, use_color=True)
+    DEFAULT_LEVEL = environ.get("LOG_LEVEL", logging.INFO)
 
     def __init__(self, name: str) -> None:
-        super().__init__(name, DEFAULT_LOGGING_LEVEL)
+        super().__init__(name, level=self.DEFAULT_LEVEL)
         color_formatter = ColoredFormatter(self.COLOR_FORMAT)
         console = logging.StreamHandler(stream=stdout)
         console.setFormatter(color_formatter)
