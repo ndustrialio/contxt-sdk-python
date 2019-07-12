@@ -1,7 +1,7 @@
 from datetime import date, datetime, timedelta
 from typing import Any, Dict, List, Optional
 
-from contxt.models import ApiField, ApiObject, Parsers, Formatters
+from contxt.models import ApiField, ApiObject, Formatters, Parsers
 from contxt.utils import Utils, make_logger
 
 logger = make_logger(__name__)
