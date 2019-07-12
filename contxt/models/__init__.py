@@ -83,6 +83,10 @@ class Formatters:
         # microseconds are always represented
         return dt.astimezone(UTC).strftime("%Y-%m-%dT%H:%M:%S.%fZ")
 
+    @staticmethod
+    def normalize_label(text: str) -> str:
+        return text.lower().replace(" ", "_")
+
 
 # TODO: Need a way to track changed attributes
 # TODO: This custom schema-validation can be replaced by a more robust

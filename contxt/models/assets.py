@@ -1,7 +1,7 @@
 from datetime import date, datetime, timedelta
 from typing import Any, Dict, List, Optional
 
-from contxt.models import ApiField, ApiObject, Parsers
+from contxt.models import ApiField, ApiObject, Parsers, Formatters
 from contxt.utils import Utils, make_logger
 
 logger = make_logger(__name__)
@@ -75,7 +75,7 @@ class Attribute(ApiObject):
 
     @property
     def normalized_label(self) -> str:
-        return self.label.lower().replace(" ", "_")
+        return Formatters.normalize_label(self.label)
 
 
 class AttributeValue(ApiObject):
@@ -169,7 +169,7 @@ class Metric(ApiObject):
 
     @property
     def normalized_label(self) -> str:
-        return self.label.lower().replace(" ", "_")
+        return Formatters.normalize_label(self.label)
 
 
 class MetricValue(ApiObject):
@@ -433,7 +433,7 @@ class Asset(ApiObject):
 
     @property
     def normalized_label(self) -> str:
-        return self.label.lower().replace(" ", "_")
+        return Formatters.normalize_label(self.label)
 
     def post(self) -> Dict:
         """Get data for a post request"""
