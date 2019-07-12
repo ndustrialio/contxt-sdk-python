@@ -1,177 +1,120 @@
 from datetime import datetime
-from typing import Optional
+from typing import Dict, List, Optional
 
-from contxt.legacy.services import (
-    GET,
-    APIObjectCollection,
-    DataResponse,
-    PagedEndpoint,
-    PagedResponse,
-    Service,
-)
-from contxt.models.iot import (
-    Feed,
-    Field,
-    FieldCategory,
-    FieldGrouping,
-    FieldGroupingOwner,
-    UnprovisionedField,
-)
-from contxt.utils import Utils
-
-CONFIGS_BY_ENVIRONMENT = {
-    "production": {
-        "base_url": "https://feeds.api.ndustrial.io/",
-        "audience": "iznTb30Sfp2Jpaf398I5DN6MyPuDCftA",
-    }
-}
+from contxt.auth import Auth
+from contxt.models.iot import Feed, Field, FieldGrouping, UnprovisionedField, Window
+from contxt.services.api import ApiEnvironment, ConfiguredApi
 
 
-class IOTService(Service):
+class IotService(ConfiguredApi):
     """
     Service to interact with our IOT API.
+
+    Terminology
+        - Feed: Data source (i.e. utility meter) with a set of fields
+        - Field: A specific time series data from a feed
+        - Grouping: Group of fields
     """
 
-    def __init__(self, auth, environment="production"):
+    _envs = (
+        ApiEnvironment(
+            name="production",
+            base_url="https://feeds.api.ndustrial.io/v1",
+            client_id="iznTb30Sfp2Jpaf398I5DN6MyPuDCftA",
+        ),
+    )
 
-        if environment not in CONFIGS_BY_ENVIRONMENT:
-            raise Exception("Invalid environment specified")
+    def __init__(self, auth: Auth, env: str = "production"):
+        super().__init__(env=env, auth=auth)
 
-        self.env = CONFIGS_BY_ENVIRONMENT[environment]
+    def get_feed_with_id(self, id: int) -> Feed:
+        return Feed.from_api(self.get(f"feeds/{id}"))
 
-        super().__init__(
-            base_url=self.env["base_url"],
-            access_token=auth.get_token_provider(self.env["audience"]).access_token,
-        )
-
-    def get_all_groupings(self, facility_id: int):
-
-        response = PagedResponse(
-            PagedEndpoint(
-                base_url=self.base_url,
-                client=self.client,
-                request=GET(uri=f"facilities/{facility_id}/groupings"),
-                parameters={},
-            )
-        )
-
-        groupings = [
-            FieldGrouping(
-                record,
-                owner_obj=FieldGroupingOwner(record["Owner"]),
-                category_obj=FieldCategory(record["FieldCategory"])
-                if record["FieldCategory"] is not None
-                else None,
-                field_obj_list=[Field(field) for field in record["Fields"]],
-            )
-            for record in response
-        ]
-        return APIObjectCollection(groupings)
-
-    def get_single_grouping(self, grouping_id: str):
-
-        response = self.execute(GET(uri=f"groupings/{grouping_id}"))
-
-        if response:
-            return FieldGrouping(
-                response,
-                owner_obj=FieldGroupingOwner(response["Owner"]),
-                category_obj=FieldCategory(response["FieldCategory"])
-                if response["FieldCategory"] is not None
-                else None,
-                field_obj_list=[Field(field) for field in response["Fields"]],
-            )
-        else:
+    def get_feed_with_key(self, key: str) -> Optional[Feed]:
+        feeds = self.get_feeds(key=key)
+        if len(feeds) == 0:
             return None
+        elif len(feeds) == 1:
+            return feeds[0]
+        raise KeyError(f"Expected singleton feed with key {key}, not {len(feeds)}")
 
-    def get_data_for_field(
+    def get_feeds(
+        self, facility_id: Optional[int] = None, key: Optional[str] = None
+    ) -> List[Feed]:
+        return [
+            Feed.from_api(rec)
+            for rec in self.get(
+                "feeds", params={"facility_id": facility_id, "key": key}
+            )
+        ]
+
+    def get_fields_for_facility(self, facility_id: int) -> List[Field]:
+        return [
+            Field.from_api(rec) for rec in self.get(f"facilities/{facility_id}/fields")
+        ]
+
+    def get_fields_for_feed(
+        self, feed_id: int, limit: int = 1000, offset: int = 0
+    ) -> List[Field]:
+        return [
+            Field.from_api(rec)
+            for rec in self.get(
+                f"feeds/{feed_id}/fields", params={"limit": limit, "offset": offset}
+            )
+        ]
+
+    def get_field_data(
         self,
-        output_id: int,
-        field_human_name: str,
+        field: Field,
         start_time: datetime,
-        window: int,
+        window: Window = Window.RAW,
         end_time: Optional[datetime] = None,
         limit: int = 1000,
-    ):
-
-        params = {
-            "timeStart": str(Utils.get_epoch_time(start_time)),
-            "window": str(window),
-            "limit": limit,
-        }
-
-        if end_time:
-            params["timeEnd"] = str(Utils.get_epoch_time(end_time))
-
-        return DataResponse(
-            data=self.execute(
-                GET(uri=f"outputs/{output_id}/fields/{field_human_name}/data").params(
-                    params
-                ),
-                execute=True,
-            ),
-            client=self.client,
+    ) -> Dict:
+        # Manually validate the window choice, since our API does not return a
+        # helpful error message
+        assert isinstance(window, Window), "window must be of type Window"
+        resp = self.get(
+            f"outputs/{field.output_id}/fields/{field.field_human_name}/data",
+            params={
+                "timeStart": int(start_time.timestamp()),
+                "timeEnd": int(end_time.timestamp()) if end_time else None,
+                "window": window.value,
+                "limit": limit,
+            },
         )
+        # NOTE: this intentionally does not yet handle pagination, or parsing
+        # (coming soon)
+        return resp
 
-    def get_field_descriptors(self, feed_id, limit=100, offset=0, execute=True):
-        assert isinstance(feed_id, int)
-        # assert isinstance(limit, int)
-        # assert isinstance(offset, int)
+    def get_field_data_for_grouping(self, grouping_id: str, **kwargs) -> List[Dict]:
+        grouping = self.get_field_grouping(grouping_id)
+        return [self.get_field_data(field=f, **kwargs) for f in grouping.fields]
 
-        params = {"limit": limit, "offset": offset}
+    def get_unprovisioned_fields_for_feed_id(
+        self, feed_id: int
+    ) -> List[UnprovisionedField]:
+        return [
+            UnprovisionedField.from_api(rec)
+            for rec in self.get(f"feeds/{feed_id}/fields/unprovisioned")
+        ]
 
-        return self.execute(
-            GET(uri=f"feeds/{feed_id}/fields").params(params), execute=True
-        )
+    def get_unprovisioned_fields_for_feed_key(
+        self, feed_key: str
+    ) -> Optional[List[UnprovisionedField]]:
+        feed = self.get_feed_with_key(key=feed_key)
+        if not feed:
+            return None
+        return [
+            UnprovisionedField.from_api(rec)
+            for rec in self.get(f"feeds/{feed.id}/fields/unprovisioned")
+        ]
 
-    def get_feeds_collection(
-        self, facility_id: Optional[int] = None, key: Optional[str] = None
-    ):
+    def get_field_grouping(self, id: str) -> FieldGrouping:
+        return FieldGrouping.from_api(self.get(f"groupings/{id}"))
 
-        params = {}
-
-        if facility_id:
-            params["facility_id"] = facility_id
-
-        if key:
-            params["key"] = key
-
-        response = PagedResponse(
-            PagedEndpoint(
-                base_url=self.base_url,
-                client=self.client,
-                request=GET(uri="feeds"),
-                parameters=params,
-            )
-        )
-
-        return (
-            APIObjectCollection([Feed(record) for record in response])
-            if response
-            else None
-        )
-
-    def get_all_fields(self, facility_id: int):
-        response = PagedResponse(
-            PagedEndpoint(
-                base_url=self.base_url,
-                client=self.client,
-                request=GET(uri=f"facilities/{facility_id}/fields"),
-                parameters={},
-            )
-        )
-
-        return (
-            APIObjectCollection([Field(record) for record in response])
-            if response
-            else None
-        )
-
-    def get_unprovisioned_fields(self, feed_id: int):
-        response = self.execute(GET(uri=f"feeds/{feed_id}/fields/unprovisioned"))
-
-        return (
-            APIObjectCollection([UnprovisionedField(record) for record in response])
-            if response
-            else None
-        )
+    def get_field_groupings_for_facility(self, facility_id: int) -> List[FieldGrouping]:
+        return [
+            FieldGrouping.from_api(rec)
+            for rec in self.get(f"facilities/{facility_id}/groupings")
+        ]

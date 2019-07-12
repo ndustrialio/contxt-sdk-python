@@ -336,7 +336,7 @@ class EmsParser(ContxtArgParser):
         return parser
 
     def _get_mains(self, args, auth):
-        from contxt.services.ems import EMSService
+        from contxt.legacy.services.ems import EMSService
 
         ems = EMSService(auth)
 

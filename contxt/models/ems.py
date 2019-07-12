@@ -1,100 +1,149 @@
-from contxt.legacy.services import APIObject, APIObjectCollection
+from datetime import datetime
+from enum import Enum
+from typing import Dict, List, Optional
+
+from contxt.models import ApiField, ApiObject, Parsers
 from contxt.models.iot import Field
 
 
-class FacilityUtilitySpend(APIObject):
-    def __init__(self, spend_api_object, keys_to_ignore=None):
-        super().__init__(keys_to_ignore=keys_to_ignore)
-
-        self.type = spend_api_object["type"]
-        self.currency = spend_api_object["currency"]
-
-        periods = [UtilitySpendPeriod(s) for s in spend_api_object["values"]]
-        self.spend_periods = APIObjectCollection(periods)
-
-    def __str__(self):
-        print(f"Utility Spend -> Type: {self.type} -- Currency: {self.currency}")
-        return self.spend_periods.__str__()
-
-    def get_dict(self):
-        return {**super().get_dict(), "spend_periods": self.spend_periods.get_dicts()}
+class ResourceType(Enum):
+    COMBINED = "combined"
+    ELECTRIC = "electric"
+    GAS = "gas"
+    WATER = "water"
 
 
-class UtilitySpendPeriod(APIObject):
-    def __init__(self, spend_api_object, keys_to_ignore=None):
-        super().__init__(keys_to_ignore=keys_to_ignore)
+class MainService(ApiObject):
+    _api_fields = (
+        ApiField("id", data_type=int),
+        ApiField("facility_id", data_type=int),
+        ApiField("name"),
+        ApiField("type", attr_key="resource_type"),
+        ApiField("demand_field_id", data_type=int),
+        ApiField("usage_field_id", data_type=int),
+        ApiField("demand_field", data_type=Field),
+        ApiField("usage_field", data_type=Field),
+        ApiField("created_at", data_type=Parsers.datetime),
+        ApiField("updated_at", data_type=Parsers.datetime),
+    )
 
-        self.date = spend_api_object["date"]
-        self.spend = spend_api_object["value"]
-        self.pro_forma_date = spend_api_object.get("pro_forma_date")
-
-    def get_values(self):
-        return [self.date, self.spend, self.pro_forma_date]
-
-    def get_keys(self):
-        return ["date", "value", "pro_forma_date"]
-
-
-class UtilityUsagePeriod(APIObject):
-    def __init__(self, spend_api_object, keys_to_ignore=None):
-        super().__init__(keys_to_ignore=keys_to_ignore)
-
-        self.date = spend_api_object["date"]
-        self.value = spend_api_object["value"]
-        self.pro_forma_date = spend_api_object.get("pro_forma_date")
-
-    def get_values(self):
-        return [self.date, self.value, self.pro_forma_date]
-
-    def get_keys(self):
-        return ["date", "value", "pro_forma_date"]
-
-
-class FacilityUtilityUsage(APIObject):
-    def __init__(self, spend_api_object, keys_to_ignore=None):
-        super().__init__(keys_to_ignore=keys_to_ignore)
-
-        self.type = spend_api_object["type"]
-        self.unit = spend_api_object["unit"]
-
-        periods = [UtilityUsagePeriod(s) for s in spend_api_object["values"]]
-        self.usage_periods = APIObjectCollection(periods)
-
-    def __str__(self):
-        print("Utility Usage -> Type: {} -- Units: {}".format(self.type, self.unit))
-        return self.usage_periods.__str__()
-
-    def get_dict(self):
-        return {**super().get_dict(), "spend_periods": self.usage_periods.get_dicts()}
+    def __init__(
+        self,
+        id: int,
+        facility_id: int,
+        name: str,
+        resource_type: str,
+        demand_field_id: int,
+        usage_field_id: int,
+        demand_field: Field,
+        usage_field: Field,
+        created_at: datetime,
+        updated_at: datetime,
+    ) -> None:
+        super().__init__()
+        self.id = id
+        self.facility_id = facility_id
+        self.name = name
+        self.resource_type = resource_type
+        self.demand_field_id = demand_field_id
+        self.usage_field_id = usage_field_id
+        self.demand_field = demand_field
+        self.usage_field = demand_field
+        self.created_at = created_at
+        self.updated_at = updated_at
 
 
-class FacilityMainService(APIObject):
-    def __init__(self, facility_main_object, keys_to_ignore=None):
-        super().__init__(keys_to_ignore=keys_to_ignore)
+class Facility(ApiObject):
+    _api_fields = (
+        ApiField("id", data_type=int),
+        ApiField("name"),
+        ApiField("asset_id"),
+        ApiField("organization_id"),
+        ApiField("baseline", data_type=dict),
+        ApiField("main_services", data_type=MainService),
+        ApiField("created_at", data_type=Parsers.datetime),
+        ApiField("updated_at", data_type=Parsers.datetime),
+    )
 
-        self.id = facility_main_object["id"]
-        self.facility_id = facility_main_object["facility_id"]
-        self.name = facility_main_object["name"]
-        self.type = facility_main_object["type"]
-        self.demand_field = (
-            Field(facility_main_object["demand_field"])
-            if facility_main_object["demand_field"]
-            else None
-        )
-        self.usage_field = (
-            Field(facility_main_object["usage_field"])
-            if facility_main_object["usage_field"]
-            else None
-        )
+    def __init__(
+        self,
+        id: int,
+        name: str,
+        asset_id: str,
+        organization_id: str,
+        baseline: str,
+        main_services: List[MainService],
+        created_at: datetime,
+        updated_at: datetime,
+    ) -> None:
+        super().__init__()
+        self.id = id
+        self.name = name
+        self.asset_id = asset_id
+        self.organization_id = organization_id
+        self.baseline = baseline
+        self.main_services = main_services
+        self.created_at = created_at
+        self.updated_at = updated_at
 
-    def get_values(self):
-        return [
-            self.facility_id,
-            self.name,
-            self.type,
-            self.demand_field.id if self.demand_field else None,
-            self.usage_field.id if self.usage_field else None,
-        ]
 
-    def get_keys(self):
-        return ["facility_id", "name", "type", "demand_field_id", "usage_field_id"]
+class UtilitySpendPeriod(ApiObject):
+    _api_fields = (
+        ApiField("date"),
+        ApiField("value"),
+        ApiField("pro_forma_date", optional=True),
+    )
+
+    def __init__(
+        self, date: str, value: str, pro_forma_date: Optional[str] = None
+    ) -> None:
+        super().__init__()
+        self.date = date
+        self.value = value
+        self.pro_forma_date = pro_forma_date
+
+
+class UtilitySpend(ApiObject):
+    _api_fields = (
+        ApiField("type"),
+        ApiField("currency"),
+        ApiField("values", data_type=UtilitySpendPeriod),
+    )
+
+    def __init__(
+        self, type: str, currency: str, values: List[UtilitySpendPeriod]
+    ) -> None:
+        super().__init__()
+        self.type = type
+        self.currency = currency
+        self.periods = values
+
+
+class UtilityUsagePeriod(ApiObject):
+    _api_fields = (
+        ApiField("date"),
+        ApiField("value"),
+        ApiField("pro_forma_date", optional=True),
+    )
+
+    def __init__(
+        self, date: str, value: str, pro_forma_date: Optional[str] = None
+    ) -> None:
+        super().__init__()
+        self.date = date
+        self.value = value
+        self.pro_forma_date = pro_forma_date
+
+
+class UtilityUsage(ApiObject):
+    _api_fields = (
+        ApiField("type"),
+        ApiField("unit"),
+        ApiField("values", data_type=UtilityUsagePeriod),
+    )
+
+    def __init__(self, type: str, unit: str, values: Dict) -> None:
+        super().__init__()
+        self.type = type
+        self.unit = unit
+        self.periods = values

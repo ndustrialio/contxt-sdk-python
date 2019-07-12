@@ -155,7 +155,7 @@ class UserTokenProvider(TokenProvider):
             logger.debug(f"Fetching new access_token for {self.audience}")
             self.access_token = self.auth_service.get_token(
                 self.identity_provider.access_token, self.audience
-            )
+            )["access_token"]
         return self._access_token
 
 
@@ -178,6 +178,7 @@ class CliAuth(Auth):
     """
 
     def __init__(self):
+        # TODO: we may not need client_secret
         super().__init__(
             client_id="bleED0RUwb7CJ9j7D48tqSiSZRZn29AV",
             client_secret=(
@@ -188,13 +189,17 @@ class CliAuth(Auth):
         self.identity_provider = UserIdentityProvider(
             client_id=self.client_id,
             client_secret=self.client_secret,
-            audience=self.auth_service.config.audience,
+            audience=self.auth_service.client_id,
             cache_file=Path.home() / ".contxt" / "cli_token",
         )
 
     def get_token_provider(self, audience: str) -> UserTokenProvider:
         """Get `TokenProvider` for audience `audience`"""
         return UserTokenProvider(self.identity_provider, audience)
+
+    @property
+    def user_id(self) -> str:
+        return self.identity_provider.decoded_access_token["sub"]
 
     def logged_in(self) -> bool:
         return bool(self.identity_provider._access_token)

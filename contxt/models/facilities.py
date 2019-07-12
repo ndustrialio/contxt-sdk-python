@@ -1,8 +1,7 @@
+from contxt.models import ApiField, ApiObject, Parsers
 from contxt.models.contxt import Organization
-from contxt.services.api import ApiField, ApiObject, Parsers
 
 
-# Hide: address1, address2, geometry_id, tags, organization, info, weather_location_id
 class Facility(ApiObject):
     _api_fields = (
         ApiField("id", data_type=int),
@@ -43,9 +42,9 @@ class Facility(ApiObject):
         organization_id: str,
         organization: Organization,
         info: dict,
+        weather_location_id: str,
         created_at: str,
-        weather_location_id: str = None,
-    ):
+    ) -> None:
         super().__init__()
         self.id = id
         self.name = name
@@ -63,8 +62,3 @@ class Facility(ApiObject):
         self.weather_location_id = weather_location_id
         self.info = info
         self.created_at = created_at
-
-    # def get_dict(self):
-    #     return {
-    #         **super().get_dict(), 'organization_name': self.organization.name
-    #     }

@@ -1,102 +1,100 @@
-from datetime import datetime
-from typing import Optional
+from datetime import date, timedelta
+from typing import List, Optional
 
-from contxt.legacy.services import GET, APIObjectCollection, Service
+from contxt.auth import Auth
 from contxt.models.ems import (
-    FacilityMainService,
-    FacilityUtilitySpend,
-    FacilityUtilityUsage,
+    Facility,
+    MainService,
+    ResourceType,
+    UtilitySpend,
+    UtilityUsage,
 )
-
-CONFIGS_BY_ENVIRONMENT = {
-    "production": {
-        "base_url": "https://ems.api.ndustrial.io/",
-        "audience": "e2IT0Zm9RgGlDBkLa2ruEcN9Iop6dJAS",
-    },
-    "staging": {
-        "base_url": "https://ems-staging.api.ndustrial.io/",
-        "audience": "vMV67yaRFgjBB1JFbT3vXBOlohFdG1I4",
-    },
-}
+from contxt.services.api import ApiEnvironment, ConfiguredApi
 
 
-class EMSService(Service):
+class EmsService(ConfiguredApi):
     """
     Service to interact with our EMS API.
     """
 
-    def __init__(self, auth, environment="production"):
+    _envs = (
+        ApiEnvironment(
+            name="production",
+            base_url="https://ems.api.ndustrial.io/v1",
+            client_id="e2IT0Zm9RgGlDBkLa2ruEcN9Iop6dJAS",
+        ),
+        ApiEnvironment(
+            name="staging",
+            base_url="https://ems-staging.api.ndustrial.io/v1",
+            client_id="vMV67yaRFgjBB1JFbT3vXBOlohFdG1I4",
+        ),
+    )
 
-        if environment not in CONFIGS_BY_ENVIRONMENT:
-            raise Exception("Invalid environment specified")
+    def __init__(self, auth: Auth, env: str = "production"):
+        super().__init__(env=env, auth=auth)
 
-        self.env = CONFIGS_BY_ENVIRONMENT[environment]
+    def get_facility(self, id: int) -> Facility:
+        return Facility.from_api(self.get(f"facilities/{id}"))
 
-        super().__init__(
-            base_url=self.env["base_url"],
-            access_token=auth.get_token_provider(self.env["audience"]).access_token,
-        )
+    def get_main_services(
+        self, facility_id: int, resource_type: Optional[ResourceType] = None
+    ) -> List[MainService]:
+        facility = self.get_facility(facility_id)
+        main_services = facility.main_services
 
-    def get_main_services(self, facility_id: int, type: Optional[str] = None):
-
-        response = self.execute(GET(uri=f"facilities/{facility_id}"), execute=True)
-
-        # manual filter for main services
-        rows = []
-        if type:
-            for row in response["main_services"]:
-                if row["type"] == type:
-                    rows.append(row)
-        else:
-            rows = response["main_services"]
-
-        return APIObjectCollection([FacilityMainService(row) for row in rows])
+        # Manually filter on resource type
+        if resource_type:
+            main_services = [
+                s
+                for s in main_services
+                if s.resource_type.lower() == resource_type.value.lower()
+            ]
+        return main_services
 
     def get_monthly_utility_spend(
         self,
         facility_id: int,
-        type: str,
-        date_start: datetime,
-        date_end: datetime,
+        resource_type: ResourceType = ResourceType.ELECTRIC,
+        start_date: date = date.today() - timedelta(days=3600),
+        end_date: date = date.today(),
         pro_forma: bool = False,
         exclude_account_charges: bool = False,
-    ):
-        params = {
-            "type": type,
-            "date_start": date_start.strftime("%Y-%m"),
-            "date_end": date_end.strftime("%Y-%m"),
-            "pro_forma": "true" if pro_forma else "false",
-            "exclude_account_charges": "true" if exclude_account_charges else "false",
-        }
-
-        response = self.execute(
-            GET(uri=f"facilities/{facility_id}/utility/spend/monthly").params(params),
-            execute=True,
+    ) -> UtilitySpend:
+        """Get monthly utility spend for facility `facility_id` and resource
+        `resource_type` (for now, this must be "electric" but will be expanded).
+        Note `start_date` defaults to 10 years ago (the API's maximum limit) and
+        `end_date` defaults to today."""
+        resp = self.get(
+            f"facilities/{facility_id}/utility/spend/monthly",
+            params={
+                "type": resource_type.value,
+                "date_start": start_date.strftime("%Y-%m"),
+                "date_end": end_date.strftime("%Y-%m"),
+                "pro_forma": pro_forma,
+                "exclude_account_charges": exclude_account_charges,
+            },
         )
-
-        return FacilityUtilitySpend(response)
+        return UtilitySpend.from_api(resp)
 
     def get_monthly_utility_usage(
         self,
         facility_id: int,
-        type: str,
-        date_start: datetime,
-        date_end: datetime,
+        resource_type: ResourceType = ResourceType.ELECTRIC,
+        start_date: date = date.today() - timedelta(days=3600),
+        end_date: date = date.today(),
         pro_forma: bool = False,
-    ):
-
-        params = {
-            "type": type,
-            "date_start": date_start.strftime("%Y-%m"),
-            "date_end": date_end.strftime("%Y-%m"),
-            "pro_forma": "true" if pro_forma else "false",
-        }
-
-        response = self.execute(
-            GET(uri="facilities/{}/utility/usage/monthly".format(facility_id)).params(
-                params
-            ),
-            execute=True,
+    ) -> UtilityUsage:
+        """Get monthly utility usage for facility `facility_id` and resource
+        `resource_type` (for now, this must be "electric" but will be expanded).
+        Note `start_date` defaults to 10 years ago (the API's maximum limit) and
+        `end_date` defaults to today."""
+        resp = self.get(
+            f"facilities/{facility_id}/utility/usage/monthly",
+            params={
+                "type": resource_type.value,
+                "date_start": start_date.strftime("%Y-%m"),
+                "date_end": end_date.strftime("%Y-%m"),
+                "pro_forma": pro_forma,
+            },
         )
-
-        return FacilityUtilityUsage(response)
+        return UtilityUsage.from_api(resp)

@@ -1,38 +1,42 @@
-from typing import List, Union
+from typing import Dict, List, Union
 
-from contxt.services.api import ApiServiceConfig, ConfiguredApiService
+from contxt.services.api import ApiEnvironment, ConfiguredApi
 from contxt.utils import make_logger
 
 logger = make_logger(__name__)
 
 
-class AuthService(ConfiguredApiService):
+class AuthService(ConfiguredApi):
     """
     Service to interact with our Auth API.
     """
 
-    _configs = (
-        ApiServiceConfig(
+    _envs = (
+        ApiEnvironment(
             name="production",
             base_url="https://contxtauth.com/v1",
-            audience="75wT048QcpE7ujwBJPPjr263eTHl4gEX",
+            client_id="75wT048QcpE7ujwBJPPjr263eTHl4gEX",
         ),
     )
 
     def __init__(self, env: str = "production"):
-        super().__init__(None, env)
+        super().__init__(env=env)
 
-    def get_token(self, access_token: str, audiences: Union[str, List[str]]) -> str:
+    def get_jwks(self) -> Dict:
+        return self.get(".well-known/jwks.json")
+
+    def get_token(self, access_token: str, audiences: Union[str, List[str]]) -> Dict:
         audiences = [audiences] if isinstance(audiences, str) else audiences
-        response = self.post(
+        return self.post(
             "token",
             json={"audiences": audiences},
             headers={"Authorization": f"Bearer {access_token}"},
         )
-        return response["access_token"]
 
-    def get_oauth_token(self, client_id: str, client_secret: str, audience: str) -> str:
-        response = self.post(
+    def get_oauth_token(
+        self, client_id: str, client_secret: str, audience: str
+    ) -> Dict:
+        return self.post(
             "oauth/token",
             json={
                 "client_id": client_id,
@@ -41,7 +45,3 @@ class AuthService(ConfiguredApiService):
                 "grant_type": "client_credentials",
             },
         )
-        return response["access_token"]
-
-    def get_jwks(self) -> str:
-        return self.get(".well-known/jwks.json")

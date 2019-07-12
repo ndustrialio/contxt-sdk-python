@@ -2,7 +2,7 @@ from datetime import datetime
 from json import loads
 from typing import List, Optional
 
-from contxt.services.api import ApiField, ApiObject, Parsers
+from contxt.models import ApiField, ApiObject, Parsers
 
 
 class ConfigValue(ApiObject):
@@ -27,7 +27,8 @@ class ConfigValue(ApiObject):
         is_hidden: bool,
         created_at: Optional[datetime] = None,
         updated_at: Optional[datetime] = None,
-    ):
+    ) -> None:
+        super().__init__()
         self.id = id
         self.key = key
         self.value = self._init_value(value, type)
@@ -68,7 +69,8 @@ class Config(ApiObject):
         config_values: List[ConfigValue],
         created_at: Optional[datetime] = None,
         updated_at: Optional[datetime] = None,
-    ):
+    ) -> None:
+        super().__init__()
         self.id = id
         self.name = name
         self.description = description
@@ -96,7 +98,7 @@ class OrganizationUser(ApiObject):
         is_primary: bool,
         created_at: Optional[datetime] = None,
         updated_at: Optional[datetime] = None,
-    ):
+    ) -> None:
         super().__init__()
         self.id = id
         self.user_id = user_id
@@ -130,7 +132,7 @@ class Organization(ApiObject):
         organization_user: Optional[OrganizationUser] = None,
         created_at: Optional[datetime] = None,
         updated_at: Optional[datetime] = None,
-    ):
+    ) -> None:
         super().__init__()
         self.id = id
         self.legacy_id = legacy_id
@@ -158,7 +160,7 @@ class UserRole(ApiObject):
         id: Optional[str] = None,
         created_at: Optional[datetime] = None,
         updated_at: Optional[datetime] = None,
-    ):
+    ) -> None:
         super().__init__()
         self.id = id
         self.user_id = user_id
@@ -189,7 +191,7 @@ class Role(ApiObject):
         id: Optional[str] = None,
         created_at: Optional[datetime] = None,
         updated_at: Optional[datetime] = None,
-    ):
+    ) -> None:
         super().__init__()
         self.id = id
         self.name = name
@@ -230,7 +232,7 @@ class User(ApiObject):
         id: Optional[str] = None,
         created_at: Optional[datetime] = None,
         updated_at: Optional[datetime] = None,
-    ):
+    ) -> None:
         super().__init__()
         self.id = id
         self.first_name = first_name

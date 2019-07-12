@@ -1,15 +1,13 @@
 from datetime import date, datetime, timedelta
-from typing import Any, List, Optional
+from typing import Any, Dict, List, Optional
 
-from inflect import engine
-
-from contxt.services.api import ApiField, ApiObject, Parsers
+from contxt.models import ApiField, ApiObject, Formatters, Parsers
 from contxt.utils import Utils, make_logger
 
-p = engine()
 logger = make_logger(__name__)
 
 
+# TODO: make these enums
 class TimeIntervals:
     """Valid time intervals for a MetricValue"""
 
@@ -60,7 +58,7 @@ class Attribute(ApiObject):
         is_global: Optional[bool] = None,
         created_at: Optional[datetime] = None,
         updated_at: Optional[datetime] = None,
-    ):
+    ) -> None:
         super().__init__()
         self.id = id
         self.asset_type_id = asset_type_id
@@ -76,8 +74,8 @@ class Attribute(ApiObject):
         self.updated_at = updated_at
 
     @property
-    def normalized_label(self):
-        return self.label.lower().replace(" ", "_")
+    def normalized_label(self) -> str:
+        return Formatters.normalize_label(self.label)
 
 
 class AttributeValue(ApiObject):
@@ -105,7 +103,7 @@ class AttributeValue(ApiObject):
         effective_date: Optional[datetime] = None,
         created_at: Optional[datetime] = None,
         updated_at: Optional[datetime] = None,
-    ):
+    ) -> None:
         super().__init__()
         self.id = id
         self.asset_id = asset_id
@@ -117,7 +115,7 @@ class AttributeValue(ApiObject):
         self.created_at = created_at
         self.updated_at = updated_at
 
-    def upsert(self):
+    def upsert(self) -> Dict:
         # HACK: handle special case of upserting attribute_values
         # TODO: if upserting becomes common, this method be moved to the base
         # class
@@ -155,7 +153,7 @@ class Metric(ApiObject):
         is_calculated: Optional[bool] = None,
         created_at: Optional[datetime] = None,
         updated_at: Optional[datetime] = None,
-    ):
+    ) -> None:
         super().__init__()
         self.id = id
         self.asset_type_id = asset_type_id
@@ -170,8 +168,8 @@ class Metric(ApiObject):
         self.updated_at = updated_at
 
     @property
-    def normalized_label(self):
-        return self.label.lower().replace(" ", "_")
+    def normalized_label(self) -> str:
+        return Formatters.normalize_label(self.label)
 
 
 class MetricValue(ApiObject):
@@ -212,7 +210,7 @@ class MetricValue(ApiObject):
         asset: Optional["Asset"] = None,
         created_at: Optional[datetime] = None,
         updated_at: Optional[datetime] = None,
-    ):
+    ) -> None:
         super().__init__()
         self.id = id
         self.asset_id = asset_id
@@ -227,7 +225,6 @@ class MetricValue(ApiObject):
 
 
 class AssetType(ApiObject):
-    __marker = object()
     _api_fields = (
         ApiField("id"),
         ApiField("label", creatable=True),
@@ -288,10 +285,6 @@ class AssetType(ApiObject):
             return self.label.title().replace(" ", "")
 
     @property
-    def plural_label(self) -> str:
-        return p.plural(self.label)
-
-    @property
     def attributes(self) -> List[Attribute]:
         return self._attributes
 
@@ -336,44 +329,46 @@ class AssetType(ApiObject):
             self._children_by_label[child.label] = child
             self._children_by_label[child.normalized_label] = child
 
-    def attribute_with_id(self, attribute_id: str, default=__marker) -> Attribute:
+    def attribute_with_id(self, attribute_id: str, default: Any = ...) -> Attribute:
         if attribute_id not in self._attributes_by_id:
-            if default is self.__marker:
+            if default is ...:
                 raise KeyError(f"Attribute {attribute_id} not found.")
             return default
         return self._attributes_by_id[attribute_id]
 
-    def attribute_with_label(self, attribute_label: str, default=__marker) -> Attribute:
+    def attribute_with_label(
+        self, attribute_label: str, default: Any = ...
+    ) -> Attribute:
         if attribute_label not in self._attributes_by_label:
-            if default is self.__marker:
+            if default is ...:
                 raise KeyError(f"Attribute {attribute_label} not found.")
             return default
         return self._attributes_by_label[attribute_label]
 
-    def metric_with_id(self, metric_id: str, default=__marker) -> Metric:
+    def metric_with_id(self, metric_id: str, default: Any = ...) -> Metric:
         if metric_id not in self._metrics_by_id:
-            if default is self.__marker:
+            if default is ...:
                 raise KeyError(f"Metric {metric_id} not found.")
             return default
         return self._metrics_by_id[metric_id]
 
-    def metric_with_label(self, metric_label: str, default=__marker) -> Metric:
+    def metric_with_label(self, metric_label: str, default: Any = ...) -> Metric:
         if metric_label not in self._metrics_by_label:
-            if default is self.__marker:
+            if default is ...:
                 raise KeyError(f"Metric {metric_label} not found.")
             return default
         return self._metrics_by_label[metric_label]
 
-    def child_with_id(self, child_id: str, default=__marker) -> "AssetType":
+    def child_with_id(self, child_id: str, default: Any = ...) -> "AssetType":
         if child_id not in self._children_by_id:
-            if default is self.__marker:
+            if default is ...:
                 raise KeyError(f"Child {child_id} not found.")
             return default
         return self._children_by_id[child_id]
 
-    def child_with_label(self, child_label: str, default=__marker) -> "AssetType":
+    def child_with_label(self, child_label: str, default: Any = ...) -> "AssetType":
         if child_label not in self._children_by_label:
-            if default is self.__marker:
+            if default is ...:
                 raise KeyError(f"Child {child_label} not found.")
             return default
         return self._children_by_label[child_label]
@@ -420,7 +415,7 @@ class Asset(ApiObject):
         metric_values: Optional[List[MetricValue]] = None,
         children: Optional[List["Asset"]] = None,
         asset_type: Optional[AssetType] = None,
-    ):
+    ) -> None:
         super().__init__()
         self.id = id
         self.asset_type_id = asset_type_id
@@ -437,10 +432,10 @@ class Asset(ApiObject):
         self.updated_at = updated_at
 
     @property
-    def normalized_label(self):
-        return self.label.lower().replace(" ", "_")
+    def normalized_label(self) -> str:
+        return Formatters.normalize_label(self.label)
 
-    def post(self):
+    def post(self) -> Dict:
         """Get data for a post request"""
         d = super().post()
         # HACK: handle special case of posting attribute_values
@@ -472,7 +467,7 @@ class CompleteAsset(ApiObject):
         self.edited_attribute_values = set()
         self.edited_metric_values = set()
 
-    def _init_attribute_values(self):
+    def _init_attribute_values(self) -> Dict:
         # Fetch attribute labels to use as keys
         attribute_values_by_label = {
             a.normalized_label: None for a in self.asset_type.attributes
@@ -487,7 +482,7 @@ class CompleteAsset(ApiObject):
 
         return attribute_values_by_label
 
-    def _init_metric_values(self):
+    def _init_metric_values(self) -> Dict:
         # Fetch metric labels to use as keys
         metric_values_by_label = {
             m.normalized_label: {} for m in self.asset_type.metrics
@@ -499,7 +494,9 @@ class CompleteAsset(ApiObject):
 
         return metric_values_by_label
 
-    def _effective_end_date(self, effective_start_date, time_interval):
+    def _effective_end_date(
+        self, effective_start_date: date, time_interval: str
+    ) -> date:
         delta = timedelta()
         if time_interval == TimeIntervals.hourly:
             delta = timedelta(hours=1) - timedelta(milliseconds=1)
@@ -517,12 +514,12 @@ class CompleteAsset(ApiObject):
             raise KeyError(f"Unrecognized time interval: {time_interval}")
         return effective_start_date + delta
 
-    def attribute(self, label):
+    def attribute(self, label: str) -> Any:
         attr = self._attribute_values_by_label[label]
         return attr.value if attr else attr
 
     @property
-    def attributes(self):
+    def attributes(self) -> Dict:
         """Get dict of key (Attribute label) value (value of AttributeValue
         with latest effective_date) pairs"""
         return {
@@ -531,7 +528,7 @@ class CompleteAsset(ApiObject):
         }
 
     @attributes.setter
-    def attributes(self, attributes: dict):
+    def attributes(self, attributes: Dict) -> None:
         # Determine attributes that changed, by performing a set difference on
         # the two dictionaries
         new_attribute_values = dict(
@@ -569,11 +566,11 @@ class CompleteAsset(ApiObject):
         # Refresh internal list of attribute values
         self._attribute_values_by_label = self._init_attribute_values()
 
-    def metric(self, label):
+    def metric(self, label: str) -> Dict:
         return self._metric_values_by_label[label]
 
     @property
-    def metrics(self):
+    def metrics(self) -> Dict:
         """Get dict of key (Metric label) value (dict of effective_start_date
         to value of MetricValue) pairs"""
         return {
@@ -582,7 +579,7 @@ class CompleteAsset(ApiObject):
         }
 
     @metrics.setter
-    def metrics(self, metrics: dict):
+    def metrics(self, metrics: Dict) -> None:
         # Determine metrics that changed, by performing a set difference on
         # the two dictionaries
         # TODO: this only identifies the label, since this is a nested dict

@@ -10,6 +10,8 @@ from contxt.utils import make_logger
 logger = make_logger(__name__)
 
 
+# NOTE: we should migrate to the official Oauth Sessions
+# https://github.com/requests/requests-oauthlib
 class TokenProvider(ABC):
     """
     An abstact base class to provide an unexpired `access_token` from the source
@@ -18,7 +20,7 @@ class TokenProvider(ABC):
     Overload this class to implement `access_token`.
     """
 
-    def __init__(self, audience: str):
+    def __init__(self, audience: str) -> None:
         self.audience = audience
         self._access_token: Optional[str] = None
         self._access_token_decoded: Optional[Dict] = None
@@ -51,7 +53,7 @@ class TokenProvider(ABC):
             self.access_token
         return self._access_token_decoded
 
-    def reset(self):
+    def reset(self) -> None:
         self._access_token: Optional[str] = None
         self._access_token_decoded: Optional[Dict] = None
 
@@ -65,7 +67,7 @@ class Auth(ABC):
     Overload this class to implement `get_token_provider(...)`.
     """
 
-    def __init__(self, client_id: str, client_secret: str):
+    def __init__(self, client_id: str, client_secret: str) -> None:
         self.client_id = client_id
         self.client_secret = client_secret
 
