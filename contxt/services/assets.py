@@ -42,7 +42,7 @@ class AssetsService(ConfiguredApi):
         load_types: bool = True,
         types_to_fully_load: Optional[List[str]] = None,
     ) -> None:
-        super().__init__(env, auth)
+        super().__init__(env=env, auth=auth)
         # TODO: handle multiple orgs
         self.organization_id = organization_id
         self.types = {}

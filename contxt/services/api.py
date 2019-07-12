@@ -146,9 +146,12 @@ class ConfiguredApi(Api, ABC):
     """
 
     def __init__(self, env: str, auth: Optional[Auth] = None) -> None:
-        self.env = self._get_env(env)
-        token_provider = auth.get_token_provider(self.env.client_id) if auth else None
-        super().__init__(base_url=self.env.base_url, token_provider=token_provider)
+        # TODO: figure out a cleaner approach to environment selection
+        api_env = self._get_env(env)
+        self.env = env
+        self.client_id = api_env.client_id
+        token_provider = auth.get_token_provider(self.client_id) if auth else None
+        super().__init__(base_url=api_env.base_url, token_provider=token_provider)
 
     @classmethod
     def _get_env(cls, name: str) -> ApiEnvironment:

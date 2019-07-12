@@ -27,7 +27,7 @@ class EventsService(ConfiguredApi):
     )
 
     def __init__(self, auth: Auth, env: str = "production"):
-        super().__init__(env, auth)
+        super().__init__(env=env, auth=auth)
 
     def set_human_readable_parameters(self, event_definition: EventDefinition) -> None:
         statement = ""

@@ -25,7 +25,7 @@ class IotService(ConfiguredApi):
     )
 
     def __init__(self, auth: Auth, env: str = "production"):
-        super().__init__(env, auth)
+        super().__init__(env=env, auth=auth)
 
     def get_feed_with_id(self, id: int) -> Feed:
         return Feed.from_api(self.get(f"feeds/{id}"))

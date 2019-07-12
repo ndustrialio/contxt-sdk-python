@@ -19,7 +19,7 @@ class FacilitiesService(ConfiguredApi):
     _envs = AssetsService._envs
 
     def __init__(self, auth: Auth, env: str = "production"):
-        super().__init__(env, auth)
+        super().__init__(env=env, auth=auth)
 
     def get_facilities(self, organization_id: Optional[str] = None) -> List[Facility]:
         logger.debug(f"Fetching facilities for organization {organization_id}")

@@ -189,7 +189,7 @@ class CliAuth(Auth):
         self.identity_provider = UserIdentityProvider(
             client_id=self.client_id,
             client_secret=self.client_secret,
-            audience=self.auth_service.env.client_id,
+            audience=self.auth_service.client_id,
             cache_file=Path.home() / ".contxt" / "cli_token",
         )
 

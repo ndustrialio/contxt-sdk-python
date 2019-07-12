@@ -20,7 +20,7 @@ class AuthService(ConfiguredApi):
     )
 
     def __init__(self, env: str = "production"):
-        super().__init__(env)
+        super().__init__(env=env)
 
     def get_jwks(self) -> Dict:
         return self.get(".well-known/jwks.json")

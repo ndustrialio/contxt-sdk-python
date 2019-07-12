@@ -34,7 +34,7 @@ class ContxtService(ConfiguredApi):
     )
 
     def __init__(self, auth: Auth, env: str = "production") -> None:
-        super().__init__(env, auth)
+        super().__init__(env=env, auth=auth)
 
     def get_organizations(self) -> List[Organization]:
         logger.debug("Fetching organizations")
