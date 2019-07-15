@@ -63,7 +63,9 @@ class TestEventsService:
     def test_create_triggered_event(self):
         pass
         # new_triggered_event = TriggeredEvent()
-        # created_triggered_event = self.service.create_triggered_event(new_triggered_event)
+        # created_triggered_event = self.service.create_triggered_event(
+        #     new_triggered_event
+        # )
         # assert created_triggered_event
 
     def test_get_triggered_event(self):

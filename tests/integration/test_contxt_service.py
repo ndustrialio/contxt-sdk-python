@@ -24,7 +24,9 @@ class TestContxtService:
 
     def test_add_user_to_organization(self):
         pass
-        # organization_user = self.service.add_user_to_organization(user_id, organization_id)
+        # organization_user = self.service.add_user_to_organization(
+        #     user_id, organization_id
+        # )
         # assert organization_user.user_id == user_id
         # assert organization_user.organization_id == organization_id
 

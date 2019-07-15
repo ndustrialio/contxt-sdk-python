@@ -28,7 +28,9 @@ class TestMessageBusService:
     def test_get_schema_for_channel_and_service(self):
         pass
         # schema = self.service.get_schema_for_channel_and_service(
-        #     schema_id=self.schema_id, channel_id=TestChannel.id, service_id=TestChannel.service_id
+        #     schema_id=self.schema_id,
+        #     channel_id=TestChannel.id,
+        #     service_id=TestChannel.service_id,
         # )
 
     # TODO: no schemas exist for this organization

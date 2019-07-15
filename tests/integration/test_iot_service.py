@@ -40,6 +40,7 @@ class TestIotService:
         field_data = self.service.get_time_series_for_field(
             field=field, start_time=start_time
         )
+        assert field_data
         # assert field_data.field_human_name == TestField.field_human_name
         # assert field_data.output_id == TestField.output_id
         # assert field_data.time_series
