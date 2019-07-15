@@ -49,9 +49,8 @@ class TestContxtService:
 
     # TODO: this endpoint fail (cannot GET)
     def test_get_config_values(self):
-        pass
-        # values = self.service.get_config_values(TestWorker.config_id, TestWorker.env_id)
-        # assert values
+        values = self.service.get_config_values(TestWorker.config_id, TestWorker.env_id)
+        assert values
 
     # TODO: figure out valid value for worker_id
     def test_get_config_values_for_worker(self):
