@@ -2,8 +2,16 @@ from datetime import datetime
 from typing import Dict, List, Optional
 
 from contxt.auth import Auth
-from contxt.models.iot import Feed, Field, FieldGrouping, UnprovisionedField, Window
+from contxt.models.iot import (
+    Feed,
+    Field,
+    FieldGrouping,
+    FieldTimeSeries,
+    UnprovisionedField,
+    Window,
+)
 from contxt.services.api import ApiEnvironment, ConfiguredApi
+from contxt.services.pagination import PageOptions, Pages, TimeSeriesPages
 
 
 class IotService(ConfiguredApi):
@@ -28,9 +36,11 @@ class IotService(ConfiguredApi):
         super().__init__(env=env, auth=auth)
 
     def get_feed_with_id(self, id: int) -> Feed:
+        """Get feed with id `id`"""
         return Feed.from_api(self.get(f"feeds/{id}"))
 
     def get_feed_with_key(self, key: str) -> Optional[Feed]:
+        """Get feed with key `key`"""
         feeds = self.get_feeds(key=key)
         if len(feeds) == 0:
             return None
@@ -39,61 +49,78 @@ class IotService(ConfiguredApi):
         raise KeyError(f"Expected singleton feed with key {key}, not {len(feeds)}")
 
     def get_feeds(
-        self, facility_id: Optional[int] = None, key: Optional[str] = None
+        self,
+        facility_id: Optional[int] = None,
+        key: Optional[str] = None,
+        page_options: Optional[PageOptions] = None,
     ) -> List[Feed]:
-        return [
-            Feed.from_api(rec)
-            for rec in self.get(
-                "feeds", params={"facility_id": facility_id, "key": key}
-            )
-        ]
+        """Get feeds with facility id `facility_id` and/or key `key`"""
+        return Pages(
+            api=self,
+            url="feeds",
+            params={"facility_id": facility_id, "key": key},
+            options=page_options,
+            record_parser=Feed.from_api,
+        )
 
-    def get_fields_for_facility(self, facility_id: int) -> List[Field]:
-        return [
-            Field.from_api(rec) for rec in self.get(f"facilities/{facility_id}/fields")
-        ]
+    def get_fields_for_facility(
+        self, facility_id: int, page_options: Optional[PageOptions] = None
+    ) -> List[Field]:
+        """Get fields for facility with id `facility_id`"""
+        return Pages(
+            api=self,
+            url=f"facilities/{facility_id}/fields",
+            options=page_options,
+            record_parser=Field.from_api,
+        )
 
     def get_fields_for_feed(
-        self, feed_id: int, limit: int = 1000, offset: int = 0
+        self, feed_id: int, page_options: Optional[PageOptions] = None
     ) -> List[Field]:
-        return [
-            Field.from_api(rec)
-            for rec in self.get(
-                f"feeds/{feed_id}/fields", params={"limit": limit, "offset": offset}
-            )
-        ]
+        """Get fields for feed with id `feed_id`"""
+        return Pages(
+            api=self,
+            url=f"feeds/{feed_id}/fields",
+            options=page_options,
+            record_parser=Field.from_api,
+        )
 
-    def get_field_data(
+    def get_time_series_for_field(
         self,
         field: Field,
         start_time: datetime,
         window: Window = Window.RAW,
         end_time: Optional[datetime] = None,
-        limit: int = 1000,
-    ) -> Dict:
+        per_page: int = 500,
+    ) -> FieldTimeSeries:
+        """Get time series data for field `Field`"""
         # Manually validate the window choice, since our API does not return a
         # helpful error message
         assert isinstance(window, Window), "window must be of type Window"
-        resp = self.get(
-            f"outputs/{field.output_id}/fields/{field.field_human_name}/data",
+        return TimeSeriesPages(
+            api=self,
+            url=f"outputs/{field.output_id}/fields/{field.field_human_name}/data",
             params={
                 "timeStart": int(start_time.timestamp()),
                 "timeEnd": int(end_time.timestamp()) if end_time else None,
                 "window": window.value,
-                "limit": limit,
             },
+            per_page=per_page,
         )
-        # NOTE: this intentionally does not yet handle pagination, or parsing
-        # (coming soon)
-        return resp
 
-    def get_field_data_for_grouping(self, grouping_id: str, **kwargs) -> List[Dict]:
+    def get_time_series_for_field_grouping(
+        self, grouping_id: str, **kwargs
+    ) -> List[Dict]:
+        """Get time series data for fields in grouping with id `grouping_id`"""
         grouping = self.get_field_grouping(grouping_id)
-        return [self.get_field_data(field=f, **kwargs) for f in grouping.fields]
+        return [
+            self.get_time_series_for_field(field=f, **kwargs) for f in grouping.fields
+        ]
 
     def get_unprovisioned_fields_for_feed_id(
         self, feed_id: int
     ) -> List[UnprovisionedField]:
+        """Get unprovisioned fields for feed with id `feed_id`"""
         return [
             UnprovisionedField.from_api(rec)
             for rec in self.get(f"feeds/{feed_id}/fields/unprovisioned")
@@ -102,6 +129,7 @@ class IotService(ConfiguredApi):
     def get_unprovisioned_fields_for_feed_key(
         self, feed_key: str
     ) -> Optional[List[UnprovisionedField]]:
+        """Get unprovisioned fields for feed with key `feed_key`"""
         feed = self.get_feed_with_key(key=feed_key)
         if not feed:
             return None
@@ -111,10 +139,16 @@ class IotService(ConfiguredApi):
         ]
 
     def get_field_grouping(self, id: str) -> FieldGrouping:
+        """Get field grouping with id `id`"""
         return FieldGrouping.from_api(self.get(f"groupings/{id}"))
 
-    def get_field_groupings_for_facility(self, facility_id: int) -> List[FieldGrouping]:
-        return [
-            FieldGrouping.from_api(rec)
-            for rec in self.get(f"facilities/{facility_id}/groupings")
-        ]
+    def get_field_groupings_for_facility(
+        self, facility_id: int, page_options: Optional[PageOptions] = None
+    ) -> List[FieldGrouping]:
+        """Get field groupings for facility with id `facility_id`"""
+        return Pages(
+            api=self,
+            url=f"facilities/{facility_id}/groupings",
+            options=page_options,
+            record_parser=FieldGrouping.from_api,
+        )

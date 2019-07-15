@@ -73,27 +73,10 @@ class Api:
         except ValueError:
             return {}
 
-    def get(
-        self,
-        uri: str,
-        params: Optional[Dict] = None,
-        records_only: bool = True,
-        **kwargs,
-    ) -> Dict:
+    def get(self, uri: str, params: Optional[Dict] = None, **kwargs) -> Dict:
         """Sends a GET request"""
         response = self.session.get(url=self._url(uri), params=params, **kwargs)
-        response_json = self._process_response(response)
-
-        # TODO: remove `records_only` in favor of pagination support
-        # Return just records, if requested and available
-        records = (
-            response_json.get("records") if isinstance(response_json, dict) else None
-        )
-        if records_only and records is not None:
-            return records
-
-        # Return entire response
-        return response_json
+        return self._process_response(response)
 
     def post(
         self,
