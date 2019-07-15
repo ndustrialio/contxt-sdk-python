@@ -45,9 +45,7 @@ class EmsService(ConfiguredApi):
         # Manually filter on resource type
         if resource_type:
             main_services = [
-                s
-                for s in main_services
-                if s.resource_type.lower() == resource_type.value.lower()
+                s for s in main_services if s.resource_type == resource_type
             ]
         return main_services
 

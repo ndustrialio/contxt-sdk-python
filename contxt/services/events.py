@@ -3,7 +3,7 @@ from typing import List, Optional
 from contxt.auth import Auth
 from contxt.models.events import Event, EventDefinition, EventType, TriggeredEvent
 from contxt.services.api import ApiEnvironment, ConfiguredApi
-from contxt.services.pagination import Pages, PageOptions
+from contxt.services.pagination import PageOptions, Pages
 from contxt.utils import make_logger
 
 logger = make_logger(__name__)

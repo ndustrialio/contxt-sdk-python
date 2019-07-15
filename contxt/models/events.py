@@ -84,7 +84,7 @@ class Owner(ApiObject):
         ApiField("first_name"),
         ApiField("last_name"),
         ApiField("email"),
-        ApiField("is_machine_user", data_type=bool),
+        ApiField("is_machine_user", data_type=bool, optional=True),
         ApiField("created_at", data_type=Parsers.datetime),
         ApiField("updated_at", data_type=Parsers.datetime),
     )
