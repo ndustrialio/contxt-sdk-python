@@ -37,6 +37,7 @@ class EventType(ApiObject):
         created_at: Optional[datetime] = None,
         updated_at: Optional[datetime] = None,
     ):
+        super().__init__()
         self.id = id
         self.name = name
         self.slug = slug
@@ -77,6 +78,7 @@ class EventDefinition(ApiObject):
         updated_at: datetime,
         id: Optional[str] = None,
     ):
+        super().__init__()
         self.id = id
         self.event_id = event_id
         self.description = description
@@ -106,6 +108,7 @@ class Owner(ApiObject):
         created_at: datetime,
         updated_at: datetime,
     ):
+        super().__init__()
         self.id = id
         self.first_name = first_name
         self.last_name = last_name
@@ -152,6 +155,7 @@ class Event(ApiObject):
         updated_at: Optional[datetime] = None,
         deleted_at: Optional[datetime] = None,
     ):
+        super().__init__()
         self.id = id
         self.name = name
         self.event_type_id = event_type_id
@@ -183,6 +187,7 @@ class TriggeredEventData(ApiObject):
         trigger_start_at: datetime,
         trigger_end_at: datetime,
     ):
+        super().__init__()
         self.source_id = source_id
         self.subchain_triggered_event_id = subchain_triggered_event_id
         self.trigger_start_at = trigger_start_at
@@ -232,6 +237,7 @@ class TriggeredEvent(ApiObject):
         updated_at: Optional[datetime] = None,
         deleted_at: Optional[datetime] = None,
     ):
+        super().__init__()
         self.id = id
         self.event_id = event_id
         self.event = event
