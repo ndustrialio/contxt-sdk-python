@@ -4,7 +4,6 @@ from contxt.services import EventsService
 from tests.static.data import TestTriggeredEvent
 
 
-# TODO: figure out how to test remaining endpoints without manipulating real data
 class TestEventsService:
     service = EventsService(CliAuth())
 

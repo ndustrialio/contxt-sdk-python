@@ -4,7 +4,6 @@ from contxt.services import ContxtService
 from tests.static.data import TestOrganization, TestWorker
 
 
-# TODO: figure out how to test remaining endpoints without manipulating real data
 class TestContxtService:
     service = ContxtService(CliAuth())
 
@@ -42,8 +41,6 @@ class TestContxtService:
     # init:clients")
     def test_get_config_for_client(self):
         pass
-        # client_id = "30vhDIDRNLMdGWgwhswJFhrMxw98ztEv"
-        # env_id = "64c6dde7-7830-47c1-a411-6c39c158ec79"
         # config = self.service.get_config_for_client(client_id, env_id)
         # assert config
 
