@@ -11,7 +11,7 @@ from contxt.models.iot import (
     Window,
 )
 from contxt.services.api import ApiEnvironment, ConfiguredApi
-from contxt.services.pagination import PageOptions, PagedRecords, PagedTimeSeries
+from contxt.services.pagination import PagedRecords, PagedTimeSeries, PageOptions
 
 
 class IotService(ConfiguredApi):
