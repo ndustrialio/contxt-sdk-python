@@ -55,7 +55,7 @@ class Page:
         return self.records[index]
 
 
-class Pages:
+class PagedRecords:
     def __init__(
         self,
         api: Api,
@@ -161,7 +161,7 @@ class TimeSeriesPage:
         return self.records[index]
 
 
-class TimeSeriesPages:
+class PagedTimeSeries:
     def __init__(
         self, api: Api, url: str, params: Optional[Dict] = None, per_page: int = 1000
     ):
@@ -175,6 +175,10 @@ class TimeSeriesPages:
         self.page = self._get_page(url=self.url, params=self.params)
 
     def __iter__(self):
+        # HACK: Reset to first page
+        if self.page_index != 0:
+            self.page_index = 0
+            self.page = self._get_page(url=self.url, params=self.params)
         yield from self.page
         while self.next_page_url:
             yield from self.get_next_page()

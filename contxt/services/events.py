@@ -3,7 +3,7 @@ from typing import List, Optional
 from contxt.auth import Auth
 from contxt.models.events import Event, EventDefinition, EventType, TriggeredEvent
 from contxt.services.api import ApiEnvironment, ConfiguredApi
-from contxt.services.pagination import PageOptions, Pages
+from contxt.services.pagination import PagedRecords, PageOptions
 from contxt.utils import make_logger
 
 logger = make_logger(__name__)
@@ -47,7 +47,7 @@ class EventsService(ConfiguredApi):
     def get_event_types(
         self, page_options: Optional[PageOptions] = None
     ) -> List[EventType]:
-        return Pages(
+        return PagedRecords(
             api=self,
             url="types",
             options=page_options,
@@ -85,7 +85,7 @@ class EventsService(ConfiguredApi):
         self, event_type_id: str, page_options: Optional[PageOptions] = None
     ) -> List[Event]:
         logger.debug(f"Fetching events for type {event_type_id}")
-        return Pages(
+        return PagedRecords(
             api=self,
             url=f"types/{event_type_id}/events",
             options=page_options,
@@ -126,7 +126,7 @@ class EventsService(ConfiguredApi):
         self, event_id: str, page_options: Optional[PageOptions] = None
     ) -> List[TriggeredEvent]:
         logger.debug(f"Fetching triggered_events for event {event_id}")
-        return Pages(
+        return PagedRecords(
             api=self,
             url=f"events/{event_id}/triggered",
             options=page_options,

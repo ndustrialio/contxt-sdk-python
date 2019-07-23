@@ -11,7 +11,7 @@ from contxt.models.iot import (
     Window,
 )
 from contxt.services.api import ApiEnvironment, ConfiguredApi
-from contxt.services.pagination import PageOptions, Pages, TimeSeriesPages
+from contxt.services.pagination import PageOptions, PagedRecords, PagedTimeSeries
 
 
 class IotService(ConfiguredApi):
@@ -55,7 +55,7 @@ class IotService(ConfiguredApi):
         page_options: Optional[PageOptions] = None,
     ) -> List[Feed]:
         """Get feeds with facility id `facility_id` and/or key `key`"""
-        return Pages(
+        return PagedRecords(
             api=self,
             url="feeds",
             params={"facility_id": facility_id, "key": key},
@@ -67,7 +67,7 @@ class IotService(ConfiguredApi):
         self, facility_id: int, page_options: Optional[PageOptions] = None
     ) -> List[Field]:
         """Get fields for facility with id `facility_id`"""
-        return Pages(
+        return PagedRecords(
             api=self,
             url=f"facilities/{facility_id}/fields",
             options=page_options,
@@ -78,7 +78,7 @@ class IotService(ConfiguredApi):
         self, feed_id: int, page_options: Optional[PageOptions] = None
     ) -> List[Field]:
         """Get fields for feed with id `feed_id`"""
-        return Pages(
+        return PagedRecords(
             api=self,
             url=f"feeds/{feed_id}/fields",
             options=page_options,
@@ -97,7 +97,7 @@ class IotService(ConfiguredApi):
         # Manually validate the window choice, since our API does not return a
         # helpful error message
         assert isinstance(window, Window), "window must be of type Window"
-        return TimeSeriesPages(
+        return PagedTimeSeries(
             api=self,
             url=f"outputs/{field.output_id}/fields/{field.field_human_name}/data",
             params={
@@ -146,7 +146,7 @@ class IotService(ConfiguredApi):
         self, facility_id: int, page_options: Optional[PageOptions] = None
     ) -> List[FieldGrouping]:
         """Get field groupings for facility with id `facility_id`"""
-        return Pages(
+        return PagedRecords(
             api=self,
             url=f"facilities/{facility_id}/groupings",
             options=page_options,
