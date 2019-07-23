@@ -1,6 +1,6 @@
 import inspect
 from enum import Enum
-from typing import Type, TypeVar
+from typing import Any, Type, TypeVar, Union
 
 _PRIMITIVES = (bool, int, float, str, type(None))
 
@@ -31,35 +31,45 @@ class ObjectMapper:
         def failure_msg():
             return f"Failed to parse '{annotation}' from tree: {tree}"
 
-        if tree is None:
+        if tree is None or annotation == Any:
             return tree
         # detecting generic types
         # note: this check is hacky, don't have a better way to detect generics
         elif type(annotation).__name__ == "_GenericAlias":
             origin = getattr(annotation, "__origin__")
+            args = getattr(annotation, "__args__")
             if origin is list:
                 assert isinstance(tree, list), failure_msg()
-                attrs = getattr(annotation, "__args__")
-                assert len(attrs) == 1
-                generic_param = attrs[0]
+                assert len(args) == 1
+                generic_param = args[0]
                 return [
                     ObjectMapper.tree_to_object(item, generic_param) for item in tree
                 ]
             elif origin is dict:
-                assert isinstance(tree, dict)
-                attrs = getattr(annotation, "__args__")
-                assert len(attrs) == 2
-                key_ann, value_ann = attrs
+                assert isinstance(tree, dict), failure_msg()
+                assert len(args) == 2
+                key_ann, value_ann = args
                 return {
                     ObjectMapper.tree_to_object(
                         k, key_ann
                     ): ObjectMapper.tree_to_object(v, value_ann)
                     for k, v in tree.items()
                 }
+            elif origin is Union:
+                assert any(t for t in args if isinstance(tree, t)), failure_msg()
+                return tree
+        elif annotation in _PRIMITIVES:
+            assert isinstance(tree, annotation), failure_msg()
+            return tree
         elif inspect.isclass(annotation):
             if isinstance(tree, annotation):
                 return tree
             elif issubclass(annotation, Enum):
+                # try to map by enum entry name
+                by_name = getattr(annotation, str(tree), None)
+                if by_name:
+                    return by_name
+                # try to map by enum entry value
                 assert isinstance(
                     tree, _PRIMITIVES
                 ), "Only primitives are supported as Enum values. " + (failure_msg())

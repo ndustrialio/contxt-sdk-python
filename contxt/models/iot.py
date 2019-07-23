@@ -1,7 +1,8 @@
+from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
 from json import loads
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 from contxt.models import ApiField, ApiObject, Parsers
 from contxt.models.events import Owner
@@ -63,7 +64,6 @@ class Field(ApiObject):
         is_default: Optional[bool] = None,
         can_aggregate: Optional[bool] = None,
         status: Optional[str] = None,
-        time_series: Optional[Dict[datetime, float]] = None,
         created_at: Optional[datetime] = None,
         updated_at: Optional[datetime] = None,
     ) -> None:
@@ -86,7 +86,6 @@ class Field(ApiObject):
         self.status = status
         self.units = units
         self.field_grouping_field = field_grouping_field
-        self.time_series = time_series
         self.created_at = created_at
         self.updated_at = updated_at
 
@@ -248,3 +247,9 @@ class Feed(ApiObject):
         self.owner = owner
         self.feed_status = feed_status
         self.metrics = metrics
+
+
+@dataclass
+class FieldTimeSeries:
+    field: Field
+    time_series: Dict[datetime, Any]

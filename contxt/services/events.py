@@ -3,6 +3,7 @@ from typing import List, Optional
 from contxt.auth import Auth
 from contxt.models.events import Event, EventDefinition, EventType, TriggeredEvent
 from contxt.services.api import ApiEnvironment, ConfiguredApi
+from contxt.services.pagination import PagedRecords, PageOptions
 from contxt.utils import make_logger
 
 logger = make_logger(__name__)
@@ -43,9 +44,15 @@ class EventsService(ConfiguredApi):
                     )
         event_definition.human_readable_parameters = statement
 
-    def get_event_types(self) -> List[EventType]:
-        resp = self.get("types")
-        return [EventType.from_api(rec) for rec in resp]
+    def get_event_types(
+        self, page_options: Optional[PageOptions] = None
+    ) -> List[EventType]:
+        return PagedRecords(
+            api=self,
+            url="types",
+            options=page_options,
+            record_parser=EventType.from_api,
+        )
 
     def create_event_type(self, event: Event) -> EventType:
         data = event.post()
@@ -74,10 +81,16 @@ class EventsService(ConfiguredApi):
         logger.debug(f"Deleting event {event.id}")
         self.delete(f"events/{event.id}")
 
-    def get_events_for_type(self, event_type_id: str) -> List[Event]:
+    def get_events_for_type(
+        self, event_type_id: str, page_options: Optional[PageOptions] = None
+    ) -> List[Event]:
         logger.debug(f"Fetching events for type {event_type_id}")
-        resp = self.get(f"types/{event_type_id}/events")
-        return [Event.from_api(rec) for rec in resp]
+        return PagedRecords(
+            api=self,
+            url=f"types/{event_type_id}/events",
+            options=page_options,
+            record_parser=Event.from_api,
+        )
 
     def get_events_for_client(self, client_id: str) -> List[Event]:
         logger.debug(f"Fetching events for client {client_id}")
@@ -110,24 +123,15 @@ class EventsService(ConfiguredApi):
         self.delete(f"triggered/{triggered_event.id}")
 
     def get_triggered_events_for_event(
-        self,
-        event_id: str,
-        limit: int = 1000,
-        offset: int = 0,
-        order_by: Optional[str] = None,
-        reverse_order: Optional[bool] = None,
+        self, event_id: str, page_options: Optional[PageOptions] = None
     ) -> List[TriggeredEvent]:
         logger.debug(f"Fetching triggered_events for event {event_id}")
-        resp = self.get(
-            uri=f"events/{event_id}/triggered",
-            params={
-                "limit": limit,
-                "offset": offset,
-                "orderBy": order_by,
-                "reverseOrder": reverse_order,
-            },
+        return PagedRecords(
+            api=self,
+            url=f"events/{event_id}/triggered",
+            options=page_options,
+            record_parser=TriggeredEvent.from_api,
         )
-        return [TriggeredEvent.from_api(rec) for rec in resp]
 
     def get_triggered_events_for_field(self, field_id: str) -> List[TriggeredEvent]:
         logger.debug(f"Fetching triggered_events for field {field_id}")

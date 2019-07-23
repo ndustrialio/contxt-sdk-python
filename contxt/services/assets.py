@@ -1,4 +1,4 @@
-from typing import Any, List, Optional
+from typing import Any, Dict, List, Optional
 
 from contxt.auth import Auth
 from contxt.models.assets import (
@@ -11,6 +11,7 @@ from contxt.models.assets import (
     MetricValue,
 )
 from contxt.services.api import ApiEnvironment, ConfiguredApi
+from contxt.services.pagination import PagedRecords, PageOptions
 from contxt.utils import make_logger
 
 logger = make_logger(__name__)
@@ -231,16 +232,20 @@ class AssetsService(ConfiguredApi):
         logger.debug(f"Creating {len(asset_types)} asset_types")
         return [self.create_asset_type(asset_type) for asset_type in asset_types]
 
-    def get_asset_types(self, organization_id: Optional[str] = None) -> List[AssetType]:
-        if organization_id:
-            logger.debug(f"Fetching asset_types for organization {organization_id}")
-            return [
-                AssetType.from_api(rec)
-                for rec in self.get(f"organizations/{organization_id}/assets/types")
-            ]
-        else:
-            logger.debug(f"Fetching asset_types")
-            return [AssetType.from_api(rec) for rec in self.get(f"assets/types")]
+    def get_asset_types(
+        self,
+        organization_id: Optional[str] = None,
+        page_options: Optional[PageOptions] = None,
+    ) -> List[AssetType]:
+        logger.debug(f"Fetching asset_types for organization {organization_id}")
+        url = (
+            f"organizations/{organization_id}/assets/types"
+            if organization_id
+            else "assets/types"
+        )
+        return PagedRecords(
+            api=self, url=url, options=page_options, record_parser=AssetType.from_api
+        )
 
     def update_asset_types(self, asset_types: List[AssetType]) -> None:
         # TODO: batch update
@@ -358,16 +363,24 @@ class AssetsService(ConfiguredApi):
         asset_type_id: Optional[str] = None,
         with_attribute_values: bool = False,
         with_metric_values: bool = False,
+        page_options: Optional[PageOptions] = None,
     ) -> List[Asset]:
         logger.debug(f"Fetching assets")
-        return [
-            self._build_asset(
-                Asset.from_api(rec),
+
+        def _build_asset(record: Dict) -> Asset:
+            return self._build_asset(
+                Asset.from_api(record),
                 with_attribute_values=with_attribute_values,
                 with_metric_values=with_metric_values,
             )
-            for rec in self.get("assets", params={"asset_type_id": asset_type_id})
-        ]
+
+        return PagedRecords(
+            api=self,
+            url="assets",
+            params={"asset_type_id": asset_type_id},
+            options=page_options,
+            record_parser=_build_asset,
+        )
 
     def get_assets_for_organization(
         self,
@@ -377,6 +390,7 @@ class AssetsService(ConfiguredApi):
         organization_id: Optional[str] = None,
         with_attribute_values: bool = False,
         with_metric_values: bool = False,
+        page_options: Optional[PageOptions] = None,
     ) -> List[Asset]:
         # BUG: this endpoint returns globals when type_id is None
         organization_id = organization_id or self.organization_id
@@ -384,51 +398,25 @@ class AssetsService(ConfiguredApi):
             f"Fetching assets for organization {organization_id} and asset_type"
             f" {asset_type_id}"
         )
-        return [
-            self._build_asset(
-                Asset.from_api(rec),
+
+        def _build_asset(record: Dict) -> Asset:
+            return self._build_asset(
+                Asset.from_api(record),
                 with_attribute_values=with_attribute_values,
                 with_metric_values=with_metric_values,
             )
-            for rec in self.get(
-                f"organizations/{organization_id}/assets",
-                params={
-                    "asset_type_id": asset_type_id,
-                    "asset_attribute_id": attribute_id,
-                    "asset_attribute_value": attribute_value,
-                },
-            )
-        ]
 
-    def get_latest_assets_for_organization(
-        self,
-        asset_type_id: Optional[str] = None,
-        attribute_id: Optional[str] = None,
-        attribute_value: Optional[str] = None,
-        organization_id: Optional[str] = None,
-        limit: Optional[int] = None,
-        order_by: str = "created_at",
-        reverse_order: bool = True,
-    ) -> List[Asset]:
-        organization_id = organization_id or self.organization_id
-        logger.debug(
-            f"Fetching latest {limit} assets for organization {organization_id}"
-            f" and asset_type {asset_type_id}"
+        return PagedRecords(
+            api=self,
+            url=f"organizations/{organization_id}/assets",
+            params={
+                "asset_type_id": asset_type_id,
+                "asset_attribute_id": attribute_id,
+                "asset_attribute_value": attribute_value,
+            },
+            options=page_options,
+            record_parser=_build_asset,
         )
-        return [
-            Asset.from_api(rec)
-            for rec in self.get(
-                f"organizations/{organization_id}/assets",
-                params={
-                    "asset_type_id": asset_type_id,
-                    "asset_attribute_id": attribute_id,
-                    "asset_attribute_value": attribute_value,
-                    "orderBy": order_by,
-                    "reverseOrder": reverse_order,
-                    "limit": limit,
-                },
-            )
-        ]
 
     def update_assets(self, assets: List[Asset]) -> None:
         # TODO: batch update
@@ -471,12 +459,16 @@ class AssetsService(ConfiguredApi):
         logger.debug(f"Creating {len(attributes)} attributes")
         return [self.create_attribute(attribute) for attribute in attributes]
 
-    def get_attributes(self, asset_type_id: str) -> List[Attribute]:
+    def get_attributes(
+        self, asset_type_id: str, page_options: Optional[PageOptions] = None
+    ) -> List[Attribute]:
         logger.debug(f"Fetching attributes for asset_type {asset_type_id}")
-        return [
-            Attribute.from_api(rec)
-            for rec in self.get(f"assets/types/{asset_type_id}/attributes")
-        ]
+        return PagedRecords(
+            api=self,
+            url=f"assets/types/{asset_type_id}/attributes",
+            options=page_options,
+            record_parser=Attribute.from_api,
+        )
 
     def update_attributes(self, attributes: List[Attribute]) -> None:
         # TODO: batch update
@@ -615,12 +607,16 @@ class AssetsService(ConfiguredApi):
         logger.debug(f"Creating {len(metrics)} metrics")
         return [self.create_metric(metric_value) for metric_value in metrics]
 
-    def get_metrics(self, asset_type_id: str) -> List[Metric]:
+    def get_metrics(
+        self, asset_type_id: str, page_options: Optional[PageOptions] = None
+    ) -> List[Metric]:
         logger.debug(f"Fetching metrics for asset_type {asset_type_id}")
-        return [
-            Metric.from_api(rec)
-            for rec in self.get(f"assets/types/{asset_type_id}/metrics")
-        ]
+        return PagedRecords(
+            api=self,
+            url=f"assets/types/{asset_type_id}/metrics",
+            options=page_options,
+            record_parser=Metric.from_api,
+        )
 
     def update_metrics(self, metrics: List[Metric]) -> None:
         # TODO: batch update
@@ -683,22 +679,22 @@ class AssetsService(ConfiguredApi):
         ]
 
     def get_metric_values(
-        self, asset_id: str, metric_id: Optional[str] = None
+        self,
+        asset_id: str,
+        metric_id: Optional[str] = None,
+        page_options: Optional[PageOptions] = None,
     ) -> List[MetricValue]:
-        if metric_id:
-            logger.debug(
-                f"Fetching metric_values for asset {asset_id} and metric {metric_id}"
-            )
-            return [
-                MetricValue.from_api(rec)
-                for rec in self.get(f"assets/{asset_id}/metrics/{metric_id}/values")
-            ]
-        else:
-            logger.debug(f"Fetching metric_values for asset {asset_id}")
-            return [
-                MetricValue.from_api(rec)
-                for rec in self.get(f"assets/{asset_id}/metrics/values")
-            ]
+        logger.debug(
+            f"Fetching metric_values for asset {asset_id} and metric {metric_id}"
+        )
+        url = (
+            f"assets/{asset_id}/metrics/{metric_id}/values"
+            if metric_id
+            else f"assets/{asset_id}/metrics/values"
+        )
+        return PagedRecords(
+            api=self, url=url, options=page_options, record_parser=MetricValue.from_api
+        )
 
     def update_metric_values(self, metric_values: List[MetricValue]) -> None:
         # TODO: batch update

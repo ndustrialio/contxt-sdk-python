@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from ast import literal_eval
+from copy import deepcopy
 from datetime import date as _date
 from datetime import datetime as _datetime
 from importlib import import_module
@@ -168,12 +169,14 @@ class ApiObject(ABC):
 
     @classmethod
     def from_api(cls, api_dict: Dict):
+        api_dict = deepcopy(api_dict)
         # Create clean dictionary to pass to init
         clean_dict = {}
         for field in cls._api_fields:
             if field.api_key not in api_dict and not field.optional:
                 raise KeyError(
-                    f"Required API field '{field.api_key}' is missing from response."
+                    f"Required API field '{field.api_key}' is missing from"
+                    f" response: {api_dict}"
                 )
             clean_dict[field.attr_key] = cls.clean_api_value(
                 field=field, value=api_dict.pop(field.api_key, None)
