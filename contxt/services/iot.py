@@ -85,13 +85,19 @@ class IotService(ConfiguredApi):
             record_parser=Field.from_api,
         )
 
+    def create_field(self, field: Field) -> Field:
+        """Create field"""
+        data = field.post()
+        resp = self.post(f"outputs/{field.output_id}/fields", data=data)
+        return Field.from_api(resp)
+
     def get_time_series_for_field(
         self,
         field: Field,
         start_time: datetime,
         window: Window = Window.RAW,
         end_time: Optional[datetime] = None,
-        per_page: int = 500,
+        per_page: int = 1000,
     ) -> FieldTimeSeries:
         """Get time series data for field `Field`"""
         # Manually validate the window choice, since our API does not return a

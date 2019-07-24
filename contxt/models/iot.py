@@ -15,27 +15,41 @@ class Window(Enum):
     HOURLY = 3600
 
 
+class FieldValueType(Enum):
+    BOOLEAN = "boolean"
+    NUMERIC = "numeric"
+    STRING = "string"
+
+
 class Field(ApiObject):
     _api_fields = (
         ApiField("id", data_type=int),
         ApiField("field_name", attr_key="name", optional=True),
-        ApiField("label"),
-        ApiField("output_id", data_type=int),
-        ApiField("field_descriptor"),
+        ApiField("label", creatable=True, updatable=True),
+        ApiField("output_id", data_type=int, creatable=True),
+        ApiField("field_descriptor", creatable=True),
         ApiField("field_human_name"),
-        ApiField("units"),
-        ApiField("scalar", data_type=float, optional=True),
-        ApiField("divisor", data_type=float, optional=True),
-        ApiField("value_type", optional=True),
-        ApiField("feed_key", optional=True),
+        ApiField("units", creatable=True, updatable=True),
+        ApiField(
+            "scalar", data_type=float, optional=True, creatable=True, updatable=True
+        ),
+        ApiField(
+            "divisor", data_type=float, optional=True, creatable=True, updatable=True
+        ),
+        ApiField("value_type", data_type=FieldValueType, optional=True, creatable=True),
+        ApiField("feed_key", optional=True, creatable=True),
         ApiField(
             "FieldGroupingField",
             attr_key="field_grouping_field",
             data_type=dict,
             optional=True,
         ),
-        ApiField("is_hidden", data_type=bool, optional=True),
-        ApiField("is_default", data_type=bool, optional=True),
+        ApiField(
+            "is_hidden", data_type=bool, creatable=True, updatable=True, optional=True
+        ),
+        ApiField(
+            "is_default", data_type=bool, optional=True, creatable=True, updatable=True
+        ),
         ApiField("is_totalizer", data_type=bool, optional=True),
         ApiField("can_aggregate", data_type=bool, optional=True),
         ApiField("is_windowed", data_type=bool, optional=True),
@@ -46,16 +60,16 @@ class Field(ApiObject):
 
     def __init__(
         self,
-        id: int,
         label: str,
         output_id: str,
         field_descriptor: str,
-        field_human_name: str,
         units: str,
+        id: Optional[int] = None,
         name: Optional[str] = None,
+        field_human_name: Optional[str] = None,
         feed_key: Optional[str] = None,
         field_grouping_field: Optional[Dict] = None,
-        value_type: Optional[str] = None,
+        value_type: Optional[FieldValueType] = None,
         scalar: Optional[float] = None,
         divisor: Optional[float] = None,
         is_hidden: Optional[bool] = None,
