@@ -2,7 +2,7 @@ from csv import DictWriter
 from datetime import date, datetime
 from json import dump, dumps
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Set, Tuple
+from typing import Any, Callable, List, Optional
 
 import pandas as pd
 from tabulate import tabulate
@@ -27,9 +27,7 @@ class Serializer:
             return []
 
     @staticmethod
-    def to_dict(obj: Any,
-                cls_key: str = None,
-                key_filter: Callable = None):
+    def to_dict(obj: Any, cls_key: str = None, key_filter: Callable = None):
         """Serializes `obj` to a `dict`. To use a custom format, overload
         `obj.to_dict()`.
 
@@ -37,12 +35,14 @@ class Serializer:
         :type obj: Any
         :param cls_key: if provided, set dict[key] = `cls.__name__`, defaults to None
         :param cls_key: str, optional
-        :param key_filter: callable filter to keep a subset of keys, of the form f(key) = keep?, defaults to ignore "hidden" variables (i.e. starting with "_")
+        :param key_filter: callable filter to keep a subset of keys, of the form
+        f(key) = keep?, defaults to ignore "hidden" variables (i.e. starting with "_")
         :param key_filter: bool, optional
         :return: dictionary
         :rtype: `dict`
         """
-        from contxt.services.api import Formatters
+        from contxt.models import Formatters
+
         # TODO: this may not return a dict but instead a list, or a native type
         # (for example, if passed an int, it will return it). this is likely
         # an unexpected behavior for callers
@@ -52,9 +52,11 @@ class Serializer:
         # 2. d = jsonpickle.encode(d, unpicklable=False))
         # >> json.loads(d)
 
+        def default_filter(key: str) -> bool:
+            return key.startswith("_")
+
         # Create default key filter (ignore _ vars)
-        if key_filter is None:
-            key_filter = lambda k: not k.startswith("_")
+        key_filter = key_filter or default_filter
 
         # Serialize
         if hasattr(obj, "to_dict"):
@@ -62,10 +64,7 @@ class Serializer:
             return obj.to_dict()
         if isinstance(obj, dict):
             # Dictionary
-            return {
-                k: Serializer.to_dict(v, cls_key=cls_key)
-                for k, v in obj.items()
-            }
+            return {k: Serializer.to_dict(v, cls_key=cls_key) for k, v in obj.items()}
         elif isinstance(obj, datetime):
             # Datetime
             return Formatters.datetime(obj)
@@ -95,7 +94,7 @@ class Serializer:
     @staticmethod
     def to_json(obj: Any, path: Optional[Path] = None, **kwargs):
         """Serializes `obj` to JSON.
-        
+
         :param obj: object to serialize
         :type obj: Any
         :param path: path for dumping, defaults to None
@@ -117,7 +116,7 @@ class Serializer:
     @staticmethod
     def to_table(obj: Any, path: Optional[Path] = None, **kwargs):
         """Serializes `obj` to a table.
-        
+
         :param obj: object to serialize
         :type obj: Any
         :param path: path for dumping, defaults to None
@@ -141,7 +140,7 @@ class Serializer:
     @staticmethod
     def to_csv(obj: Any, path: Path, header: bool = True, **kwargs):
         """Serializes `obj` to CSV.
-        
+
         :param obj: object to serialize
         :type obj: Any
         :param path: path to export
@@ -169,7 +168,7 @@ class Serializer:
     @staticmethod
     def to_df(obj: Any, **kwargs):
         """Serializes `obj` as a `pandas.DataFrame`.
-        
+
         :param obj: object to serialize
         :type obj: Any
         :return: dataframe
@@ -180,35 +179,42 @@ class Serializer:
         return pd.DataFrame(d, columns=Serializer._keys(d), **kwargs)
 
     @staticmethod
-    def to_file(obj: Any,
-                path: Optional[Path] = None,
-                valid_exts: Optional[List[str]] = (".csv", ".json", ".txt")):
-        """Write an object to a file (or stdout). 
+    def to_file(
+        obj: Any,
+        path: Optional[Path] = None,
+        valid_exts: Optional[List[str]] = (".csv", ".json", ".txt"),
+    ):
+        """Write an object to a file (or stdout).
 
-        If path is not provided, `obj` is sent to stdout. Otherwise, the file 
+        If path is not provided, `obj` is sent to stdout. Otherwise, the file
         extension is used to determine the data format of `obj` before exporting.
-        Supported file extensions are csv (calls `Serializer.to_csv`), 
+        Supported file extensions are csv (calls `Serializer.to_csv`),
         json (calls `Serializer.to_json`), or txt (calls `Serializer.to_table`).
 
         :param obj: object to output
         :type obj: Any
         :param path: path to export, defaults to None
         :param path: Optional[Path], optional
-        :param valid_exts: supported file extensions, defaults to (".csv", ".json", ".txt")
+        :param valid_exts: supported file extensions, defaults to
+        (".csv", ".json", ".txt")
         :param valid_exts: Optional[List[str]], optional
         """
 
         # If path unspecified, default to stdout
         if path is None:
-            obj_to_print = Serializer.to_table(obj) if isinstance(
-                obj, (list, tuple)) else Serializer.to_json(obj)
+            obj_to_print = (
+                Serializer.to_table(obj)
+                if isinstance(obj, (list, tuple))
+                else Serializer.to_json(obj)
+            )
             print(obj_to_print)
             return
 
         # Validate file extension
         if path.suffix not in valid_exts:
             logger.critical(
-                f"Unsupported filetype: '{path.suffix}'. Choose from {', '.join(valid_exts)}"
+                f"Unsupported filetype: '{path.suffix}'. Choose from"
+                f" {', '.join(valid_exts)}"
             )
             return
 

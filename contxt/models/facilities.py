@@ -1,8 +1,7 @@
+from contxt.models import ApiField, ApiObject, Parsers
 from contxt.models.contxt import Organization
-from contxt.services.api import ApiField, ApiObject, Parsers
 
 
-# Hide: address1, address2, geometry_id, tags, organization, info, weather_location_id
 class Facility(ApiObject):
     _api_fields = (
         ApiField("id", data_type=int),
@@ -18,30 +17,34 @@ class Facility(ApiObject):
         ApiField("tags"),
         ApiField("organization_id"),
         ApiField("Organization", attr_key="organization", data_type=Organization),
-        ApiField("Info", attr_key="info", data_type=lambda o: {k: Parsers.unknown(v) for k, v in o.items()}),
+        ApiField(
+            "Info",
+            attr_key="info",
+            data_type=lambda o: {k: Parsers.unknown(v) for k, v in o.items()},
+        ),
         ApiField("created_at", data_type=Parsers.datetime),
         ApiField("weather_location_id"),
     )
 
     def __init__(
-            self,
-            id: int,
-            name: str,
-            address1: str,
-            address2: str,
-            city: str,
-            state: str,
-            zip: str,
-            timezone: str,
-            geometry_id: str,
-            asset_id: str,
-            tags: list,
-            organization_id: str,
-            organization: Organization,
-            info: dict,
-            created_at: str,
-            weather_location_id: str = None,
-    ):
+        self,
+        id: int,
+        name: str,
+        address1: str,
+        address2: str,
+        city: str,
+        state: str,
+        zip: str,
+        timezone: str,
+        geometry_id: str,
+        asset_id: str,
+        tags: list,
+        organization_id: str,
+        organization: Organization,
+        info: dict,
+        weather_location_id: str,
+        created_at: str,
+    ) -> None:
         super().__init__()
         self.id = id
         self.name = name
@@ -59,8 +62,3 @@ class Facility(ApiObject):
         self.weather_location_id = weather_location_id
         self.info = info
         self.created_at = created_at
-
-    # def get_dict(self):
-    #     return {
-    #         **super().get_dict(), 'organization_name': self.organization.name
-    #     }

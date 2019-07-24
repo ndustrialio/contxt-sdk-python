@@ -1,4 +1,5 @@
 # Contxt Python SDK
+[![wercker status](https://app.wercker.com/status/960b7b32c2d94d12a3a5c89ca17e13ba/s/ "wercker status")](https://app.wercker.com/project/byKey/960b7b32c2d94d12a3a5c89ca17e13ba)
 
 ## Dependencies
 This project **requires** Python 3.6+.
@@ -21,6 +22,9 @@ $ contxt -h
 ```
 $ activate-global-python-argcomplete
 ```
+
+## Contributing
+Please refer to the [release guide](docs/release.md).
 
 ## Command Line Interface
 
@@ -136,8 +140,9 @@ subcommands:
     channels  Get channels
 ```
 
-## Using Machine Authentication (for Workers)
+## Workers 
 
+### Machine Authentication
 Since the CLI interface is just a wrapper around different functions in the SDK, users can also leverage these
 functions in their own code. Within Contxt we have a concept of a machine user that is identified by a unique
 client_id / client_secret pair (instead of a user/pass combination like regular users). When writing code that
@@ -145,8 +150,7 @@ will eventually go to production that will need to call other APIs (this is obvi
 will automatically be given a unique client_id / client_secret pair within Contxt. When you create this service,
 you can use these credentials in your local development environment as well.
 
-### Using the Base Worker Class
-
+### Base Worker Class
 In order to make development easier, we have a Worker Base Class we provide in the SDK to abstract away the
 nuance of the authentication process (if you're curious, [here](https://contxt.readme.io/docs/machine-to-machine-authentication) is a link to the documentation on this process, in
 case you're really REALLY bored and looking for some "light" reading). In the root path of this SDK, you'll
@@ -161,41 +165,13 @@ major no-no as these should be regarded the same as user credentials
 - Contxt will automatically set these in the environment upon deployment to a Contxt environment (staging, prod, etc.)
 so setting this up in development will make it seamless upon deployment
 
-```
-from contxt.workers import BaseWorker
-
-from contxt.functions.facilities import Facilities
-
-
-class TestWorker(BaseWorker):
-
-    def __init__(self):
-
-        super().__init__()
-
-        self.facilities = Facilities(auth_module=self.auth_module)
-
-    def doWork(self):
-
-        facilities = self.facilities.get_all_facilities()
-        print(facilities)
-
-
-if __name__ == '__main__':
-
-    worker = TestWorker()
-    worker.doWork()
-```
-
-Looking at the code (pasted above for convenience), you can see that we're implementing the `BaseWorker` class. Behind
+Looking at this [example](examples/worker.py), you can see that we're implementing the `BaseWorker` class. Behind
 the scenes, that class is doing all the work around getting tokens, refreshing tokens, etc. so you don't have to. In
 this example, we're going to make a call to the Contxt Facilities (Assets) Service to get a list of facilities available
-to this worker (machine user). To do so, we must instantiate the Facilities class and pass in `self.auth_module`. In the
-near future we will remove this parameter to make it easier, but for now, you will always pass in `self.auth_module` to
-services.
+to this worker (machine user). To do so, we must instantiate the Facilities class and pass in `self.auth`.
 
-Next, in the `doWork` method (you can call this whatever you want, but this is just an example), it's just making a simple
-call to the facilities function class to `get_all_facilities`. You can iterate over this list, or just print it to
+Next, in the `do_work` method, it's just making a simple
+call to `get_facilities`. You can iterate over this list, or just print it to
 the console (like we've done here).
 
 From here, you can continue to code up your application logic to perform whatever tasks you need using all the SDK

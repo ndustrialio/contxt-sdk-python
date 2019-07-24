@@ -1,6 +1,8 @@
 import json
-from contxt.services.ngest import NgestService
+
 import pytz
+
+from contxt.services.ngest import NgestService
 
 MAX_MESSAGE_FIELDS = 50
 TIMESERIES_TYPE = "timeseries"

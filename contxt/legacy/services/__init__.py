@@ -2,15 +2,15 @@ import json
 from datetime import datetime
 from pprint import pformat
 
-import pytz
 import jwt
 import pandas as pd
+import pytz
 import requests
 from tabulate import tabulate
 
 from contxt.exceptions import UnauthorizedException
 
-API_VERSION = 'v1'
+API_VERSION = "v1"
 
 
 class ApiClient:
@@ -30,29 +30,25 @@ class ApiClient:
 
             # authorize this request?
             if api_request.authorize():
-                headers['Authorization'] = 'Bearer ' + self.access_token
+                headers["Authorization"] = "Bearer " + self.access_token
 
-            if api_request.method() == 'GET':
+            if api_request.method() == "GET":
                 response = requests.get(url=str(api_request), headers=headers)
-            if api_request.method() == 'POST':
+            if api_request.method() == "POST":
                 if api_request.content_type == ApiRequest.URLENCODED_CONTENT_TYPE:
                     response = requests.post(
-                        url=str(api_request),
-                        data=api_request.body(),
-                        headers=headers)
+                        url=str(api_request), data=api_request.body(), headers=headers
+                    )
                 else:
                     response = requests.post(
-                        url=str(api_request),
-                        json=api_request.body(),
-                        headers=headers)
-            if api_request.method() == 'PUT':
+                        url=str(api_request), json=api_request.body(), headers=headers
+                    )
+            if api_request.method() == "PUT":
                 response = requests.put(
-                    url=str(api_request),
-                    data=api_request.body(),
-                    headers=headers)
-            if api_request.method() == 'DELETE':
-                response = requests.delete(
-                    url=str(api_request), headers=headers)
+                    url=str(api_request), data=api_request.body(), headers=headers
+                )
+            if api_request.method() == "DELETE":
+                response = requests.delete(url=str(api_request), headers=headers)
 
             status = response.status_code
             retries -= 1
@@ -65,18 +61,23 @@ class ApiClient:
         # response.raise_for_status()
 
         # lifted the following code from requests/models.py and modified it
-        http_error_msg = ''
+        http_error_msg = ""
 
         if 400 <= response.status_code < 500:
-            msg = json.loads(response.text)['message']
-            raise UnauthorizedException(f'{response.reason} - {msg}')
+            msg = json.loads(response.text)["message"]
+            raise UnauthorizedException(f"{response.reason} - {msg}")
 
         elif response.status_code == 500:
-            msg = json.loads(response.text)['message']
-            http_error_msg = f'{response.status_code} Server Error: {response.reason} - {msg}'
+            msg = json.loads(response.text)["message"]
+            http_error_msg = (
+                f"{response.status_code} Server Error: {response.reason} - {msg}"
+            )
 
         elif 500 < response.status_code < 600:
-            http_error_msg = f'{response.status_code} Server Error: {response.reason} - {response.text}'
+            http_error_msg = (
+                f"{response.status_code} Server Error: {response.reason}"
+                f" - {response.text}"
+            )
 
         if http_error_msg:
             raise requests.exceptions.HTTPError(http_error_msg, response=self)
@@ -101,14 +102,15 @@ class PagedEndpoint:
         self.response = None
 
     def set_offset(self, offset):
-        self.parameters['offset'] = offset
+        self.parameters["offset"] = offset
 
     def set_limit(self, limit):
-        self.parameters['limit'] = limit
+        self.parameters["limit"] = limit
 
     def execute(self):
         return self.client.execute(
-            self.request.params(self.parameters).base_url(self.base_url))
+            self.request.params(self.parameters).base_url(self.base_url)
+        )
 
 
 class PagedResponse:
@@ -117,17 +119,17 @@ class PagedResponse:
         self.endpoint = endpoint
         self.data = self.endpoint.execute()
 
-        self.total_records = self.data['_metadata']['totalRecords']
-        self.offset = self.data['_metadata']['offset']
+        self.total_records = self.data["_metadata"]["totalRecords"]
+        self.offset = self.data["_metadata"]["offset"]
 
-        self.records = self.data['records']
+        self.records = self.data["records"]
         self.retrieved_record_count = len(self.records)
 
     def get_more_records(self):
         self.endpoint.set_offset(self.retrieved_record_count)
         self.data = self.endpoint.execute()
 
-        self.records = self.data['records']
+        self.records = self.data["records"]
         self.retrieved_record_count += len(self.records)
 
     def __iter__(self):
@@ -149,40 +151,44 @@ class PagedResponse:
 class DataResponse(object):
     def __init__(self, data, client):
         self.client = client
-        self.count = data['meta']['count']
-        self.has_more = data['meta']['has_more']
+        self.count = data["meta"]["count"]
+        self.has_more = data["meta"]["has_more"]
 
         self.next_page_url = None
         if self.has_more:
-            self.next_page_url = data['meta']['next_page_url']
+            self.next_page_url = data["meta"]["next_page_url"]
 
-        self.records = data['records']
+        self.records = data["records"]
 
     def __iter__(self):
 
         while True:
             for record in self.records:
-                record['event_time'] = datetime.strptime(record['event_time'], "%Y-%m-%dT%H:%M:%S.%fZ").replace(tzinfo=pytz.UTC)
+                record["event_time"] = datetime.strptime(
+                    record["event_time"], "%Y-%m-%dT%H:%M:%S.%fZ"
+                ).replace(tzinfo=pytz.UTC)
                 yield record
 
             if self.has_more:
-                response = self.client.execute(StringRequest(self.next_page_url).method('GET'))
+                response = self.client.execute(
+                    StringRequest(self.next_page_url).method("GET")
+                )
 
-                self.count = response['meta']['count']
-                self.has_more = response['meta']['has_more']
+                self.count = response["meta"]["count"]
+                self.has_more = response["meta"]["has_more"]
 
                 self.next_page_url = None
                 if self.has_more:
-                    self.next_page_url = response['meta']['next_page_url']
+                    self.next_page_url = response["meta"]["next_page_url"]
 
-                self.records = response['records']
+                self.records = response["records"]
             else:
                 break
 
 
 class StringRequest:
-    URLENCODED_CONTENT_TYPE = 'application/x-www-form-urlencoded'
-    JSON_CONTENT_TYPE = 'application/json'
+    URLENCODED_CONTENT_TYPE = "application/x-www-form-urlencoded"
+    JSON_CONTENT_TYPE = "application/json"
 
     def __init__(self, request_string):
         self.request_string = request_string
@@ -232,8 +238,8 @@ class StringRequest:
 
 
 class ApiRequest:
-    URLENCODED_CONTENT_TYPE = 'application/x-www-form-urlencoded'
-    JSON_CONTENT_TYPE = 'application/json'
+    URLENCODED_CONTENT_TYPE = "application/x-www-form-urlencoded"
+    JSON_CONTENT_TYPE = "application/json"
 
     def __init__(self, uri, authorize=True):
 
@@ -322,19 +328,19 @@ class ApiRequest:
 
         # append params
         if self.http_params:
-            param_string = '?'
+            param_string = "?"
 
             param_list = []
 
             for p, v in self.http_params.items():
-                param_list.append(p + '=' + str(v))
+                param_list.append(p + "=" + str(v))
 
-            param_string += '&'.join(param_list)
+            param_string += "&".join(param_list)
 
-            request_string = '/'.join(request_chunks) + param_string
+            request_string = "/".join(request_chunks) + param_string
 
         else:
-            request_string = '/'.join(request_chunks)
+            request_string = "/".join(request_chunks)
 
         return request_string
 
@@ -344,7 +350,7 @@ class GET(ApiRequest):
         super().__init__(uri, authorize)
 
     def method(self, method=None):
-        return 'GET'
+        return "GET"
 
 
 class POST(ApiRequest):
@@ -352,7 +358,7 @@ class POST(ApiRequest):
         super().__init__(uri, authorize)
 
     def method(self, method=None):
-        return 'POST'
+        return "POST"
 
 
 class PUT(ApiRequest):
@@ -360,7 +366,7 @@ class PUT(ApiRequest):
         super().__init__(uri, authorize)
 
     def method(self, method=None):
-        return 'PUT'
+        return "PUT"
 
 
 class DELETE(ApiRequest):
@@ -368,7 +374,7 @@ class DELETE(ApiRequest):
         super().__init__(uri, authorize)
 
     def method(self, method=None):
-        return 'DELETE'
+        return "DELETE"
 
 
 class ApiService:
@@ -399,7 +405,7 @@ class Service(ApiService):
     def get_logged_in_user_id(self):
         # TODO do actual token verification
         decoded_token = jwt.decode(self.client.access_token, verify=False)
-        return decoded_token['sub']
+        return decoded_token["sub"]
 
 
 def to_raw(v):
@@ -415,12 +421,13 @@ class APIObject:
     def __init__(self, keys_to_ignore=None):
         # TODO: may want to following a naming pattern for ignored keys, like
         # prefixed with _ instead of explicitly declaring the ignored keys
-        self._keys_to_ignore = {'_keys_to_ignore'} | set(keys_to_ignore or [])
+        self._keys_to_ignore = {"_keys_to_ignore"} | set(keys_to_ignore or [])
 
     def get_dict(self):
         return {
             k: to_raw(v)
-            for k, v in self.__dict__.items() if k not in self._keys_to_ignore
+            for k, v in self.__dict__.items()
+            if k not in self._keys_to_ignore
         }
 
     def get_keys(self):
@@ -450,7 +457,7 @@ class APIObjectCollection:
 
     def __repr__(self):
         if not self.list_of_objects:
-            return 'None'
+            return "None"
         vals = [obj.get_values() for obj in self.list_of_objects]
         return tabulate(vals, headers=self.list_of_objects[0].get_keys())
 
@@ -480,13 +487,12 @@ class APIObjectCollection:
 
     def pretty_print(self):
         if not self.list_of_objects:
-            return 'None'
+            return "None"
         vals = [obj for obj in self.list_of_objects]
         return pformat(vals, indent=4)
 
 
 class APIObjectDict:
-
     def __init__(self, obj_dict: dict):
         self.dict_of_objects = obj_dict
 
@@ -495,7 +501,7 @@ class APIObjectDict:
 
     def pretty_print(self):
         if not self.dict_of_objects:
-            return 'None'
+            return "None"
         return pformat(self.dict_of_objects, indent=4)
 
     def __str__(self):
