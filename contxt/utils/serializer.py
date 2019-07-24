@@ -1,5 +1,6 @@
 from csv import DictWriter
 from datetime import date, datetime
+from enum import Enum
 from json import dump, dumps
 from pathlib import Path
 from typing import Any, Callable, List, Optional
@@ -71,6 +72,8 @@ class Serializer:
         elif isinstance(obj, date):
             # Date
             return Formatters.date(obj)
+        elif isinstance(obj, Enum):
+            return obj.value
         elif hasattr(obj, "_ast"):
             # Abstract syntax tree
             return Serializer.to_dict(obj._ast())
