@@ -1,11 +1,10 @@
 import logging
-from datetime import datetime, time
+from datetime import datetime
 from os import environ
 from sys import stdout
-from time import time as _time
+from time import time
 from typing import Dict, Optional, Set
 
-from dateutil import parser as dt_parser
 from pytz import UTC
 from tzlocal import get_localzone
 
@@ -21,9 +20,9 @@ def make_logger(name: str, level: Optional[str] = None):
 
 def timed(func):
     def wrapper(*args, **kwargs):
-        t0 = _time()
+        t0 = time()
         return_val = func(*args, **kwargs)
-        logger.info(f"{func.__name__}'s elapsed time: {_time() - t0} s")
+        logger.info(f"{func.__name__}'s elapsed time: {time() - t0} s")
         return return_val
 
     return wrapper
@@ -31,13 +30,6 @@ def timed(func):
 
 def is_datetime_aware(dt: datetime) -> bool:
     return dt.tzinfo is not None and dt.tzinfo.utcoffset(dt) is not None
-
-
-def datetime_parse(timestamp: str) -> datetime:
-    dt = dt_parser.parse(timestamp)
-    if dt.time() == time(0):
-        dt = dt.replace(tzinfo=UTC)
-    return dt
 
 
 class Utils:

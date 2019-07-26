@@ -62,7 +62,7 @@ class AuthParser(ContxtArgParser):
 class IotParser(ContxtArgParser):
     def _init_parser(self, subparsers):
         from contxt.models.iot import Window
-        from contxt.utils import datetime_parse
+        from contxt.models import Parsers
 
         parser = subparsers.add_parser("iot", help="IOT service")
         parser.set_defaults(func=self._help)
@@ -105,13 +105,13 @@ class IotParser(ContxtArgParser):
         field_data_parser = _subparsers.add_parser("field-data", help="Get field data")
         field_data_parser.add_argument("grouping_id", help="Grouping id")
         field_data_parser.add_argument(
-            "start_time", type=datetime_parse, help="Data start time"
+            "start_time", type=Parsers.datetime, help="Data start time"
         )
         field_data_parser.add_argument(
             "window", type=Window, help="Data windowing period"
         )
         field_data_parser.add_argument(
-            "-e", "--end-time", type=datetime_parse, help="Data end time"
+            "-e", "--end-time", type=Parsers.datetime, help="Data end time"
         )
         field_data_parser.add_argument(
             "-p", "--plot", action="store_true", help="Plot data"
@@ -169,7 +169,8 @@ class IotParser(ContxtArgParser):
         iot_service = IotService(auth)
         fields = iot_service.get_field_grouping(args.grouping_id).fields
         print(
-            f"Fetching iot data for {len(fields)} tags for {args.start_time} - {args.end_time}..."
+            f"Fetching iot data for {len(fields)} tags for {args.start_time}"
+            f" - {args.end_time}..."
         )
         try:
             field_data = {
@@ -194,12 +195,11 @@ class IotParser(ContxtArgParser):
         df.to_csv(args.output)
 
 
-
-RESOURCE_TYPES = ["electric", "gas", "combined"]
-
-
 class EmsParser(ContxtArgParser):
     def _init_parser(self, subparsers):
+        from contxt.models.ems import ResourceType
+        from contxt.models import Parsers
+
         parser = subparsers.add_parser("ems", help="EMS service")
         parser.set_defaults(func=self._help)
         _subparsers = parser.add_subparsers(title="subcommands", dest="subcommand")
@@ -210,7 +210,7 @@ class EmsParser(ContxtArgParser):
             "facility_id", type=int, help="Facility to get main services for"
         )
         mains_parser.add_argument(
-            "--resource_type", choices=RESOURCE_TYPES, help="Filter by type of resource"
+            "--resource_type", type=ResourceType, help="Filter by type of resource"
         )
         mains_parser.set_defaults(func=self._get_mains)
 
@@ -219,9 +219,9 @@ class EmsParser(ContxtArgParser):
             "main-data", help="Get main service data for a facility"
         )
         md_parser.add_argument("facility_id", type=int, help="Facility ID")
-        md_parser.add_argument("resource_type", choices=RESOURCE_TYPES)
-        md_parser.add_argument("start_date", help="Start month (YYYY-MM)")
-        md_parser.add_argument("end_date", help="End month (YYYY-MM)")
+        md_parser.add_argument("resource_type", type=ResourceType)
+        md_parser.add_argument("start_time", type=Parsers.datetime, help="Start time")
+        md_parser.add_argument("end_time", type=Parsers.datetime, help="End time")
         md_parser.set_defaults(func=self._get_main_data)
 
         # Spend
@@ -230,10 +230,10 @@ class EmsParser(ContxtArgParser):
             "interval", choices=["daily", "monthly"], help="Time interval"
         )
         spend_parser.add_argument(
-            "resource_type", choices=RESOURCE_TYPES, help="Type of resource"
+            "resource_type", type=ResourceType, help="Type of resource"
         )
-        spend_parser.add_argument("start_date", help="Start month (YYYY-MM)")
-        spend_parser.add_argument("end_date", help="End month (YYYY-MM)")
+        spend_parser.add_argument("start_date", type=Parsers.date, help="Start date")
+        spend_parser.add_argument("end_date", type=Parsers.date, help="End date")
 
         spend_group = spend_parser.add_mutually_exclusive_group(required=True)
         spend_group.add_argument("-f", "--facility-id", type=int, help="Facility id")
@@ -255,12 +255,10 @@ class EmsParser(ContxtArgParser):
             "interval", choices=["daily", "monthly"], help="Time interval"
         )
         usage_parser.add_argument(
-            "resource_type",
-            choices=["electric", "gas", "combined"],
-            help="Type of resource",
+            "resource_type", type=ResourceType, help="Type of resource"
         )
-        usage_parser.add_argument("start_date", help="Start month (YYYY-MM)")
-        usage_parser.add_argument("end_date", help="End month (YYYY-MM)")
+        usage_parser.add_argument("start_date", type=Parsers.date, help="Start date")
+        usage_parser.add_argument("end_date", type=Parsers.date, help="End date")
 
         usage_group = usage_parser.add_mutually_exclusive_group(required=True)
         usage_group.add_argument("-f", "--facility-id", type=int, help="Facility id")
@@ -276,129 +274,43 @@ class EmsParser(ContxtArgParser):
         )
         usage_parser.set_defaults(func=self._utility_usage)
 
-        # Spend Metric Normalization
-        spend_metrics_parser = _subparsers.add_parser(
-            "util-spend-metrics", help="Utility spend metrics"
-        )
-
-        spend_metrics_parser.add_argument(
-            "metric", help="Provide the metric you want to normalize against"
-        )
-        spend_metrics_parser.add_argument(
-            "interval", choices=["daily", "monthly"], help="Time interval"
-        )
-        spend_metrics_parser.add_argument(
-            "resource_type",
-            choices=["electric", "gas", "combined"],
-            help="Type of resource",
-        )
-        spend_metrics_parser.add_argument("start_date", help="Start month (YYYY-MM)")
-        spend_metrics_parser.add_argument("end_date", help="End month (YYYY-MM)")
-
-        spend_metrics_group = spend_metrics_parser.add_mutually_exclusive_group(
-            required=True
-        )
-        spend_metrics_group.add_argument(
-            "-f", "--facility-id", type=int, help="Facility id"
-        )
-        spend_metrics_group.add_argument("-g", "--org-id", help="Organization id")
-        spend_metrics_group.add_argument("-n", "--org-name", help="Organization name")
-
-        spend_metrics_parser.add_argument(
-            "-o", "--output", help="Filename to save data (csv)"
-        )
-        spend_metrics_parser.add_argument(
-            "-p",
-            "--pro-forma",
-            action="store_true",
-            help="Include pro forma calculations",
-        )
-        spend_metrics_parser.add_argument(
-            "--metric-scalar",
-            type=float,
-            help="Optionally scale the normalized metric by a float",
-        )
-        spend_metrics_parser.set_defaults(func=self._utility_spend_metrics)
-
-        # Usage Metric Normalization
-        usage_metrics_parser = _subparsers.add_parser(
-            "util-usage-metrics", help="Utility usage metrics"
-        )
-
-        usage_metrics_parser.add_argument(
-            "metric", help="Provide the metric you want to normalize against"
-        )
-        usage_metrics_parser.add_argument(
-            "interval", choices=["daily", "monthly"], help="Time interval"
-        )
-        usage_metrics_parser.add_argument(
-            "resource_type",
-            choices=["electric", "gas", "combined"],
-            help="Type of resource",
-        )
-        usage_metrics_parser.add_argument("start_date", help="Start month (YYYY-MM)")
-        usage_metrics_parser.add_argument("end_date", help="End month (YYYY-MM)")
-
-        usage_metrics_group = usage_metrics_parser.add_mutually_exclusive_group(
-            required=True
-        )
-        usage_metrics_group.add_argument(
-            "-f", "--facility-id", type=int, help="Facility id"
-        )
-        usage_metrics_group.add_argument("-g", "--org-id", help="Organization id")
-        usage_metrics_group.add_argument("-n", "--org-name", help="Organization name")
-
-        usage_metrics_parser.add_argument(
-            "-o", "--output", help="Filename to save data (csv)"
-        )
-        usage_metrics_parser.add_argument(
-            "-p",
-            "--pro-forma",
-            action="store_true",
-            help="Include pro forma calculations",
-        )
-        usage_metrics_parser.add_argument(
-            "--metric-scalar",
-            type=float,
-            help="Optionally scale the normalized metric by a float",
-        )
-        usage_metrics_parser.set_defaults(func=self._utility_usage_metrics)
-
         return parser
 
     def _get_mains(self, args, auth):
-        from contxt.legacy.services.ems import EMSService
+        from contxt.services import EmsService
 
-        ems = EMSService(auth)
+        ems_service = EmsService(auth)
 
-        mains = ems.get_main_services(
-            facility_id=args.facility_id, type=args.resource_type
+        main_services = ems_service.get_main_services(
+            facility_id=args.facility_id, resource_type=args.resource_type
         )
-        print(mains)
+        print(main_services)
 
     def _get_main_data(self, args, auth):
-        from contxt.functions.ems import EMS
+        from contxt.services import EmsService, IotService
 
-        ems = EMS(auth)
-
-        data = ems.get_facility_main_data(
-            facility_id=args.facility_id,
-            resource_type=args.resource_type,
-            start_date=args.start_date,
-            end_date=args.end_date,
+        ems_service = EmsService(auth)
+        iot_service = IotService(auth)
+        services = ems_service.get_main_services(
+            facility_id=args.facility_id, resource_type=args.resource_type
         )
-
-        self.to_csv_main_service_data(data)
+        data = {
+            service.name: iot_service.get_time_series_for_field(
+                service.demand_field, start_time=args.start_time, end_time=args.end_time
+            )
+            for service in services
+        }
+        print(data)
 
     def _utility_spend(self, args, auth):
-        from contxt.functions.ems import EMS
+        from contxt.services import EmsService
 
-        ems = EMS(auth)
+        ems_service = EmsService(auth)
+
         if args.facility_id:
             # Get facility spend
-            spend = ems.get_facility_spend(
+            spend = ems_service.get_monthly_utility_spend(
                 facility_id=args.facility_id,
-                interval=args.interval,
                 resource_type=args.resource_type,
                 start_date=args.start_date,
                 end_date=args.end_date,
@@ -407,28 +319,31 @@ class EmsParser(ContxtArgParser):
             print(spend)
         else:
             # Get organization spend
-            org_spend = ems.get_organization_spend(
-                resource_type=args.resource_type,
-                interval=args.interval,
-                start_date=args.start_date,
-                end_date=args.end_date,
-                pro_forma=args.pro_forma,
-                organization_id=args.org_id,
-                organization_name=args.org_name,
-            )
+            from contxt.services import FacilitiesService
 
-            # always write to file
-            ems.write_organization_utility_data_to_file(org_spend, args.output)
+            organization_id = args.org_id or _get_organization_id(args.org_name, auth)
+            facilities_service = FacilitiesService(auth)
+            spend = {
+                f: ems_service.get_monthly_utility_spend(
+                    facility_id=f.id,
+                    resource_type=args.resource_type,
+                    start_date=args.start_date,
+                    end_date=args.end_date,
+                    pro_forma=args.pro_forma,
+                )
+                for f in facilities_service.get_facilities(organization_id)
+            }
+            print(spend)
 
     def _utility_usage(self, args, auth):
-        from contxt.functions.ems import EMS
+        from contxt.services import EmsService
 
-        ems = EMS(auth)
+        ems_service = EmsService(auth)
+
         if args.facility_id:
-            # get facility usage
-            usage = ems.get_facility_usage(
+            # Get facility usage
+            usage = ems_service.get_monthly_utility_usage(
                 facility_id=args.facility_id,
-                interval=args.interval,
                 resource_type=args.resource_type,
                 start_date=args.start_date,
                 end_date=args.end_date,
@@ -436,189 +351,22 @@ class EmsParser(ContxtArgParser):
             )
             print(usage)
         else:
-            org_usage = ems.get_organization_usage(
-                resource_type=args.resource_type,
-                interval=args.interval,
-                start_date=args.start_date,
-                end_date=args.end_date,
-                pro_forma=args.pro_forma,
-                organization_id=args.org_id,
-                organization_name=args.org_name,
-            )
+            # Get organization usage
+            from contxt.services import FacilitiesService
 
-            # always write to file
-            ems.write_organization_utility_data_to_file(org_usage, args.output)
-
-    def _utility_spend_metrics(self, args, auth):
-        from contxt.functions.ems import EMS
-
-        ems = EMS(auth)
-        if args.facility_id:
-            normalized_spend = ems.get_facility_spend_vs_monthly_metric(
-                facility_id=args.facility_id,
-                interval=args.interval,
-                start_date=args.start_date,
-                end_date=args.end_date,
-                metric=args.metric,
-                resource_type=args.resource_type,
-                pro_forma=args.pro_forma,
-                metric_scalar=args.metric_scalar or 1,
-            )
-            self._print_facility_normalized_metrics(normalized_spend, "spend")
-        else:
-
-            if not args.output:
-                # TODO: this requirement should be enforced by argparse
-                logger.critical(
-                    "Please provide --output as an argument to specify report"
-                    " export file"
+            organization_id = args.org_id or _get_organization_id(args.org_name, auth)
+            facilities_service = FacilitiesService(auth)
+            usage = {
+                f: ems_service.get_monthly_utility_usage(
+                    facility_id=f.id,
+                    resource_type=args.resource_type,
+                    start_date=args.start_date,
+                    end_date=args.end_date,
+                    pro_forma=args.pro_forma,
                 )
-                return
-
-            normalized_spend = ems.get_organization_spend_vs_monthly_metric(
-                organization_name=args.org_name,
-                organization_id=args.org_id,
-                metric=args.metric,
-                start_date=args.start_date,
-                end_date=args.end_date,
-                resource_type=args.resource_type,
-                pro_forma=args.pro_forma,
-                interval=args.interval,
-                metric_scalar=args.metric_scalar or 1,
-            )
-            self.to_csv_organization_normalized_metric(args.output, normalized_spend)
-
-    def _utility_usage_metrics(self, args, auth):
-        from contxt.functions.ems import EMS
-
-        ems = EMS(auth)
-        if args.facility_id:
-            normalized_usage = ems.get_facility_usage_vs_monthly_metric(
-                facility_id=args.facility_id,
-                interval=args.interval,
-                start_date=args.start_date,
-                end_date=args.end_date,
-                metric=args.metric,
-                resource_type=args.resource_type,
-                pro_forma=args.pro_forma,
-                metric_scalar=args.metric_scalar or 1,
-            )
-            self._print_facility_normalized_metrics(normalized_usage, "usage")
-        else:
-
-            if not args.output:
-                # TODO: this requirement should be enforced by argparse
-                logger.critical(
-                    "Please provide --output as an argument to specify report"
-                    " export file"
-                )
-                return
-
-            normalized_usage = ems.get_organization_usage_vs_monthly_metric(
-                organization_name=args.org_name,
-                organization_id=args.org_id,
-                metric=args.metric,
-                start_date=args.start_date,
-                end_date=args.end_date,
-                resource_type=args.resource_type,
-                pro_forma=args.pro_forma,
-                interval=args.interval,
-                metric_scalar=args.metric_scalar or 1,
-            )
-            self.to_csv_organization_normalized_metric(args.output, normalized_usage)
-
-    @staticmethod
-    def to_csv_main_service_data(main_service_data):
-        from csv import DictWriter
-        from datetime import datetime
-        from pathlib import Path
-
-        output_path = Path(
-            f"main_service_export_{datetime.now().strftime('%m-%d_%H_%M_%S')}"
-        )
-        output_path.mkdir(parents=True, exist_ok=False)
-
-        for service_name, data in main_service_data.items():
-            filename = output_path / f"{service_name}.csv"
-            with filename.open("w") as f:
-                writer = DictWriter(f, fieldnames=["event_time", "value"])
-                for row in reversed(data):
-                    writer.writerow(row)
-
-    @staticmethod
-    def _print_facility_normalized_metrics(normalized_data_by_date, normalization_key):
-        from tabulate import tabulate
-
-        normalized_to_print = []
-
-        for date, data in normalized_data_by_date.items():
-            # TODO clean this up when we can properly filter metric value data
-            # by start->end date
-            if normalization_key in data:
-                normalized_to_print.append(
-                    [
-                        date.strftime("%Y-%m"),
-                        data[normalization_key],
-                        data["metric_value"] if "metric_value" in data else None,
-                        data["normalized"],
-                        data["pro_forma_date"],
-                    ]
-                )
-
-        print(
-            tabulate(
-                normalized_to_print,
-                headers=[
-                    "date",
-                    normalization_key,
-                    "metric-value",
-                    "normalized",
-                    "pro_forma_date",
-                ],
-            )
-        )
-
-    @staticmethod
-    def to_csv_organization_normalized_metric(filename, normalized_data_by_facility):
-        from csv import DictWriter
-
-        to_csv_data = []
-
-        unique_dates = []
-        by_facility = {}
-
-        # gotta organize by date so that all the dates match across facilities
-        for facility_name in sorted(normalized_data_by_facility.keys()):
-            data = normalized_data_by_facility[facility_name]
-
-            by_facility[facility_name] = {}
-            for date, spend in data.items():
-                if date not in unique_dates:
-                    unique_dates.append(date)
-
-                by_facility[facility_name][date] = spend.get("normalized", "N/A")
-
-        facility_data = {}
-        for date in reversed(sorted(unique_dates)):
-            for facility_name, date_data in by_facility.items():
-                if facility_name not in facility_data:
-                    facility_data[facility_name] = {}
-                facility_data[facility_name][date] = date_data.get(date)
-
-        for facility, date_dict in facility_data.items():
-            date_dict["facility_name"] = facility
-            to_csv_data.append(date_dict)
-
-        with open(filename, "w") as f:
-
-            fields = ["facility_name"]
-            fields.extend(unique_dates)
-
-            writer = DictWriter(f, fieldnames=fields)
-            writer.writeheader()
-
-            for row in to_csv_data:
-                writer.writerow(row)
+                for f in facilities_service.get_facilities(organization_id)
+            }
+            print(usage)
 
 
 class AssetsParser(ContxtArgParser):
