@@ -682,34 +682,29 @@ class AssetsParser(ContxtArgParser):
         print(facilities)
 
     def _types(self, args, auth):
-        from contxt.functions.assets import Assets
+        from contxt.services import AssetsService
 
-        assets = Assets(auth)
+        organization_id = args.org_id or _get_organization_id(args.org_name, auth)
+        assets_service = AssetsService(auth, organization_id)
+
         if not args.type_label:
             # Get all asset types
-            types = assets.get_asset_types(
-                organization_id=args.org_id, organization_name=args.org_name
-            )
-            print(types)
+            asset_types = assets_service.types_by_id.values()
+            print(asset_types)
         else:
             # Get single asset type
-            type_ = assets.get_asset_type_info(
-                type=args.type_label,
-                organization_id=args.org_id,
-                organization_name=args.org_name,
-            )
-            self._print_asset_type(type_)
+            asset_type = assets_service.asset_type_with_label(args.type_label)
+            assets_service._cache_asset_type_full(asset_type)
+            print(asset_type)
 
     def _assets(self, args, auth):
-        from contxt.functions.assets import Assets
+        from contxt.services import AssetsService
 
-        assets = Assets(auth)
-        assets_of_type = assets.get_assets_for_type(
-            type=args.type_label,
-            organization_id=args.org_id,
-            organization_name=args.org_name,
-        )
-        print(assets_of_type)
+        organization_id = args.org_id or _get_organization_id(args.org_name, auth)
+        assets_service = AssetsService(auth, organization_id)
+        asset_type = assets_service.asset_type_with_label(args.type_label)
+        assets = assets_service.get_assets(asset_type.id)
+        print(assets)
 
     def _attributes(self, args, auth):
         raise NotImplementedError
@@ -721,43 +716,26 @@ class AssetsParser(ContxtArgParser):
         raise NotImplementedError
 
     def _metric_values(self, args, auth):
+        from contxt.services import AssetsService
+
+        organization_id = args.org_id or _get_organization_id(args.org_name, auth)
+        assets_service = AssetsService(auth, organization_id)
+
         if args.asset_id:
             # Get metric values for single asset
-            from contxt.functions.assets import Assets
-
-            assets = Assets(auth)
-            metric_value_pairs = [
-                assets.get_metric_values_for_asset(
-                    metric=metric_label,
-                    asset_id=args.asset_id,
-                    organization_id=args.org_id,
-                    organization_name=args.org_name,
-                )
-                for metric_label in args.metric_label
+            asset = assets_service.get_complete_asset(args.asset_id)
+            print(asset.metrics)
+        else:
+            # Get metric values for all assets of the specified type(s)
+            asset_type = assets_service.asset_type_with_label(args.type_label)
+            metrics = [
+                assets_service.get_complete_asset(asset.id).metrics
+                for asset in assets_service.get_assets(asset_type.id)
             ]
             if args.plot:
                 raise NotImplementedError
             else:
-                for pair in metric_value_pairs:
-                    self._print_asset_metric_values(*pair)
-        else:
-            # Get metric values for all assets of the specified type(s)
-            from contxt.functions.assets import Assets
-
-            assets = Assets(auth)
-            metric_values = {
-                metric_label: assets.get_metric_values_for_asset_type(
-                    asset_type_label=args.type_label,
-                    metric_label=metric_label,
-                    organization_id=args.org_id,
-                    organization_name=args.org_name,
-                )
-                for metric_label in args.metric_label
-            }
-            if args.plot:
-                assets.plot_multi_asset_metrics(metric_values)
-            else:
-                print(metric_values)
+                print(metrics)
 
 
 class ContxtParser(ContxtArgParser):
@@ -862,26 +840,26 @@ class BusParser(ContxtArgParser):
         return parser
 
     def _channels(self, args, auth):
-        from contxt.functions.bus import Bus
+        from contxt.services import MessageBusService
         from contxt.utils.serializer import Serializer
 
-        bus = Bus(auth)
-        channels = bus.get_all_channels_for_service(
-            service_id=args.service_id,
-            organization_id=args.org_id,
-            organization_name=args.org_name,
-        )
+        organization_id = args.org_id or _get_organization_id(args.org_name, auth)
+        bus_service = MessageBusService(auth, organization_id)
+        channels = bus_service.get_channels_for_service(args.service_id)
         print(Serializer.to_table(channels))
 
     def _stats(self, args, auth):
-        from contxt.functions.bus import Bus
+        from contxt.services import MessageBusService
 
-        bus = Bus(auth)
-        stats = bus.get_stats_for_channel(
-            organization_id=args.org_id,
-            organization_name=args.org_name,
-            service_id=args.service_id,
-            channel_id=args.channel_id,
-            channel_name=args.channel_name,
+        organization_id = args.org_id or _get_organization_id(args.org_name, auth)
+        bus_service = MessageBusService(auth, organization_id)
+        channel_id = (
+            args.channel_id
+            or bus_service.get_channel_with_name_for_service(
+                channel_name=args.channel_name, service_id=args.service_id
+            ).id
+        )
+        stats = bus_service.get_stats_for_channel_and_service(
+            channel_id=channel_id, service_id=args.service_id
         )
         print(stats)
