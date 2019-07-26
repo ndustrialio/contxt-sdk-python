@@ -3,6 +3,24 @@ from contxt.utils import make_logger
 logger = make_logger(__name__)
 
 
+def _get_organization_id(name, auth):
+    from contxt.services import ContxtService
+
+    contxt_service = ContxtService(auth)
+    return contxt_service.get_organization_with_name(name).id
+
+
+def _to_csv(self, filename, items):
+    from csv import DictWriter
+    from pathlib import Path
+
+    with Path(filename).open("w") as f:
+        writer = DictWriter(f, fieldnames=vars(items[0]))
+        writer.writeheader()
+        for item in items:
+            writer.writerow(vars(item))
+
+
 class ContxtArgParser:
     def __init__(self, subparsers):
         self.parser = self._init_parser(subparsers)
@@ -654,40 +672,13 @@ class AssetsParser(ContxtArgParser):
 
         return parser
 
-    # TODO: move these print utilities to the classes themselves
-    def _print_asset_type(self, asset_type):
-        from contxt.legacy.services import APIObjectCollection
-
-        print(f"Type Information:\n{asset_type}")
-        attrs = APIObjectCollection(list(asset_type.attributes.values()))
-        print(f"\nAttributes:\n{attrs}")
-        metrics = APIObjectCollection(list(asset_type.metrics.values()))
-        print(f"\nMetrics:\n{metrics}")
-
-    def _print_asset_metric_values(self, metric, metric_values):
-        from tabulate import tabulate
-
-        items = []
-        for val in metric_values:
-            values = val.get_values()
-            values.append(metric.label)
-            values.append(metric.units)
-            items.append(values)
-
-        if len(metric_values) > 0:
-            keys = metric_values[0].get_keys()
-            keys.extend(["label", "units"])
-            print(tabulate(items, headers=keys))
-        else:
-            print(metric_values)
-
     def _facilities(self, args, auth):
-        from contxt.functions.facilities import Facilities
+        from contxt.services import FacilitiesService
 
-        facs = Facilities(auth)
-        facilities = facs.get_all_facilities(
-            organization_id=args.org_id, organization_name=args.org_name
-        )
+        facilites_service = FacilitiesService(auth)
+
+        organization_id = args.org_id or _get_organization_id(args.org_name, auth)
+        facilities = facilites_service.get_facilities(organization_id)
         print(facilities)
 
     def _types(self, args, auth):
@@ -810,18 +801,22 @@ class ContxtParser(ContxtArgParser):
         print(Serializer.to_table(orgs))
 
     def _create_organization(self, args, auth):
-        from contxt.functions.organizations import Organizations
+        from contxt.services import ContxtService
+        from contxt.models.contxt import Organization
 
-        orgs = Organizations(auth)
-        orgs.create_organization(args.org_name)
+        contxt_service = ContxtService(auth)
+        org = contxt_service.create_organization(Organization(args.org_name))
+        contxt_service.add_user_to_organization(
+            user_id=auth.user_id, organization_id=org.id
+        )
+        print(org)
 
     def _users(self, args, auth):
-        from contxt.functions.organizations import Organizations
+        from contxt.services import ContxtService
 
-        orgs = Organizations(auth)
-        users = orgs.get_organization_users(
-            organization_id=args.org_id, organization_name=args.org_name
-        )
+        contxt_service = ContxtService(auth)
+        organization_id = args.org_id or _get_organization_id(args.org_name, auth)
+        users = contxt_service.get_users_for_organization(organization_id)
         print(users)
 
     def _add_user(self, args, auth):
