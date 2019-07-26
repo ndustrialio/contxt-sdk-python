@@ -1,9 +1,7 @@
 from typing import NamedTuple
 
+import jwt
 import requests
-from jose import jwt
-from jose.constants import ALGORITHMS
-
 
 # NOTE: this code was originally stolen from https://auth0.com/docs/quickstart/backend/python/01-authorization
 #       then tweaked for convenience
@@ -25,14 +23,10 @@ class AuthTokenValidator(NamedTuple):
 
     def validate(self, token: str) -> TokenPayload:
         try:
-            return jwt.decode(token=token, key=self.public_key, algorithms=ALGORITHMS.RS256, audience=self.audience,
+            return jwt.decode(jwt=token, key=self.public_key, algorithms="RS256", audience=self.audience,
                               issuer=self.issuer)
-        except jwt.ExpiredSignatureError:
-            raise AuthError("TOKEN_EXPIRED: token is expired")
-        except jwt.JWTClaimsError:
-            raise AuthError("INVALID_CLAIMS: please check the audience and issuer")
-        except jwt.JWTError:
-            raise AuthError("INVALID_TOKEN: please check the token")
+        except jwt.PyJWTError as e:
+            raise AuthError(f"INVALID_TOKEN: {str(e)}")
         except Exception:
             raise AuthError("INVALID_HEADER: Unable to parse authentication")
 

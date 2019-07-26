@@ -1,12 +1,11 @@
 from datetime import datetime
 
-from jose import jwt
-from jose.constants import ALGORITHMS
+import jwt
 from pytz import UTC
 
 from contxt.auth import TokenProvider
-from contxt.auth.jwt import (AuthError, AuthTokenValidator,
-                             ContxtAuthTokenValidator)
+from contxt.auth.token import (AuthError, AuthTokenValidator,
+                               ContxtAuthTokenValidator)
 
 PRIVATE_KEY = """\
 -----BEGIN RSA PRIVATE KEY-----
@@ -44,7 +43,7 @@ class TestAuthTokenValidator:
         audience = "foo_audience"
         issuer = "foo_issuer"
         claims = {"foo": "bar", "aud": audience, "iss": issuer}
-        token = jwt.encode(claims, PRIVATE_KEY, algorithm=ALGORITHMS.RS256)
+        token = jwt.encode(claims, PRIVATE_KEY, algorithm="RS256")
         validator = AuthTokenValidator(
             audience=audience, issuer=issuer, public_key=PUBLIC_KEY
         )
@@ -79,7 +78,7 @@ class TestTokenProvider:
                     "exp": datetime.now(UTC).timestamp(),
                 }
                 self.access_token = jwt.encode(
-                    self._claims, PRIVATE_KEY, algorithm=ALGORITHMS.RS256
+                    self._claims, PRIVATE_KEY, algorithm="RS256"
                 )
             return self._access_token
 
