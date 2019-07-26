@@ -13,6 +13,10 @@ class AuthError(Exception):
         self.message = message
 
 
+class Algorithms:
+    RS256 = "RS256"
+
+
 TokenPayload = dict
 
 
@@ -23,8 +27,8 @@ class AuthTokenValidator(NamedTuple):
 
     def validate(self, token: str) -> TokenPayload:
         try:
-            return jwt.decode(jwt=token, key=self.public_key, algorithms="RS256", audience=self.audience,
-                              issuer=self.issuer)
+            return jwt.decode(jwt=token, key=self.public_key, algorithms=Algorithms.RS256,
+                              audience=self.audience, issuer=self.issuer)
         except jwt.PyJWTError as e:
             raise AuthError(f"INVALID_TOKEN: {str(e)}")
         except Exception:
