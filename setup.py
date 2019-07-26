@@ -81,26 +81,20 @@ setup(
         # Requirements
         "argcomplete",
         "auth0-python>=3",
-        "dash-core-components",
-        "dash-html-components",
-        "dash",
         "dataclasses",  # needed for python < 3.7
-        "inflect",
-        "jwt",
         "pandas",
-        "plotly",
         "python-dateutil",
         "python-jose-cryptodome",
         "pytz",
         "requests",
-        "setuptools",
         "tabulate",
         "tqdm",
         "tzlocal",
     ],
     extras_require={
         # Optional requirements
-        "dev": ["black", "flake8", "isort", "mypy", "pytest"]
+        "dev": ["black", "flake8", "isort", "mypy", "pytest", "twine"],
+        "plotly": ["dash-core-components", "dash-html-components", "dash", "plotly"],
     },
     include_package_data=True,
     license=about["__license__"],
