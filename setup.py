@@ -96,7 +96,7 @@ setup(
         "tabulate",
         "tqdm",
         "tzlocal",
-        "pyjwt",
+        "pyjwt[crypto]",
     ],
     extras_require={
         # Optional requirements
