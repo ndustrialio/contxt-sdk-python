@@ -84,6 +84,7 @@ setup(
         "dash-core-components",
         "dash-html-components",
         "dash",
+        "dataclasses",  # needed for python < 3.7
         "inflect",
         "jwt",
         "pandas",
