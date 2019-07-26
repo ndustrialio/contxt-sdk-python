@@ -53,7 +53,6 @@ class AuthParser(ContxtArgParser):
         return parser
 
     def _login(self, args, auth):
-        # TODO: create separate auth class
         auth.login()
 
     def _logout(self, args, auth):
@@ -62,6 +61,9 @@ class AuthParser(ContxtArgParser):
 
 class IotParser(ContxtArgParser):
     def _init_parser(self, subparsers):
+        from contxt.models.iot import Window
+        from contxt.utils import datetime_parse
+
         parser = subparsers.add_parser("iot", help="IOT service")
         parser.set_defaults(func=self._help)
         _subparsers = parser.add_subparsers(title="subcommands", dest="subcommand")
@@ -102,11 +104,15 @@ class IotParser(ContxtArgParser):
         # Field data
         field_data_parser = _subparsers.add_parser("field-data", help="Get field data")
         field_data_parser.add_argument("grouping_id", help="Grouping id")
-        field_data_parser.add_argument("start_date", help="Data start date")
         field_data_parser.add_argument(
-            "window", type=int, choices=[0, 60, 900, 3600], help="Data windowing period"
+            "start_time", type=datetime_parse, help="Data start time"
         )
-        field_data_parser.add_argument("-e", "--end-date", help="Data end date")
+        field_data_parser.add_argument(
+            "window", type=Window, help="Data windowing period"
+        )
+        field_data_parser.add_argument(
+            "-e", "--end-time", type=datetime_parse, help="Data end time"
+        )
         field_data_parser.add_argument(
             "-p", "--plot", action="store_true", help="Plot data"
         )
@@ -115,71 +121,78 @@ class IotParser(ContxtArgParser):
         return parser
 
     def _groupings(self, args, auth):
-        from contxt.functions.iot import IOT
+        from contxt.services import IotService
 
-        iot = IOT(auth)
-        groupings = iot.iot_service.get_all_groupings(args.facility_id)
+        iot_service = IotService(auth)
+        groupings = iot_service.get_field_groupings_for_facility(args.facility_id)
         print(groupings)
 
     def _feeds(self, args, auth):
-        from contxt.functions.iot import IOT
+        from contxt.services import IotService
 
-        iot = IOT(auth)
-        feeds = iot.iot_service.get_feeds_collection(args.facility_id)
+        iot_service = IotService(auth)
+        feeds = iot_service.get_feeds(args.facility_id)
         print(feeds)
 
     def _fields(self, args, auth):
-        from contxt.functions.iot import IOT
+        from contxt.services import IotService
 
-        iot = IOT(auth)
+        iot_service = IotService(auth)
         if args.facility_id:
             # Get fields for facility
-            fields = iot.iot_service.get_all_fields(args.facility_id)
-            print(fields)
+            fields = iot_service.get_fields_for_facility(args.facility_id)
         else:
             # Get fields for grouping
-            fields = iot.get_fields_for_grouping(args.grouping_id)
-            print(fields)
+            fields = iot_service.get_field_grouping(args.grouping_id).fields
+        print(fields)
 
     def _unprovisioned_fields(self, args, auth):
-        from contxt.functions.iot import IOT
+        from contxt.services import IotService
 
-        iot = IOT(auth)
-        fields = iot.get_unprovisioned_fields_for_feed(
-            feed_id=args.feed_id, feed_key=args.feed_key
+        iot_service = IotService(auth)
+        fields = (
+            iot_service.get_unprovisioned_fields_for_feed_id(args.feed_id)
+            if args.feed_id
+            else iot_service.get_unprovisioned_fields_for_feed_key(args.feed_key)
         )
 
         if args.output:
-            self._collection_to_csv(args.output, fields)
+            _to_csv(args.output, fields)
         else:
             print(fields)
 
     def _field_data(self, args, auth):
-        from contxt.functions.iot import IOT
+        from contxt.services import IotService
+        from tqdm import tqdm
+        from pandas import DataFrame
 
-        iot = IOT(auth)
-        # TODO: may want to control dumping/plotting from here
-        iot.get_field_data_for_grouping(
-            grouping_id=args.grouping_id,
-            start_date=args.start_date,
-            window=args.window,
-            end_date=args.end_date,
-            plot=args.plot,
+        iot_service = IotService(auth)
+        fields = iot_service.get_field_grouping(args.grouping_id).fields
+        print(
+            f"Fetching iot data for {len(fields)} tags for {args.start_time} - {args.end_time}..."
         )
+        try:
+            field_data = {
+                field.field_human_name: {
+                    d[0]: d[1]
+                    for d in iot_service.get_time_series_for_field(
+                        field=field,
+                        start_time=args.start_time,
+                        end_time=args.end_time,
+                        window=args.resolution,
+                    )
+                }
+                for field in tqdm(fields)
+            }
+        except MemoryError:
+            print("ERROR: Ran out of memory. Trying fetching a smaller date range.")
 
-    def _collection_to_csv(self, filename, api_collection_data):
-        from csv import DictWriter
-        from pathlib import Path
+        # Output to csv
+        print(f"Writing tag data to {args.output}...")
+        df = DataFrame(field_data)
+        df.index.name = "timestamp"
+        df.to_csv(args.output)
 
-        with Path(filename).open("w") as f:
-
-            fields = api_collection_data.get_keys()
-
-            writer = DictWriter(f, fieldnames=fields)
-            writer.writeheader()
-
-            for row in api_collection_data:
-                writer.writerow(row.get_dict())
 
 
 RESOURCE_TYPES = ["electric", "gas", "combined"]

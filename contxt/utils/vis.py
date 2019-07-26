@@ -108,21 +108,3 @@ class DataVisualizer:
             showlegend=True,
             # margin=go.layout.Margin(l=80, r=80, t=80, b=80),
         )
-
-
-if __name__ == "__main__":
-    import pandas as pd
-
-    df = pd.read_csv(
-        "https://gist.githubusercontent.com/chriddyp/"
-        "c78bf172206ce24f77d6363a2d754b59/raw/"
-        "c353e8ef842413cae56ae3920b8fd78468aa4cb2/"
-        "usa-agricultural-exports-2011.csv"
-    )
-    s = go.Scatter(
-        x=df["beef"].sort_values(),
-        y=df["pork"],
-        name="pork vs beef",
-        line=dict(shape="spline", width=3),
-    )
-    DataVisualizer().run({"test1": s, "test2": s})
