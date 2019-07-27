@@ -34,7 +34,7 @@ class PublishCommand(Command):
     def run(self):
         # Check for twine
         try:
-            import twine
+            import twine  # noqa: F401
         except ImportError:
             print("ERROR: Publishing requires twine (run `pip install twine`)")
             sys.exit(1)
