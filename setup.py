@@ -82,7 +82,6 @@ setup(
         "argcomplete",
         "auth0-python>=3",
         "dataclasses;python_version<'3.7'",
-        "pandas",
         "python-dateutil",
         "python-jose-cryptodome",
         "pytz",
