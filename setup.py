@@ -81,7 +81,7 @@ setup(
         # Requirements
         "argcomplete",
         "auth0-python>=3",
-        "dataclasses",  # needed for python < 3.7
+        "dataclasses;python_version<'3.7'",
         "pandas",
         "python-dateutil",
         "python-jose-cryptodome",
