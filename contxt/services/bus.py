@@ -1,4 +1,4 @@
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 from contxt.auth import Auth
 from contxt.models.bus import Channel, ChannelStats
@@ -39,6 +39,16 @@ class MessageBusService(ConfiguredApi):
         logger.debug(f"Fetching channel {channel_id} for service {service_id}")
         resp = self.get(f"{self._channels_url(service_id)}/{channel_id}")
         return Channel.from_api(resp)
+
+    def get_channel_with_name_for_service(
+        self, channel_name: str, service_id: str
+    ) -> Optional[Channel]:
+        logger.debug(f"Fetching channel {channel_name} for service {service_id}")
+        for channel in self.get_channels_for_service(service_id):
+            if channel.name.lower() == channel_name.lower():
+                return channel
+        logger.warning(f"Failed to find channel with name {channel_name}")
+        return None
 
     def get_channels_for_service(self, service_id: str) -> List[Channel]:
         logger.debug(f"Fetching channels for service {service_id}")

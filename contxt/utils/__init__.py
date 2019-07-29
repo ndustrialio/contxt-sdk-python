@@ -8,6 +8,8 @@ from typing import Dict, Optional, Set
 from pytz import UTC
 from tzlocal import get_localzone
 
+logger = logging.getLogger(__name__)
+
 
 def make_logger(name: str, level: Optional[str] = None):
     logger = logging.getLogger(name)
@@ -20,7 +22,7 @@ def timed(func):
     def wrapper(*args, **kwargs):
         t0 = time()
         return_val = func(*args, **kwargs)
-        print(f"{func.__name__}'s elapsed time: {time() - t0} s")
+        logger.info(f"{func.__name__}'s elapsed time: {time() - t0} s")
         return return_val
 
     return wrapper
