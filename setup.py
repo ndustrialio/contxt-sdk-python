@@ -14,24 +14,16 @@ about = {}
 with open(os.path.join(here, "contxt", "__version__.py")) as f:
     exec(f.read(), about)
 
-# Import readme (make sure its declared in MANIFEST.in)
-try:
-    with open(os.path.join(here, "README.md")) as f:
-        long_description = "\n" + f.read()
-except FileNotFoundError:
-    long_description = about["__description__"]
+# Import readme
+with open(os.path.join(here, "README.md")) as f:
+    long_description = "\n" + f.read()
 
 
 class PublishCommand(Command):
-    """Support setup.py publish."""
+    """Support `python setup.py publish`."""
 
     description = "Build and publish the package."
     user_options = []
-
-    @staticmethod
-    def status(s):
-        """Prints things in bold."""
-        print("\033[1m{0}\033[0m".format(s))
 
     def initialize_options(self):
         pass
@@ -40,25 +32,32 @@ class PublishCommand(Command):
         pass
 
     def run(self):
-        # Remove old builds
+        # Check for twine
         try:
-            self.status("Removing previous builds...")
+            import twine  # noqa: F401
+        except ImportError:
+            print("ERROR: Publishing requires twine (run `pip install twine`)")
+            sys.exit(1)
+
+        # Remove old builds
+        print("Removing previous builds...")
+        try:
             rmtree(os.path.join(here, "dist"))
         except OSError:
             pass
 
         # Build
-        self.status("Building distribution...")
-        os.system("{0} setup.py sdist bdist_wheel --universal".format(sys.executable))
+        print("Building distribution...")
+        os.system(f"{sys.executable} setup.py sdist bdist_wheel --universal")
 
         # Upload
-        self.status("Uploading to PyPI...")
+        print("Uploading to PyPI...")
         os.system("twine upload dist/*")
 
         # Tag
-        self.status("Pushing git tags...")
-        os.system("git tag v{0}".format(about["__version__"]))
-        os.system("git push origin v{0}".format(about["__version__"]))
+        print("Pushing git tags...")
+        os.system(f"git tag v{about['__version__']}")
+        os.system(f"git push origin v{about['__version__']}")
 
         sys.exit()
 
@@ -73,37 +72,30 @@ setup(
     author=about["__author__"],
     author_email=about["__author_email__"],
     url=about["__url__"],
+    license=about["__license__"],
     # Python requirement
     python_requires=">=3.6.0",
-    packages=find_packages(exclude=("tests",)),
+    packages=find_packages(include=("contxt*",)),
     entry_points={"console_scripts": ["contxt=contxt.__main__:main"]},
     install_requires=[
         # Requirements
         "argcomplete",
         "auth0-python>=3",
-        "dash-core-components",
-        "dash-html-components",
-        "dash",
-        "dataclasses",  # needed for python < 3.7
-        "inflect",
-        "jwt",
-        "pandas",
-        "plotly",
+        "dataclasses;python_version<'3.7'",
         "python-dateutil",
         "python-jose-cryptodome",
         "pytz",
         "requests",
-        "setuptools",
         "tabulate",
         "tqdm",
         "tzlocal",
     ],
     extras_require={
         # Optional requirements
-        "dev": ["black", "flake8", "isort", "mypy", "pytest"]
+        "dev": ["black", "flake8", "isort", "mypy", "pytest", "twine"],
+        "plotly": ["dash-core-components", "dash-html-components", "dash", "plotly"],
     },
     include_package_data=True,
-    license=about["__license__"],
     classifiers=[
         # Trove classifiers: https://pypi.org/pypi?:action=list_classifiers
         "License :: OSI Approved :: ISC License (ISCL)",
@@ -112,7 +104,6 @@ setup(
     ],
     cmdclass={
         # $ python setup.py publish
-        # NOTE: requires twine ($ pip install twine)
         "publish": PublishCommand
     },
 )

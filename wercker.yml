@@ -3,7 +3,8 @@ build:
   steps:
     # Install package
     - pip-install:
-      extra_args: .[dev]
+      requirements_file: ""
+      packages_list: .[dev,plotly]
 
     # Run formatters
     - script:

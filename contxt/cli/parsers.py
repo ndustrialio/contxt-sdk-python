@@ -63,6 +63,7 @@ class IotParser(ContxtArgParser):
     def _init_parser(self, subparsers):
         from contxt.models.iot import Window
         from contxt.models import Parsers
+        from pathlib import Path
 
         parser = subparsers.add_parser("iot", help="IOT service")
         parser.set_defaults(func=self._help)
@@ -108,13 +109,13 @@ class IotParser(ContxtArgParser):
             "start_time", type=Parsers.datetime, help="Data start time"
         )
         field_data_parser.add_argument(
-            "window", type=Window, help="Data windowing period"
+            "window", type=lambda x: Window(int(x)), help="Data windowing period"
         )
         field_data_parser.add_argument(
             "-e", "--end-time", type=Parsers.datetime, help="Data end time"
         )
         field_data_parser.add_argument(
-            "-p", "--plot", action="store_true", help="Plot data"
+            "-o", "--output", type=Path, help="File for output"
         )
         field_data_parser.set_defaults(func=self._field_data)
 
@@ -163,8 +164,8 @@ class IotParser(ContxtArgParser):
 
     def _field_data(self, args, auth):
         from contxt.services import IotService
+        from contxt.utils.serializer import Serializer
         from tqdm import tqdm
-        from pandas import DataFrame
 
         iot_service = IotService(auth)
         fields = iot_service.get_field_grouping(args.grouping_id).fields
@@ -173,26 +174,22 @@ class IotParser(ContxtArgParser):
             f" - {args.end_time}..."
         )
         try:
-            field_data = {
-                field.field_human_name: {
-                    d[0]: d[1]
-                    for d in iot_service.get_time_series_for_field(
-                        field=field,
-                        start_time=args.start_time,
-                        end_time=args.end_time,
-                        window=args.resolution,
-                    )
-                }
-                for field in tqdm(fields)
-            }
+            field_data = {}
+            for field in tqdm(fields):
+                for d in iot_service.get_time_series_for_field(
+                    field=field,
+                    start_time=args.start_time,
+                    end_time=args.end_time,
+                    window=args.window,
+                ):
+                    field_data.setdefault(d[0], {})[field.field_human_name] = d[1]
         except MemoryError:
             print("ERROR: Ran out of memory. Trying fetching a smaller date range.")
 
         # Output to csv
-        print(f"Writing tag data to {args.output}...")
-        df = DataFrame(field_data)
-        df.index.name = "timestamp"
-        df.to_csv(args.output)
+        print(f"Writing field data to {args.output}...")
+        data = [{"timestamp": k, **v} for k, v in field_data.items()]
+        Serializer.to_csv(data, args.output)
 
 
 class EmsParser(ContxtArgParser):

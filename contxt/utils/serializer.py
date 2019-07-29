@@ -5,7 +5,6 @@ from json import dump, dumps
 from pathlib import Path
 from typing import Any, Callable, List, Optional
 
-import pandas as pd
 from tabulate import tabulate
 
 from contxt.utils import make_logger
@@ -167,19 +166,6 @@ class Serializer:
                 # TODO: may not actually be a dict
                 # Write dict
                 writer.writerow(d)
-
-    @staticmethod
-    def to_df(obj: Any, **kwargs):
-        """Serializes `obj` as a `pandas.DataFrame`.
-
-        :param obj: object to serialize
-        :type obj: Any
-        :return: dataframe
-        :rtype: DataFrame
-        """
-
-        d = Serializer.to_dict(obj)
-        return pd.DataFrame(d, columns=Serializer._keys(d), **kwargs)
 
     @staticmethod
     def to_file(

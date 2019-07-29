@@ -205,14 +205,6 @@ class ApiObject(ABC):
             # Apply type
             return field.data_type(value)
 
-    def get_dict(self):
-        # TODO: deprecate, call Serializer directly
-        return Serializer.to_dict(self)
-
-    def get_df(self):
-        # TODO: deprecate, call Serializer directly
-        return Serializer.to_df(self)
-
     def post(self):
         """Gets data for a POST request"""
         # Transform api fields to dict
