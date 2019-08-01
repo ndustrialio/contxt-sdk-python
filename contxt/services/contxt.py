@@ -24,13 +24,14 @@ class ContxtService(ConfiguredApi):
         ApiEnvironment(
             name="production",
             base_url="https://contxt.api.ndustrial.io/v1",
-            client_id="ahqLTupqA4i81FW0isq8TFL1IjIgUgQv",
-        ),
-        ApiEnvironment(
-            name="staging",
-            base_url="https://contxt-staging.api.ndustrial.io/v1",
             client_id="8qY2xJob1JAxhmVhIDLCNnGriTM9bct8",
         ),
+        # FIXME: staging shares the same client_id, which breaks assumptions
+        # ApiEnvironment(
+        #     name="staging",
+        #     base_url="https://contxt-staging.api.ndustrial.io/v1",
+        #     client_id="8qY2xJob1JAxhmVhIDLCNnGriTM9bct8",
+        # ),
     )
 
     def __init__(self, auth: Auth, env: str = "production") -> None:
