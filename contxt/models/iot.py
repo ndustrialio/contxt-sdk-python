@@ -14,16 +14,16 @@ class FieldGrouping(APIObject):
                 'category', 'fields'
             ])
 
-        self.id = grouping_api_object['id']
-        self.label = grouping_api_object['label']
-        self.slug = grouping_api_object['slug']
-        self.description = grouping_api_object['description']
-        self.facility_id = grouping_api_object['facility_id']
-        self.owner_id = grouping_api_object['owner_id']
-        self.is_public = grouping_api_object['is_public']
-        self.created_at = grouping_api_object['created_at']
-        self.updated_at = grouping_api_object['updated_at']
-        self.field_category_id = grouping_api_object['field_category_id']
+        self.id = grouping_api_object.get('id')
+        self.label = grouping_api_object.get('label')
+        self.slug = grouping_api_object.get('slug')
+        self.description = grouping_api_object.get('description')
+        self.facility_id = grouping_api_object.get('facility_id')
+        self.owner_id = grouping_api_object.get('owner_id')
+        self.is_public = grouping_api_object.get('is_public')
+        self.created_at = grouping_api_object.get('created_at')
+        self.updated_at = grouping_api_object.get('updated_at')
+        self.field_category_id = grouping_api_object.get('field_category_id')
         self.owner = owner_obj
         self.category = category_obj
         self.fields = APIObjectCollection(field_obj_list)
@@ -84,16 +84,16 @@ class Field(APIObject):
     def __init__(self, field_api_object):
         super().__init__()
 
-        self.id = field_api_object['id']
-        self.label = field_api_object['label']
-        self.output_id = field_api_object['output_id']
-        self.field_descriptor = field_api_object['field_descriptor']
-        self.field_human_name = field_api_object['field_human_name']
-        self.is_hidden = field_api_object[
-            'is_hidden'] if 'is_hidden' in field_api_object else None
-        self.status = field_api_object[
-            'status'] if 'status' in field_api_object else None
-        self.units = field_api_object['units']
+        self.id = field_api_object.get('id')
+        self.label = field_api_object.get('label')
+        self.output_id = field_api_object.get('output_id')
+        self.field_descriptor = field_api_object.get('field_descriptor')
+        self.field_human_name = field_api_object.get('field_human_name')
+        self.is_hidden = field_api_object.get('is_hidden')
+        self.status = field_api_object.get('status')
+        self.units = field_api_object.get('units')
+        self.value_type = field_api_object.get('value_type')
+        self.feed_key = field_api_object.get('feed_key')
 
 
 class Feed(APIObject):

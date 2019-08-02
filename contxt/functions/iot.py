@@ -59,7 +59,6 @@ class IOT:
         logger.info(f"Unprovisioning {len(fields)} fields")
         self.unprovision_fields([field.id for field in fields])
 
-
     def get_unprovisioned_fields_for_feed(self, feed_id=None, feed_key=None):
 
         if feed_id is None and feed_key is None:
