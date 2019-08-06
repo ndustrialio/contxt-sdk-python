@@ -450,7 +450,7 @@ class Asset(ApiObject):
         return d
 
 
-class CompleteAsset(ApiObject):
+class CompleteAsset:
     """High-level abstraction of an asset"""
 
     def __init__(self, asset: Asset, asset_type: AssetType):
