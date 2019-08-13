@@ -113,7 +113,8 @@ class AssetsService(ConfiguredApi):
         if with_attribute_values and not asset.attribute_values:
             asset.attribute_values = self.get_attribute_values(asset.id)
         if with_metric_values and not asset.metric_values:
-            asset.metric_values = self.get_metric_values(asset.id)
+            # NOTE: this is a paged response, so fetch all records
+            asset.metric_values = [mv for mv in self.get_metric_values(asset.id)]
 
         # Attach asset type
         if not asset.asset_type:
