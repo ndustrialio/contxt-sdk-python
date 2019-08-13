@@ -1,5 +1,7 @@
-from datetime import date, datetime, timedelta
+from datetime import date, datetime
 from typing import Any, Dict, List, Optional
+
+from dateutil.relativedelta import relativedelta
 
 from contxt.models import ApiField, ApiObject, Formatters, Parsers
 from contxt.utils import Utils, make_logger
@@ -411,7 +413,7 @@ class Asset(ApiObject):
         updated_at: Optional[datetime] = None,
         parent_id: Optional[str] = None,
         hierarchy_level: Optional[str] = None,
-        attribute_values: Optional[List[MetricValue]] = None,
+        attribute_values: Optional[List[AttributeValue]] = None,
         metric_values: Optional[List[MetricValue]] = None,
         children: Optional[List["Asset"]] = None,
         asset_type: Optional[AssetType] = None,
@@ -497,19 +499,18 @@ class CompleteAsset:
     def _effective_end_date(
         self, effective_start_date: date, time_interval: str
     ) -> date:
-        delta = timedelta()
         if time_interval == TimeIntervals.hourly:
-            delta = timedelta(hours=1) - timedelta(milliseconds=1)
+            delta = relativedelta(hours=1, microseconds=-1)
         elif time_interval == TimeIntervals.daily:
-            delta = timedelta(days=1) - timedelta(milliseconds=1)
+            delta = relativedelta(days=1, microseconds=-1)
         elif time_interval == TimeIntervals.weekly:
-            delta = timedelta(weeks=1) - timedelta(milliseconds=1)
+            delta = relativedelta(weeks=1, microseconds=-1)
         elif time_interval == TimeIntervals.monthly:
-            delta = timedelta(months=1) - timedelta(milliseconds=1)
+            delta = relativedelta(months=1, microseconds=-1)
         elif time_interval == TimeIntervals.yearly:
-            delta = timedelta(years=1) - timedelta(milliseconds=1)
+            delta = relativedelta(years=1, microseconds=-1)
         elif time_interval == TimeIntervals.sparse:
-            pass
+            delta = relativedelta()
         else:
             raise KeyError(f"Unrecognized time interval: {time_interval}")
         return effective_start_date + delta
