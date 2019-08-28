@@ -82,8 +82,8 @@ setup(
         "argcomplete",
         "auth0-python>=3",
         "dataclasses;python_version<'3.7'",
+        "pyjwt",
         "python-dateutil",
-        "python-jose-cryptodome",
         "pytz",
         "requests",
         "tabulate",
@@ -94,6 +94,7 @@ setup(
         # Optional requirements
         "dev": ["black", "flake8", "isort", "mypy", "pytest", "twine"],
         "plotly": ["dash-core-components", "dash-html-components", "dash", "plotly"],
+        "server": ["python-jose-cryptodome"],
     },
     include_package_data=True,
     classifiers=[

@@ -1,4 +1,4 @@
-from typing import NamedTuple
+from dataclasses import dataclass
 
 import requests
 from jose import jwt
@@ -18,7 +18,8 @@ class AuthError(Exception):
 TokenPayload = dict
 
 
-class AuthTokenValidator(NamedTuple):
+@dataclass
+class AuthTokenValidator:
     audience: str
     issuer: str
     public_key: str

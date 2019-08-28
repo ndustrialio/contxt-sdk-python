@@ -1,5 +1,6 @@
 from datetime import datetime
 
+import pytest
 from jose import jwt
 from jose.constants import ALGORITHMS
 from pytz import UTC
@@ -36,9 +37,6 @@ yOQ45SZ1Kbm0ILrYaLfl1yvFr6MqHrO07HWsiW9zoHDFU31sd2CoGJsu35fTils1
 
 
 class TestAuthTokenValidator:
-    def main(self):
-        self.test_auth()
-
     def test_auth(self):
         audience = "foo_audience"
         issuer = "foo_issuer"
@@ -52,18 +50,10 @@ class TestAuthTokenValidator:
 
 
 class TestContxtAuthTokenValidator:
-    def main(self):
-        self.test_contxt_auth()
-
     def test_contxt_auth(self):
         token_validator = ContxtAuthTokenValidator(audience="foo_audience")
-        try:
+        with pytest.raises(AuthError):
             token_validator.validate("bad_token")
-            raise AssertionError(
-                "Token validation should have raised a token error before"
-            )
-        except AuthError:
-            pass
 
 
 class TestTokenProvider:
@@ -82,9 +72,6 @@ class TestTokenProvider:
                 )
             return self._access_token
 
-    def main(self):
-        self.test_token_provider()
-
     def test_token_provider(self):
         token_provider = self.DummyTokenProvider(audience=self.claims["aud"])
         # Test first token is set
@@ -96,9 +83,3 @@ class TestTokenProvider:
         assert token1
         assert token_provider.decoded_access_token == token_provider._claims
         assert token0 != token1
-
-
-if __name__ == "__main__":
-    TestAuthTokenValidator().main()
-    TestContxtAuthTokenValidator().main()
-    TestTokenProvider().main()
