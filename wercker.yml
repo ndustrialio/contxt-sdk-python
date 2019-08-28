@@ -2,8 +2,9 @@ box: python:3.6
 build:
   steps:
     # Install package
-    - pip-install:
-      extra_args: .[dev]
+    - script:
+      name: install package
+      code: pip install .[dev,plotly,server]
 
     # Run formatters
     - script:

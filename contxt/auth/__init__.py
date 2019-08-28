@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from datetime import datetime
 from typing import Dict, Optional
 
-from jose.jwt import get_unverified_claims
+from jwt import decode
 from pytz import UTC
 
 from contxt.utils import make_logger
@@ -43,7 +43,7 @@ class TokenProvider(ABC):
     def access_token(self, value: str) -> None:
         """Sets both the access token and the decoded access token"""
         self._access_token = value
-        self._access_token_decoded = get_unverified_claims(self._access_token)
+        self._access_token_decoded = decode(self._access_token, verify=False)
 
     @property
     def decoded_access_token(self) -> Dict:
