@@ -82,13 +82,13 @@ setup(
         "argcomplete",
         "auth0-python>=3",
         "dataclasses;python_version<'3.7'",
+        "marshmallow-dataclass[enum]>=6.0b",
         "pyjwt",
         "python-dateutil",
         "pytz",
         "requests",
         "tabulate",
         "tqdm",
-        "tzlocal",
     ],
     extras_require={
         # Optional requirements
