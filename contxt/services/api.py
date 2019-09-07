@@ -13,9 +13,7 @@ logger = make_logger(__name__)
 
 
 class BearerTokenAuth(AuthBase):
-    """
-    Bearer token to authorize requests.
-    """
+    """Bearer token to authorize requests"""
 
     def __init__(self, token_provider: TokenProvider) -> None:
         self.token_provider = token_provider

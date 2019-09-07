@@ -10,9 +10,7 @@ logger = make_logger(__name__)
 
 
 class EventsService(ConfiguredApi):
-    """
-    Service to interact with our Events API.
-    """
+    """Wrapper around our Events API"""
 
     _envs = (
         ApiEnvironment(
@@ -95,7 +93,7 @@ class EventsService(ConfiguredApi):
     def get_events_for_client(self, client_id: str) -> List[Event]:
         logger.debug(f"Fetching events for client {client_id}")
         resp = self.get(f"clients/{client_id}/events")
-        return [Event.from_api(rec) for rec in resp]
+        return Event.from_api(resp, many=True)
 
     def get_event_definition(self, event_id: str) -> EventDefinition:
         logger.debug(f"Fetching definition for event {event_id}")
@@ -136,4 +134,4 @@ class EventsService(ConfiguredApi):
     def get_triggered_events_for_field(self, field_id: str) -> List[TriggeredEvent]:
         logger.debug(f"Fetching triggered_events for field {field_id}")
         resp = self.get(f"fields/{field_id}/triggered")
-        return [TriggeredEvent.from_api(rec) for rec in resp]
+        return TriggeredEvent.from_api(resp, many=True)

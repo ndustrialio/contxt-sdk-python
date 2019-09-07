@@ -1,4 +1,4 @@
-from typing import Dict, List, Union
+from typing import Any, Dict, List, Union
 
 from contxt.services.api import ApiEnvironment, ConfiguredApi
 from contxt.utils import make_logger
@@ -7,9 +7,7 @@ logger = make_logger(__name__)
 
 
 class AuthService(ConfiguredApi):
-    """
-    Service to interact with our Auth API.
-    """
+    """Wrapper around our Auth API"""
 
     _envs = (
         ApiEnvironment(
@@ -25,7 +23,9 @@ class AuthService(ConfiguredApi):
     def get_jwks(self) -> Dict:
         return self.get(".well-known/jwks.json")
 
-    def get_token(self, access_token: str, audiences: Union[str, List[str]]) -> Dict:
+    def get_token(
+        self, access_token: str, audiences: Union[str, List[str]]
+    ) -> Dict[str, Any]:
         audiences = [audiences] if isinstance(audiences, str) else audiences
         return self.post(
             "token",
@@ -35,7 +35,7 @@ class AuthService(ConfiguredApi):
 
     def get_oauth_token(
         self, client_id: str, client_secret: str, audience: str
-    ) -> Dict:
+    ) -> Dict[str, Any]:
         return self.post(
             "oauth/token",
             json={

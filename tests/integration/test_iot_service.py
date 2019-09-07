@@ -41,7 +41,7 @@ class TestIotService:
             field=field, start_time=start_time
         )
         assert field_data
-        # assert field_data.field_human_name == TestField.field_human_name
+        # assert field_data.human_name == TestField.human_name
         # assert field_data.output_id == TestField.output_id
         # assert field_data.time_series
         # assert min(field_data.time_series.keys()) >= start_time

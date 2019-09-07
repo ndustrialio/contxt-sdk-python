@@ -53,7 +53,7 @@ class BaseModel:
         return cls(**clean_dict)
 
     @classmethod
-    def from_dict(cls, data: Any, **kwargs) -> Any:
+    def from_api(cls, data: Any, **kwargs) -> Any:
         """Deserialize a dictionary to a class instance"""
         with Timer() as t:
             instance = cls.Schema(**kwargs).load(data)
@@ -61,7 +61,7 @@ class BaseModel:
         logger.info(f"Deserialized {N} items of type {cls.__name__} in {t.elapsed} s")
         return instance
 
-    def to_dict(self, **kwargs) -> RawDict:
+    def to_api(self, **kwargs) -> RawDict:
         """Serialize instance to a dictionary"""
         with Timer() as t:
             d = self.Schema(**kwargs).dump(self)
@@ -74,7 +74,7 @@ class BaseModel:
         post_keys = tuple(
             f.name for f in dataclasses.fields(self) if is_field_creatable(f)
         )
-        return self.to_dict(only=post_keys)
+        return self.to_api(only=post_keys)
 
     def put(self) -> RawDict:
         """Serialize instance for PUT request"""
@@ -82,7 +82,7 @@ class BaseModel:
         put_keys = tuple(
             f.name for f in dataclasses.fields(self) if is_field_updatable(f)
         )
-        return self.to_dict(only=put_keys)
+        return self.to_api(only=put_keys)
 
 
 def field(

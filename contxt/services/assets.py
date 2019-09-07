@@ -18,9 +18,7 @@ logger = make_logger(__name__)
 
 
 class AssetsService(ConfiguredApi):
-    """
-    Service to interact with our Assets API.
-    """
+    """Wrapper around our Assets API"""
 
     _envs = (
         ApiEnvironment(
@@ -133,21 +131,19 @@ class AssetsService(ConfiguredApi):
         # TODO: should automatically check if we need to cache any attributes/metrics
         return asset
 
-    def asset_type_with_id(self, asset_type_id: str, default: Any = ...) -> AssetType:
-        if asset_type_id not in self.types_by_id:
+    def asset_type_with_id(self, id: str, default: Any = ...) -> AssetType:
+        if id not in self.types_by_id:
             if default is ...:
-                raise KeyError(f"Asset type {asset_type_id} not found.")
+                raise KeyError(f"Asset type {id} not found.")
             return default
-        return self.types_by_id[asset_type_id]
+        return self.types_by_id[id]
 
-    def asset_type_with_label(
-        self, asset_type_label: str, default: Any = ...
-    ) -> AssetType:
-        if asset_type_label not in self.types:
+    def asset_type_with_label(self, label: str, default: Any = ...) -> AssetType:
+        if label not in self.types:
             if default is ...:
-                raise KeyError(f"Asset type {asset_type_label} not found.")
+                raise KeyError(f"Asset type {label} not found.")
             return default
-        return self.types[asset_type_label]
+        return self.types[label]
 
     # Abstractions
     def get_complete_asset(
@@ -539,10 +535,8 @@ class AssetsService(ConfiguredApi):
         # https://contxt.readme.io/v1.0/reference#get-effective-values-by-asset-id
         # https://contxt.readme.io/v1.0/reference#get-values-by-attribute-id
         logger.debug(f"Fetching attribute_values for asset {asset_id}")
-        return [
-            AttributeValue.from_api(rec)
-            for rec in self.get(f"assets/{asset_id}/attributes/values")
-        ]
+        resp = self.get(f"assets/{asset_id}/attributes/values")
+        return AttributeValue.from_api(resp, many=True)
 
     def update_attribute_values(self, attribute_values: List[AttributeValue]) -> None:
         # TODO: batch update

@@ -11,9 +11,7 @@ logger = make_logger(__name__)
 
 
 class NgestService(ConfiguredApi):
-    """
-    Service to interact with our Ngest API.
-    """
+    """Wrapper around our Ngest API"""
 
     _envs = (
         ApiEnvironment(

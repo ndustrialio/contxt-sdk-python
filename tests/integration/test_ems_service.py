@@ -38,7 +38,7 @@ class TestEmsServices:
         )
         assert utility_spend.currency == "$"
         assert utility_spend.type == ResourceType.ELECTRIC
-        assert utility_spend.periods
+        assert utility_spend.values
 
     def test_get_monthly_utility_usage(self, facility_id: int = TestFacility.id):
         utility_usage = self.service.get_monthly_utility_usage(
@@ -46,4 +46,4 @@ class TestEmsServices:
         )
         assert utility_usage.unit.lower() == "kwh"
         assert utility_usage.type == ResourceType.ELECTRIC
-        assert utility_usage.periods
+        assert utility_usage.values

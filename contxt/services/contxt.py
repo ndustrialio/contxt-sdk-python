@@ -16,15 +16,13 @@ logger = make_logger(__name__)
 
 
 class ContxtService(ConfiguredApi):
-    """
-    Service to interact with our Contxt API.
-    """
+    """Wrapper around our Contxt API"""
 
     _envs = (
         ApiEnvironment(
             name="production",
             base_url="https://contxt.api.ndustrial.io/v1",
-            client_id="8qY2xJob1JAxhmVhIDLCNnGriTM9bct8",
+            client_id="ahqLTupqA4i81FW0isq8TFL1IjIgUgQv",
         ),
         # FIXME: staging shares the same client_id, which breaks assumptions
         # ApiEnvironment(
@@ -40,7 +38,7 @@ class ContxtService(ConfiguredApi):
     def get_organizations(self) -> List[Organization]:
         logger.debug("Fetching organizations")
         resp = self.get("organizations")
-        return [Organization.from_api(rec) for rec in resp]
+        return Organization.from_api(resp, many=True)
 
     def get_organization_with_name(self, name: str) -> Optional[Organization]:
         logger.debug(f"Fetching organization {name}")
@@ -66,7 +64,7 @@ class ContxtService(ConfiguredApi):
     def get_users_for_organization(self, organization_id: str) -> List[User]:
         logger.debug(f"Fetching users for organizations {organization_id}")
         resp = self.get(f"organizations/{organization_id}/users")
-        return [User.from_api(rec) for rec in resp]
+        return User.from_api(resp, many=True)
 
     def get_config(self, configuration_id: str) -> Config:
         logger.debug(f"Fetching configuration {configuration_id}")
@@ -105,7 +103,7 @@ class ContxtService(ConfiguredApi):
             f"Fetching configuration_values for configuration {config_id} with {params}"
         )
         resp = self.get(f"configurations/{config_id}/values", params=params)
-        return [ConfigValue.from_api(rec) for rec in resp]
+        return ConfigValue.from_api(resp, many=True)
 
     def get_config_values_for_worker(
         self, worker_id: str, environment_id: str
@@ -115,7 +113,7 @@ class ContxtService(ConfiguredApi):
             f"Fetching configuration_values for worker {worker_id} with {params}"
         )
         resp = self.get(f"workers/{worker_id}/configurations/values", params=params)
-        return [ConfigValue.from_api(rec) for rec in resp]
+        return ConfigValue.from_api(resp, many=True)
 
     def start_worker_run(self, client_id: str) -> Dict:
         data = {"start_time": datetime.now()}

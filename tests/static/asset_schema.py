@@ -2,9 +2,9 @@ from contxt.models.assets import (
     Asset,
     AssetType,
     Attribute,
-    DataTypes,
+    AttributeDataType,
     Metric,
-    TimeIntervals,
+    MetricTimeInterval,
 )
 from contxt.utils.assets_migration import AssetSchema
 
@@ -28,7 +28,7 @@ class AssetSchemas:
                                 description="Test description",
                                 units="?",
                                 organization_id=organization_id,
-                                data_type=DataTypes.string,
+                                data_type=AttributeDataType.string,
                                 is_required=False,
                             )
                         ],
@@ -38,7 +38,7 @@ class AssetSchemas:
                                 label="test_met_label",
                                 description="Test description",
                                 organization_id=organization_id,
-                                time_interval=TimeIntervals.weekly,
+                                time_interval=MetricTimeInterval.weekly,
                                 units="?",
                             )
                         ],

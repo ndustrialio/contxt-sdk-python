@@ -182,7 +182,7 @@ class IotParser(ContxtArgParser):
                     end_time=args.end_time,
                     window=args.window,
                 ):
-                    field_data.setdefault(d[0], {})[field.field_human_name] = d[1]
+                    field_data.setdefault(d[0], {})[field.human_name] = d[1]
         except MemoryError:
             print("ERROR: Ran out of memory. Trying fetching a smaller date range.")
 

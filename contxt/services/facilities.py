@@ -10,11 +10,7 @@ logger = make_logger(__name__)
 
 
 class FacilitiesService(ConfiguredApi):
-    """
-    Service to interact with our Facilities API.
-
-    NOTE: The facility_id in this service is the legacy integer id.
-    """
+    """Wrapper around our Facilities API"""
 
     _envs = AssetsService._envs
 
@@ -29,15 +25,11 @@ class FacilitiesService(ConfiguredApi):
             else "facilities"
         )
         resp = self.get(uri)
-        # TODO: handle not found errors here, and return None instead of
-        # raising an error
-        return [Facility.from_api(rec) for rec in resp]
+        return Facility.from_api(resp, many=True)
 
     def get_facility_with_id(self, facility_id: int) -> Facility:
         logger.debug(f"Fetching facility {facility_id}")
         resp = self.get(f"facilities/{facility_id}")
-        # TODO: handle not found errors here, and return None instead of
-        # raising an error
         return Facility.from_api(resp)
 
     def get_facility_with_name(

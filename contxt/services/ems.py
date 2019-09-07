@@ -13,9 +13,7 @@ from contxt.services.api import ApiEnvironment, ConfiguredApi
 
 
 class EmsService(ConfiguredApi):
-    """
-    Service to interact with our EMS API.
-    """
+    """Wrapper around our EMS (Energy Management System) API"""
 
     _envs = (
         ApiEnvironment(
@@ -34,7 +32,8 @@ class EmsService(ConfiguredApi):
         super().__init__(env=env, auth=auth)
 
     def get_facility(self, id: int) -> Facility:
-        return Facility.from_api(self.get(f"facilities/{id}"))
+        resp = self.get(f"facilities/{id}")
+        return Facility.from_api(resp)
 
     def get_main_services(
         self, facility_id: int, resource_type: Optional[ResourceType] = None

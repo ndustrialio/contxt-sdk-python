@@ -127,7 +127,7 @@ class TriggeredEvent(BaseModel):
         # Got valid json, try serializing as ChainedData if it appears applicable
         if "subchain_triggered_event_id" in self.data:
             try:
-                return ChainedData.from_dict(data_json, many=True)
+                return ChainedData.from_api(data_json, many=True)
             except Exception as e:
                 _log_failure(e, "ChainedData")
 

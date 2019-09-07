@@ -9,9 +9,7 @@ logger = make_logger(__name__)
 
 
 class MessageBusService(ConfiguredApi):
-    """
-    Service to interact with our Message Bus API.
-    """
+    """Wrapper around our Message Bus API"""
 
     _envs = (
         ApiEnvironment(
@@ -53,7 +51,7 @@ class MessageBusService(ConfiguredApi):
     def get_channels_for_service(self, service_id: str) -> List[Channel]:
         logger.debug(f"Fetching channels for service {service_id}")
         resp = self.get(self._channels_url(service_id))
-        return [Channel.from_api(rec) for rec in resp]
+        return Channel.from_api(resp, many=True)
 
     def get_schema_for_channel_and_service(
         self, schema_id: str, channel_id: str, service_id: str

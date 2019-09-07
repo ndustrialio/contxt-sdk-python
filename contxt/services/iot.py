@@ -15,13 +15,12 @@ from contxt.services.pagination import PagedRecords, PagedTimeSeries, PageOption
 
 
 class IotService(ConfiguredApi):
-    """
-    Service to interact with our IOT API.
+    """Wrapper around our IOT API.
 
-    Terminology
-        - Feed: Data source (i.e. utility meter) with a set of fields
-        - Field: A specific time series data from a feed
-        - Grouping: Group of fields
+    Terminology:
+    - Feed: Data source (i.e. utility meter) with a set of fields
+    - Field: A specific time series data from a feed
+    - Grouping: Group of fields
     """
 
     _envs = (
@@ -37,7 +36,8 @@ class IotService(ConfiguredApi):
 
     def get_feed_with_id(self, id: int) -> Feed:
         """Get feed with id `id`"""
-        return Feed.from_api(self.get(f"feeds/{id}"))
+        resp = self.get(f"feeds/{id}")
+        return Feed.from_api(resp)
 
     def get_feed_with_key(self, key: str) -> Optional[Feed]:
         """Get feed with key `key`"""
@@ -105,7 +105,7 @@ class IotService(ConfiguredApi):
         assert isinstance(window, Window), "window must be of type Window"
         return PagedTimeSeries(
             api=self,
-            url=f"outputs/{field.output_id}/fields/{field.field_human_name}/data",
+            url=f"outputs/{field.output_id}/fields/{field.human_name}/data",
             params={
                 "timeStart": int(start_time.timestamp()),
                 "timeEnd": int(end_time.timestamp()) if end_time else None,
@@ -127,10 +127,8 @@ class IotService(ConfiguredApi):
         self, feed_id: int
     ) -> List[UnprovisionedField]:
         """Get unprovisioned fields for feed with id `feed_id`"""
-        return [
-            UnprovisionedField.from_api(rec)
-            for rec in self.get(f"feeds/{feed_id}/fields/unprovisioned")
-        ]
+        resp = self.get(f"feeds/{feed_id}/fields/unprovisioned")
+        return UnprovisionedField.from_api(resp, many=True)
 
     def get_unprovisioned_fields_for_feed_key(
         self, feed_key: str
@@ -139,14 +137,13 @@ class IotService(ConfiguredApi):
         feed = self.get_feed_with_key(key=feed_key)
         if not feed:
             return None
-        return [
-            UnprovisionedField.from_api(rec)
-            for rec in self.get(f"feeds/{feed.id}/fields/unprovisioned")
-        ]
+        resp = self.get(f"feeds/{feed.id}/fields/unprovisioned")
+        return UnprovisionedField.from_api(resp, many=True)
 
     def get_field_grouping(self, id: str) -> FieldGrouping:
         """Get field grouping with id `id`"""
-        return FieldGrouping.from_api(self.get(f"groupings/{id}"))
+        resp = self.get(f"groupings/{id}")
+        return FieldGrouping.from_api(resp)
 
     def get_field_groupings_for_facility(
         self, facility_id: int, page_options: Optional[PageOptions] = None
