@@ -1,18 +1,18 @@
+from dataclasses import InitVar
 from datetime import date, datetime
+from enum import Enum
 from typing import Any, Dict, List, Optional
 
 from dateutil.relativedelta import relativedelta
 
-from contxt.models import ApiField, ApiObject, Formatters, Parsers
-from contxt.utils import Utils, make_logger
+from contxt.models import Formatters, Parsers
+from contxt.models.base import UUID, BaseModel, dataclass, field
+from contxt.utils import Utils, cachedproperty, make_logger
 
 logger = make_logger(__name__)
 
 
-# TODO: make these enums
-class TimeIntervals:
-    """Valid time intervals for a MetricValue"""
-
+class MetricTimeInterval(Enum):
     hourly = "hourly"
     daily = "daily"
     weekly = "weekly"
@@ -21,270 +21,121 @@ class TimeIntervals:
     sparse = "sparse"
 
 
-class DataTypes:
-    """Valid data types for an Attribute"""
-
+class AttributeDataType(Enum):
     boolean = "boolean"
     datetime = "date"
     number = "number"
     string = "string"
 
 
-class Attribute(ApiObject):
-    _api_fields = (
-        ApiField("id"),
-        ApiField("asset_type_id", creatable=True),
-        ApiField("label", creatable=True, updatable=True),
-        ApiField("description", creatable=True, updatable=True),
-        ApiField("units", creatable=True, updatable=True),
-        ApiField("organization_id", creatable=True),
-        ApiField("data_type", creatable=True, updatable=True),
-        ApiField("is_required", data_type=bool, creatable=True, updatable=True),
-        ApiField("is_global", data_type=bool),
-        ApiField("global_asset_attribute_parent_id"),
-        ApiField("created_at", data_type=Parsers.datetime),
-        ApiField("updated_at", data_type=Parsers.datetime),
-    )
+class DataTypes(AttributeDataType):
+    """DEPRECATED"""
 
-    def __init__(
-        self,
-        asset_type_id: str,
-        label: str,
-        description: str,
-        units: str,
-        organization_id: str,
-        data_type: str,
-        is_required: bool,
-        id: Optional[str] = None,
-        global_asset_attribute_parent_id: Optional[str] = None,
-        is_global: Optional[bool] = None,
-        created_at: Optional[datetime] = None,
-        updated_at: Optional[datetime] = None,
-    ) -> None:
-        super().__init__()
-        self.id = id
-        self.asset_type_id = asset_type_id
-        self.label = label
-        self.description = description
-        self.units = units
-        self.organization_id = organization_id
-        self.data_type = data_type
-        self.is_required = is_required
-        self.global_asset_attribute_parent_id = global_asset_attribute_parent_id
-        self.is_global = is_global
-        self.created_at = created_at
-        self.updated_at = updated_at
+
+@dataclass
+class Attribute(BaseModel):
+    id: UUID
+    asset_type_id: UUID = field(post=True)
+    label: str = field(post=True, put=True)
+    units: Optional[str] = field(post=True, put=True)  # default=""
+    organization_id: Optional[UUID] = field(post=True)
+    description: str = field(post=True, put=True)  # default=label
+    is_required: bool = field(post=True, put=True)  # # default=False
+    created_at: datetime
+    updated_at: datetime
+    data_type: AttributeDataType = field(post=True, put=True, enum=True)
+    global_asset_attribute_parent_id: Optional[UUID]
+    is_global: bool
 
     @property
     def normalized_label(self) -> str:
-        return Formatters.normalize_label(self.label)
+        return Formatters.snake_case(self.label)
 
 
-class AttributeValue(ApiObject):
-    _api_fields = (
-        ApiField("id"),
-        ApiField("asset_id"),
-        ApiField("asset_attribute_id", attr_key="attribute_id", creatable=True),
-        ApiField("notes", creatable=True, updatable=True),
-        ApiField("value", data_type=Parsers.unknown, creatable=True, updatable=True),
-        ApiField(
-            "effective_date", data_type=Parsers.date, creatable=True, updatable=True
-        ),
-        ApiField("created_at", data_type=Parsers.datetime),
-        ApiField("updated_at", data_type=Parsers.datetime),
-    )
+@dataclass
+class AttributeValue(BaseModel):
+    id: UUID
+    asset_id: UUID
+    attribute_id: UUID = field(key="asset_attribute_id", post=True)
+    value: str = field(post=True, put=True)
+    notes: Optional[str] = field(post=True, put=True)
+    created_at: datetime
+    updated_at: datetime
+    effective_date: date = field(default_factory=date.today, post=True, put=True)
+    attribute: Optional[Attribute] = None
 
-    def __init__(
-        self,
-        asset_id: str,
-        attribute_id: str,
-        notes: str,
-        value: Any,
-        id: Optional[str] = None,
-        attribute: Optional[Attribute] = None,
-        effective_date: Optional[datetime] = None,
-        created_at: Optional[datetime] = None,
-        updated_at: Optional[datetime] = None,
-    ) -> None:
-        super().__init__()
-        self.id = id
-        self.asset_id = asset_id
-        self.attribute_id = attribute_id
-        self.attribute = attribute
-        self.effective_date = effective_date or date.today()
-        self.notes = notes
-        self.value = value
-        self.created_at = created_at
-        self.updated_at = updated_at
+    @cachedproperty
+    def parsed_value(self) -> Any:
+        # TODO: replace value
+        return Parsers.unknown(self.value)
 
     def upsert(self) -> Dict:
         # HACK: handle special case of upserting attribute_values
-        # TODO: if upserting becomes common, this method be moved to the base
-        # class
         return {**self.put(), "id": self.id, "asset_attribute_id": self.attribute_id}
 
 
-# TODO: need to fix global metric for POST
-class Metric(ApiObject):
-    _api_fields = (
-        ApiField("id"),
-        ApiField("asset_type_id"),
-        ApiField("label", creatable=True, updatable=True),
-        ApiField("description", creatable=True, updatable=True),
-        ApiField("organization_id", creatable=True),
-        ApiField("time_interval", creatable=True, updatable=True),
-        ApiField("units", creatable=True, updatable=True),
-        ApiField("global_asset_metric_parent_id"),
-        ApiField("is_global", data_type=bool, creatable=True),
-        ApiField("is_calculated", data_type=bool),
-        ApiField("created_at", data_type=Parsers.datetime),
-        ApiField("updated_at", data_type=Parsers.datetime),
-    )
-
-    def __init__(
-        self,
-        asset_type_id: str,
-        label: str,
-        description: str,
-        organization_id: str,
-        time_interval: str,
-        units: str,
-        id: Optional[str] = None,
-        global_asset_metric_parent_id: Optional[str] = None,
-        is_global: Optional[bool] = None,
-        is_calculated: Optional[bool] = None,
-        created_at: Optional[datetime] = None,
-        updated_at: Optional[datetime] = None,
-    ) -> None:
-        super().__init__()
-        self.id = id
-        self.asset_type_id = asset_type_id
-        self.label = label
-        self.description = description
-        self.units = units
-        self.organization_id = organization_id
-        self.time_interval = time_interval
-        self.global_asset_metric_parent_id = global_asset_metric_parent_id
-        self.is_global = is_global
-        self.created_at = created_at
-        self.updated_at = updated_at
+@dataclass
+class Metric(BaseModel):
+    id: UUID
+    asset_type_id: UUID
+    description: str = field(post=True, put=True)
+    label: str = field(post=True, put=True)
+    organization_id: Optional[UUID] = field(post=True)
+    time_interval: MetricTimeInterval = field(post=True, put=True, enum=True)
+    units: Optional[str] = field(post=True, put=True)
+    created_at: datetime
+    updated_at: datetime
+    global_asset_metric_parent_id: Optional[UUID]
+    is_global: bool = field(post=True)
+    is_calculated: bool
 
     @property
     def normalized_label(self) -> str:
-        return Formatters.normalize_label(self.label)
+        return Formatters.snake_case(self.label)
 
 
-class MetricValue(ApiObject):
-    _api_fields = (
-        ApiField("id"),
-        ApiField("asset_id"),
-        ApiField(
-            "Asset", attr_key="asset", data_type=f"{__name__}:Asset", optional=True
-        ),
-        ApiField("asset_metric_id"),
-        ApiField(
-            "effective_start_date",
-            data_type=Parsers.datetime,
-            creatable=True,
-            updatable=True,
-        ),
-        ApiField(
-            "effective_end_date",
-            data_type=Parsers.datetime,
-            creatable=True,
-            updatable=True,
-        ),
-        ApiField("notes", creatable=True, updatable=True),
-        ApiField("value", data_type=float, creatable=True, updatable=True),
-        ApiField("created_at", data_type=Parsers.datetime),
-        ApiField("updated_at", data_type=Parsers.datetime),
+@dataclass
+class MetricValue(BaseModel):
+    id: UUID
+    asset_id: UUID
+    asset_metric_id: UUID
+    effective_start_date: datetime = field(post=True, put=True)
+    effective_end_date: datetime = field(post=True, put=True)
+    notes: Optional[str] = field(post=True, put=True)
+    value: str = field(post=True, put=True)
+    created_at: datetime
+    updated_at: datetime
+    asset: Optional["Asset"] = field(default=None, key="Asset")
+    # TODO: post-process value as float
+
+
+@dataclass
+class AssetType(BaseModel):
+    id: UUID
+    label: str = field(post=True)
+    organization_id: Optional[UUID] = field(post=True)
+    description: str = field(post=True, put=True)
+    created_at: datetime
+    updated_at: datetime
+    hierarchy_level: Optional[int]
+    parent_id: Optional[UUID] = field(post=True, put=True)
+    global_asset_type_parent_id: Optional[UUID]
+    is_global: bool
+    # FIXME: come up with more elegant solution
+    attributes: InitVar[Optional[List[Attribute]]] = field(
+        default=None, key="asset_attributes"
     )
+    metrics: InitVar[Optional[List[Metric]]] = field(default=None, key="asset_metrics")
+    children: InitVar[Optional[List["AssetType"]]] = field(default=None)
 
-    def __init__(
-        self,
-        asset_id: str,
-        asset_metric_id: str,
-        effective_start_date: datetime,
-        effective_end_date: datetime,
-        notes: str,
-        value: str,
-        id: Optional[str] = None,
-        asset: Optional["Asset"] = None,
-        created_at: Optional[datetime] = None,
-        updated_at: Optional[datetime] = None,
-    ) -> None:
-        super().__init__()
-        self.id = id
-        self.asset_id = asset_id
-        self.asset_metric_id = asset_metric_id
-        self.effective_start_date = effective_start_date
-        self.effective_end_date = effective_end_date
-        self.notes = notes
-        self.value = value
-        self.created_at = created_at
-        self.updated_at = updated_at
-        self.asset = asset
-
-
-class AssetType(ApiObject):
-    _api_fields = (
-        ApiField("id"),
-        ApiField("label", creatable=True),
-        ApiField("description", creatable=True, updatable=True),
-        ApiField("organization_id", creatable=True),
-        ApiField("global_asset_type_parent_id"),
-        ApiField("is_global", data_type=bool),
-        ApiField("parent_id", creatable=True, updatable=True),
-        ApiField("hierarchy_level", data_type=int),
-        ApiField(
-            "asset_attributes",
-            attr_key="attributes",
-            data_type=Attribute,
-            optional=True,
-        ),
-        ApiField("asset_metrics", attr_key="metrics", data_type=Metric, optional=True),
-        ApiField("children", data_type=f"{__name__}:AssetType", optional=True),
-        ApiField("created_at", data_type=Parsers.datetime),
-        ApiField("updated_at", data_type=Parsers.datetime),
-    )
-
-    def __init__(
-        self,
-        label: str,
-        description: str,
-        organization_id: str,
-        id: Optional[str] = None,
-        is_global: Optional[bool] = None,
-        global_asset_type_parent_id: Optional[str] = None,
-        parent_id: Optional[str] = None,
-        hierarchy_level: Optional[int] = None,
-        attributes: Optional[List[Attribute]] = None,
-        metrics: Optional[List[Metric]] = None,
-        children: Optional[List["AssetType"]] = None,
-        created_at: Optional[datetime] = None,
-        updated_at: Optional[datetime] = None,
-    ) -> None:
-        super().__init__()
-        self.id = id
-        self.label = label
-        self.description = description
-        self.organization_id = organization_id
-        self.parent_id = parent_id
-        self.hierarchy_level = hierarchy_level
-        self.global_asset_type_parent_id = global_asset_type_parent_id
-        self.is_global = is_global
+    def __post_init__(self, attributes, metrics, children) -> None:
         self._attributes = attributes or []
         self._metrics = metrics or []
         self._children = children or []
-        self.created_at = created_at
-        self.updated_at = updated_at
 
     @property
     def normalized_label(self) -> str:
-        if " " not in self.label:
-            return self.label
-        else:
-            return self.label.title().replace(" ", "")
+        return Formatters.pascal_case(self.label)
 
     @property
     def attributes(self) -> List[Attribute]:
@@ -292,10 +143,10 @@ class AssetType(ApiObject):
 
     @attributes.setter
     def attributes(self, attributes: List[Attribute]) -> None:
+        """Store attributes by `id`, `label`, and `normalized_label`"""
         self._attributes = attributes
-        self._attributes_by_id = {}
-        self._attributes_by_label = {}
-        # Store by id/label for fast lookup
+        self._attributes_by_id: Dict[UUID, Attribute] = {}
+        self._attributes_by_label: Dict[str, Attribute] = {}
         for attribute in self._attributes:
             self._attributes_by_id[attribute.id] = attribute
             self._attributes_by_label[attribute.label] = attribute
@@ -307,10 +158,10 @@ class AssetType(ApiObject):
 
     @metrics.setter
     def metrics(self, metrics: List[Metric]) -> None:
+        """Store metrics by `id`, `label`, and `normalized_label`"""
         self._metrics = metrics
-        self._metrics_by_id = {}
-        self._metrics_by_label = {}
-        # Store by id/label for fast lookup
+        self._metrics_by_id: Dict[UUID, Metric] = {}
+        self._metrics_by_label: Dict[str, Metric] = {}
         for metric in self._metrics:
             self._metrics_by_id[metric.id] = metric
             self._metrics_by_label[metric.label] = metric
@@ -322,133 +173,95 @@ class AssetType(ApiObject):
 
     @children.setter
     def children(self, children: List["AssetType"]) -> None:
+        """Store children by `id`, `label`, and `normalized_label`"""
         self._children = children
-        self._children_by_id = {}
-        self._children_by_label = {}
-        # Store by id/label for fast lookup
+        self._children_by_id: Dict[UUID, AssetType] = {}
+        self._children_by_label: Dict[str, AssetType] = {}
         for child in self._children:
             self._children_by_id[child.id] = child
             self._children_by_label[child.label] = child
             self._children_by_label[child.normalized_label] = child
 
-    def attribute_with_id(self, attribute_id: str, default: Any = ...) -> Attribute:
-        if attribute_id not in self._attributes_by_id:
+    def _cache_look_up(
+        self, name: str, key: Any, dct: Dict[Any, Any], default: Any
+    ) -> Any:
+        """Get `dct[key]` if available, or `default` if specified, or raise `KeyError`"""
+        if key not in dct:
             if default is ...:
-                raise KeyError(f"Attribute {attribute_id} not found.")
+                raise KeyError(f"{name} {key} not found.")
             return default
-        return self._attributes_by_id[attribute_id]
+        return dct[key]
 
-    def attribute_with_label(
-        self, attribute_label: str, default: Any = ...
-    ) -> Attribute:
-        if attribute_label not in self._attributes_by_label:
-            if default is ...:
-                raise KeyError(f"Attribute {attribute_label} not found.")
-            return default
-        return self._attributes_by_label[attribute_label]
+    def attribute_with_id(self, id: str, default: Any = ...) -> Attribute:
+        """Get attribute with id `id`"""
+        return self._cache_look_up(
+            name="Attribute", key=id, dct=self._attributes_by_id, default=default
+        )
 
-    def metric_with_id(self, metric_id: str, default: Any = ...) -> Metric:
-        if metric_id not in self._metrics_by_id:
-            if default is ...:
-                raise KeyError(f"Metric {metric_id} not found.")
-            return default
-        return self._metrics_by_id[metric_id]
+    def attribute_with_label(self, label: str, default: Any = ...) -> Attribute:
+        """Get attribute with label `label`"""
+        return self._cache_look_up(
+            name="Attribute", key=label, dct=self._attributes_by_label, default=default
+        )
 
-    def metric_with_label(self, metric_label: str, default: Any = ...) -> Metric:
-        if metric_label not in self._metrics_by_label:
-            if default is ...:
-                raise KeyError(f"Metric {metric_label} not found.")
-            return default
-        return self._metrics_by_label[metric_label]
+    def metric_with_id(self, id: str, default: Any = ...) -> Metric:
+        """Get metric with id `id`"""
+        return self._cache_look_up(
+            name="Metric", key=id, dct=self._metrics_by_id, default=default
+        )
 
-    def child_with_id(self, child_id: str, default: Any = ...) -> "AssetType":
-        if child_id not in self._children_by_id:
-            if default is ...:
-                raise KeyError(f"Child {child_id} not found.")
-            return default
-        return self._children_by_id[child_id]
+    def metric_with_label(self, label: str, default: Any = ...) -> Metric:
+        """Get metric with label `label`"""
+        return self._cache_look_up(
+            name="Metric", key=label, dct=self._metrics_by_label, default=default
+        )
 
-    def child_with_label(self, child_label: str, default: Any = ...) -> "AssetType":
-        if child_label not in self._children_by_label:
-            if default is ...:
-                raise KeyError(f"Child {child_label} not found.")
-            return default
-        return self._children_by_label[child_label]
+    def child_with_id(self, id: str, default: Any = ...) -> "AssetType":
+        """Get child `AssetType` with id `id`"""
+        return self._cache_look_up(
+            name="Child", key=id, dct=self._children_by_id, default=default
+        )
+
+    def child_with_label(self, label: str, default: Any = ...) -> "AssetType":
+        """Get child `AssetType` with label `label`"""
+        return self._cache_look_up(
+            name="Child", key=label, dct=self._children_by_label, default=default
+        )
 
 
-class Asset(ApiObject):
-    _api_fields = (
-        ApiField("id"),
-        ApiField("asset_type_id", creatable=True),
-        ApiField("label", creatable=True),
-        ApiField("description", creatable=True, updatable=True),
-        ApiField("organization_id", creatable=True),
-        ApiField("parent_id", creatable=True, updatable=True),
-        ApiField("hierarchy_level", data_type=int),
-        ApiField(
-            "asset_attribute_values",
-            attr_key="attribute_values",
-            data_type=AttributeValue,
-            optional=True,
-        ),
-        ApiField(
-            "asset_metric_values",
-            attr_key="metric_values",
-            data_type=MetricValue,
-            optional=True,
-        ),
-        ApiField("children", data_type=f"{__name__}:Asset", optional=True),
-        ApiField("created_at", data_type=Parsers.datetime),
-        ApiField("updated_at", data_type=Parsers.datetime),
+@dataclass
+class Asset(BaseModel):
+    id: UUID
+    asset_type_id: UUID = field(post=True)
+    label: str = field(post=True)
+    description: Optional[str] = field(post=True, put=True)
+    organization_id: UUID = field(post=True)
+    created_at: datetime
+    updated_at: datetime
+    hierarchy_level: Optional[int]
+    parent_id: Optional[UUID] = field(post=True, put=True)
+    # TODO: mayne default to None so we can determine if we just haven't fetched values yet
+    attribute_values: List[AttributeValue] = field(
+        default_factory=list, key="asset_attribute_values"
     )
-
-    def __init__(
-        self,
-        asset_type_id: str,
-        label: str,
-        description: str,
-        organization_id: str,
-        id: Optional[str] = None,
-        created_at: Optional[datetime] = None,
-        updated_at: Optional[datetime] = None,
-        parent_id: Optional[str] = None,
-        hierarchy_level: Optional[str] = None,
-        attribute_values: Optional[List[AttributeValue]] = None,
-        metric_values: Optional[List[MetricValue]] = None,
-        children: Optional[List["Asset"]] = None,
-        asset_type: Optional[AssetType] = None,
-    ) -> None:
-        super().__init__()
-        self.id = id
-        self.asset_type_id = asset_type_id
-        self.asset_type = asset_type
-        self.label = label
-        self.description = description
-        self.organization_id = organization_id
-        self.parent_id = parent_id
-        self.attribute_values = attribute_values or []
-        self.metric_values = metric_values or []
-        self.hierarchy_level = hierarchy_level
-        self.children = children or []
-        self.created_at = created_at
-        self.updated_at = updated_at
+    metric_values: List[MetricValue] = field(
+        default_factory=list, key="asset_metric_values"
+    )
+    children: Optional[List["Asset"]] = field(default_factory=list)
+    asset_type: Optional[AssetType] = None
 
     @property
     def normalized_label(self) -> str:
-        return Formatters.normalize_label(self.label)
+        return Formatters.snake_case(self.label)
 
     def post(self) -> Dict:
-        """Get data for a post request"""
+        """Serialize instance for POST request"""
         d = super().post()
         # HACK: handle special case of posting attribute_values
         if self.attribute_values:
-            d.update(
-                {
-                    "asset_attribute_values_to_create": [
-                        av.post() for av in self.attribute_values
-                    ]
-                }
-            )
+            d["asset_attribute_values_to_create"] = [
+                av.post() for av in self.attribute_values
+            ]
         return d
 
 
@@ -497,19 +310,19 @@ class CompleteAsset:
         return metric_values_by_label
 
     def _effective_end_date(
-        self, effective_start_date: date, time_interval: str
+        self, effective_start_date: date, time_interval: MetricTimeInterval
     ) -> date:
-        if time_interval == TimeIntervals.hourly:
+        if time_interval == MetricTimeInterval.hourly:
             delta = relativedelta(hours=1, microseconds=-1)
-        elif time_interval == TimeIntervals.daily:
+        elif time_interval == MetricTimeInterval.daily:
             delta = relativedelta(days=1, microseconds=-1)
-        elif time_interval == TimeIntervals.weekly:
+        elif time_interval == MetricTimeInterval.weekly:
             delta = relativedelta(weeks=1, microseconds=-1)
-        elif time_interval == TimeIntervals.monthly:
+        elif time_interval == MetricTimeInterval.monthly:
             delta = relativedelta(months=1, microseconds=-1)
-        elif time_interval == TimeIntervals.yearly:
+        elif time_interval == MetricTimeInterval.yearly:
             delta = relativedelta(years=1, microseconds=-1)
-        elif time_interval == TimeIntervals.sparse:
+        elif time_interval == MetricTimeInterval.sparse:
             delta = relativedelta()
         else:
             raise KeyError(f"Unrecognized time interval: {time_interval}")

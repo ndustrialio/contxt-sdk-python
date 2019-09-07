@@ -1,243 +1,134 @@
 from datetime import datetime
-from json import loads
-from typing import Optional
+from json import JSONDecodeError, loads
+from typing import Any, Dict, Optional
 
-from contxt.models import ApiField, ApiObject, Parsers
-from contxt.utils import make_logger
+from contxt.models.base import UUID, BaseModel, dataclass, field
+from contxt.utils import cachedproperty, make_logger
 
 logger = make_logger(__name__)
 
-
-class EventType(ApiObject):
-    _api_fields = (
-        ApiField("id"),
-        ApiField("name", creatable=True),
-        ApiField("slug", creatable=True),
-        ApiField("description", creatable=True),
-        ApiField("client_id", creatable=True),
-        ApiField("level", data_type=int, creatable=True),
-        ApiField("is_ongoing_event", data_type=bool, optional=True),
-        ApiField("is_realtime_enabled", data_type=bool, creatable=True),
-        ApiField("created_at", data_type=Parsers.datetime),
-        ApiField("updated_at", data_type=Parsers.datetime),
-    )
-
-    def __init__(
-        self,
-        name: str,
-        slug: str,
-        description: str,
-        client_id: str,
-        level: int,
-        id: Optional[str] = None,
-        is_ongoing_event: Optional[bool] = None,
-        is_realtime_enabled: Optional[bool] = None,
-        created_at: Optional[datetime] = None,
-        updated_at: Optional[datetime] = None,
-    ) -> None:
-        super().__init__()
-        self.id = id
-        self.name = name
-        self.slug = slug
-        self.client_id = client_id
-        self.description = description
-        self.level = level
-        self.is_ongoing_event = is_ongoing_event
-        self.is_realtime_enabled = is_realtime_enabled
-        self.created_at = created_at
-        self.updated_at = updated_at
+Parameters = Dict[str, Any]
 
 
-class EventDefinition(ApiObject):
-    _api_fields = (
-        ApiField("id"),
-        ApiField("event_id"),
-        ApiField("description"),
-        ApiField("parameters", data_type=lambda o: loads(o.replace('"', '"'))),
-        ApiField("created_at", data_type=Parsers.datetime),
-        ApiField("updated_at", data_type=Parsers.datetime),
-    )
-
-    def __init__(
-        self,
-        event_id: str,
-        description: str,
-        parameters: dict,
-        created_at: datetime,
-        updated_at: datetime,
-        id: Optional[str] = None,
-        human_readable_parameters: Optional[str] = None,
-    ) -> None:
-        super().__init__()
-        self.id = id
-        self.event_id = event_id
-        self.description = description
-        self.parameters = parameters
-        self.human_readable_parameters = human_readable_parameters
-        self.created_at = created_at
-        self.updated_at = updated_at
+@dataclass
+class EventType(BaseModel):
+    id: UUID
+    name: str = field(post=True)
+    description: str = field(post=True)
+    level: int = field(post=True)
+    client_id: str = field(post=True)
+    slug: str = field(post=True)
+    is_ongoing_event: bool  # optional
+    is_realtime_enabled: bool = field(post=True)
+    created_at: datetime
+    updated_at: datetime
 
 
-class Owner(ApiObject):
-    _api_fields = (
-        ApiField("id"),
-        ApiField("first_name"),
-        ApiField("last_name"),
-        ApiField("email"),
-        ApiField("is_machine_user", data_type=bool, optional=True),
-        ApiField("created_at", data_type=Parsers.datetime),
-        ApiField("updated_at", data_type=Parsers.datetime),
-    )
+@dataclass
+class EventDefinition(BaseModel):
+    id: UUID
+    event_id: UUID
+    description: str
+    parameters: str
+    created_at: datetime
+    updated_at: datetime
+    human_readable_parameters: Optional[str] = None
 
-    def __init__(
-        self,
-        id: str,
-        first_name: str,
-        last_name: str,
-        email: str,
-        is_machine_user: bool,
-        created_at: datetime,
-        updated_at: datetime,
-    ) -> None:
-        super().__init__()
-        self.id = id
-        self.first_name = first_name
-        self.last_name = last_name
-        self.email = email
-        self.is_machine_user = is_machine_user
-        self.created_at = created_at
-        self.updated_at = updated_at
+    @cachedproperty
+    def parsed_parameters(self) -> Parameters:
+        """Parse `parameters` as JSON"""
+        try:
+            return loads(self.parameters)
+        except JSONDecodeError as e:
+            logger.error(
+                f"Failed to parse {type(self).__name__}.parameters"
+                f" {self.parameters} as JSON: {e}"
+            )
+        return {}
 
 
-class Event(ApiObject):
-    _api_fields = (
-        ApiField("id"),
-        ApiField("name", creatable=True),
-        ApiField("event_type_id", creatable=True),
-        ApiField(
-            "EventType", attr_key="event_type", data_type=EventType, optional=True
-        ),
-        ApiField("organization_id", creatable=True),
-        ApiField("facility_id", data_type=int, creatable=True),
-        ApiField("owner_id"),
-        ApiField("Owner", attr_key="owner", data_type=Owner, optional=True),
-        ApiField("topic_arn", optional=True),
-        ApiField("allow_others_to_trigger", data_type=bool, creatable=True),
-        ApiField("is_public", data_type=bool, creatable=True),
-        ApiField("created_at", data_type=Parsers.datetime),
-        ApiField("updated_at", data_type=Parsers.datetime),
-        ApiField("deleted_at", data_type=Parsers.datetime),
-    )
-
-    def __init__(
-        self,
-        name: str,
-        event_type_id: str,
-        organization_id: str,
-        allow_others_to_trigger: bool,
-        is_public: bool,
-        id: Optional[str] = None,
-        facility_id: Optional[int] = None,
-        owner_id: Optional[str] = None,
-        owner: Optional[Owner] = None,
-        event_type: Optional[EventType] = None,
-        topic_arn: Optional[str] = None,
-        created_at: Optional[datetime] = None,
-        updated_at: Optional[datetime] = None,
-        deleted_at: Optional[datetime] = None,
-    ) -> None:
-        super().__init__()
-        self.id = id
-        self.name = name
-        self.event_type_id = event_type_id
-        self.event_type = event_type
-        self.facility_id = facility_id
-        self.organization_id = organization_id
-        self.owner_id = owner_id
-        self.owner = owner
-        self.topic_arn = topic_arn
-        self.allow_others_to_trigger = allow_others_to_trigger
-        self.is_public = is_public
-        self.created_at = created_at
-        self.updated_at = updated_at
-        self.deleted_at = deleted_at
+@dataclass
+class Owner(BaseModel):
+    id: str
+    first_name: str
+    last_name: str
+    email: str
+    is_machine_user: bool  # optional
+    created_at: datetime
+    updated_at: datetime
 
 
-class TriggeredEventData(ApiObject):
-    _api_fields = (
-        ApiField("source_id"),
-        ApiField("subchain_triggered_event_id"),
-        ApiField("trigger_start_at", data_type=Parsers.datetime),
-        ApiField("trigger_end_at", data_type=Parsers.datetime),
-    )
-
-    def __init__(
-        self,
-        source_id: str,
-        subchain_triggered_event_id: str,
-        trigger_start_at: datetime,
-        trigger_end_at: datetime,
-    ) -> None:
-        super().__init__()
-        self.source_id = source_id
-        self.subchain_triggered_event_id = subchain_triggered_event_id
-        self.trigger_start_at = trigger_start_at
-        self.trigger_end_at = trigger_end_at
+@dataclass
+class Event(BaseModel):
+    id: UUID
+    event_type_id: UUID = field(post=True)
+    organization_id: UUID = field(post=True)
+    name: str = field(post=True)
+    allow_others_to_trigger: bool = field(post=True)
+    created_at: datetime
+    updated_at: datetime
+    event_type: EventType = field(default=None, key="EventType")
+    topic_arn: Optional[str] = None
+    facility_id: Optional[int] = field(default=None, post=True)
+    is_public: Optional[bool] = field(default=None, post=True)
+    owner_id: Optional[str] = None
+    owner: Optional[Owner] = field(default=None, key="Owner")
+    deleted_at: Optional[datetime] = None
 
 
-class TriggeredEvent(ApiObject):
-    _api_fields = (
-        ApiField("id"),
-        ApiField("event_id", creatable=True),
-        ApiField("Event", data_type=Event, attr_key="event"),
-        ApiField("owner_id"),
-        ApiField("Owner", data_type=dict, attr_key="owner"),
-        ApiField("is_public", data_type=bool),
-        ApiField(
-            "data",
-            data_type=lambda o: [TriggeredEventData.from_api(d) for d in loads(o)],
-            creatable=True,
-            updatable=True,
-        ),
-        ApiField(
-            "trigger_start_at",
-            data_type=Parsers.datetime,
-            creatable=True,
-            updatable=True,
-        ),
-        ApiField(
-            "trigger_end_at", data_type=Parsers.datetime, creatable=True, updatable=True
-        ),
-        ApiField("created_at", data_type=Parsers.datetime),
-        ApiField("updated_at", data_type=Parsers.datetime),
-        ApiField("deleted_at", data_type=Parsers.datetime),
-    )
+@dataclass
+class ChainedData(BaseModel):
+    source_id: str
+    subchain_triggered_event_id: str
+    trigger_start_at: datetime
+    trigger_end_at: datetime
 
-    def __init__(
-        self,
-        event_id: str,
-        trigger_start_at: datetime,
-        id: Optional[str],
-        owner_id: Optional[str] = None,
-        owner: Optional[Owner] = None,
-        event: Optional[Event] = None,
-        is_public: Optional[bool] = None,
-        trigger_end_at: Optional[datetime] = None,
-        data: Optional[dict] = None,
-        created_at: Optional[datetime] = None,
-        updated_at: Optional[datetime] = None,
-        deleted_at: Optional[datetime] = None,
-    ) -> None:
-        super().__init__()
-        self.id = id
-        self.event_id = event_id
-        self.event = event
-        self.owner_id = owner_id
-        self.owner = owner
-        self.is_public = is_public
-        self.data = data
-        self.trigger_start_at = trigger_start_at
-        self.trigger_end_at = trigger_end_at
-        self.created_at = created_at
-        self.updated_at = updated_at
-        self.deleted_at = deleted_at
+
+class TriggeredEventData(ChainedData):
+    """DEPRECATED"""
+
+
+@dataclass
+class TriggeredEvent(BaseModel):
+    id: UUID
+    event_id: UUID = field(post=True)
+    event: Event = field(key="Event")  # default=None
+    trigger_start_at: datetime = field(post=True, put=True)
+    created_at: datetime
+    updated_at: datetime
+    trigger_end_at: Optional[datetime] = field(default=None, post=True, put=True)
+    data: Optional[str] = field(default=None, post=True, put=True)
+    owner_id: Optional[str] = None
+    owner: Optional[Owner] = field(default=None, key="Owner")
+    is_public: Optional[bool] = None
+    deleted_at: Optional[datetime] = None
+
+    @cachedproperty
+    def parsed_data(self) -> Optional[Any]:
+        """Parse `data` as either JSON or `ChainedData`"""
+
+        def _log_failure(e, guess):
+            logger.error(
+                f"Failed to parse {type(self).__name__}.data {self.data}"
+                f" as {guess}: {e}"
+            )
+
+        if not self.data:
+            return self.data
+
+        # HACK: infer datatype (values seem to be mostly json or a
+        # loosely-structured string, such as "(15>10)")
+        try:
+            data_json = loads(self.data)
+        except JSONDecodeError as e:
+            _log_failure(e, "JSON")
+            return self.data
+
+        # Got valid json, try serializing as ChainedData if it appears applicable
+        if "subchain_triggered_event_id" in self.data:
+            try:
+                return ChainedData.from_dict(data_json, many=True)
+            except Exception as e:
+                _log_failure(e, "ChainedData")
+
+        return data_json
