@@ -7,7 +7,7 @@ from dateutil.relativedelta import relativedelta
 
 from contxt.models import Formatters, Parsers
 from contxt.models.base import UUID, BaseModel, dataclass, field
-from contxt.utils import Utils, cachedproperty, make_logger
+from contxt.utils import cachedproperty, dict_diff, make_logger
 
 logger = make_logger(__name__)
 
@@ -185,7 +185,8 @@ class AssetType(BaseModel):
     def _cache_look_up(
         self, name: str, key: Any, dct: Dict[Any, Any], default: Any
     ) -> Any:
-        """Get `dct[key]` if available, or `default` if specified, or raise `KeyError`"""
+        """Get `dct[key]` if `key` is present, or `default` if specified. Otherwise,
+        raise `KeyError`."""
         if key not in dct:
             if default is ...:
                 raise KeyError(f"{name} {key} not found.")
@@ -240,7 +241,7 @@ class Asset(BaseModel):
     updated_at: datetime
     hierarchy_level: Optional[int]
     parent_id: Optional[UUID] = field(post=True, put=True)
-    # TODO: mayne default to None so we can determine if we just haven't fetched values yet
+    # TODO: default to None so we can determine if we just haven't fetched values yet
     attribute_values: List[AttributeValue] = field(
         default_factory=list, key="asset_attribute_values"
     )
@@ -398,9 +399,7 @@ class CompleteAsset:
         # the two dictionaries
         # TODO: this only identifies the label, since this is a nested dict
         curr_metrics = self.metrics
-        new_metrics = Utils.set_to_dict(
-            Utils.dict_to_set(metrics) - Utils.dict_to_set(curr_metrics)
-        )
+        new_metrics = dict_diff(metrics, curr_metrics)
 
         # Determine each change
         for label, start_date_to_value in new_metrics.items():
@@ -414,10 +413,7 @@ class CompleteAsset:
             # Determine metric values that changed
             metric = self.asset_type.metric_with_label(label)
             metric_values = self._metric_values_by_label[label]
-            new_metric_values = Utils.set_to_dict(
-                Utils.dict_to_set(start_date_to_value)
-                - Utils.dict_to_set(curr_metrics[label])
-            )
+            new_metric_values = dict_diff(start_date_to_value, curr_metrics[label])
 
             for start_date, new_value in new_metric_values.items():
                 # Make the change, and mark as changed

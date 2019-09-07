@@ -22,7 +22,7 @@ class ContxtService(ConfiguredApi):
         ApiEnvironment(
             name="production",
             base_url="https://contxt.api.ndustrial.io/v1",
-            client_id="ahqLTupqA4i81FW0isq8TFL1IjIgUgQv",
+            client_id="8qY2xJob1JAxhmVhIDLCNnGriTM9bct8",
         ),
         # FIXME: staging shares the same client_id, which breaks assumptions
         # ApiEnvironment(

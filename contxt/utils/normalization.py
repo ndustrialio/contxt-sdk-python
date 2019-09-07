@@ -1,7 +1,3 @@
-"""
-This stuff feels super custom/broken
-"""
-
 from csv import DictWriter
 from datetime import datetime
 from typing import Dict

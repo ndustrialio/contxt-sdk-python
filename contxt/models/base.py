@@ -1,5 +1,4 @@
 import dataclasses
-from time import time
 from typing import Any, ClassVar, Dict, Optional, Type
 
 from marshmallow import Schema as _Schema
@@ -53,8 +52,8 @@ class BaseModel:
         return cls(**clean_dict)
 
     @classmethod
-    def from_api(cls, data: Any, **kwargs) -> Any:
-        """Deserialize a dictionary to a class instance"""
+    def from_api(cls, data: Any, **kwargs) -> "BaseModel":
+        """Deserialize JSON-like `data` from API to class instance(s)"""
         with Timer() as t:
             instance = cls.Schema(**kwargs).load(data)
         N = len(data) if isinstance(data, list) else 1
@@ -62,7 +61,7 @@ class BaseModel:
         return instance
 
     def to_api(self, **kwargs) -> RawDict:
-        """Serialize instance to a dictionary"""
+        """Serialize instance for an API request"""
         with Timer() as t:
             d = self.Schema(**kwargs).dump(self)
         logger.info(f"Serialized 1 item of type {type(self).__name__} in {t.elapsed} s")
