@@ -38,16 +38,15 @@ class BaseWorker(ABC):
         )
         self.config_values = self.config.parsed_values if self.config else {}
 
-    def run(self) -> None:
-        run = self.contxt_service.start_worker_run(self.client_id)
-        self.run_id = run["id"]
-        logger.info(f"Worker run id: {self.run_id}")
-        self.do_work()
-        self.contxt_service.end_worker_run(self.client_id, self.run_id)
-
-    def add_metric(self, key: str, value: Any) -> None:
-        self.contxt_service.create_worker_run_metric(self.run_id, key, value)
-
     @abstractmethod
     def do_work(self) -> None:
         pass
+
+    def run(self) -> None:
+        self.run_id = self.contxt_service.create_worker_run(self.client_id)["id"]
+        logger.info(f"Started worker run with id {self.run_id}")
+        self.do_work()
+        self.contxt_service.update_worker_run(self.client_id, self.run_id)
+
+    def add_metric(self, key: str, value: Any) -> None:
+        self.contxt_service.create_metric_for_worker_run(self.run_id, key, value)

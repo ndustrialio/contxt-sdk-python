@@ -19,10 +19,10 @@ class ConfigValueType(Enum):
 @dataclass
 class ConfigValue(BaseModel):
     id: UUID
-    configuration_id: UUID
     key: str
     value: str
     type: ConfigValueType = field(enum=True)
+    configuration_id: UUID
     is_hidden: bool
     created_at: datetime
     updated_at: datetime
@@ -50,12 +50,12 @@ class ConfigValue(BaseModel):
 @dataclass
 class Config(BaseModel):
     id: UUID
-    environment_id: UUID
     name: str
+    description: Optional[str]
     values: List[ConfigValue] = field(key="ConfigurationValues")
+    environment_id: UUID
     created_at: datetime
     updated_at: datetime
-    description: Optional[str]
 
     @cachedproperty
     def parsed_values(self) -> Dict[str, Any]:
@@ -63,57 +63,34 @@ class Config(BaseModel):
 
 
 @dataclass
-class OrganizationUser(BaseModel):
-    id: UUID
-    organization_id: UUID
-    user_id: str
+class User(BaseModel):
+    id: str
+    first_name: str
+    last_name: str
+    email: str
+    phone_number: Optional[str]
+    is_superuser: bool
+    is_activated: bool
     created_at: datetime
     updated_at: datetime
-    is_primary: Optional[bool]
+
+
+@dataclass
+class OrganizationUser(BaseModel):
+    id: UUID
+    user_id: str
+    organization_id: UUID
+    is_primary: bool
+    created_at: datetime
+    updated_at: datetime
 
 
 @dataclass
 class Organization(BaseModel):
     id: UUID
-    name: Optional[str] = field(post=True)
-    created_at: datetime
-    updated_at: datetime
+    name: str = field(post=True)
+    slug: str = field(post=True)
     legacy_id: Optional[int] = field(key="legacy_organization_id")
-    slug: str
+    created_at: datetime
+    updated_at: datetime
     organization_user: Optional[OrganizationUser] = field(key="OrganizationUser")
-
-
-@dataclass
-class UserRole(BaseModel):
-    id: UUID
-    role_id: UUID
-    user_id: str
-    mapped_from_external_group: bool
-    created_at: datetime
-    updated_at: datetime
-
-
-@dataclass
-class Role(BaseModel):
-    id: UUID
-    name: str
-    description: str
-    user_role: UserRole = field(key="UserRole")
-    created_at: datetime
-    updated_at: datetime
-    organization_id: Optional[str]
-
-
-@dataclass
-class User(BaseModel):
-    id: str
-    email: str
-    first_name: str
-    last_name: str
-    is_superuser: bool
-    is_activated: bool
-    created_at: datetime
-    updated_at: datetime
-    phone_number: Optional[str]
-    # roles: List[Role] = field(key="Roles")
-    # organizations: List[Organization]

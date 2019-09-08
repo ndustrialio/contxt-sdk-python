@@ -24,7 +24,7 @@ def is_field_updatable(f: dataclasses.Field) -> bool:
     return f.metadata.get("put", False)
 
 
-# TODO:
+# TODO
 # (1) Enhance instantiating new classes
 # (2) Freeze fields that are not editable
 @dataclasses.dataclass
@@ -52,7 +52,7 @@ class BaseModel:
         return cls(**clean_dict)
 
     @classmethod
-    def from_api(cls, data: Any, **kwargs) -> "BaseModel":
+    def from_api(cls, data: Any, **kwargs):
         """Deserialize JSON-like `data` from API to class instance(s)"""
         with Timer() as t:
             instance = cls.Schema(**kwargs).load(data)
