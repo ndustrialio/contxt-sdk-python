@@ -24,26 +24,39 @@ class TestEmsServices:
         main_services = self.service.get_main_services(facility_id)
         assert all([s.facility_id == facility_id for s in main_services])
 
-    def test_get_main_services_with_resource_type(
+    def test_get_main_services_with_type(
         self,
         facility_id: int = TestFacility.id,
         resource_type: ResourceType = ResourceType.ELECTRIC,
     ):
         main_services = self.service.get_main_services(facility_id, resource_type)
+        assert all([s.facility_id == facility_id for s in main_services])
         assert all([s.resource_type == resource_type for s in main_services])
 
-    def test_get_monthly_utility_spend(self, facility_id: int = TestFacility.id):
+    def test_get_monthly_utility_spend(
+        self,
+        facility_id: int = TestFacility.id,
+        resource_type: ResourceType = ResourceType.ELECTRIC,
+    ):
         utility_spend = self.service.get_monthly_utility_spend(
-            facility_id, start_date=date.today() - timedelta(days=30)
+            facility_id,
+            resource_type=resource_type,
+            start_date=date.today() - timedelta(days=30),
         )
         assert utility_spend.currency == "$"
-        assert utility_spend.type == ResourceType.ELECTRIC
+        assert utility_spend.type == resource_type
         assert utility_spend.values
 
-    def test_get_monthly_utility_usage(self, facility_id: int = TestFacility.id):
+    def test_get_monthly_utility_usage(
+        self,
+        facility_id: int = TestFacility.id,
+        resource_type: ResourceType = ResourceType.ELECTRIC,
+    ):
         utility_usage = self.service.get_monthly_utility_usage(
-            facility_id, start_date=date.today() - timedelta(days=30)
+            facility_id,
+            resource_type=resource_type,
+            start_date=date.today() - timedelta(days=30),
         )
         assert utility_usage.unit.lower() == "kwh"
-        assert utility_usage.type == ResourceType.ELECTRIC
+        assert utility_usage.type == resource_type
         assert utility_usage.values

@@ -1,3 +1,5 @@
+import pytest
+
 from contxt.auth.cli import CliAuth
 from contxt.services import MessageBusService
 from tests.static.data import TestChannel
@@ -24,25 +26,25 @@ class TestMessageBusService:
         )
         assert all([c.service_id == TestChannel.service_id for c in channels])
 
-    # TODO: no schemas exist for this organization
+    @pytest.mark.skip(reason="No schemas exist for test channel")
     def test_get_schema_for_channel_and_service(self):
-        pass
-        # schema = self.service.get_schema_for_channel_and_service(
-        #     schema_id=self.schema_id,
-        #     channel_id=TestChannel.id,
-        #     service_id=TestChannel.service_id,
-        # )
+        schema = self.service.get_schema_for_channel_and_service(
+            schema_id=TestChannel.schema_id,
+            channel_id=TestChannel.id,
+            service_id=TestChannel.service_id,
+        )
+        assert schema
 
-    # TODO: no schemas exist for this organization
+    @pytest.mark.skip(reason="No schemas exist for test channel")
     def test_get_schemas_for_channel_and_service(self):
         schemas = self.service.get_schemas_for_channel_and_service(
             TestChannel.id, TestChannel.service_id
         )
-        assert schemas is not None
+        assert schemas
 
-    # TODO: no stats exist for this organization
+    @pytest.mark.skip(reason="No stats exist for test channel")
     def test_get_stats_for_channel_and_service(self):
-        pass
-        # stats = self.service.get_stats_for_channel_and_service(
-        #     TestChannel.id, TestChannel.service_id
-        # )
+        stats = self.service.get_stats_for_channel_and_service(
+            TestChannel.id, TestChannel.service_id
+        )
+        assert stats

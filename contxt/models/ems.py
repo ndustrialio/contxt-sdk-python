@@ -51,9 +51,9 @@ class Facility(BaseModel):
 
 
 @dataclass
-class UtilitySpendPeriod(BaseModel):
+class UtilityValue(BaseModel):
     date: str
-    value: Optional[str]
+    value: Optional[float]
     pro_forma_date: Optional[str] = None
 
 
@@ -61,18 +61,11 @@ class UtilitySpendPeriod(BaseModel):
 class UtilitySpend(BaseModel):
     type: ResourceType = field(enum=True)
     currency: str
-    values: List[UtilitySpendPeriod]
-
-
-@dataclass
-class UtilityUsagePeriod(BaseModel):
-    date: str
-    value: Optional[str]
-    pro_forma_date: Optional[str] = None
+    values: List[UtilityValue]
 
 
 @dataclass
 class UtilityUsage(BaseModel):
     type: ResourceType = field(enum=True)
     unit: str
-    values: List[UtilityUsagePeriod]
+    values: List[UtilityValue]

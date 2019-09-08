@@ -39,14 +39,12 @@ class EmsService(ConfiguredApi):
         self, facility_id: int, resource_type: Optional[ResourceType] = None
     ) -> List[MainService]:
         facility = self.get_facility(facility_id)
-        main_services = facility.main_services
-
-        # Manually filter on resource type
+        # Filter by resource_type
         if resource_type:
-            main_services = [
-                s for s in main_services if s.resource_type == resource_type
+            return [
+                s for s in facility.main_services if s.resource_type == resource_type
             ]
-        return main_services
+        return facility.main_services
 
     def get_monthly_utility_spend(
         self,
