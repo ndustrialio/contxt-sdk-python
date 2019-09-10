@@ -1,7 +1,8 @@
 from os import environ
 
-from contxt.services import AuthService
 from jose.jwt import get_unverified_claims
+
+from contxt.services import AuthService
 
 
 class TestAuthService:

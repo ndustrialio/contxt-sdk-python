@@ -7,8 +7,9 @@ import dash
 import dash_core_components as dcc
 import dash_html_components as html
 import plotly.graph_objs as go
-from contxt.utils import make_logger
 from dash.dependencies import Input, Output
+
+from contxt.utils import make_logger
 
 logger = make_logger(__name__)
 

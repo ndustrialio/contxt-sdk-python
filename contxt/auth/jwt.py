@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 
 import requests
-
 from jose import jwt
 from jose.constants import ALGORITHMS
 
