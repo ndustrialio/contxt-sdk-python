@@ -154,3 +154,5 @@ Temporary Items
 .vscode/*
 *.csv
 *data.py
+
+.sandbox.py

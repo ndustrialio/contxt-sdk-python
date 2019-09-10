@@ -24,6 +24,7 @@ class Facility(ApiObject):
         ),
         ApiField("created_at", data_type=Parsers.datetime),
         ApiField("weather_location_id"),
+        ApiField("slug"),
     )
 
     def __init__(
@@ -44,6 +45,7 @@ class Facility(ApiObject):
         info: dict,
         weather_location_id: str,
         created_at: str,
+        slug: str,
     ) -> None:
         super().__init__()
         self.id = id
@@ -62,3 +64,4 @@ class Facility(ApiObject):
         self.weather_location_id = weather_location_id
         self.info = info
         self.created_at = created_at
+        self.slug = slug

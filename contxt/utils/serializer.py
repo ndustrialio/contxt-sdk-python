@@ -53,7 +53,7 @@ class Serializer:
         # >> json.loads(d)
 
         def default_filter(key: str) -> bool:
-            return key.startswith("_")
+            return not key.startswith("_")
 
         # Create default key filter (ignore _ vars)
         key_filter = key_filter or default_filter
