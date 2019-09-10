@@ -4,6 +4,8 @@ exclude =
     __pycache__,
     .git,
     .mypy_cache,
-    .pytest_cache
+    .pytest_cache,
     build,
-    dist
+    dist,
+    .venv,
+    venv
