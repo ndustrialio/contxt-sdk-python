@@ -36,8 +36,8 @@ class PageOptions:
 
 @dataclass
 class PageMetadata:
-    offset: int
     totalRecords: int
+    offset: int = 0
 
 
 @dataclass

@@ -3,6 +3,7 @@ from enum import Enum
 from typing import Dict, List, Optional
 
 from contxt.models import ApiField, ApiObject, Parsers
+from contxt.models.events import Event
 from contxt.models.iot import Field
 
 
@@ -147,3 +148,79 @@ class UtilityUsage(ApiObject):
         self.type = type
         self.unit = unit
         self.periods = values
+
+
+class UtilityContractReminder(ApiObject):
+    _api_fields = (
+        ApiField("utility_contract_id", data_type=int),
+        ApiField("user_id", data_type=str),
+        ApiField("user_event_subscription_id", data_type=str),
+        ApiField("created_at", data_type=Parsers.datetime),
+        ApiField("updated_at", data_type=Parsers.datetime),
+    )
+
+    def __init__(
+        self,
+        utility_contract_id: int,
+        user_id: str,
+        user_event_subscription_id: str,
+        created_at: datetime,
+        updated_at: datetime,
+    ):
+        self.utility_contract_id = utility_contract_id
+        self.user_id = user_id
+        self.user_event_subscription_id = user_event_subscription_id
+        self.created_at = created_at
+        self.updated_at = updated_at
+
+
+class UtilityContract(ApiObject):
+    _api_fields = (
+        ApiField("id", data_type=int),
+        ApiField("name"),
+        ApiField("facility_id", data_type=int),
+        ApiField("status"),
+        ApiField("start_date", data_type=Parsers.date),
+        ApiField("end_date", data_type=Parsers.date),
+        ApiField("rate_narrative"),
+        ApiField("file_id"),
+        ApiField("created_at", data_type=Parsers.datetime),
+        ApiField("updated_at", data_type=Parsers.datetime),
+        ApiField("created_by"),
+        ApiField("utility_contract_reminders", data_type=UtilityContractReminder),
+        ApiField("report_event_id"),
+        ApiField("report_event", data_type=Event),
+    )
+
+    def __init__(
+        self,
+        id: int,
+        name: str,
+        facility_id: int,
+        status: str,
+        start_date: datetime,
+        end_date: datetime,
+        rate_narrative: str,
+        file_id: str,
+        created_at: datetime,
+        updated_at: datetime,
+        created_by: str,
+        utility_contract_reminders: list,
+        report_event_id: str,
+        report_event: Event,
+    ) -> None:
+        super().__init__()
+        self.id = id
+        self.name = name
+        self.facility_id = facility_id
+        self.status = status
+        self.start_date = start_date
+        self.end_date = end_date
+        self.rate_narrative = rate_narrative
+        self.file_id = file_id
+        self.created_at = created_at
+        self.updated_at = updated_at
+        self.created_by = created_by
+        self.utility_contract_reminders = utility_contract_reminders
+        self.report_event_id = report_event_id
+        self.report_event = report_event
