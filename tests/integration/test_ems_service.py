@@ -50,6 +50,7 @@ class TestEmsServices:
 
     def test_get_contracts(self):
         from tests.system.test_facilities import TestFacilities
+
         facilities = TestFacilities.service.get_facilities()
         assert facilities
         for f in facilities:
