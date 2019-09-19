@@ -27,9 +27,9 @@ class MessageBusService(ConfiguredApi):
     )
 
     def __init__(
-        self, auth: Auth, organization_id: str, env: str = "production"
+        self, auth: Auth, organization_id: str, env: str = "production", **kwargs
     ) -> None:
-        super().__init__(env=env, auth=auth)
+        super().__init__(env=env, auth=auth, **kwargs)
         self.organization_id = organization_id
 
     def _channels_url(self, service_id: str) -> str:

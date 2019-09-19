@@ -32,8 +32,8 @@ class IotService(ConfiguredApi):
         ),
     )
 
-    def __init__(self, auth: Auth, env: str = "production"):
-        super().__init__(env=env, auth=auth)
+    def __init__(self, auth: Auth, env: str = "production", **kwargs):
+        super().__init__(env=env, auth=auth, **kwargs)
 
     def get_feed_with_id(self, id: int) -> Feed:
         """Get feed with id `id`"""

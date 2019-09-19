@@ -23,8 +23,8 @@ class NgestService(ConfiguredApi):
         ),
     )
 
-    def __init__(self, env: str = "production"):
-        super().__init__(env=env)
+    def __init__(self, env: str = "production", **kwargs):
+        super().__init__(env=env, **kwargs)
 
     @staticmethod
     def specialize(feed_key: str, feed_token: str) -> "SpecializedNgestService":
