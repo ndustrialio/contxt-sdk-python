@@ -3,8 +3,10 @@ from dataclasses import dataclass
 from typing import Dict, Optional, Tuple
 
 from requests import PreparedRequest, Response, Session
+from requests.adapters import HTTPAdapter
 from requests.auth import AuthBase
 from requests.exceptions import HTTPError
+from urllib3.util.retry import Retry
 
 from contxt.auth import Auth, TokenProvider
 from contxt.utils import make_logger
@@ -25,6 +27,22 @@ class BearerTokenAuth(AuthBase):
         return request
 
 
+class ApiRetry(Retry):
+    def __init__(
+        self,
+        total: int = 3,
+        backoff_factor: float = 0.1,
+        status_forcelist: Tuple[int, ...] = (500, 502, 504),
+        **kwargs,
+    ) -> None:
+        super().__init__(
+            total=total,
+            backoff_factor=backoff_factor,
+            status_forcelist=status_forcelist,
+            **kwargs,
+        )
+
+
 class Api:
     """
     An API with url `base_url`.
@@ -34,13 +52,23 @@ class Api:
     """
 
     def __init__(
-        self, base_url: str, token_provider: Optional[TokenProvider] = None
+        self,
+        base_url: str,
+        token_provider: Optional[TokenProvider] = None,
+        retry: Optional[ApiRetry] = ApiRetry(),
     ) -> None:
         self.base_url = base_url if base_url.endswith("/") else f"{base_url}/"
+
         # Initialize session
         self.session = Session()
         self.session.auth = BearerTokenAuth(token_provider) if token_provider else None
         self.session.hooks = {"response": self._log_response}
+
+        # Attach retry adapter
+        if retry:
+            adapter = HTTPAdapter(max_retries=retry)
+            self.session.mount("http://", adapter)
+            self.session.mount("https://", adapter)
 
     def _url(self, uri: str) -> str:
         return f"{self.base_url}{uri}"
