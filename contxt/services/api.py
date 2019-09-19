@@ -33,12 +33,14 @@ class ApiRetry(Retry):
         total: int = 3,
         backoff_factor: float = 0.1,
         status_forcelist: Tuple[int, ...] = (500, 502, 504),
+        raise_on_status: bool = False,
         **kwargs,
     ) -> None:
         super().__init__(
             total=total,
             backoff_factor=backoff_factor,
             status_forcelist=status_forcelist,
+            raise_on_status=raise_on_status,
             **kwargs,
         )
 
