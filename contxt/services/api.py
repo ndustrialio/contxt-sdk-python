@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Dict, Optional, Tuple
+from typing import Dict, FrozenSet, Optional, Tuple
 
 from requests import PreparedRequest, Response, Session
 from requests.adapters import HTTPAdapter
@@ -32,6 +32,10 @@ class ApiRetry(Retry):
         self,
         total: int = 3,
         backoff_factor: float = 0.1,
+        method_whitelist: FrozenSet = frozenset(
+            # NOTE: be careful as some of these methods are not idempotent
+            ["DELETE", "GET", "OPTIONS", "POST", "PUT", "TRACE", "HEAD"]
+        ),
         status_forcelist: Tuple[int, ...] = (500, 502, 504),
         raise_on_status: bool = False,
         **kwargs,
@@ -39,6 +43,7 @@ class ApiRetry(Retry):
         super().__init__(
             total=total,
             backoff_factor=backoff_factor,
+            method_whitelist=method_whitelist,
             status_forcelist=status_forcelist,
             raise_on_status=raise_on_status,
             **kwargs,
