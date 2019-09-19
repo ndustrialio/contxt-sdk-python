@@ -167,6 +167,7 @@ class UtilityContractReminder(ApiObject):
         created_at: datetime,
         updated_at: datetime,
     ):
+        super().__init__()
         self.utility_contract_id = utility_contract_id
         self.user_id = user_id
         self.user_event_subscription_id = user_event_subscription_id
