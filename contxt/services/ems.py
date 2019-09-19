@@ -1,15 +1,17 @@
 from datetime import date, timedelta
-from typing import List, Optional
+from typing import Iterable, List, Optional
 
 from contxt.auth import Auth
 from contxt.models.ems import (
     Facility,
     MainService,
     ResourceType,
+    UtilityContract,
     UtilitySpend,
     UtilityUsage,
 )
 from contxt.services.api import ApiEnvironment, ConfiguredApi
+from contxt.services.pagination import PagedRecords
 
 
 class EmsService(ConfiguredApi):
@@ -96,3 +98,12 @@ class EmsService(ConfiguredApi):
             },
         )
         return UtilityUsage.from_api(resp)
+
+    def get_utility_contracts_for_facility(
+        self, facility_id: int
+    ) -> Iterable[UtilityContract]:
+        return PagedRecords(
+            api=self,
+            url=f"facilities/{facility_id}/contracts",
+            record_parser=UtilityContract.from_api,
+        )

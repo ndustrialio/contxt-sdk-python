@@ -47,3 +47,11 @@ class TestEmsServices:
         assert utility_usage.unit.lower() == "kwh"
         assert utility_usage.type == ResourceType.ELECTRIC
         assert utility_usage.periods
+
+    def test_get_contracts(self):
+        from tests.system.test_facilities import TestFacilities
+
+        facilities = TestFacilities.service.get_facilities()
+        assert facilities
+        for f in facilities:
+            assert self.service.get_utility_contracts_for_facility(f.id)
