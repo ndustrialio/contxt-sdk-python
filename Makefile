@@ -1,13 +1,13 @@
 .PHONY: lint fix test
 
 lint:
-	isort --check-only
-	black . --check
-	flake8
+	poetry run isort --check-only
+	poetry run black --check .
+	poetry run flake8
 
 fix:
-	isort --apply
-	black .
+	poetry run isort --apply
+	poetry run black .
 
 test:
-	pytest tests/unit
+	poetry run pytest tests/unit

@@ -4,22 +4,15 @@ build:
     # Install package
     - script:
       name: install package
-      code: pip install .[dev,server]
-
-    # Run formatters
-    - script:
-      name: run formatters
       code: |
-        isort --check-only
-        black --check .
+        pip install poetry
+        poetry install -E server
 
     # Run linters
     - script:
       name: run linters
-      code: flake8
+      code: make lint
 
     # Run tests
     - script:
-      name: run unit tests
-      code: pytest tests/unit
-
+      name: make test
