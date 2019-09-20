@@ -1,6 +1,4 @@
-"""
-This stuff feels super custom/broken
-"""
+"""Utility script to calculate normalized metrics"""
 
 from csv import DictWriter
 from datetime import datetime

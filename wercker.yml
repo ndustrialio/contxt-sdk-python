@@ -4,7 +4,7 @@ build:
     # Install package
     - script:
       name: install package
-      code: pip install .[dev,plotly,server]
+      code: pip install .[dev,server]
 
     # Run formatters
     - script:

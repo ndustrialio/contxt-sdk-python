@@ -1,1 +1,1 @@
--e .[dev,plotly,server]
+-e .[dev,server]

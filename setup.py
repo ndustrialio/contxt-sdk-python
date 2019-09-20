@@ -93,7 +93,6 @@ setup(
     extras_require={
         # Optional requirements
         "dev": ["black", "flake8", "isort", "mypy", "pytest", "twine"],
-        "plotly": ["dash-core-components", "dash-html-components", "dash", "plotly"],
         "server": ["python-jose-cryptodome"],
     },
     include_package_data=True,
