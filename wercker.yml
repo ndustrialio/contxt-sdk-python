@@ -15,4 +15,5 @@ build:
 
     # Run tests
     - script:
-      name: make test
+      name: run unit tests
+      code: make test
