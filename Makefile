@@ -1,4 +1,4 @@
-.PHONY: lint fix test
+.PHONY: lint fix test version publish
 
 lint:
 	poetry run isort --check-only
@@ -11,3 +11,10 @@ fix:
 
 test:
 	poetry run pytest tests/unit
+
+version:
+	bump2version $(v) --commit --tag && git push && git push --tags
+
+publish:
+	poetry publish --build --username ndustrial.io
+	rm -rf dist/

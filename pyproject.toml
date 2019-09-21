@@ -28,10 +28,11 @@ tzlocal = "*"
 
 [tool.poetry.dev-dependencies]
 black = {version = "*", allows-prereleases = true}
-flake8 = "*"
-isort = "*"
-mypy = "*"
-pytest = "*"
+bump2version = "^0.5.11"
+flake8 = "^3.7"
+isort = "^4.3"
+mypy = "^0.720.0"
+pytest = "^5.1"
 
 [tool.poetry.extras]
 server = ["python-jose-cryptodome"]
