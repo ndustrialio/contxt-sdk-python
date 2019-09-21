@@ -3,7 +3,7 @@ To publish a new version to [PyPI](https://pypi.org/project/contxt-sdk/), follow
 
 ```bash
 # Bump version (creates commit and tag)
-$ make version v=[major|minor|patch|build]
+$ make version v=[major|minor|patch|release|build]
 
 # Publish (authenticating when prompted)
 $ make publish

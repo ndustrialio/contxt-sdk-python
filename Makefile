@@ -13,6 +13,7 @@ test:
 	poetry run pytest tests/unit
 
 version:
+	# Usage: make version v=[major|minor|patch|release|build]
 	bump2version $(v) --commit --tag && git push && git push --tags
 
 publish:

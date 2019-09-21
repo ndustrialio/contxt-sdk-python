@@ -10,24 +10,24 @@ authors = ["ndustrial.io <dev@ndustrial.io>"]
 license = "ISC"
 readme = "README.md"
 repository = "https://github.com/ndustrialio/contxt-sdk-python"
-packages = [{include = "contxt"}]
+packages = [ { include = "contxt" } ]
 
 [tool.poetry.dependencies]
-python = ">=3.6.0"
-argcomplete = "*"
-auth0-python = "^3"
-dataclasses = {version = "*", python = "<3.7"}
-pyjwt = "*"
-python-dateutil = "*"
-python-jose-cryptodome = {version = "*", optional = true}
-pytz = "*"
-requests = "*"
-tabulate = "*"
-tqdm = "*"
-tzlocal = "*"
+python = "^3.6"
+argcomplete = "^1.10"
+auth0-python = "^3.9"
+dataclasses = { version = "^0.6.0", python = "<3.7" }
+pyjwt = "^1.7"
+python-dateutil = "^2.8"
+python-jose-cryptodome = { version = "^1.3", optional = true }
+pytz = "^2019.2"
+requests = "^2.22"
+tabulate = "^0.8.3"
+tqdm = "^4.36"
+tzlocal = "^2.0"
 
 [tool.poetry.dev-dependencies]
-black = {version = "*", allows-prereleases = true}
+black = "^19.3b0"
 bump2version = "^0.5.11"
 flake8 = "^3.7"
 isort = "^4.3"
