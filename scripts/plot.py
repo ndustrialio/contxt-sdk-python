@@ -1,5 +1,4 @@
-"""
-Utility script to plot data
+"""Utility script to plot data
 
 Requirements:
     $ pip install dash-core-components dash-html-components dash plotly

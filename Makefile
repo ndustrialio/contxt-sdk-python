@@ -1,9 +1,11 @@
-.PHONY: lint fix test version publish
+install:
+	pip install poetry
+	poetry install -E server
 
 lint:
 	poetry run isort --check-only
 	poetry run black --check .
-	poetry run flake8
+	poetry run flake8 contxt scripts tests
 
 fix:
 	poetry run isort --apply
@@ -14,8 +16,10 @@ test:
 
 version:
 	# Usage: make version v=[major|minor|patch|release|build]
-	bump2version $(v) --commit --tag && git push && git push --tags
+	poetry run bump2version $(v) --commit --tag && git push && git push --tags
 
-publish:
+clean:
+	rm -rf dist/ build/ *.egg-info
+
+publish: clean
 	poetry publish --build --username ndustrial.io
-	rm -rf dist/

@@ -4,9 +4,7 @@ build:
     # Install package
     - script:
       name: install package
-      code: |
-        pip install poetry
-        poetry install -E server
+      code: make install
 
     # Run linters
     - script:
