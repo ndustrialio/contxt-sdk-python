@@ -9,7 +9,6 @@ from contxt.models import Parsers
 from contxt.models.iot import (
     BatchRequest,
     BatchRequests,
-    BatchResponse,
     BatchResponses,
     Feed,
     Field,
