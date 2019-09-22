@@ -246,8 +246,5 @@ class IotService(ConfiguredApi):
 
     def _batch_request(self, requests: BatchRequests) -> BatchResponses:
         prepared_requests = {label: req.to_api() for label, req in requests.items()}
-        responses = self.post("batch", json=prepared_requests)
-        return {
-            label: ObjectMapper.tree_to_object(resp, BatchResponse)
-            for label, resp in responses.items()
-        }
+        resp = self.post("batch", json=prepared_requests)
+        return ObjectMapper.tree_to_object(resp, BatchResponses)
