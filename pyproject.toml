@@ -5,7 +5,7 @@ build-backend = "poetry.masonry.api"
 [tool.poetry]
 name = "contxt-sdk"
 description = "Contxt SDK from ndustrial.io"
-version = "1.0.0b7"
+version = "1.0.0b8"
 authors = ["ndustrial.io <dev@ndustrial.io>"]
 license = "ISC"
 readme = "README.md"
