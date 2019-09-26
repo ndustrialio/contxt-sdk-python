@@ -4,22 +4,14 @@ build:
     # Install package
     - script:
       name: install package
-      code: pip install .[dev,plotly,server]
-
-    # Run formatters
-    - script:
-      name: run formatters
-      code: |
-        isort --check-only
-        black --check .
+      code: make install
 
     # Run linters
     - script:
       name: run linters
-      code: flake8
+      code: make lint
 
     # Run tests
     - script:
       name: run unit tests
-      code: pytest tests/unit
-
+      code: make test
