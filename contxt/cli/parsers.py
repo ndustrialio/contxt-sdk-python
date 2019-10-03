@@ -91,32 +91,22 @@ class IotParser(ContxtArgParser):
             "unprovisioned", help="Unprovisioned fields"
         )
 
-        feeds_group = unprovisioned_fields_parser.add_mutually_exclusive_group(
-            required=True
-        )
+        feeds_group = unprovisioned_fields_parser.add_mutually_exclusive_group(required=True)
         feeds_group.add_argument("--feed_key", help="Provide feed key")
         feeds_group.add_argument("--feed_id", type=int, help="Provide feed id")
 
-        unprovisioned_fields_parser.add_argument(
-            "--output", help="Dump results to csv if desired"
-        )
+        unprovisioned_fields_parser.add_argument("--output", help="Dump results to csv if desired")
         unprovisioned_fields_parser.set_defaults(func=self._unprovisioned_fields)
 
         # Field data
         field_data_parser = _subparsers.add_parser("field-data", help="Get field data")
         field_data_parser.add_argument("grouping_id", help="Grouping id")
-        field_data_parser.add_argument(
-            "start_time", type=Parsers.datetime, help="Data start time"
-        )
+        field_data_parser.add_argument("start_time", type=Parsers.datetime, help="Data start time")
         field_data_parser.add_argument(
             "window", type=lambda x: Window(int(x)), help="Data windowing period"
         )
-        field_data_parser.add_argument(
-            "-e", "--end-time", type=Parsers.datetime, help="Data end time"
-        )
-        field_data_parser.add_argument(
-            "-o", "--output", type=Path, help="File for output"
-        )
+        field_data_parser.add_argument("-e", "--end-time", type=Parsers.datetime, help="Data end time")
+        field_data_parser.add_argument("-o", "--output", type=Path, help="File for output")
         field_data_parser.set_defaults(func=self._field_data)
 
         return parser
@@ -169,18 +159,12 @@ class IotParser(ContxtArgParser):
 
         iot_service = IotService(auth)
         fields = iot_service.get_field_grouping(args.grouping_id).fields
-        print(
-            f"Fetching iot data for {len(fields)} tags for {args.start_time}"
-            f" - {args.end_time}..."
-        )
+        print(f"Fetching iot data for {len(fields)} tags for {args.start_time}" f" - {args.end_time}...")
         try:
             field_data = {}
             for field in tqdm(fields):
                 for d in iot_service.get_time_series_for_field(
-                    field=field,
-                    start_time=args.start_time,
-                    end_time=args.end_time,
-                    window=args.window,
+                    field=field, start_time=args.start_time, end_time=args.end_time, window=args.window
                 ):
                     field_data.setdefault(d[0], {})[field.field_human_name] = d[1]
         except MemoryError:
@@ -203,18 +187,14 @@ class EmsParser(ContxtArgParser):
 
         # Main Services
         mains_parser = _subparsers.add_parser("mains", help="Get Main Services")
-        mains_parser.add_argument(
-            "facility_id", type=int, help="Facility to get main services for"
-        )
+        mains_parser.add_argument("facility_id", type=int, help="Facility to get main services for")
         mains_parser.add_argument(
             "--resource_type", type=ResourceType, help="Filter by type of resource"
         )
         mains_parser.set_defaults(func=self._get_mains)
 
         # Get Main Service Data
-        md_parser = _subparsers.add_parser(
-            "main-data", help="Get main service data for a facility"
-        )
+        md_parser = _subparsers.add_parser("main-data", help="Get main service data for a facility")
         md_parser.add_argument("facility_id", type=int, help="Facility ID")
         md_parser.add_argument("resource_type", type=ResourceType)
         md_parser.add_argument("start_time", type=Parsers.datetime, help="Start time")
@@ -223,12 +203,8 @@ class EmsParser(ContxtArgParser):
 
         # Spend
         spend_parser = _subparsers.add_parser("util-spend", help="Utility spend")
-        spend_parser.add_argument(
-            "interval", choices=["daily", "monthly"], help="Time interval"
-        )
-        spend_parser.add_argument(
-            "resource_type", type=ResourceType, help="Type of resource"
-        )
+        spend_parser.add_argument("interval", choices=["daily", "monthly"], help="Time interval")
+        spend_parser.add_argument("resource_type", type=ResourceType, help="Type of resource")
         spend_parser.add_argument("start_date", type=Parsers.date, help="Start date")
         spend_parser.add_argument("end_date", type=Parsers.date, help="End date")
 
@@ -239,21 +215,14 @@ class EmsParser(ContxtArgParser):
 
         spend_parser.add_argument("-o", "--output", help="Filename to save data (csv)")
         spend_parser.add_argument(
-            "-p",
-            "--pro-forma",
-            action="store_true",
-            help="Include pro forma calculations",
+            "-p", "--pro-forma", action="store_true", help="Include pro forma calculations"
         )
         spend_parser.set_defaults(func=self._utility_spend)
 
         # Usage
         usage_parser = _subparsers.add_parser("util-usage", help="Utility usage")
-        usage_parser.add_argument(
-            "interval", choices=["daily", "monthly"], help="Time interval"
-        )
-        usage_parser.add_argument(
-            "resource_type", type=ResourceType, help="Type of resource"
-        )
+        usage_parser.add_argument("interval", choices=["daily", "monthly"], help="Time interval")
+        usage_parser.add_argument("resource_type", type=ResourceType, help="Type of resource")
         usage_parser.add_argument("start_date", type=Parsers.date, help="Start date")
         usage_parser.add_argument("end_date", type=Parsers.date, help="End date")
 
@@ -264,10 +233,7 @@ class EmsParser(ContxtArgParser):
 
         usage_parser.add_argument("-o", "--output", help="Filename to save data (csv)")
         usage_parser.add_argument(
-            "-p",
-            "--pro-forma",
-            action="store_true",
-            help="Include pro forma calculations",
+            "-p", "--pro-forma", action="store_true", help="Include pro forma calculations"
         )
         usage_parser.set_defaults(func=self._utility_usage)
 
@@ -401,9 +367,7 @@ class AssetsParser(ContxtArgParser):
         attr_parser.set_defaults(func=self._attributes)
 
         # TODO: Attribute values
-        attr_vals_parser = _subparsers.add_parser(
-            "attr-vals", help="Get asset attribute values"
-        )
+        attr_vals_parser = _subparsers.add_parser("attr-vals", help="Get asset attribute values")
         attr_vals_parser.set_defaults(func=self._attribute_values)
 
         # TODO: Metrics
@@ -411,21 +375,15 @@ class AssetsParser(ContxtArgParser):
         metrics_parser.set_defaults(func=self._metrics)
 
         # Metric values
-        metric_vals_parser = _subparsers.add_parser(
-            "metric-vals", help="Get asset metric values"
-        )
+        metric_vals_parser = _subparsers.add_parser("metric-vals", help="Get asset metric values")
         metrics_group1 = metric_vals_parser.add_mutually_exclusive_group(required=True)
         metrics_group1.add_argument("-i", "--org_id", help="Organization id")
         metrics_group1.add_argument("-n", "--org_name", help="Organization name")
         metrics_group2 = metric_vals_parser.add_mutually_exclusive_group(required=True)
         metrics_group2.add_argument("-a", "--asset_id", help="Asset id")
         metrics_group2.add_argument("-t", "--type_label", help="Asset type label")
-        metric_vals_parser.add_argument(
-            "--metric_label", nargs="+", help="Metric label"
-        )
-        metric_vals_parser.add_argument(
-            "-p", "--plot", action="store_true", help="Plot the values"
-        )
+        metric_vals_parser.add_argument("--metric_label", nargs="+", help="Metric label")
+        metric_vals_parser.add_argument("-p", "--plot", action="store_true", help="Plot the values")
         metric_vals_parser.set_defaults(func=self._metric_values)
 
         return parser
@@ -519,9 +477,7 @@ class ContxtParser(ContxtArgParser):
         users_parser.set_defaults(func=self._users)
 
         # Add users
-        add_user_parser = _subparsers.add_parser(
-            "add-user", help="Add user to an organization"
-        )
+        add_user_parser = _subparsers.add_parser("add-user", help="Add user to an organization")
         add_user_parser.add_argument("org_id", help="Organization id")
         add_user_parser.add_argument("user_id", help="User id")
         add_user_parser.set_defaults(func=self._add_user)
@@ -542,9 +498,7 @@ class ContxtParser(ContxtArgParser):
 
         contxt_service = ContxtService(auth)
         org = contxt_service.create_organization(Organization(args.org_name))
-        contxt_service.add_user_to_organization(
-            user_id=auth.user_id, organization_id=org.id
-        )
+        contxt_service.add_user_to_organization(user_id=auth.user_id, organization_id=org.id)
         print(org)
 
     def _users(self, args, auth):
@@ -559,9 +513,7 @@ class ContxtParser(ContxtArgParser):
         from contxt.services.contxt import ContxtService
 
         contxt_service = ContxtService(auth)
-        contxt_service.add_user_to_organization(
-            user_id=args.user_id, organization_id=args.org_id
-        )
+        contxt_service.add_user_to_organization(user_id=args.user_id, organization_id=args.org_id)
 
 
 class BusParser(ContxtArgParser):
@@ -579,16 +531,10 @@ class BusParser(ContxtArgParser):
         channel_parser.set_defaults(func=self._channels)
 
         # Stats
-        stats_parser = _subparsers.add_parser(
-            "stats", help="View Message Bus Channel statistics"
-        )
-        stats_organization_group = stats_parser.add_mutually_exclusive_group(
-            required=True
-        )
+        stats_parser = _subparsers.add_parser("stats", help="View Message Bus Channel statistics")
+        stats_organization_group = stats_parser.add_mutually_exclusive_group(required=True)
         stats_organization_group.add_argument("-I", "--org-id", help="Organization id")
-        stats_organization_group.add_argument(
-            "-N", "--org-name", help="Organization name"
-        )
+        stats_organization_group.add_argument("-N", "--org-name", help="Organization name")
         stats_channel_group = stats_parser.add_mutually_exclusive_group(required=True)
         stats_channel_group.add_argument("-i", "--channel-id", help="Channel id")
         stats_channel_group.add_argument("-n", "--channel-name", help="Channel name")

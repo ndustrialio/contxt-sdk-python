@@ -12,9 +12,7 @@ class TestFacilitiesService:
         assert facilities
         assert all([isinstance(f, Facility) for f in facilities])
 
-    def test_get_facilities_for_organization(
-        self, organization_id: str = TestFacility.organization_id
-    ):
+    def test_get_facilities_for_organization(self, organization_id: str = TestFacility.organization_id):
         facilities = self.service.get_facilities(organization_id)
         assert facilities
         assert all([f.organization_id == organization_id for f in facilities])

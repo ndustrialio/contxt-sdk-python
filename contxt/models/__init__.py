@@ -31,9 +31,7 @@ class Parsers:
     @staticmethod
     def datetime(timestamp: str, strict: bool = True) -> _datetime:
         if strict:
-            return _datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%S.%fZ").replace(
-                tzinfo=UTC
-            )
+            return _datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%S.%fZ").replace(tzinfo=UTC)
         return parser.parse(timestamp)
 
     @staticmethod
@@ -153,18 +151,14 @@ class ApiObject(ABC):
     def creatable_fields(self) -> Dict[str, ApiField]:
         cls = type(self)
         if not hasattr(cls, "_creatable_fields"):
-            cls._creatable_fields = {
-                f.attr_key: f for f in cls._api_fields if f.creatable
-            }
+            cls._creatable_fields = {f.attr_key: f for f in cls._api_fields if f.creatable}
         return cls._creatable_fields
 
     @property
     def updatable_fields(self) -> Dict[str, ApiField]:
         cls = type(self)
         if not hasattr(cls, "_updatable_fields"):
-            cls._updatable_fields = {
-                f.attr_key: f for f in cls._api_fields if f.updatable
-            }
+            cls._updatable_fields = {f.attr_key: f for f in cls._api_fields if f.updatable}
         return cls._updatable_fields
 
     @classmethod
@@ -175,8 +169,7 @@ class ApiObject(ABC):
         for field in cls._api_fields:
             if field.api_key not in api_dict and not field.optional:
                 raise KeyError(
-                    f"Required API field '{field.api_key}' is missing from"
-                    f" response: {api_dict}"
+                    f"Required API field '{field.api_key}' is missing from" f" response: {api_dict}"
                 )
             clean_dict[field.attr_key] = cls.clean_api_value(
                 field=field, value=api_dict.pop(field.api_key, None)
@@ -208,17 +201,13 @@ class ApiObject(ABC):
     def post(self):
         """Gets data for a POST request"""
         # Transform api fields to dict
-        d = Serializer.to_dict(
-            self, key_filter=lambda k: k in set(self.creatable_fields.keys())
-        )
+        d = Serializer.to_dict(self, key_filter=lambda k: k in set(self.creatable_fields.keys()))
         # Swap attr_keys for api_keys
         return {self.creatable_fields[k].api_key: v for k, v in d.items()}
 
     def put(self):
         """Gets data for a PUT request"""
         # Transform api fields to dict
-        d = Serializer.to_dict(
-            self, key_filter=lambda k: k in set(self.updatable_fields.keys())
-        )
+        d = Serializer.to_dict(self, key_filter=lambda k: k in set(self.updatable_fields.keys()))
         # Swap attr_keys for api_keys
         return {self.updatable_fields[k].api_key: v for k, v in d.items()}

@@ -30,14 +30,10 @@ class NgestService(ConfiguredApi):
     def specialize(feed_key: str, feed_token: str) -> "SpecializedNgestService":
         return SpecializedNgestService(feed_key=feed_key, feed_token=feed_token)
 
-    def _format_time_series(
-        self, feed_key: str, time_series: Dict[str, Dict[datetime, float]]
-    ) -> Dict:
+    def _format_time_series(self, feed_key: str, time_series: Dict[str, Dict[datetime, float]]) -> Dict:
         # Enforce all datetimes are tz-aware
         assert all(
-            is_datetime_aware(dt)
-            for time_series in time_series.values()
-            for dt in time_series.keys()
+            is_datetime_aware(dt) for time_series in time_series.values() for dt in time_series.keys()
         ), "Timezone-aware datetimes required"
 
         # Format for request
@@ -87,9 +83,7 @@ class NgestService(ConfiguredApi):
             # Make request
             response = self.post(f"{feed_token}/ngest/{feed_key}", json=chunk)
             if response["status"] != "ok":
-                logger.warning(
-                    f"{self.__class__.__name__}: got status {response['status']}"
-                )
+                logger.warning(f"{self.__class__.__name__}: got status {response['status']}")
             responses.append(response)
 
             # Update remaining data

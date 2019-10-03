@@ -87,9 +87,7 @@ class AttributeValue(ApiObject):
         ApiField("asset_attribute_id", attr_key="attribute_id", creatable=True),
         ApiField("notes", creatable=True, updatable=True),
         ApiField("value", data_type=Parsers.unknown, creatable=True, updatable=True),
-        ApiField(
-            "effective_date", data_type=Parsers.date, creatable=True, updatable=True
-        ),
+        ApiField("effective_date", data_type=Parsers.date, creatable=True, updatable=True),
         ApiField("created_at", data_type=Parsers.datetime),
         ApiField("updated_at", data_type=Parsers.datetime),
     )
@@ -178,22 +176,10 @@ class MetricValue(ApiObject):
     _api_fields = (
         ApiField("id"),
         ApiField("asset_id"),
-        ApiField(
-            "Asset", attr_key="asset", data_type=f"{__name__}:Asset", optional=True
-        ),
+        ApiField("Asset", attr_key="asset", data_type=f"{__name__}:Asset", optional=True),
         ApiField("asset_metric_id"),
-        ApiField(
-            "effective_start_date",
-            data_type=Parsers.datetime,
-            creatable=True,
-            updatable=True,
-        ),
-        ApiField(
-            "effective_end_date",
-            data_type=Parsers.datetime,
-            creatable=True,
-            updatable=True,
-        ),
+        ApiField("effective_start_date", data_type=Parsers.datetime, creatable=True, updatable=True),
+        ApiField("effective_end_date", data_type=Parsers.datetime, creatable=True, updatable=True),
         ApiField("notes", creatable=True, updatable=True),
         ApiField("value", data_type=float, creatable=True, updatable=True),
         ApiField("created_at", data_type=Parsers.datetime),
@@ -236,12 +222,7 @@ class AssetType(ApiObject):
         ApiField("is_global", data_type=bool),
         ApiField("parent_id", creatable=True, updatable=True),
         ApiField("hierarchy_level", data_type=int),
-        ApiField(
-            "asset_attributes",
-            attr_key="attributes",
-            data_type=Attribute,
-            optional=True,
-        ),
+        ApiField("asset_attributes", attr_key="attributes", data_type=Attribute, optional=True),
         ApiField("asset_metrics", attr_key="metrics", data_type=Metric, optional=True),
         ApiField("children", data_type=f"{__name__}:AssetType", optional=True),
         ApiField("created_at", data_type=Parsers.datetime),
@@ -338,9 +319,7 @@ class AssetType(ApiObject):
             return default
         return self._attributes_by_id[attribute_id]
 
-    def attribute_with_label(
-        self, attribute_label: str, default: Any = ...
-    ) -> Attribute:
+    def attribute_with_label(self, attribute_label: str, default: Any = ...) -> Attribute:
         if attribute_label not in self._attributes_by_label:
             if default is ...:
                 raise KeyError(f"Attribute {attribute_label} not found.")
@@ -391,12 +370,7 @@ class Asset(ApiObject):
             data_type=AttributeValue,
             optional=True,
         ),
-        ApiField(
-            "asset_metric_values",
-            attr_key="metric_values",
-            data_type=MetricValue,
-            optional=True,
-        ),
+        ApiField("asset_metric_values", attr_key="metric_values", data_type=MetricValue, optional=True),
         ApiField("children", data_type=f"{__name__}:Asset", optional=True),
         ApiField("created_at", data_type=Parsers.datetime),
         ApiField("updated_at", data_type=Parsers.datetime),
@@ -442,13 +416,7 @@ class Asset(ApiObject):
         d = super().post()
         # HACK: handle special case of posting attribute_values
         if self.attribute_values:
-            d.update(
-                {
-                    "asset_attribute_values_to_create": [
-                        av.post() for av in self.attribute_values
-                    ]
-                }
-            )
+            d.update({"asset_attribute_values_to_create": [av.post() for av in self.attribute_values]})
         return d
 
 
@@ -471,9 +439,7 @@ class CompleteAsset:
 
     def _init_attribute_values(self) -> Dict:
         # Fetch attribute labels to use as keys
-        attribute_values_by_label = {
-            a.normalized_label: None for a in self.asset_type.attributes
-        }
+        attribute_values_by_label = {a.normalized_label: None for a in self.asset_type.attributes}
 
         # TODO: this is sorted to only store the attribute value with the
         # latest effective_date. However, we may later need to keep the
@@ -486,9 +452,7 @@ class CompleteAsset:
 
     def _init_metric_values(self) -> Dict:
         # Fetch metric labels to use as keys
-        metric_values_by_label = {
-            m.normalized_label: {} for m in self.asset_type.metrics
-        }
+        metric_values_by_label = {m.normalized_label: {} for m in self.asset_type.metrics}
 
         for mv in self.asset.metric_values:
             label = self.asset_type.metric_with_id(mv.asset_metric_id).normalized_label
@@ -496,9 +460,7 @@ class CompleteAsset:
 
         return metric_values_by_label
 
-    def _effective_end_date(
-        self, effective_start_date: date, time_interval: str
-    ) -> date:
+    def _effective_end_date(self, effective_start_date: date, time_interval: str) -> date:
         if time_interval == TimeIntervals.hourly:
             delta = relativedelta(hours=1, microseconds=-1)
         elif time_interval == TimeIntervals.daily:
@@ -523,18 +485,13 @@ class CompleteAsset:
     def attributes(self) -> Dict:
         """Get dict of key (Attribute label) value (value of AttributeValue
         with latest effective_date) pairs"""
-        return {
-            k: v.value if v else None
-            for k, v in self._attribute_values_by_label.items()
-        }
+        return {k: v.value if v else None for k, v in self._attribute_values_by_label.items()}
 
     @attributes.setter
     def attributes(self, attributes: Dict) -> None:
         # Determine attributes that changed, by performing a set difference on
         # the two dictionaries
-        new_attribute_values = dict(
-            set(attributes.items()) - set(self.attributes.items())
-        )
+        new_attribute_values = dict(set(attributes.items()) - set(self.attributes.items()))
 
         # Handle each change
         for label, new_value in new_attribute_values.items():
@@ -585,25 +542,21 @@ class CompleteAsset:
         # the two dictionaries
         # TODO: this only identifies the label, since this is a nested dict
         curr_metrics = self.metrics
-        new_metrics = Utils.set_to_dict(
-            Utils.dict_to_set(metrics) - Utils.dict_to_set(curr_metrics)
-        )
+        new_metrics = Utils.set_to_dict(Utils.dict_to_set(metrics) - Utils.dict_to_set(curr_metrics))
 
         # Determine each change
         for label, start_date_to_value in new_metrics.items():
             # Validate metric label
             if label not in self._metric_values_by_label:
                 raise KeyError(
-                    f"Metric {label} does not exist for AssetType"
-                    f" {self.asset_type.normalized_label}"
+                    f"Metric {label} does not exist for AssetType" f" {self.asset_type.normalized_label}"
                 )
 
             # Determine metric values that changed
             metric = self.asset_type.metric_with_label(label)
             metric_values = self._metric_values_by_label[label]
             new_metric_values = Utils.set_to_dict(
-                Utils.dict_to_set(start_date_to_value)
-                - Utils.dict_to_set(curr_metrics[label])
+                Utils.dict_to_set(start_date_to_value) - Utils.dict_to_set(curr_metrics[label])
             )
 
             for start_date, new_value in new_metric_values.items():
@@ -612,9 +565,7 @@ class CompleteAsset:
                     asset_id=self.asset.id,
                     asset_metric_id=metric.id,
                     effective_start_date=start_date,
-                    effective_end_date=self._effective_end_date(
-                        start_date, metric.time_interval
-                    ),
+                    effective_end_date=self._effective_end_date(start_date, metric.time_interval),
                     notes="",
                     value=None,
                 )
@@ -630,9 +581,7 @@ class CompleteAsset:
                     logger.debug(f"Set {label} {start_date}: {new_value}")
                     self.asset.metric_values.append(metric_value)
                 else:
-                    logger.debug(
-                        f"Changed {label} {start_date}: {prev_value} -> {new_value}"
-                    )
+                    logger.debug(f"Changed {label} {start_date}: {prev_value} -> {new_value}")
 
         # Refresh internal list of metric values
         self._metric_values_by_label = self._init_metric_values()

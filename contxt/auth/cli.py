@@ -24,11 +24,7 @@ class UserIdentityProvider(TokenProvider):
     """
 
     def __init__(
-        self,
-        client_id: str,
-        client_secret: str,
-        audience: str,
-        cache_file: Optional[Path] = None,
+        self, client_id: str, client_secret: str, audience: str, cache_file: Optional[Path] = None
     ):
         super().__init__(audience)
         self.client_id = client_id
@@ -89,9 +85,7 @@ class UserIdentityProvider(TokenProvider):
         """Sets the refresh token"""
         self._refresh_token = value
 
-    def login(
-        self, username: Optional[str] = None, password: Optional[str] = None
-    ) -> Dict:
+    def login(self, username: Optional[str] = None, password: Optional[str] = None) -> Dict:
         """Returns an access_token from Auth0, from client `client_id` and
         `client_secret` for audience `audience`, with username `username` and
         password `password`"""
@@ -121,10 +115,7 @@ class UserIdentityProvider(TokenProvider):
     def update_cache(self) -> None:
         if self._cache_file:
             logger.debug(f"Updating cache {self._cache_file}")
-            cache = {
-                "access_token": self.access_token,
-                "refresh_token": self.refresh_token,
-            }
+            cache = {"access_token": self.access_token, "refresh_token": self.refresh_token}
             self._cache_file.parent.mkdir(parents=True, exist_ok=True)
             with self._cache_file.open("w") as f:
                 dump(cache, f, indent=4)

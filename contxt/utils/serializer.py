@@ -192,9 +192,7 @@ class Serializer:
         # If path unspecified, default to stdout
         if path is None:
             obj_to_print = (
-                Serializer.to_table(obj)
-                if isinstance(obj, (list, tuple))
-                else Serializer.to_json(obj)
+                Serializer.to_table(obj) if isinstance(obj, (list, tuple)) else Serializer.to_json(obj)
             )
             print(obj_to_print)
             return
@@ -202,8 +200,7 @@ class Serializer:
         # Validate file extension
         if path.suffix not in valid_exts:
             logger.critical(
-                f"Unsupported filetype: '{path.suffix}'. Choose from"
-                f" {', '.join(valid_exts)}"
+                f"Unsupported filetype: '{path.suffix}'. Choose from" f" {', '.join(valid_exts)}"
             )
             return
 

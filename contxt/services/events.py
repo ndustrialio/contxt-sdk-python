@@ -39,19 +39,13 @@ class EventsService(ConfiguredApi):
                     event2 = self.get_event(d2.get("event_id"))
                     mins = d1.get("overlap_variance") / 60
                     statement += (
-                        f"Event {event1.name} overlaps with {event2.name}"
-                        f" within {mins} min "
+                        f"Event {event1.name} overlaps with {event2.name}" f" within {mins} min "
                     )
         event_definition.human_readable_parameters = statement
 
-    def get_event_types(
-        self, page_options: Optional[PageOptions] = None
-    ) -> List[EventType]:
+    def get_event_types(self, page_options: Optional[PageOptions] = None) -> List[EventType]:
         return PagedRecords(
-            api=self,
-            url="types",
-            options=page_options,
-            record_parser=EventType.from_api,
+            api=self, url="types", options=page_options, record_parser=EventType.from_api
         )
 
     def create_event_type(self, event: Event) -> EventType:

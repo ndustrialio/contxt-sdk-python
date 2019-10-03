@@ -26,9 +26,7 @@ class MessageBusService(ConfiguredApi):
         ),
     )
 
-    def __init__(
-        self, auth: Auth, organization_id: str, env: str = "production", **kwargs
-    ) -> None:
+    def __init__(self, auth: Auth, organization_id: str, env: str = "production", **kwargs) -> None:
         super().__init__(env=env, auth=auth, **kwargs)
         self.organization_id = organization_id
 
@@ -40,9 +38,7 @@ class MessageBusService(ConfiguredApi):
         resp = self.get(f"{self._channels_url(service_id)}/{channel_id}")
         return Channel.from_api(resp)
 
-    def get_channel_with_name_for_service(
-        self, channel_name: str, service_id: str
-    ) -> Optional[Channel]:
+    def get_channel_with_name_for_service(self, channel_name: str, service_id: str) -> Optional[Channel]:
         logger.debug(f"Fetching channel {channel_name} for service {service_id}")
         for channel in self.get_channels_for_service(service_id):
             if channel.name.lower() == channel_name.lower():
@@ -63,21 +59,13 @@ class MessageBusService(ConfiguredApi):
         resp = self.get(f"{self._channels_url(service_id)}/{channel_id}/schemas")
         return resp
 
-    def get_schemas_for_channel_and_service(
-        self, channel_id: str, service_id: str
-    ) -> List[Dict]:
+    def get_schemas_for_channel_and_service(self, channel_id: str, service_id: str) -> List[Dict]:
         # TODO: create model for this response
-        logger.debug(
-            f"Fetching schemas for channel {channel_id} and service {service_id}"
-        )
+        logger.debug(f"Fetching schemas for channel {channel_id} and service {service_id}")
         resp = self.get(f"{self._channels_url(service_id)}/{channel_id}/schemas")
         return resp
 
-    def get_stats_for_channel_and_service(
-        self, channel_id: str, service_id: str
-    ) -> ChannelStats:
-        logger.debug(
-            f"Fetching stats for channel {channel_id} and service {service_id}"
-        )
+    def get_stats_for_channel_and_service(self, channel_id: str, service_id: str) -> ChannelStats:
+        logger.debug(f"Fetching stats for channel {channel_id} and service {service_id}")
         resp = self.get(f"{self._channels_url(service_id)}/{channel_id}/statistics")
         return ChannelStats.from_api(resp)

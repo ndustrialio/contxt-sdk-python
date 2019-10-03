@@ -17,9 +17,7 @@ class TestAuthService:
         identity_access_token: str = environ.get("TEST_ACCESS_TOKEN"),
         audience: str = environ.get("TEST_AUDIENCE"),
     ):
-        access_token = self.service.get_token(identity_access_token, audience)[
-            "access_token"
-        ]
+        access_token = self.service.get_token(identity_access_token, audience)["access_token"]
         assert access_token
         identity_claims = get_unverified_claims(identity_access_token)
         claims = get_unverified_claims(access_token)
@@ -33,9 +31,7 @@ class TestAuthService:
         client_secret: str = environ.get("TEST_CLIENT_SECRET"),
         audience: str = environ.get("TEST_AUDIENCE"),
     ):
-        access_token = self.service.get_oauth_token(client_id, client_secret, audience)[
-            "access_token"
-        ]
+        access_token = self.service.get_oauth_token(client_id, client_secret, audience)["access_token"]
         assert access_token
         claims = get_unverified_claims(access_token)
         assert claims["sub"] == f"{client_id}@clients"

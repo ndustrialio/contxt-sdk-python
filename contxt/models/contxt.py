@@ -53,9 +53,7 @@ class Config(ApiObject):
         ApiField("name"),
         ApiField("description"),
         ApiField("environment_id"),
-        ApiField(
-            "ConfigurationValues", attr_key="config_values", data_type=ConfigValue
-        ),
+        ApiField("ConfigurationValues", attr_key="config_values", data_type=ConfigValue),
         ApiField("created_at", data_type=Parsers.datetime),
         ApiField("updated_at", data_type=Parsers.datetime),
     )
@@ -115,10 +113,7 @@ class Organization(ApiObject):
         ApiField("name", creatable=True),
         ApiField("legacy_organization_id", attr_key="legacy_id", optional=True),
         ApiField(
-            "OrganizationUser",
-            attr_key="organization_user",
-            data_type=OrganizationUser,
-            optional=True,
+            "OrganizationUser", attr_key="organization_user", data_type=OrganizationUser, optional=True
         ),
         ApiField("created_at", data_type=Parsers.datetime),
         ApiField("updated_at", data_type=Parsers.datetime),

@@ -31,9 +31,7 @@ class BaseWorker(ABC):
             return None, {}
 
         # Fetch contxt config
-        config = self.contxt_service.get_config_for_client(
-            self.client_id, self.environment_id
-        )
+        config = self.contxt_service.get_config_for_client(self.client_id, self.environment_id)
 
         # Cache values in a simple dict for easy consumption
         config_values = {v.key: v.value for v in config.config_values} if config else {}

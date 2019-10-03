@@ -114,9 +114,7 @@ class Event(ApiObject):
         ApiField("id"),
         ApiField("name", creatable=True),
         ApiField("event_type_id", creatable=True),
-        ApiField(
-            "EventType", attr_key="event_type", data_type=EventType, optional=True
-        ),
+        ApiField("EventType", attr_key="event_type", data_type=EventType, optional=True),
         ApiField("organization_id", creatable=True),
         ApiField("facility_id", data_type=int, creatable=True),
         ApiField("owner_id"),
@@ -199,15 +197,8 @@ class TriggeredEvent(ApiObject):
             creatable=True,
             updatable=True,
         ),
-        ApiField(
-            "trigger_start_at",
-            data_type=Parsers.datetime,
-            creatable=True,
-            updatable=True,
-        ),
-        ApiField(
-            "trigger_end_at", data_type=Parsers.datetime, creatable=True, updatable=True
-        ),
+        ApiField("trigger_start_at", data_type=Parsers.datetime, creatable=True, updatable=True),
+        ApiField("trigger_end_at", data_type=Parsers.datetime, creatable=True, updatable=True),
         ApiField("created_at", data_type=Parsers.datetime),
         ApiField("updated_at", data_type=Parsers.datetime),
         ApiField("deleted_at", data_type=Parsers.datetime),

@@ -54,9 +54,5 @@ def test_iot_unprovisioned_parser(parser):
     parser.parse_args(["iot"])
     parser.parse_args(["iot", "unprovisioned", "--feed_key", "100"])
     parser.parse_args(["iot", "unprovisioned", "--feed_id", "100"])
-    parser.parse_args(
-        ["iot", "unprovisioned", "--feed_key", "100", "--output", "dump_file.csv"]
-    )
-    parser.parse_args(
-        ["iot", "unprovisioned", "--feed_id", "100", "--output", "dump_file.csv"]
-    )
+    parser.parse_args(["iot", "unprovisioned", "--feed_key", "100", "--output", "dump_file.csv"])
+    parser.parse_args(["iot", "unprovisioned", "--feed_id", "100", "--output", "dump_file.csv"])

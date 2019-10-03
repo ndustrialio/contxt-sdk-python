@@ -1,12 +1,5 @@
 from contxt.auth.cli import CliAuth
-from contxt.models.assets import (
-    Asset,
-    AssetType,
-    Attribute,
-    AttributeValue,
-    Metric,
-    MetricValue,
-)
+from contxt.models.assets import Asset, AssetType, Attribute, AttributeValue, Metric, MetricValue
 from contxt.services.assets import AssetsService
 from tests.static.data import TestAsset, TestAssetType
 

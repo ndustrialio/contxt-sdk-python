@@ -89,15 +89,9 @@ class Facility(ApiObject):
 
 
 class UtilitySpendPeriod(ApiObject):
-    _api_fields = (
-        ApiField("date"),
-        ApiField("value"),
-        ApiField("pro_forma_date", optional=True),
-    )
+    _api_fields = (ApiField("date"), ApiField("value"), ApiField("pro_forma_date", optional=True))
 
-    def __init__(
-        self, date: str, value: str, pro_forma_date: Optional[str] = None
-    ) -> None:
+    def __init__(self, date: str, value: str, pro_forma_date: Optional[str] = None) -> None:
         super().__init__()
         self.date = date
         self.value = value
@@ -111,9 +105,7 @@ class UtilitySpend(ApiObject):
         ApiField("values", data_type=UtilitySpendPeriod),
     )
 
-    def __init__(
-        self, type: str, currency: str, values: List[UtilitySpendPeriod]
-    ) -> None:
+    def __init__(self, type: str, currency: str, values: List[UtilitySpendPeriod]) -> None:
         super().__init__()
         self.type = type
         self.currency = currency
@@ -121,15 +113,9 @@ class UtilitySpend(ApiObject):
 
 
 class UtilityUsagePeriod(ApiObject):
-    _api_fields = (
-        ApiField("date"),
-        ApiField("value"),
-        ApiField("pro_forma_date", optional=True),
-    )
+    _api_fields = (ApiField("date"), ApiField("value"), ApiField("pro_forma_date", optional=True))
 
-    def __init__(
-        self, date: str, value: str, pro_forma_date: Optional[str] = None
-    ) -> None:
+    def __init__(self, date: str, value: str, pro_forma_date: Optional[str] = None) -> None:
         super().__init__()
         self.date = date
         self.value = value
@@ -137,11 +123,7 @@ class UtilityUsagePeriod(ApiObject):
 
 
 class UtilityUsage(ApiObject):
-    _api_fields = (
-        ApiField("type"),
-        ApiField("unit"),
-        ApiField("values", data_type=UtilityUsagePeriod),
-    )
+    _api_fields = (ApiField("type"), ApiField("unit"), ApiField("values", data_type=UtilityUsagePeriod))
 
     def __init__(self, type: str, unit: str, values: Dict) -> None:
         super().__init__()

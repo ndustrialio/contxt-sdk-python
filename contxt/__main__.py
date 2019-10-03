@@ -11,12 +11,8 @@ from contxt.cli.parsers import ContxtArgParser
 
 def create_parser():
     # Setup parser
-    root_parser = ArgumentParser(
-        description="Contxt CLI", formatter_class=ArgumentDefaultsHelpFormatter
-    )
-    root_parser.add_argument(
-        "-v", "--version", action="version", version=f"%(prog)s {__version__}"
-    )
+    root_parser = ArgumentParser(description="Contxt CLI", formatter_class=ArgumentDefaultsHelpFormatter)
+    root_parser.add_argument("-v", "--version", action="version", version=f"%(prog)s {__version__}")
     root_parser.set_defaults(func=lambda auth, args: root_parser.print_help())
 
     # Setup our subparsers, which are subclassed from ContxtArgParser

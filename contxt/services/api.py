@@ -113,24 +113,12 @@ class Api:
         response = self.session.get(url=self._url(uri), params=params, **kwargs)
         return self._process_response(response)
 
-    def post(
-        self,
-        uri: str,
-        data: Optional[Dict] = None,
-        json: Optional[Dict] = None,
-        **kwargs,
-    ) -> Dict:
+    def post(self, uri: str, data: Optional[Dict] = None, json: Optional[Dict] = None, **kwargs) -> Dict:
         """Sends a POST request"""
         response = self.session.post(url=self._url(uri), data=data, json=json, **kwargs)
         return self._process_response(response)
 
-    def put(
-        self,
-        uri: str,
-        data: Optional[Dict] = None,
-        json: Optional[Dict] = None,
-        **kwargs,
-    ) -> Dict:
+    def put(self, uri: str, data: Optional[Dict] = None, json: Optional[Dict] = None, **kwargs) -> Dict:
         """Sends a PUT request"""
         response = self.session.put(url=self._url(uri), data=data, json=json, **kwargs)
         return self._process_response(response)
@@ -169,18 +157,14 @@ class ConfiguredApi(Api, ABC):
         self.env = env
         self.client_id = api_env.client_id
         token_provider = auth.get_token_provider(self.client_id) if auth else None
-        super().__init__(
-            base_url=api_env.base_url, token_provider=token_provider, **kwargs
-        )
+        super().__init__(base_url=api_env.base_url, token_provider=token_provider, **kwargs)
 
     @classmethod
     def _get_env(cls, name: str) -> ApiEnvironment:
         """Get environment with name `name`."""
         envs = {e.name: e for e in cls._envs}
         if name not in envs:
-            raise KeyError(
-                f"Invalid environment '{name}'. Choose from {list(envs.keys())}."
-            )
+            raise KeyError(f"Invalid environment '{name}'. Choose from {list(envs.keys())}.")
         return envs[name]
 
     @property

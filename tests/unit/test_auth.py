@@ -42,9 +42,7 @@ class TestAuthTokenValidator:
         issuer = "foo_issuer"
         claims = {"foo": "bar", "aud": audience, "iss": issuer}
         token = jwt.encode(claims, PRIVATE_KEY, algorithm=ALGORITHMS.RS256)
-        validator = AuthTokenValidator(
-            audience=audience, issuer=issuer, public_key=PUBLIC_KEY
-        )
+        validator = AuthTokenValidator(audience=audience, issuer=issuer, public_key=PUBLIC_KEY)
         payload = validator.validate(token)
         assert claims == payload
 
@@ -63,13 +61,8 @@ class TestTokenProvider:
         @TokenProvider.access_token.getter
         def access_token(self):
             if self._access_token is None or self._token_expiring(within=0):
-                self._claims = {
-                    **TestTokenProvider.claims,
-                    "exp": datetime.now(UTC).timestamp(),
-                }
-                self.access_token = jwt.encode(
-                    self._claims, PRIVATE_KEY, algorithm=ALGORITHMS.RS256
-                )
+                self._claims = {**TestTokenProvider.claims, "exp": datetime.now(UTC).timestamp()}
+                self.access_token = jwt.encode(self._claims, PRIVATE_KEY, algorithm=ALGORITHMS.RS256)
             return self._access_token
 
     def test_token_provider(self):

@@ -37,9 +37,7 @@ class TestIotService:
 
     def test_get_time_series_for_field(self, field: Field = TestField):
         start_time = datetime.now(UTC) - timedelta(days=30)
-        field_data = self.service.get_time_series_for_field(
-            field=field, start_time=start_time
-        )
+        field_data = self.service.get_time_series_for_field(field=field, start_time=start_time)
         assert field_data
         # assert field_data.field_human_name == TestField.field_human_name
         # assert field_data.output_id == TestField.output_id
@@ -49,16 +47,12 @@ class TestIotService:
     def test_get_time_series_for_field_grouping(self):
         pass
 
-    def test_get_unprovisioned_fields_for_feed_id(
-        self, feed_id: int = TestField.feed_id
-    ):
+    def test_get_unprovisioned_fields_for_feed_id(self, feed_id: int = TestField.feed_id):
         fields = self.service.get_unprovisioned_fields_for_feed_id(feed_id)
         assert fields
         assert all([isinstance(f, UnprovisionedField) for f in fields])
 
-    def test_get_unprovisioned_fields_for_feed_key(
-        self, feed_key: str = TestField.feed_key
-    ):
+    def test_get_unprovisioned_fields_for_feed_key(self, feed_key: str = TestField.feed_key):
         fields = self.service.get_unprovisioned_fields_for_feed_key(feed_key)
         assert fields
 
@@ -67,9 +61,7 @@ class TestIotService:
         assert grouping
         assert grouping.id == grouping_id
 
-    def test_get_field_groupings_for_facility(
-        self, facility_id: int = TestField.facility_id
-    ):
+    def test_get_field_groupings_for_facility(self, facility_id: int = TestField.facility_id):
         groupings = self.service.get_field_groupings_for_facility(facility_id)
         assert groupings
         assert all([g.facility_id == facility_id for g in groupings])

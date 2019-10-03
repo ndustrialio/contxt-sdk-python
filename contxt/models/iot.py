@@ -30,26 +30,13 @@ class Field(ApiObject):
         ApiField("field_descriptor", creatable=True),
         ApiField("field_human_name"),
         ApiField("units", creatable=True, updatable=True),
-        ApiField(
-            "scalar", data_type=float, optional=True, creatable=True, updatable=True
-        ),
-        ApiField(
-            "divisor", data_type=float, optional=True, creatable=True, updatable=True
-        ),
+        ApiField("scalar", data_type=float, optional=True, creatable=True, updatable=True),
+        ApiField("divisor", data_type=float, optional=True, creatable=True, updatable=True),
         ApiField("value_type", data_type=FieldValueType, optional=True, creatable=True),
         ApiField("feed_key", optional=True, creatable=True),
-        ApiField(
-            "FieldGroupingField",
-            attr_key="field_grouping_field",
-            data_type=dict,
-            optional=True,
-        ),
-        ApiField(
-            "is_hidden", data_type=bool, creatable=True, updatable=True, optional=True
-        ),
-        ApiField(
-            "is_default", data_type=bool, optional=True, creatable=True, updatable=True
-        ),
+        ApiField("FieldGroupingField", attr_key="field_grouping_field", data_type=dict, optional=True),
+        ApiField("is_hidden", data_type=bool, creatable=True, updatable=True, optional=True),
+        ApiField("is_default", data_type=bool, optional=True, creatable=True, updatable=True),
         ApiField("is_totalizer", data_type=bool, optional=True),
         ApiField("can_aggregate", data_type=bool, optional=True),
         ApiField("is_windowed", data_type=bool, optional=True),

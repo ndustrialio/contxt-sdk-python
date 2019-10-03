@@ -4,14 +4,10 @@ from tests.static.data import TestChannel
 
 
 class TestMessageBusService:
-    service = MessageBusService(
-        auth=CliAuth(), organization_id=TestChannel.organization_id
-    )
+    service = MessageBusService(auth=CliAuth(), organization_id=TestChannel.organization_id)
 
     def test_get_channel_for_service(self):
-        channel = self.service.get_channel_for_service(
-            TestChannel.id, TestChannel.service_id
-        )
+        channel = self.service.get_channel_for_service(TestChannel.id, TestChannel.service_id)
         assert channel.id == TestChannel.id
         assert channel.service_id == TestChannel.service_id
         assert channel.organization_id == self.service.organization_id
@@ -19,9 +15,7 @@ class TestMessageBusService:
     def test_get_channels_for_service(self):
         channels = self.service.get_channels_for_service(TestChannel.service_id)
         assert channels
-        assert all(
-            [c.organization_id == self.service.organization_id for c in channels]
-        )
+        assert all([c.organization_id == self.service.organization_id for c in channels])
         assert all([c.service_id == TestChannel.service_id for c in channels])
 
     # TODO: no schemas exist for this organization

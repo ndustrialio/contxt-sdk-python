@@ -84,13 +84,7 @@ RESET_SEQ = "\033[0m"
 COLOR_SEQ = "\033[0;%dm"
 BOLD_SEQ = "\033[1m"
 
-COLORS = {
-    "WARNING": YELLOW,
-    "INFO": WHITE,
-    "DEBUG": BLUE,
-    "CRITICAL": RED,
-    "ERROR": RED,
-}
+COLORS = {"WARNING": YELLOW, "INFO": WHITE, "DEBUG": BLUE, "CRITICAL": RED, "ERROR": RED}
 
 
 def formatter_message(message, use_color=True):

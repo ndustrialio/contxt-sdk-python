@@ -25,9 +25,7 @@ class TestEmsServices:
         assert all([s.facility_id == facility_id for s in main_services])
 
     def test_get_main_services_with_resource_type(
-        self,
-        facility_id: int = TestFacility.id,
-        resource_type: ResourceType = ResourceType.ELECTRIC,
+        self, facility_id: int = TestFacility.id, resource_type: ResourceType = ResourceType.ELECTRIC
     ):
         main_services = self.service.get_main_services(facility_id, resource_type)
         assert all([s.resource_type == resource_type for s in main_services])

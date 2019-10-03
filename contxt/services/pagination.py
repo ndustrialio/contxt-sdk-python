@@ -21,9 +21,7 @@ class PageOptions:
     reverse_order: Optional[bool] = None
 
     def __post_init__(self) -> None:
-        assert (
-            self.per_page > 0
-        ), f"per_page must be a positive integer, not {self.per_page}"
+        assert self.per_page > 0, f"per_page must be a positive integer, not {self.per_page}"
 
     def to_api(self, index: int) -> Dict:
         return {
@@ -86,9 +84,7 @@ class PagedRecords:
             return self._get_item(index)
         elif isinstance(index, slice):
             return self._get_slice(index)
-        raise TypeError(
-            f"Record index must be int or slice, not {type(index).__name__}"
-        )
+        raise TypeError(f"Record index must be int or slice, not {type(index).__name__}")
 
     def _get_item(self, index: int) -> Record:
         if not 0 <= index < self.total_records:
@@ -104,9 +100,7 @@ class PagedRecords:
         return records[index]
 
     def _get_page(self, index: int) -> Page:
-        resp = self.api.get(
-            uri=self.url, params={**self.params, **self.options.to_api(index)}
-        )
+        resp = self.api.get(uri=self.url, params={**self.params, **self.options.to_api(index)})
         page = ObjectMapper.tree_to_object(resp, Page)
         # NOTE: this post processing is not ideal, but works for now
         page.records = [self.record_parser(rec) for rec in page.records]
@@ -162,9 +156,7 @@ class TimeSeriesPage:
 
 
 class PagedTimeSeries:
-    def __init__(
-        self, api: Api, url: str, params: Optional[Dict] = None, per_page: int = 1000
-    ):
+    def __init__(self, api: Api, url: str, params: Optional[Dict] = None, per_page: int = 1000):
         self.api = api
         self.url = url
         self.params = params or {}

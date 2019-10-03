@@ -17,9 +17,7 @@ class PublisherStats(ApiObject):
         ApiField("connectedSince", attr_key="connected_since"),
     )
 
-    def __init__(
-        self, msg_rate_in: str, producer_id: str, connected_since: str
-    ) -> None:
+    def __init__(self, msg_rate_in: str, producer_id: str, connected_since: str) -> None:
         super().__init__()
         self.msg_rate_in = msg_rate_in
         self.producer_id = producer_id
@@ -35,9 +33,7 @@ class ConsumerStats(ApiObject):
         ApiField("msgRateRedeliver", attr_key="msg_rate_redeliver", data_type=float),
         ApiField("unackedMessages", attr_key="unacked_messages", data_type=int),
         ApiField(
-            "blockedConsumerOnUnackedMsgs",
-            attr_key="blocked_consumer_on_unacked_msgs",
-            data_type=bool,
+            "blockedConsumerOnUnackedMsgs", attr_key="blocked_consumer_on_unacked_msgs", data_type=bool
         ),
         ApiField("connectedSince", attr_key="connected_since"),
     )
@@ -100,16 +96,9 @@ class SubscriberStats(ApiObject):
 
 
 class Channel(ApiObject):
-    _api_fields = (
-        ApiField("id"),
-        ApiField("name"),
-        ApiField("organization_id"),
-        ApiField("service_id"),
-    )
+    _api_fields = (ApiField("id"), ApiField("name"), ApiField("organization_id"), ApiField("service_id"))
 
-    def __init__(
-        self, id: str, name: str, organization_id: str, service_id: str
-    ) -> None:
+    def __init__(self, id: str, name: str, organization_id: str, service_id: str) -> None:
         super().__init__()
         self.id = id
         self.name = name
@@ -133,9 +122,7 @@ class ChannelStats(ApiObject):
         ApiField("publishers", data_type=PublisherStats),
         ApiField(
             "subscriptions",
-            data_type=lambda o: [
-                SubscriberStats.from_api({**v, "name": k}) for k, v in o.items()
-            ],
+            data_type=lambda o: [SubscriberStats.from_api({**v, "name": k}) for k, v in o.items()],
         ),
     )
 

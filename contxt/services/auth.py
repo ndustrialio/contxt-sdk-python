@@ -28,14 +28,10 @@ class AuthService(ConfiguredApi):
     def get_token(self, access_token: str, audiences: Union[str, List[str]]) -> Dict:
         audiences = [audiences] if isinstance(audiences, str) else audiences
         return self.post(
-            "token",
-            json={"audiences": audiences},
-            headers={"Authorization": f"Bearer {access_token}"},
+            "token", json={"audiences": audiences}, headers={"Authorization": f"Bearer {access_token}"}
         )
 
-    def get_oauth_token(
-        self, client_id: str, client_secret: str, audience: str
-    ) -> Dict:
+    def get_oauth_token(self, client_id: str, client_secret: str, audience: str) -> Dict:
         return self.post(
             "oauth/token",
             json={

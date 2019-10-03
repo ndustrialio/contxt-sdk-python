@@ -18,9 +18,7 @@ class Facility(ApiObject):
         ApiField("organization_id"),
         ApiField("Organization", attr_key="organization", data_type=Organization),
         ApiField(
-            "Info",
-            attr_key="info",
-            data_type=lambda o: {k: Parsers.unknown(v) for k, v in o.items()},
+            "Info", attr_key="info", data_type=lambda o: {k: Parsers.unknown(v) for k, v in o.items()}
         ),
         ApiField("created_at", data_type=Parsers.datetime),
         ApiField("weather_location_id"),

@@ -46,9 +46,7 @@ class EmsService(ConfiguredApi):
 
         # Manually filter on resource type
         if resource_type:
-            main_services = [
-                s for s in main_services if s.resource_type == resource_type
-            ]
+            main_services = [s for s in main_services if s.resource_type == resource_type]
         return main_services
 
     def get_monthly_utility_spend(
@@ -99,11 +97,7 @@ class EmsService(ConfiguredApi):
         )
         return UtilityUsage.from_api(resp)
 
-    def get_utility_contracts_for_facility(
-        self, facility_id: int
-    ) -> Iterable[UtilityContract]:
+    def get_utility_contracts_for_facility(self, facility_id: int) -> Iterable[UtilityContract]:
         return PagedRecords(
-            api=self,
-            url=f"facilities/{facility_id}/contracts",
-            record_parser=UtilityContract.from_api,
+            api=self, url=f"facilities/{facility_id}/contracts", record_parser=UtilityContract.from_api
         )

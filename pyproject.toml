@@ -41,12 +41,12 @@ server = ["python-jose-cryptodome"]
 contxt = "contxt.__main__:main"
 
 [tool.black]
-line-length = 88
+line-length = 105
 target-version = ["py36", "py37"]
 include = '(contxt|scripts|tests).*\.pyi?$'
 
 [tool.isort]
-line_length = 88
+line_length = 105
 multi_line_output = 3
 include_trailing_comma = true
 force_grid_wrap = 0

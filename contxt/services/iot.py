@@ -2,14 +2,7 @@ from datetime import datetime
 from typing import Dict, List, Optional
 
 from contxt.auth import Auth
-from contxt.models.iot import (
-    Feed,
-    Field,
-    FieldGrouping,
-    FieldTimeSeries,
-    UnprovisionedField,
-    Window,
-)
+from contxt.models.iot import Feed, Field, FieldGrouping, FieldTimeSeries, UnprovisionedField, Window
 from contxt.services.api import ApiEnvironment, ConfiguredApi
 from contxt.services.pagination import PagedRecords, PagedTimeSeries, PageOptions
 
@@ -79,10 +72,7 @@ class IotService(ConfiguredApi):
     ) -> List[Field]:
         """Get fields for feed with id `feed_id`"""
         return PagedRecords(
-            api=self,
-            url=f"feeds/{feed_id}/fields",
-            options=page_options,
-            record_parser=Field.from_api,
+            api=self, url=f"feeds/{feed_id}/fields", options=page_options, record_parser=Field.from_api
         )
 
     def create_field(self, field: Field) -> Field:
@@ -114,34 +104,24 @@ class IotService(ConfiguredApi):
             per_page=per_page,
         )
 
-    def get_time_series_for_field_grouping(
-        self, grouping_id: str, **kwargs
-    ) -> List[Dict]:
+    def get_time_series_for_field_grouping(self, grouping_id: str, **kwargs) -> List[Dict]:
         """Get time series data for fields in grouping with id `grouping_id`"""
         grouping = self.get_field_grouping(grouping_id)
-        return [
-            self.get_time_series_for_field(field=f, **kwargs) for f in grouping.fields
-        ]
+        return [self.get_time_series_for_field(field=f, **kwargs) for f in grouping.fields]
 
-    def get_unprovisioned_fields_for_feed_id(
-        self, feed_id: int
-    ) -> List[UnprovisionedField]:
+    def get_unprovisioned_fields_for_feed_id(self, feed_id: int) -> List[UnprovisionedField]:
         """Get unprovisioned fields for feed with id `feed_id`"""
         return [
-            UnprovisionedField.from_api(rec)
-            for rec in self.get(f"feeds/{feed_id}/fields/unprovisioned")
+            UnprovisionedField.from_api(rec) for rec in self.get(f"feeds/{feed_id}/fields/unprovisioned")
         ]
 
-    def get_unprovisioned_fields_for_feed_key(
-        self, feed_key: str
-    ) -> Optional[List[UnprovisionedField]]:
+    def get_unprovisioned_fields_for_feed_key(self, feed_key: str) -> Optional[List[UnprovisionedField]]:
         """Get unprovisioned fields for feed with key `feed_key`"""
         feed = self.get_feed_with_key(key=feed_key)
         if not feed:
             return None
         return [
-            UnprovisionedField.from_api(rec)
-            for rec in self.get(f"feeds/{feed.id}/fields/unprovisioned")
+            UnprovisionedField.from_api(rec) for rec in self.get(f"feeds/{feed.id}/fields/unprovisioned")
         ]
 
     def get_field_grouping(self, id: str) -> FieldGrouping:

@@ -2,13 +2,7 @@ from datetime import datetime
 from typing import Any, Dict, List, Optional
 
 from contxt.auth import Auth
-from contxt.models.contxt import (
-    Config,
-    ConfigValue,
-    Organization,
-    OrganizationUser,
-    User,
-)
+from contxt.models.contxt import Config, ConfigValue, Organization, OrganizationUser, User
 from contxt.services.api import ApiEnvironment, ConfiguredApi
 from contxt.utils import make_logger
 
@@ -56,9 +50,7 @@ class ContxtService(ConfiguredApi):
         resp = self.post("organizations", data=data)
         return Organization.from_api(resp)
 
-    def add_user_to_organization(
-        self, user_id: str, organization_id: str
-    ) -> OrganizationUser:
+    def add_user_to_organization(self, user_id: str, organization_id: str) -> OrganizationUser:
         logger.debug(f"Adding user {user_id} to organization {organization_id}")
         resp = self.post(f"organizations/{organization_id}/users/{user_id}")
         return OrganizationUser.from_api(resp)
@@ -97,23 +89,15 @@ class ContxtService(ConfiguredApi):
         logger.debug(f"Deleting configuration_value {value_id}")
         self.delete(f"configurations/{configuration_id}/values{value_id}")
 
-    def get_config_values(
-        self, config_id: str, environment_id: str
-    ) -> List[ConfigValue]:
+    def get_config_values(self, config_id: str, environment_id: str) -> List[ConfigValue]:
         params = {"environment": environment_id}
-        logger.debug(
-            f"Fetching configuration_values for configuration {config_id} with {params}"
-        )
+        logger.debug(f"Fetching configuration_values for configuration {config_id} with {params}")
         resp = self.get(f"configurations/{config_id}/values", params=params)
         return [ConfigValue.from_api(rec) for rec in resp]
 
-    def get_config_values_for_worker(
-        self, worker_id: str, environment_id: str
-    ) -> List[ConfigValue]:
+    def get_config_values_for_worker(self, worker_id: str, environment_id: str) -> List[ConfigValue]:
         params = {"environment": environment_id}
-        logger.debug(
-            f"Fetching configuration_values for worker {worker_id} with {params}"
-        )
+        logger.debug(f"Fetching configuration_values for worker {worker_id} with {params}")
         resp = self.get(f"workers/{worker_id}/configurations/values", params=params)
         return [ConfigValue.from_api(rec) for rec in resp]
 

@@ -1,13 +1,6 @@
 from typing import List, Optional
 
-from contxt.models.assets import (
-    Asset,
-    AssetType,
-    Attribute,
-    AttributeValue,
-    Metric,
-    MetricValue,
-)
+from contxt.models.assets import Asset, AssetType, Attribute, AttributeValue, Metric, MetricValue
 from contxt.services.assets import AssetsService
 from contxt.utils import make_logger
 
@@ -16,12 +9,7 @@ logger = make_logger(__name__)
 
 # TODO: methods for creating assets, attribute_values, metric_values
 class AssetSchema:
-    def __init__(
-        self,
-        name: str,
-        asset_types: List[AssetType],
-        assets: Optional[List[Asset]] = None,
-    ):
+    def __init__(self, name: str, asset_types: List[AssetType], assets: Optional[List[Asset]] = None):
         self.name = name
         self.asset_types = asset_types
         self.assets = assets
@@ -54,17 +42,13 @@ class AssetMigrationManager:
     def create_asset_type(self, asset_type, parent=None):
         # Check if asset_type already exists
         logger.info(f"Processing asset_type {asset_type.label}")
-        existing_asset_type = self.assets_service.asset_type_with_label(
-            asset_type.label, None
-        )
+        existing_asset_type = self.assets_service.asset_type_with_label(asset_type.label, None)
 
         if existing_asset_type:
             # Asset type already exists, just check parent link
             if parent and parent.id != existing_asset_type.parent_id:
                 # Update parent asset_type id
-                logger.info(
-                    f"Updating parent of {existing_asset_type.label} to {parent.label}"
-                )
+                logger.info(f"Updating parent of {existing_asset_type.label} to {parent.label}")
                 existing_asset_type.parent_id = parent.id
                 self.assets_service.update_asset_type(existing_asset_type)
         else:
@@ -99,9 +83,7 @@ class AssetMigrationManager:
             attribute.asset_type_id = asset_type.id
             self.assets_service.create_attribute(attribute)
         else:
-            logger.info(
-                f"Attribute {asset_type.label}::{attribute.label} already exists"
-            )
+            logger.info(f"Attribute {asset_type.label}::{attribute.label} already exists")
 
     def create_metric(self, asset_type: AssetType, metric: Metric):
         # For the existing asset_type, create the metric
@@ -132,7 +114,5 @@ class AssetMigrationManager:
                 self.assets_service.delete_asset_type(created_child)
 
             # Delete parent
-            created_asset_type = self.assets_service.asset_type_with_label(
-                asset_type.label
-            )
+            created_asset_type = self.assets_service.asset_type_with_label(asset_type.label)
             self.assets_service.delete_asset_type(created_asset_type)

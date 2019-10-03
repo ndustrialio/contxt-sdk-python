@@ -8,9 +8,7 @@ class TestEventsService:
     service = EventsService(CliAuth())
 
     def test_get_sentence_from_parameters(self):
-        event_definition = self.service.get_event_definition(
-            TestTriggeredEvent.event_id
-        )
+        event_definition = self.service.get_event_definition(TestTriggeredEvent.event_id)
         self.service.set_human_readable_parameters(event_definition)
         assert event_definition.human_readable_parameters
         assert isinstance(event_definition.human_readable_parameters, str)
@@ -54,9 +52,7 @@ class TestEventsService:
         # assert events
 
     def test_get_event_definition(self):
-        event_definition = self.service.get_event_definition(
-            TestTriggeredEvent.event_id
-        )
+        event_definition = self.service.get_event_definition(TestTriggeredEvent.event_id)
         assert event_definition.event_id == TestTriggeredEvent.event_id
 
     def test_create_triggered_event(self):
@@ -82,13 +78,9 @@ class TestEventsService:
         # self.service.delete_triggered_event(TestTriggeredEvent.id)
 
     def test_get_triggered_events_for_event(self):
-        triggered_events = self.service.get_triggered_events_for_event(
-            TestTriggeredEvent.event_id
-        )
+        triggered_events = self.service.get_triggered_events_for_event(TestTriggeredEvent.event_id)
         assert triggered_events
-        assert all(
-            [t.event_id == TestTriggeredEvent.event_id for t in triggered_events]
-        )
+        assert all([t.event_id == TestTriggeredEvent.event_id for t in triggered_events])
 
     # TODO: find a valid field_id
     def test_get_triggered_events_for_field(self):
