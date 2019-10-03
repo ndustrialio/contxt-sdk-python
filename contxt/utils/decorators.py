@@ -36,8 +36,10 @@ def decorate_all_methods(decorator):
     return decorate
 
 
-def lazy(fn):
-    """Decorator that makes a property lazy-evaluated. While caching the value for future getter calls.
+def cached(fn):
+    """
+    Decorator that makes caches the result of a property or monadic method.
+    So its body is executed only once and the value is saved for subsequent calls.
     """
     attr_name = "_lazy_" + fn.__name__
 
