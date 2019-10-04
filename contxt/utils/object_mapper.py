@@ -55,8 +55,12 @@ class ObjectMapper:
                 assert any(t for t in args if isinstance(tree, t)), failure_msg()
                 return tree
         elif annotation in _PRIMITIVES:
-            assert isinstance(tree, annotation), failure_msg()
-            return tree
+            try:
+                conv = annotation(tree)
+                assert conv == tree
+                return conv
+            except Exception as e:
+                raise AssertionError(failure_msg(), e)
         elif inspect.isclass(annotation):
             if isinstance(tree, annotation):
                 return tree
