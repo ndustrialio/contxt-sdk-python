@@ -1,9 +1,5 @@
-from datetime import datetime
-
-from pytz import UTC
-
 from contxt.auth import Auth
-from contxt.models.health import Health, HealthStatus
+from contxt.models.health import Health
 from contxt.services.api import ApiEnvironment, ConfiguredApi
 from contxt.utils import make_logger
 
