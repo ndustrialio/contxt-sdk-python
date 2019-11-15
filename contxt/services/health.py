@@ -23,7 +23,10 @@ class HealthService(ConfiguredApi):
     def report(self, org_id, asset_id, health: Health) -> Health:
         data = health.post()
         logger.debug(
-            f"Created health with org_id {org_id} asset_id {asset_id} and with data {data}"
+            (
+                f"Created health status with org_id {org_id} "
+                f"asset_id {asset_id} and with data {data}"
+            )
         )
         resp = self.post(f"{org_id}/assets/{asset_id}", data=data)
         return Health.from_api(resp)

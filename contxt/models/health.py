@@ -1,5 +1,6 @@
 from datetime import datetime
 from enum import Enum
+from typing import Optional
 
 from pytz import UTC
 
@@ -24,8 +25,8 @@ class Health(ApiObject):
 
     def __init__(
         self,
+        status: str,
         id: Optional[str] = None,
-        status: string,
         timestamp: Optional[datetime] = datetime.now(UTC),
         created_at: Optional[datetime] = None,
         updated_at: Optional[datetime] = None,
