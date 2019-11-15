@@ -1,31 +1,33 @@
-from enum import Enum
 from datetime import datetime
+
 from pytz import UTC
 
-from ndustrialio.apiservices import Service, POST
+from contxt.auth import Auth
+from contxt.models.health import Health, HealthStatus
+from contxt.services.api import ApiEnvironment, ConfiguredApi
+from contxt.utils import make_logger
+
+logger = make_logger(__name__)
 
 
-class HealthStatus(Enum):
-    GOOD = 'healthy'
-    BAD = 'unhealthy'
+class HealthService(ConfiguredApi):
+    """
+    Service to interact with our Health API.
+    """
 
+    _envs = ApiEnvironment(
+        name="production",
+        base_url="https://health.api.ndustrial.io/v1",
+        client_id="6uaQIV1KnnWhXiTm09iGDvy2aQaz2xVI",
+    )
 
-class HealthService(Service):
+    def __init__(self, auth: Auth, env: str = "production", **kwargs) -> None:
+        super().__init__(env=env, auth=auth, **kwargs)
 
-    def __init__(self, client_id, client_secret=None):
-        super(HealthService, self).__init__(client_id, client_secret)
-
-    def baseURL(self):
-        return 'https://health.api.ndustrial.io/v1'
-
-    def audience(self):
-        return '6uaQIV1KnnWhXiTm09iGDvy2aQaz2xVI'
-
-    def report(self, org_id, asset_id, status=HealthStatus.GOOD, timestamp=datetime.now(tz=UTC).isoformat(), execute=True):
-        body = {
-            status: status,
-            timestamp: timestamp
-        }
-
-        return self.execute(POST(uri='{}/assets/{}'.format(org_id, asset_id))
-                            .body(body))
+    def report(self, org_id, asset_id, health: Health) -> Health:
+        data = health.post()
+        logger.debug(
+            f"Created health with org_id {org_id} asset_id {asset_id} and with data {data}"
+        )
+        resp = self.post(f"{org_id}/assets/{asset_id}", data=data)
+        return Health.from_api(resp)
