@@ -11,10 +11,12 @@ class HealthService(ConfiguredApi):
     Service to interact with our Health API.
     """
 
-    _envs = ApiEnvironment(
-        name="production",
-        base_url="https://health.api.ndustrial.io/v1",
-        client_id="6uaQIV1KnnWhXiTm09iGDvy2aQaz2xVI",
+    _envs = (
+        ApiEnvironment(
+            name="production",
+            base_url="https://health.api.ndustrial.io/v1",
+            client_id="6uaQIV1KnnWhXiTm09iGDvy2aQaz2xVI",
+        ),
     )
 
     def __init__(self, auth: Auth, env: str = "production", **kwargs) -> None:
