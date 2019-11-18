@@ -21,9 +21,7 @@ class Health(ApiObject):
     )
 
     def __init__(
-        self,
-        status: HealthStatus,
-        timestamp: Optional[datetime] = datetime.now(UTC),
+        self, status: HealthStatus, timestamp: Optional[datetime] = datetime.now(UTC)
     ) -> None:
         super().__init__()
         self.status = status
