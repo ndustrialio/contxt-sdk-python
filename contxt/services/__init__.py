@@ -5,6 +5,7 @@ from .contxt import ContxtService
 from .ems import EmsService
 from .events import EventsService
 from .facilities import FacilitiesService
+from .health import HealthService
 from .iot import IotService
 from .ngest import NgestService
 
@@ -16,6 +17,7 @@ __all__ = [
     "EmsService",
     "EventsService",
     "FacilitiesService",
+    "HealthService",
     "IotService",
     "NgestService",
 ]
