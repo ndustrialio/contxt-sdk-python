@@ -1,6 +1,6 @@
 # Contxt Python SDK
 [![pypi version](https://pypip.in/v/contxt-sdk/badge.png)](https://pypi.org/project/contxt-sdk/)
-![build status](https://github.com/ndustrialio/contxt-sdk-python/workflows/.github/workflows/main.yml/badge.svg)
+[![build status](https://github.com/ndustrialio/contxt-sdk-python/workflows/main/badge.svg)](https://github.com/ndustrialio/contxt-sdk-python/actions)
 
 
 ## Dependencies
