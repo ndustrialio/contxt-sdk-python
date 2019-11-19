@@ -17,4 +17,4 @@ jobs:
     - name: Run linters
       run: make lint
     - name: Run unit tests
-      run: make tess
+      run: make test
