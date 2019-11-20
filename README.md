@@ -1,6 +1,7 @@
 # Contxt Python SDK
 [![pypi version](https://pypip.in/v/contxt-sdk/badge.png)](https://pypi.org/project/contxt-sdk/)
-[![wercker status](https://app.wercker.com/status/960b7b32c2d94d12a3a5c89ca17e13ba/s/ "wercker status")](https://app.wercker.com/project/byKey/960b7b32c2d94d12a3a5c89ca17e13ba)
+[![build status](https://github.com/ndustrialio/contxt-sdk-python/workflows/build/badge.svg)](https://github.com/ndustrialio/contxt-sdk-python/actions)
+
 
 ## Dependencies
 This project **requires** Python 3.6+.
