@@ -4,6 +4,8 @@ from enum import Enum
 from json import loads
 from typing import Any, Dict, List, Optional
 
+from requests import Request
+
 from contxt.models import ApiField, ApiObject, Parsers
 from contxt.models.events import Owner
 
@@ -267,3 +269,39 @@ class Feed(ApiObject):
 class FieldTimeSeries:
     field: Field
     time_series: Dict[datetime, Any]
+
+
+@dataclass
+class BatchRequest:
+    method: str
+    uri: str
+    body: Optional[str] = None
+
+    @staticmethod
+    def from_request(request: Request) -> "BatchRequest":
+        # NOTE: this handles url-encoding parameters and other low-level translations
+        r = request.prepare()
+        return BatchRequest(method=r.method, uri=r.url, body=r.body)
+
+    def to_api(self) -> Dict[str, str]:
+        d = {"method": self.method, "uri": self.uri}
+        if self.body:
+            d["body"] = self.body
+        return d
+
+
+BatchRequests = Dict[str, BatchRequest]
+
+
+@dataclass
+class BatchResponse:
+    body: Any
+    headers: Dict[str, Any]
+    statusCode: int
+
+    @property
+    def ok(self) -> bool:
+        return self.statusCode == 200
+
+
+BatchResponses = Dict[str, BatchResponse]

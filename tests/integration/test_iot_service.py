@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from pytz import UTC
 
 from contxt.auth.cli import CliAuth
-from contxt.models.iot import Field, UnprovisionedField
+from contxt.models.iot import Field, FieldTimeSeries, UnprovisionedField
 from contxt.services import IotService
 from tests.static.data import TestField
 
@@ -45,6 +45,16 @@ class TestIotService:
         # assert field_data.output_id == TestField.output_id
         # assert field_data.time_series
         # assert min(field_data.time_series.keys()) >= start_time
+
+    def test_get_time_series_for_fields(self):
+        fields = self.service.get_fields_for_feed(TestField.feed_id)[:2]
+        start_time = datetime.now(UTC) - timedelta(days=7)
+        fields_data = self.service.get_time_series_for_fields(
+            fields=fields, start_time=start_time
+        )
+        assert fields_data
+        assert len(fields_data) == len(fields)
+        assert all(isinstance(d, FieldTimeSeries) for d in fields_data)
 
     def test_get_time_series_for_field_grouping(self):
         pass

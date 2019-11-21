@@ -18,7 +18,8 @@ test:
 
 version:
 	# Usage: make version v=[major|minor|patch|release|build]
-	poetry run bump2version $(v) --commit --tag && git push && git push --tags
+	poetry run bump2version --commit --tag $(v)
+	git push && git push --tags
 
 clean:
 	rm -rf dist/ build/ *.egg-info
