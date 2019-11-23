@@ -72,7 +72,7 @@ class Facility(ApiObject):
         name: str,
         asset_id: str,
         organization_id: str,
-        baseline: str,
+        baseline: dict,
         main_services: List[MainService],
         created_at: datetime,
         updated_at: datetime,

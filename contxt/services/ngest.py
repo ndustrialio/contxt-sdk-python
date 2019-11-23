@@ -11,9 +11,7 @@ logger = make_logger(__name__)
 
 
 class NgestService(ConfiguredApi):
-    """
-    Service to interact with our Ngest API.
-    """
+    """Ngest API client"""
 
     _envs = (
         ApiEnvironment(
@@ -23,7 +21,7 @@ class NgestService(ConfiguredApi):
         ),
     )
 
-    def __init__(self, env: str = "production", **kwargs):
+    def __init__(self, env: str = "production", **kwargs) -> None:
         super().__init__(env=env, **kwargs)
 
     @staticmethod

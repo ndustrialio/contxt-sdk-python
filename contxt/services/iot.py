@@ -26,8 +26,7 @@ logger = make_logger(__name__)
 
 
 class IotService(ConfiguredApi):
-    """
-    Service to interact with our IOT API.
+    """IOT API client
 
     Terminology
         - Feed: Data source (i.e. utility meter) with a set of fields

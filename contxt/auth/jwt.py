@@ -58,7 +58,7 @@ def _get_jwks() -> str:
 
 
 class ContxtAuthTokenValidator:
-    def __init__(self, audience: str):
+    def __init__(self, audience: str) -> None:
         self.delegate = AuthTokenValidator(
             audience=audience, issuer=CONTXT_AUTH0_ISSUER, public_key=_get_jwks()
         )

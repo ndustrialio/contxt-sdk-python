@@ -16,9 +16,7 @@ logger = make_logger(__name__)
 
 
 class Parsers:
-    """
-    Parsers to deserialize JSON as Python.
-    """
+    """Parsers to deserialize JSON as Python"""
 
     boolean = bool
     number = float
@@ -67,9 +65,7 @@ class Parsers:
 
 
 class Formatters:
-    """
-    Formatters to serialize Python as JSON.
-    """
+    """Formatters to serialize Python as JSON"""
 
     @staticmethod
     def date(d: _date) -> str:
@@ -93,8 +89,7 @@ class Formatters:
 # TODO: This custom schema-validation can be replaced by a more robust
 # (although slower) implementation: see https://github.com/marshmallow-code/marshmallow
 class ApiField:
-    """
-    A field retrieved from an API service.
+    """A field retrieved from an API service.
 
     `api_key` is the expected key, `attr_key` is the desired class attribute key,
     `data_type` is the object type.
@@ -108,7 +103,7 @@ class ApiField:
         creatable: bool = False,
         updatable: bool = False,
         optional: bool = False,
-    ):
+    ) -> None:
         self.api_key = api_key
         self.attr_key = attr_key or api_key
         self._data_type = data_type
@@ -117,7 +112,7 @@ class ApiField:
         self.optional = optional
 
     @property
-    def data_type(self):
+    def data_type(self) -> Callable[[Any], Any]:
         if isinstance(self._data_type, str):
             # Load callable from str
             # NOTE: this is to delay the type assignment to instance creation,
@@ -132,15 +127,11 @@ class ApiField:
 
 
 class ApiObject(ABC):
-    """
-    An abstract base class for a response from an API. This class serves to
+    """An abstract base class for a response from an API. This class serves to
     take a raw response from an API and create a parsed Python object.
     """
 
-    # _creatable_fields = None
-    # _updatable_fields = None
-
-    def __str__(self):
+    def __str__(self) -> str:
         return Serializer.to_table(self)
 
     @property
@@ -168,7 +159,7 @@ class ApiObject(ABC):
         return cls._updatable_fields
 
     @classmethod
-    def from_api(cls, api_dict: Dict):
+    def from_api(cls, api_dict: Dict) -> Any:
         api_dict = deepcopy(api_dict)
         # Create clean dictionary to pass to init
         clean_dict = {}
@@ -190,7 +181,7 @@ class ApiObject(ABC):
         return cls(**clean_dict)
 
     @classmethod
-    def clean_api_value(cls, field: ApiField, value: Any):
+    def clean_api_value(cls, field: ApiField, value: Any) -> Any:
         if value is None:
             # No value
             return value
@@ -205,7 +196,7 @@ class ApiObject(ABC):
             # Apply type
             return field.data_type(value)
 
-    def post(self):
+    def post(self) -> Dict[str, Any]:
         """Gets data for a POST request"""
         # Transform api fields to dict
         d = Serializer.to_dict(
@@ -214,7 +205,7 @@ class ApiObject(ABC):
         # Swap attr_keys for api_keys
         return {self.creatable_fields[k].api_key: v for k, v in d.items()}
 
-    def put(self):
+    def put(self) -> Dict[str, Any]:
         """Gets data for a PUT request"""
         # Transform api fields to dict
         d = Serializer.to_dict(

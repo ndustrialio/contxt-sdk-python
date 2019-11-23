@@ -147,7 +147,7 @@ class ChannelStats(ApiObject):
         msg_throughput_out: float,
         avg_msg_size: float,
         storage_size: float,
-        replication: Any,
+        replication: dict,
         deduplication_status: str,
         publishers: List[PublisherStats],
         subscriptions: List[SubscriberStats],

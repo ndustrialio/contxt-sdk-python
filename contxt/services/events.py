@@ -10,9 +10,7 @@ logger = make_logger(__name__)
 
 
 class EventsService(ConfiguredApi):
-    """
-    Service to interact with our Events API.
-    """
+    """Events API client"""
 
     _envs = (
         ApiEnvironment(
@@ -27,7 +25,7 @@ class EventsService(ConfiguredApi):
         ),
     )
 
-    def __init__(self, auth: Auth, env: str = "production", **kwargs):
+    def __init__(self, auth: Auth, env: str = "production", **kwargs) -> None:
         super().__init__(env=env, auth=auth, **kwargs)
 
     def set_human_readable_parameters(self, event_definition: EventDefinition) -> None:

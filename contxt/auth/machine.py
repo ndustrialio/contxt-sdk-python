@@ -1,4 +1,4 @@
-from contxt.auth import Auth, TokenProvider
+from contxt.auth import Auth, Token, TokenProvider
 from contxt.services.auth import AuthService
 from contxt.utils import make_logger
 
@@ -6,20 +6,18 @@ logger = make_logger(__name__)
 
 
 class MachineTokenProvider(TokenProvider):
-    """
-    Same as `TokenProvider`, but specifically for a non-human client. In this case,
-    `client_id` and `client_secret` serve as the identity provider for the source
-    client.
+    """Concrete `TokenProvider` for a machine client, where `client_id` and
+    `client_secret` serve as the identity provider.
     """
 
-    def __init__(self, client_id: str, client_secret: str, audience: str):
+    def __init__(self, client_id: str, client_secret: str, audience: str) -> None:
         super().__init__(audience)
         self.client_id = client_id
         self.client_secret = client_secret
         self.auth_service = AuthService()
 
     @TokenProvider.access_token.getter
-    def access_token(self) -> str:
+    def access_token(self) -> Token:
         """Gets a valid access token for audience `audience`"""
         if self._access_token is None or self._token_expiring():
             # Token either not yet set or expiring soon, fetch one
@@ -31,10 +29,7 @@ class MachineTokenProvider(TokenProvider):
 
 
 class MachineAuth(Auth):
-    """
-    Same as `Auth`, but specifically for a non-human client, such as a service,
-    API, or worker.
-    """
+    """Concrete `Auth` for a machine client"""
 
     def get_token_provider(self, audience: str) -> MachineTokenProvider:
         """Get `MachineTokenProvider` for audience `audience`"""

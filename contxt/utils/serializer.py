@@ -13,9 +13,7 @@ logger = make_logger(__name__)
 
 
 class Serializer:
-    """
-    A general serializer to transform a Python object to common data formats.
-    """
+    """Serializer to transform a Python object to common data formats"""
 
     @staticmethod
     def _keys(obj):

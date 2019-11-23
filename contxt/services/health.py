@@ -7,9 +7,7 @@ logger = make_logger(__name__)
 
 
 class HealthService(ConfiguredApi):
-    """
-    Service to interact with our Health API.
-    """
+    """Health API client"""
 
     _envs = (
         ApiEnvironment(

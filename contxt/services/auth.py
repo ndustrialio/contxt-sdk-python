@@ -7,9 +7,7 @@ logger = make_logger(__name__)
 
 
 class AuthService(ConfiguredApi):
-    """
-    Service to interact with our Auth API.
-    """
+    """Auth API client"""
 
     _envs = (
         ApiEnvironment(
@@ -19,7 +17,7 @@ class AuthService(ConfiguredApi):
         ),
     )
 
-    def __init__(self, env: str = "production", **kwargs):
+    def __init__(self, env: str = "production", **kwargs) -> None:
         super().__init__(env=env, **kwargs)
 
     def get_jwks(self) -> Dict:
