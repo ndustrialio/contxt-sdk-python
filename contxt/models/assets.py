@@ -4,7 +4,7 @@ from typing import Any, Dict, List, Optional
 from dateutil.relativedelta import relativedelta
 
 from contxt.models import ApiField, ApiObject, Formatters, Parsers
-from contxt.utils import Utils, make_logger
+from contxt.utils import dict_diff, make_logger
 
 logger = make_logger(__name__)
 
@@ -585,9 +585,7 @@ class CompleteAsset:
         # the two dictionaries
         # TODO: this only identifies the label, since this is a nested dict
         curr_metrics = self.metrics
-        new_metrics = Utils.set_to_dict(
-            Utils.dict_to_set(metrics) - Utils.dict_to_set(curr_metrics)
-        )
+        new_metrics = dict_diff(metrics, curr_metrics)
 
         # Determine each change
         for label, start_date_to_value in new_metrics.items():
@@ -601,10 +599,7 @@ class CompleteAsset:
             # Determine metric values that changed
             metric = self.asset_type.metric_with_label(label)
             metric_values = self._metric_values_by_label[label]
-            new_metric_values = Utils.set_to_dict(
-                Utils.dict_to_set(start_date_to_value)
-                - Utils.dict_to_set(curr_metrics[label])
-            )
+            new_metric_values = dict_diff(start_date_to_value, curr_metrics[label])
 
             for start_date, new_value in new_metric_values.items():
                 # Make the change, and mark as changed

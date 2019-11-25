@@ -19,14 +19,8 @@ This also installs a command line interface (cli) available via `contxt`, as lon
 $ contxt -h
 ```
 
- Additionally, there is support for command line tab completion via [argcomplete](https://github.com/kislyuk/argcomplete). To active, run the following and refresh your bash environment:
-
-```
-$ activate-global-python-argcomplete
-```
-
 ## Contributing
-Please refer to the [release guide](docs/release.md).
+Please refer to [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Command Line Interface
 

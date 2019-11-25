@@ -1,10 +1,7 @@
 #!/usr/bin/env python3
-# PYTHON_ARGCOMPLETE_OK
 
 from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
 from typing import List, Tuple
-
-from argcomplete import autocomplete
 
 from contxt import __version__
 from contxt.cli.parsers import ContxtArgParser
@@ -24,13 +21,11 @@ def create_parser() -> Tuple[ArgumentParser, List[ContxtArgParser]]:
     parsers = root_parser.add_subparsers(title="subcommands", dest="command")
     subparsers = [cls(parsers) for cls in ContxtArgParser.__subclasses__()]
 
-    # Setup tab autocompletion
-    autocomplete(root_parser)
-
     return root_parser, subparsers
 
 
 def main() -> None:
+    """Main CLI"""
     parser, subparsers = create_parser()
     args = parser.parse_args()
 
