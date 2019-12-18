@@ -1,6 +1,7 @@
+from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-from typing import Optional
+from typing import ClassVar
 
 from pytz import UTC
 
@@ -14,15 +15,12 @@ class HealthStatus(Enum):
     BAD = "unhealthy"
 
 
+@dataclass
 class Health(ApiObject):
-    _api_fields = (
+    _api_fields: ClassVar = (
         ApiField("status", data_type=HealthStatus, creatable=True),
         ApiField("timestamp", data_type=Parsers.datetime, creatable=True),
     )
 
-    def __init__(
-        self, status: HealthStatus, timestamp: Optional[datetime] = datetime.now(UTC)
-    ) -> None:
-        super().__init__()
-        self.status = status
-        self.timestamp = timestamp
+    status: HealthStatus
+    timestamp: datetime = field(default_factory=lambda: datetime.now(UTC))
