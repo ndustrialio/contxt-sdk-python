@@ -9,6 +9,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 * Removed unnecessary dependencies, `tzlocal` and `argcomplete`
+* Update all models to use dataclasses ([#57](https://github.com/ndustrialio/contxt-sdk-python/pull/57))
 
 ### Fixed
 * API call for `ContxtService.create_organization` now sends new `slug` parameter ([#54](https://github.com/ndustrialio/contxt-sdk-python/pull/54))

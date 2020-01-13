@@ -31,4 +31,4 @@ release: ## Release new version [usage: v=rule]
 	git commit pyproject.toml CHANGELOG.md -m "Bump version to $(VERSION)" && git tag "v$(VERSION)"
 	git push && git push --tags
 	# Publish to pypi
-	poetry publish --build --username ndustrial.io
+	poetry publish --build
