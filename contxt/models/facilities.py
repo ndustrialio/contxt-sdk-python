@@ -10,7 +10,7 @@ class Facility(ApiObject):
         ApiField("address2"),
         ApiField("city"),
         ApiField("state"),
-        ApiField("zip", data_type=int),
+        ApiField("zip"),
         ApiField("timezone"),
         ApiField("geometry_id"),
         ApiField("asset_id"),
