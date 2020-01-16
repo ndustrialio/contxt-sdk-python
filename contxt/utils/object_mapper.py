@@ -83,7 +83,7 @@ class ObjectMapper:
                     if raw is Null:
                         assert param.default is not inspect.Parameter.empty, (
                             f"Missing value for required parameter; "
-                            f"type: {annotation}, param: {param}, tree: {tree}." + " " + failure_msg()
+                            f"type: {annotation}, param: {param}, tree: {tree}. {failure_msg()}"
                         )
                     else:
                         args[param.name] = ObjectMapper.tree_to_object(raw, param.annotation)

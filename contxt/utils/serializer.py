@@ -167,9 +167,7 @@ class Serializer:
 
     @staticmethod
     def to_file(
-        obj: Any,
-        path: Optional[Path] = None,
-        valid_exts: Optional[List[str]] = (".csv", ".json", ".txt"),
+        obj: Any, path: Optional[Path] = None, valid_exts: List[str] = (".csv", ".json", ".txt"),
     ):
         """Write an object to a file (or stdout).
 
@@ -198,7 +196,7 @@ class Serializer:
         # Validate file extension
         if path.suffix not in valid_exts:
             logger.critical(
-                f"Unsupported filetype: '{path.suffix}'. Choose from" f" {', '.join(valid_exts)}"
+                f"Unsupported filetype: '{path.suffix}'. Choose from {', '.join(valid_exts)}"
             )
             return
 

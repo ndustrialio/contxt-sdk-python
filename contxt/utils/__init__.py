@@ -1,9 +1,6 @@
-import logging
 from datetime import datetime
 from functools import partial, wraps
 from logging import Logger, getLogger
-from os import environ
-from sys import stdout
 from time import time
 from typing import Callable, Dict, Optional
 
@@ -55,54 +52,3 @@ def dict_diff(d1: Dict, d2: Dict) -> Dict:
         return obj
 
     return expand(set(flatten(d1)) - set(flatten(d2)))
-
-
-# Define logger
-# TODO: add loggly support
-BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN = range(7)
-WHITE = 37
-
-# The background is set with 40 plus the number of the color, and the foreground with 30
-
-# These are the sequences need to get colored ouput
-RESET_SEQ = "\033[0m"
-COLOR_SEQ = "\033[0;%dm"
-BOLD_SEQ = "\033[1m"
-
-COLORS = {"WARNING": YELLOW, "INFO": WHITE, "DEBUG": BLUE, "CRITICAL": RED, "ERROR": RED}
-
-
-def formatter_message(message, use_color=True):
-    if use_color:
-        message = message.replace("$RESET", RESET_SEQ).replace("$BOLD", BOLD_SEQ)
-    else:
-        message = message.replace("$RESET", "").replace("$BOLD", "")
-    return message
-
-
-class ColoredFormatter(logging.Formatter):
-    def __init__(self, msg: str, use_color: bool = True) -> None:
-        super().__init__(msg)
-        self.use_color = use_color
-
-    def format(self, record):
-        level_color = COLOR_SEQ % (30 + COLORS[record.levelname])
-        log = super().format(record).replace("$COLOR", level_color)
-        return log
-
-
-# Custom logger class with multiple destinations
-class ColoredLogger(logging.Logger):
-    FORMAT = (
-        "$COLOR%(asctime)s $BOLD$COLOR%(levelname)-8s$RESET$COLOR [%(name)s]"
-        "  %(message)s (%(filename)s:%(lineno)d)$RESET "
-    )
-    COLOR_FORMAT = formatter_message(FORMAT, use_color=True)
-    DEFAULT_LEVEL = environ.get("LOG_LEVEL", logging.INFO)
-
-    def __init__(self, name: str) -> None:
-        super().__init__(name, level=self.DEFAULT_LEVEL)
-        color_formatter = ColoredFormatter(self.COLOR_FORMAT)
-        console = logging.StreamHandler(stream=stdout)
-        console.setFormatter(color_formatter)
-        self.addHandler(console)

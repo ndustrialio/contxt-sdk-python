@@ -99,16 +99,6 @@ class UtilitySpend(ApiObject):
         return self.values
 
 
-class UtilityUsagePeriod(ApiObject):
-    _api_fields = (ApiField("date"), ApiField("value"), ApiField("pro_forma_date", optional=True))
-
-    def __init__(self, date: str, value: str, pro_forma_date: Optional[str] = None) -> None:
-        super().__init__()
-        self.date = date
-        self.value = value
-        self.pro_forma_date = pro_forma_date
-
-
 @dataclass
 class UtilityUsage(ApiObject):
     _api_fields: ClassVar = (
