@@ -1,7 +1,8 @@
 from collections import defaultdict
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Tuple
 
+import pytz
 from requests import Request
 
 from contxt.auth import Auth
@@ -227,3 +228,53 @@ class IotService(ConfiguredApi):
         prepared_requests = {label: req.to_api() for label, req in requests.items()}
         resp = self.post("batch", json=prepared_requests)
         return ObjectMapper.tree_to_object(resp, BatchResponses)
+
+
+class IotDataService(ConfiguredApi):
+    """IOT API client
+
+    Terminology
+        - Feed: Data source (i.e. utility meter) with a set of fields
+        - Field: A specific time series data from a feed
+        - Grouping: Group of fields
+    """
+
+    _envs = (
+        ApiEnvironment(
+            name="production",
+            base_url="https://iot.api.ndustrial.io/v2/",
+            client_id="ZPrYMWVCcsyYaKKK2uiFLS71X1MB7zJP",
+        ),
+        ApiEnvironment(
+            name="development",
+            base_url="http://localhost:8080/v2/",
+            client_id="ZPrYMWVCcsyYaKKK2uiFLS71X1MB7zJP",
+        ),
+    )
+
+    def __init__(self, auth: Auth, env: str = "production", **kwargs) -> None:
+        super().__init__(env=env, auth=auth, **kwargs)
+
+    def get_source_data(
+        self, source_key: str, start: datetime, resolution: timedelta, end: Optional[datetime] = None
+    ):
+        """Get the data for the given source"""
+        assert start.tzinfo
+        assert resolution.total_seconds() == int(resolution.total_seconds())
+        params = {
+            "start": int(start.timestamp()),
+            "end": end or int(datetime.now().timestamp()),
+            "resolution": f"P{resolution.days}DT{resolution.seconds}S",
+        }
+        return self.get(f"sources/{source_key}/data", params=params)
+
+    def get_source_cursor(self, source_key: str) -> datetime:
+        """Get the cursor for the given source"""
+        body = self.get(f"sources/{source_key}/cursor")
+        assert (
+            body["source_key"] == source_key
+        ), f"Got unexpected source key on response. Requested {source_key}, but got {body['source_key']}"
+        epoch = body["cursor_epoch"]
+        if epoch:
+            return datetime.fromtimestamp(epoch, tz=pytz.UTC)
+        return None
