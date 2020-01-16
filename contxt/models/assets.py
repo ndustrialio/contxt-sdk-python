@@ -461,7 +461,7 @@ class CompleteAsset:
         # the two dictionaries
         # TODO: this only identifies the label, since this is a nested dict
         curr_metrics = self.metrics
-        new_metrics = dict_diff(metrics,curr_metrics)
+        new_metrics = dict_diff(metrics, curr_metrics)
 
         # Determine each change
         for label, start_date_to_value in new_metrics.items():

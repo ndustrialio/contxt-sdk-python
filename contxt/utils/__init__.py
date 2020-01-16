@@ -1,6 +1,9 @@
+import logging
 from datetime import datetime
 from functools import partial, wraps
 from logging import Logger, getLogger
+from os import environ
+from sys import stdout
 from time import time
 from typing import Callable, Dict, Optional
 
@@ -19,9 +22,7 @@ def is_datetime_aware(dt: datetime) -> bool:
     return dt.tzinfo is not None and dt.tzinfo.utcoffset(dt) is not None
 
 
-def timed(
-    func: Optional[Callable] = None, *, printer: Callable[[str], None] = print
-) -> Callable:
+def timed(func: Optional[Callable] = None, *, printer: Callable[[str], None] = print) -> Callable:
     """Decorator to print `func`'s runtime, via `printer`"""
 
     if func is None:

@@ -67,11 +67,16 @@ class Facility(ApiObject):
 
 @dataclass
 class UtilityPeriod(ApiObject):
-    _api_fields: ClassVar = (ApiField("date"), ApiField("value"), ApiField("pro_forma_date", optional=True))
+    _api_fields: ClassVar = (
+        ApiField("date"),
+        ApiField("value"),
+        ApiField("pro_forma_date", optional=True),
+    )
 
     date: str
     value: str
     pro_forma_date: Optional[str] = None
+
 
 UtilitySpendPeriod = UtilityPeriod
 UtilityUsagePeriod = UtilityPeriod
@@ -92,6 +97,8 @@ class UtilitySpend(ApiObject):
     @property
     def periods(self):
         return self.values
+
+
 class UtilityUsagePeriod(ApiObject):
     _api_fields = (ApiField("date"), ApiField("value"), ApiField("pro_forma_date", optional=True))
 
@@ -101,9 +108,14 @@ class UtilityUsagePeriod(ApiObject):
         self.value = value
         self.pro_forma_date = pro_forma_date
 
+
 @dataclass
 class UtilityUsage(ApiObject):
-    _api_fields: ClassVar = (ApiField("type"), ApiField("unit"), ApiField("values", data_type=UtilityUsagePeriod))
+    _api_fields: ClassVar = (
+        ApiField("type"),
+        ApiField("unit"),
+        ApiField("values", data_type=UtilityUsagePeriod),
+    )
 
     type: str
     unit: str

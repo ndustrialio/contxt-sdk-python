@@ -47,9 +47,7 @@ class TestIotService:
     def test_get_time_series_for_fields(self):
         fields = self.service.get_fields_for_feed(TestField.feed_id)[:2]
         start_time = datetime.now(UTC) - timedelta(days=7)
-        fields_data = self.service.get_time_series_for_fields(
-            fields=fields, start_time=start_time
-        )
+        fields_data = self.service.get_time_series_for_fields(fields=fields, start_time=start_time)
         assert fields_data
         assert len(fields_data) == len(fields)
         assert all(isinstance(d, FieldTimeSeries) for d in fields_data)

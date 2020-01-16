@@ -79,7 +79,12 @@ class SubscriberStats(ApiObject):
 
 @dataclass
 class Channel(ApiObject):
-    _api_fields: ClassVar = (ApiField("id"), ApiField("name"), ApiField("organization_id"), ApiField("service_id"))
+    _api_fields: ClassVar = (
+        ApiField("id"),
+        ApiField("name"),
+        ApiField("organization_id"),
+        ApiField("service_id"),
+    )
 
     id: str
     name: str

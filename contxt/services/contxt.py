@@ -45,9 +45,7 @@ class ContxtService(ConfiguredApi):
     def create_organization(self, organization: Organization) -> Organization:
         data = organization.post()
         logger.debug(f"Creating organization with {data}")
-        resp = self.post(
-            "organizations", data={"name": data["name"], "slug": data["name"]}
-        )
+        resp = self.post("organizations", data={"name": data["name"], "slug": data["name"]})
         return Organization.from_api(resp)
 
     def add_user_to_organization(self, user_id: str, organization_id: str) -> OrganizationUser:

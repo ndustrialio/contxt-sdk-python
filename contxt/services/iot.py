@@ -142,9 +142,7 @@ class IotService(ConfiguredApi):
                 BatchRequest.from_request(
                     Request(
                         method="GET",
-                        url=self._url(
-                            f"outputs/{f.output_id}/fields/{f.field_human_name}/data"
-                        ),
+                        url=self._url(f"outputs/{f.output_id}/fields/{f.field_human_name}/data"),
                         params=params,
                     )
                 ),
@@ -175,14 +173,10 @@ class IotService(ConfiguredApi):
                     # Add request for next page
                     next_page_url = resp.body["meta"]["next_page_url"]
                     if next_page_url:
-                        queue.append(
-                            (name, BatchRequest(method="GET", uri=next_page_url))
-                        )
+                        queue.append((name, BatchRequest(method="GET", uri=next_page_url)))
                 else:
                     # Retry request
-                    logger.warning(
-                        f"Got bad response from IOT API ({resp.body}). Retrying..."
-                    )
+                    logger.warning(f"Got bad response from IOT API ({resp.body}). Retrying...")
                     queue.append((name, requests[name]))
 
             if not any_success:
