@@ -1,15 +1,32 @@
+from collections import defaultdict
 from datetime import datetime
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
+
+from requests import Request
 
 from contxt.auth import Auth
-from contxt.models.iot import Feed, Field, FieldGrouping, FieldTimeSeries, UnprovisionedField, Window
+from contxt.models import Parsers
+from contxt.models.iot import (
+    BatchRequest,
+    BatchRequests,
+    BatchResponses,
+    Feed,
+    Field,
+    FieldGrouping,
+    FieldTimeSeries,
+    UnprovisionedField,
+    Window,
+)
 from contxt.services.api import ApiEnvironment, ConfiguredApi
 from contxt.services.pagination import PagedRecords, PagedTimeSeries, PageOptions
+from contxt.utils import make_logger
+from contxt.utils.object_mapper import ObjectMapper
+
+logger = make_logger(__name__)
 
 
 class IotService(ConfiguredApi):
-    """
-    Service to interact with our IOT API.
+    """IOT API client
 
     Terminology
         - Feed: Data source (i.e. utility meter) with a set of fields
@@ -25,7 +42,7 @@ class IotService(ConfiguredApi):
         ),
     )
 
-    def __init__(self, auth: Auth, env: str = "production", **kwargs):
+    def __init__(self, auth: Auth, env: str = "production", **kwargs) -> None:
         super().__init__(env=env, auth=auth, **kwargs)
 
     def get_feed_with_id(self, id: int) -> Feed:
@@ -89,7 +106,7 @@ class IotService(ConfiguredApi):
         end_time: Optional[datetime] = None,
         per_page: int = 1000,
     ) -> FieldTimeSeries:
-        """Get time series data for field `Field`"""
+        """Get time series data for field `field`"""
         # Manually validate the window choice, since our API does not return a
         # helpful error message
         assert isinstance(window, Window), "window must be of type Window"
@@ -103,6 +120,79 @@ class IotService(ConfiguredApi):
             },
             per_page=per_page,
         )
+
+    def get_time_series_for_fields(
+        self,
+        fields: List[Field],
+        start_time: datetime,
+        window: Window = Window.RAW,
+        end_time: Optional[datetime] = None,
+    ) -> List[FieldTimeSeries]:
+        """Get complete (non-paginated) time series data for each field in `fields`"""
+        # Build requests queue
+        params = {
+            "timeStart": int(start_time.timestamp()),
+            "timeEnd": int(end_time.timestamp()) if end_time else None,
+            "window": window.value,
+            "limit": 5000,
+        }
+        queue: List[Tuple[str, BatchRequest]] = [
+            (
+                f.field_human_name,
+                BatchRequest.from_request(
+                    Request(
+                        method="GET",
+                        url=self._url(
+                            f"outputs/{f.output_id}/fields/{f.field_human_name}/data"
+                        ),
+                        params=params,
+                    )
+                ),
+            )
+            for f in fields
+        ]
+
+        # Make all requests in queue
+        MAX_BATCH_REQUESTS = 200
+        records: Dict[str, Dict[datetime, str]] = defaultdict(dict)
+        while queue:
+            # Make next batch of requests
+            requests = dict(queue[:MAX_BATCH_REQUESTS])
+            del queue[:MAX_BATCH_REQUESTS]
+            logger.info(f"Making {len(requests)} batched requests to IOT API")
+            responses = self._batch_request(requests)
+            any_success = False
+
+            # Process responses
+            for name, resp in responses.items():
+                if resp.ok:
+                    any_success = True
+                    series = {
+                        Parsers.datetime(r["event_time"]): Parsers.unknown(r["value"])
+                        for r in resp.body["records"]
+                    }
+                    records[name].update(series)
+                    # Add request for next page
+                    next_page_url = resp.body["meta"]["next_page_url"]
+                    if next_page_url:
+                        queue.append(
+                            (name, BatchRequest(method="GET", uri=next_page_url))
+                        )
+                else:
+                    # Retry request
+                    logger.warning(
+                        f"Got bad response from IOT API ({resp.body}). Retrying..."
+                    )
+                    queue.append((name, requests[name]))
+
+            if not any_success:
+                raise IOError(f"All {len(requests)} batched requests to IOT API failed")
+
+        fields_by_name = {f.field_human_name: f for f in fields}
+        return [
+            FieldTimeSeries(field=fields_by_name[name], time_series=series)
+            for name, series in records.items()
+        ]
 
     def get_time_series_for_field_grouping(self, grouping_id: str, **kwargs) -> List[Dict]:
         """Get time series data for fields in grouping with id `grouping_id`"""
@@ -138,3 +228,8 @@ class IotService(ConfiguredApi):
             options=page_options,
             record_parser=FieldGrouping.from_api,
         )
+
+    def _batch_request(self, requests: BatchRequests) -> BatchResponses:
+        prepared_requests = {label: req.to_api() for label, req in requests.items()}
+        resp = self.post("batch", json=prepared_requests)
+        return ObjectMapper.tree_to_object(resp, BatchResponses)

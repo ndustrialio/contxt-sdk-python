@@ -9,9 +9,7 @@ logger = make_logger(__name__)
 
 
 class MessageBusService(ConfiguredApi):
-    """
-    Service to interact with our Message Bus API.
-    """
+    """Message Bus API client"""
 
     _envs = (
         ApiEnvironment(

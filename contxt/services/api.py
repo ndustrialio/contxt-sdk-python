@@ -15,9 +15,7 @@ logger = make_logger(__name__)
 
 
 class BearerTokenAuth(AuthBase):
-    """
-    Bearer token to authorize requests.
-    """
+    """Bearer token to authorize requests"""
 
     def __init__(self, token_provider: TokenProvider) -> None:
         self.token_provider = token_provider
@@ -51,8 +49,7 @@ class ApiRetry(Retry):
 
 
 class Api:
-    """
-    An API with url `base_url`.
+    """An API with url `base_url`.
 
     If `token_provider` is specified, all requests will be authenticated with
     the access token it provides.
@@ -131,8 +128,7 @@ class Api:
 
 @dataclass
 class ApiEnvironment:
-    """
-    An environment for an API.
+    """An environment for an API.
 
     Note `client_id` is only needed if authentication is required.
     """
@@ -143,8 +139,7 @@ class ApiEnvironment:
 
 
 class ConfiguredApi(Api, ABC):
-    """
-    An `Api` configured for multiple environments, such as staging and production.
+    """An `Api` configured for multiple environments, such as staging and production.
     Available environments are expressed by `_envs` and the desired environment is
     specified by its name `env`.
 
@@ -161,7 +156,7 @@ class ConfiguredApi(Api, ABC):
 
     @classmethod
     def _get_env(cls, name: str) -> ApiEnvironment:
-        """Get environment with name `name`."""
+        """Get environment with name `name`"""
         envs = {e.name: e for e in cls._envs}
         if name not in envs:
             raise KeyError(f"Invalid environment '{name}'. Choose from {list(envs.keys())}.")

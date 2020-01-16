@@ -1,11 +1,11 @@
 from getpass import getpass
 from json import dump, load
 from pathlib import Path
-from typing import Dict, Optional
+from typing import Any, Dict, Optional
 
 from auth0.v3.authentication import GetToken
 
-from contxt.auth import Auth, TokenProvider
+from contxt.auth import Auth, Token, TokenProvider
 from contxt.services.auth import AuthService
 from contxt.utils import make_logger
 
@@ -13,11 +13,9 @@ logger = make_logger(__name__)
 
 
 class UserIdentityProvider(TokenProvider):
-    """
-    Same as `TokenProvider`, but the access token provided is authenticated via
-    username and password and granted for offline access, meaning expired tokens
-    are refreshed with a refresh token. To do so, our own Auth API
-    (i.e. `AuthService`) is replaced by Auth0's API.
+    """Concrete `TokenProvider` for a user's identity. The access token is provided
+    directly from Auth0 via username and password and granted for offline access, so
+    expired tokens are refreshed with a refresh token.
 
     If `cache_file` is specified, both the `access_token` and `refresh_token`
     are cached there as a JSON blob.
@@ -25,12 +23,12 @@ class UserIdentityProvider(TokenProvider):
 
     def __init__(
         self, client_id: str, client_secret: str, audience: str, cache_file: Optional[Path] = None
-    ):
+    ) -> None:
         super().__init__(audience)
         self.client_id = client_id
         self.client_secret = client_secret
         self.auth_service = GetToken("ndustrial.auth0.com")
-        self._refresh_token: Optional[str] = None
+        self._refresh_token: Optional[Token] = None
 
         # Initialize cache
         self._cache_file = cache_file
@@ -51,7 +49,7 @@ class UserIdentityProvider(TokenProvider):
                 logger.debug(f"Token not found in cache")
 
     @TokenProvider.access_token.getter
-    def access_token(self) -> str:
+    def access_token(self) -> Token:
         """Gets a valid access token for audience `audience`"""
         if self._access_token is None:
             # Token not yet set, fetch one
@@ -73,7 +71,7 @@ class UserIdentityProvider(TokenProvider):
         return self._access_token
 
     @property
-    def refresh_token(self) -> str:
+    def refresh_token(self) -> Token:
         """Gets the refresh token"""
         if self._refresh_token is None:
             # Token not yet set, fetch it now
@@ -81,11 +79,11 @@ class UserIdentityProvider(TokenProvider):
         return self._refresh_token
 
     @refresh_token.setter
-    def refresh_token(self, value: str) -> None:
+    def refresh_token(self, value: Token) -> None:
         """Sets the refresh token"""
         self._refresh_token = value
 
-    def login(self, username: Optional[str] = None, password: Optional[str] = None) -> Dict:
+    def login(self, username: Optional[str] = None, password: Optional[str] = None) -> Dict[str, Any]:
         """Returns an access_token from Auth0, from client `client_id` and
         `client_secret` for audience `audience`, with username `username` and
         password `password`"""
@@ -100,11 +98,11 @@ class UserIdentityProvider(TokenProvider):
             realm="",
         )
 
-    def reset(self):
+    def reset(self) -> None:
         super().reset()
         self._refresh_token: Optional[str] = None
 
-    def read_cache(self) -> Dict:
+    def read_cache(self) -> Dict[str, Any]:
         if self._cache_file:
             logger.debug(f"Reading cache {self._cache_file}")
             if self._cache_file.is_file():
@@ -128,18 +126,17 @@ class UserIdentityProvider(TokenProvider):
 
 
 class UserTokenProvider(TokenProvider):
-    """
-    Same as `TokenProvider`, but specifically for a human client. In this case,
-    `identity_provider.access_token` serves as the identity provider for the client.
+    """Concrete `TokenProvider` for a user, where `identity_provider` serves as the
+    identity provider.
     """
 
-    def __init__(self, identity_provider: UserIdentityProvider, audience: str):
+    def __init__(self, identity_provider: UserIdentityProvider, audience: str) -> None:
         super().__init__(audience)
         self.identity_provider = identity_provider
         self.auth_service = AuthService()
 
     @TokenProvider.access_token.getter
-    def access_token(self) -> str:
+    def access_token(self) -> Token:
         """Gets a valid access token for audience `audience`"""
         if self._access_token is None or self._token_expiring():
             # Token either not yet set or expiring soon, fetch one
@@ -151,10 +148,8 @@ class UserTokenProvider(TokenProvider):
 
 
 class CliAuth(Auth):
-    """
-    Same as `Auth`, but specifically for the client CLI. It uses
-    `UserIdentityProvider` to authenticate requests to get an access token for
-    target clients defined by `audience`.
+    """Concrete `Auth` for a CLI user, where `identity_provider` authenticates requests
+    for an access token for target clients defined by `audience`.
 
     The access token from Auth0 is cached in a JSON file in a hidden directory,
     meaning that the user will only have to authenticate with their credientials
@@ -168,7 +163,7 @@ class CliAuth(Auth):
        for the target service, authenticating with the above Auth0 access token
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__(client_id="bleED0RUwb7CJ9j7D48tqSiSZRZn29AV", client_secret="")
         self.auth_service = AuthService()
         self.identity_provider = UserIdentityProvider(

@@ -1,27 +1,34 @@
-dirs = contxt tests
+.PHONY: help install lint fix test release
+
+CMD := poetry run
+DIRS := contxt tests
+VERSION := $$(poetry version | sed -n 's/contxt-sdk //p')
+
+help: ## List all commands
+	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z -]+:.*?## / {printf "\033[36m%-10s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
 install:
 	pip install poetry
 	poetry install -E server
 
-lint:
-	poetry run isort --check-only --recursive $(dirs)
-	poetry run black --check $(dirs)
-	poetry run flake8 $(dirs)
+lint: ## Run formatters and linter
+	$(CMD) isort --check-only --recursive $(DIRS)
+	$(CMD) black --check $(DIRS)
+	$(CMD) flake8 $(DIRS)
 
-fix:
-	poetry run isort --apply --recursive $(dirs)
-	poetry run black $(dirs)
+fix: ## Fix formatting
+	$(CMD) isort --apply --recursive $(DIRS)
+	$(CMD) black $(DIRS)
 
-test:
-	poetry run pytest tests/unit
+test: ## Run unit tests
+	$(CMD) pytest tests/unit
 
-version:
-	# Usage: make version v=[major|minor|patch|release|build]
-	poetry run bump2version $(v) --commit --tag && git push && git push --tags
-
-clean:
-	rm -rf dist/ build/ *.egg-info
-
-publish: clean
-	poetry publish --build --username ndustrial.io
+release: ## Release new version [usage: v=rule]
+	# Update pyproject and changelog
+	poetry version $(v)
+	sed -i "" "s/\[Unreleased\]/\[$(VERSION)\] - $(shell date +%F)/" CHANGELOG.md
+	# Create commit and tag
+	git commit pyproject.toml CHANGELOG.md -m "Bump version to $(VERSION)" && git tag "v$(VERSION)"
+	git push && git push --tags
+	# Publish to pypi
+	poetry publish --build

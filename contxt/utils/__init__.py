@@ -1,75 +1,59 @@
-import logging
 from datetime import datetime
-from os import environ
-from sys import stdout
+from functools import partial, wraps
+from logging import Logger, getLogger
 from time import time
-from typing import Dict, Optional, Set
-
-from pytz import UTC
-from tzlocal import get_localzone
-
-logger = logging.getLogger(__name__)
+from typing import Callable, Dict, Optional
 
 
-def make_logger(name: str, level: Optional[str] = None):
-    logger = logging.getLogger(name)
+def make_logger(name: str, level: Optional[str] = None) -> Logger:
+    """Get logger with name `name` and level `level`"""
+    logger = getLogger(name)
     if level:
         logger.setLevel(level.upper())
     return logger
 
 
-def timed(func):
+# Ref: https://docs.python.org/3/library/datetime.html#determining-if-an-object-is-aware-or-naive # noqa: E501
+def is_datetime_aware(dt: datetime) -> bool:
+    """Returns if datetime `dt` is timezone-aware"""
+    return dt.tzinfo is not None and dt.tzinfo.utcoffset(dt) is not None
+
+
+def timed(
+    func: Optional[Callable] = None, *, printer: Callable[[str], None] = print
+) -> Callable:
+    """Decorator to print `func`'s runtime, via `printer`"""
+
+    if func is None:
+        return partial(timed, printer=printer)
+
+    @wraps(func)
     def wrapper(*args, **kwargs):
         t0 = time()
-        return_val = func(*args, **kwargs)
-        logger.info(f"{func.__name__}'s elapsed time: {time() - t0} s")
-        return return_val
+        res = func(*args, **kwargs)
+        printer(f"{func.__name__}'s elapsed time: {time() - t0} s")
+        return res
 
     return wrapper
 
 
-def is_datetime_aware(dt: datetime) -> bool:
-    return dt.tzinfo is not None and dt.tzinfo.utcoffset(dt) is not None
+# FIXME: does not handle nested dictionaries
+def dict_diff(d1: Dict, d2: Dict) -> Dict:
+    """Compute the set difference `d1` - `d2`"""
 
+    def flatten(obj):
+        if isinstance(obj, (list, tuple)):
+            return tuple([flatten(o) for o in obj])
+        elif isinstance(obj, dict):
+            return tuple([(flatten(k), flatten(v)) for k, v in sorted(obj.items())])
+        return obj
 
-class Utils:
-    @staticmethod
-    def delocalize_datetime(dt: datetime) -> datetime:
-        localized_dt = get_localzone().localize(dt)
-        return localized_dt.astimezone(UTC)
+    def expand(obj):
+        if isinstance(obj, (set, tuple)):
+            return {k: expand(v) for k, v in obj}
+        return obj
 
-    @staticmethod
-    def get_epoch_time(dt: datetime) -> int:
-        if dt.tzinfo is None:
-            # assuming an naive datetime is in the callers timezone
-            # as set on the system,
-            dt = get_localzone().localize(dt)
-
-        utc_1970 = datetime(1970, 1, 1).replace(tzinfo=UTC)
-
-        return int((dt.astimezone(UTC) - utc_1970).total_seconds())
-
-    @staticmethod
-    def dict_to_set(dict_: Dict) -> Set:
-        # TODO: this does not handle nested dicts
-
-        def flatten(obj):
-            if isinstance(obj, (list, tuple)):
-                return tuple([flatten(o) for o in obj])
-            elif isinstance(obj, dict):
-                return tuple([(flatten(k), flatten(v)) for k, v in sorted(obj.items())])
-            return obj
-
-        return set(flatten(dict_))
-
-    @staticmethod
-    def set_to_dict(set_: Set) -> Dict:
-        def expand(obj):
-            if isinstance(obj, (set, tuple)):
-                return {k: expand(v) for k, v in obj}
-            return obj
-
-        return expand(set_)
+    return expand(set(flatten(d1)) - set(flatten(d2)))
 
 
 # Define logger

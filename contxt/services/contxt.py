@@ -10,9 +10,7 @@ logger = make_logger(__name__)
 
 
 class ContxtService(ConfiguredApi):
-    """
-    Service to interact with our Contxt API.
-    """
+    """Contxt API client"""
 
     _envs = (
         ApiEnvironment(
@@ -47,7 +45,9 @@ class ContxtService(ConfiguredApi):
     def create_organization(self, organization: Organization) -> Organization:
         data = organization.post()
         logger.debug(f"Creating organization with {data}")
-        resp = self.post("organizations", data=data)
+        resp = self.post(
+            "organizations", data={"name": data["name"], "slug": data["name"]}
+        )
         return Organization.from_api(resp)
 
     def add_user_to_organization(self, user_id: str, organization_id: str) -> OrganizationUser:

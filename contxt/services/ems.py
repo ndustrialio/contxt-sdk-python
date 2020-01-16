@@ -15,9 +15,7 @@ from contxt.services.pagination import PagedRecords
 
 
 class EmsService(ConfiguredApi):
-    """
-    Service to interact with our EMS API.
-    """
+    """EMS API client"""
 
     _envs = (
         ApiEnvironment(
@@ -32,7 +30,7 @@ class EmsService(ConfiguredApi):
         ),
     )
 
-    def __init__(self, auth: Auth, env: str = "production", **kwargs):
+    def __init__(self, auth: Auth, env: str = "production", **kwargs) -> None:
         super().__init__(env=env, auth=auth, **kwargs)
 
     def get_facility(self, id: int) -> Facility:

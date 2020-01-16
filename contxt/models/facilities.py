@@ -1,9 +1,13 @@
+from dataclasses import dataclass
+from typing import ClassVar
+
 from contxt.models import ApiField, ApiObject, Parsers
 from contxt.models.contxt import Organization
 
 
+@dataclass
 class Facility(ApiObject):
-    _api_fields = (
+    _api_fields: ClassVar = (
         ApiField("id", data_type=int),
         ApiField("name"),
         ApiField("address1"),
@@ -25,41 +29,20 @@ class Facility(ApiObject):
         ApiField("slug"),
     )
 
-    def __init__(
-        self,
-        id: int,
-        name: str,
-        address1: str,
-        address2: str,
-        city: str,
-        state: str,
-        zip: str,
-        timezone: str,
-        geometry_id: str,
-        asset_id: str,
-        tags: list,
-        organization_id: str,
-        organization: Organization,
-        info: dict,
-        weather_location_id: str,
-        created_at: str,
-        slug: str,
-    ) -> None:
-        super().__init__()
-        self.id = id
-        self.name = name
-        self.address1 = address1
-        self.address2 = address2
-        self.city = city
-        self.state = state
-        self.zip = zip
-        self.timezone = timezone
-        self.geometry_id = geometry_id
-        self.asset_id = asset_id
-        self.tags = tags
-        self.organization_id = organization_id
-        self.organization = organization
-        self.weather_location_id = weather_location_id
-        self.info = info
-        self.created_at = created_at
-        self.slug = slug
+    id: int
+    name: str
+    address1: str
+    address2: str
+    city: str
+    state: str
+    zip: str
+    timezone: str
+    geometry_id: str
+    asset_id: str
+    tags: list
+    organization_id: str
+    organization: Organization
+    info: dict
+    weather_location_id: str
+    created_at: str
+    slug: str

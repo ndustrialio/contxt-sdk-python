@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from datetime import datetime
-from typing import Dict, Optional
+from typing import Any, Dict, Optional
 
 from jwt import decode
 from pytz import UTC
@@ -9,21 +9,22 @@ from contxt.utils import make_logger
 
 logger = make_logger(__name__)
 
+Token = str
+DecodedToken = Dict[str, Any]
 
-# NOTE: we should migrate to the official Oauth Sessions
-# https://github.com/requests/requests-oauthlib
+
+# TODO: Replace with https://github.com/requests/requests-oauthlib
 class TokenProvider(ABC):
-    """
-    An abstact base class to provide an unexpired `access_token` from the source
-    client to the target client (defined by `audience`).
+    """An abstact base class to provide an unexpired `access_token` from the source
+    client to the target client, defined by `audience`.
 
     Overload this class to implement `access_token`.
     """
 
     def __init__(self, audience: str) -> None:
         self.audience = audience
-        self._access_token: Optional[str] = None
-        self._access_token_decoded: Optional[Dict] = None
+        self._access_token: Optional[Token] = None
+        self._access_token_decoded: Optional[DecodedToken] = None
 
     def _token_expiring(self, within: int = 60) -> bool:
         """Returns if `access_token` is within `within` seconds of expiring.
@@ -40,13 +41,13 @@ class TokenProvider(ABC):
         """Gets a valid access token for audience `audience`"""
 
     @access_token.setter
-    def access_token(self, value: str) -> None:
+    def access_token(self, value: Token) -> None:
         """Sets both the access token and the decoded access token"""
         self._access_token = value
         self._access_token_decoded = decode(self._access_token, verify=False)
 
     @property
-    def decoded_access_token(self) -> Dict:
+    def decoded_access_token(self) -> DecodedToken:
         """Gets the decoded access token"""
         if self._access_token_decoded is None:
             # Token not yet set, fetch it now
@@ -54,17 +55,15 @@ class TokenProvider(ABC):
         return self._access_token_decoded
 
     def reset(self) -> None:
-        self._access_token: Optional[str] = None
-        self._access_token_decoded: Optional[Dict] = None
+        self._access_token: Optional[Token] = None
+        self._access_token_decoded: Optional[DecodedToken] = None
 
 
 class Auth(ABC):
-    """
-    An abstract base class for a client (user, service, worker, etc.) defined
-    by `client_id` and `client_secret`. When the client needs to authenticate
-    to another client, use `get_token_provider(...)`.
+    """An abstract base class for a client defined by `client_id` and `client_secret`.
+    To authenticate to another client, use `get_token_provider()`.
 
-    Overload this class to implement `get_token_provider(...)`.
+    Overload this class to implement `get_token_provider()`.
     """
 
     def __init__(self, client_id: str, client_secret: str) -> None:

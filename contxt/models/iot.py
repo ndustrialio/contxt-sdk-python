@@ -2,7 +2,9 @@ from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
 from json import loads
-from typing import Any, Dict, List, Optional
+from typing import Any, ClassVar, Dict, List, Optional
+
+from requests import Request
 
 from contxt.models import ApiField, ApiObject, Parsers
 from contxt.models.events import Owner
@@ -21,8 +23,9 @@ class FieldValueType(Enum):
     STRING = "string"
 
 
+@dataclass
 class Field(ApiObject):
-    _api_fields = (
+    _api_fields: ClassVar = (
         ApiField("id", data_type=int),
         ApiField("field_name", attr_key="name", optional=True),
         ApiField("label", creatable=True, updatable=True),
@@ -45,54 +48,31 @@ class Field(ApiObject):
         ApiField("updated_at", data_type=Parsers.datetime, optional=True),
     )
 
-    def __init__(
-        self,
-        label: str,
-        output_id: str,
-        field_descriptor: str,
-        units: str,
-        id: Optional[int] = None,
-        name: Optional[str] = None,
-        field_human_name: Optional[str] = None,
-        feed_key: Optional[str] = None,
-        field_grouping_field: Optional[Dict] = None,
-        value_type: Optional[FieldValueType] = None,
-        scalar: Optional[float] = None,
-        divisor: Optional[float] = None,
-        is_hidden: Optional[bool] = None,
-        is_totalizer: Optional[bool] = None,
-        is_windowed: Optional[bool] = None,
-        is_default: Optional[bool] = None,
-        can_aggregate: Optional[bool] = None,
-        status: Optional[str] = None,
-        created_at: Optional[datetime] = None,
-        updated_at: Optional[datetime] = None,
-    ) -> None:
-        super().__init__()
-        self.id = id
-        self.name = name
-        self.label = label
-        self.output_id = output_id
-        self.field_descriptor = field_descriptor
-        self.field_human_name = field_human_name
-        self.scalar = scalar
-        self.divisor = divisor
-        self.value_type = value_type
-        self.feed_key = feed_key
-        self.is_hidden = is_hidden
-        self.is_totalizer = is_totalizer
-        self.is_windowed = is_windowed
-        self.is_default = is_default
-        self.can_aggregate = can_aggregate
-        self.status = status
-        self.units = units
-        self.field_grouping_field = field_grouping_field
-        self.created_at = created_at
-        self.updated_at = updated_at
+    label: str
+    output_id: str
+    field_descriptor: str
+    units: str
+    id: Optional[int] = None
+    name: Optional[str] = None
+    field_human_name: Optional[str] = None
+    feed_key: Optional[str] = None
+    field_grouping_field: Optional[Dict] = None
+    value_type: Optional[FieldValueType] = None
+    scalar: Optional[float] = None
+    divisor: Optional[float] = None
+    is_hidden: Optional[bool] = None
+    is_totalizer: Optional[bool] = None
+    is_windowed: Optional[bool] = None
+    is_default: Optional[bool] = None
+    can_aggregate: Optional[bool] = None
+    status: Optional[str] = None
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
 
 
+@dataclass
 class FieldCategory(ApiObject):
-    _api_fields = (
+    _api_fields: ClassVar = (
         ApiField("id"),
         ApiField("name"),
         ApiField("description"),
@@ -102,28 +82,18 @@ class FieldCategory(ApiObject):
         ApiField("updated_at", data_type=Parsers.datetime),
     )
 
-    def __init__(
-        self,
-        id: str,
-        name: str,
-        description: str,
-        organization_id: str,
-        parent_category_id: str,
-        created_at: datetime,
-        updated_at: datetime,
-    ) -> None:
-        super().__init__()
-        self.id = id
-        self.name = name
-        self.description = description
-        self.organization_id = organization_id
-        self.parent_category_id = parent_category_id
-        self.created_at = created_at
-        self.updated_at = updated_at
+    id: str
+    name: str
+    description: str
+    organization_id: str
+    parent_category_id: str
+    created_at: datetime
+    updated_at: datetime
 
 
+@dataclass
 class FieldGrouping(ApiObject):
-    _api_fields = (
+    _api_fields: ClassVar = (
         ApiField("id"),
         ApiField("label"),
         ApiField("slug"),
@@ -139,49 +109,32 @@ class FieldGrouping(ApiObject):
         ApiField("updated_at", data_type=Parsers.datetime),
     )
 
-    def __init__(
-        self,
-        id: str,
-        label: str,
-        slug: str,
-        description: str,
-        facility_id: int,
-        is_public: bool,
-        owner_id: str,
-        owner: Owner,
-        field_category_id: str,
-        field_category: FieldCategory,
-        fields: List[Field],
-        created_at: datetime,
-        updated_at: datetime,
-    ) -> None:
-        super().__init__()
-        self.id = id
-        self.label = label
-        self.slug = slug
-        self.description = description
-        self.facility_id = facility_id
-        self.owner_id = owner_id
-        self.is_public = is_public
-        self.field_category_id = field_category_id
-        self.owner = owner
-        self.category = field_category
-        self.fields = fields
-        self.created_at = created_at
-        self.updated_at = updated_at
+    id: str
+    label: str
+    slug: str
+    description: str
+    facility_id: int
+    is_public: bool
+    owner_id: str
+    owner: Owner
+    field_category_id: str
+    field_category: FieldCategory
+    fields: List[Field]
+    created_at: datetime
+    updated_at: datetime
 
 
+@dataclass
 class UnprovisionedField(ApiObject):
-    _api_fields = (ApiField("field_descriptor"), ApiField("assumed_type"))
+    _api_fields: ClassVar = (ApiField("field_descriptor"), ApiField("assumed_type"))
 
-    def __init__(self, field_descriptor: str, assumed_type: str) -> None:
-        super().__init__()
-        self.field_descriptor = field_descriptor
-        self.assumed_type = assumed_type
+    field_descriptor: str
+    assumed_type: str
 
 
+@dataclass
 class Feed(ApiObject):
-    _api_fields = (
+    _api_fields: ClassVar = (
         ApiField("id", data_type=int),
         ApiField("feed_type_id", data_type=int),
         ApiField("down_after"),
@@ -204,53 +157,65 @@ class Feed(ApiObject):
         ApiField("Metrics", attr_key="metrics", data_type=dict, optional=True),
     )
 
-    def __init__(
-        self,
-        id: int,
-        facility_id: int,
-        feed_type_id: int,
-        down_after: str,
-        key: str,
-        timezone: str,
-        token: str,
-        status: str,
-        degraded_threshold: float,
-        critical_threshold: float,
-        status_event_id: str,
-        created_at: datetime,
-        updated_at: datetime,
-        routing_keys: str,
-        is_paused: bool,
-        owner_id: str,
-        feed_type: str,
-        owner: Owner,
-        feed_status: str,
-        metrics: Optional[Dict] = None,
-    ) -> None:
-        super().__init__()
-        self.id = id
-        self.feed_type_id = feed_type_id
-        self.down_after = down_after
-        self.key = key
-        self.facility_id = facility_id
-        self.timezone = timezone
-        self.token = token
-        self.status = status
-        self.degraded_threshold = degraded_threshold
-        self.critical_threshold = critical_threshold
-        self.status_event_id = status_event_id
-        self.created_at = created_at
-        self.updated_at = updated_at
-        self.routing_keys = routing_keys
-        self.is_paused = is_paused
-        self.owner_id = owner_id
-        self.feed_type = feed_type
-        self.owner = owner
-        self.feed_status = feed_status
-        self.metrics = metrics
+    id: int
+    facility_id: int
+    feed_type_id: int
+    down_after: str
+    key: str
+    timezone: str
+    token: str
+    status: str
+    degraded_threshold: float
+    critical_threshold: float
+    status_event_id: str
+    created_at: datetime
+    updated_at: datetime
+    routing_keys: str
+    is_paused: bool
+    owner_id: str
+    feed_type: str
+    owner: Owner
+    feed_status: str
+    metrics: Optional[Dict] = None
 
 
 @dataclass
 class FieldTimeSeries:
     field: Field
     time_series: Dict[datetime, Any]
+
+
+@dataclass
+class BatchRequest:
+    method: str
+    uri: str
+    body: Optional[str] = None
+
+    @staticmethod
+    def from_request(request: Request) -> "BatchRequest":
+        # NOTE: this handles url-encoding parameters and other low-level translations
+        r = request.prepare()
+        return BatchRequest(method=r.method, uri=r.url, body=r.body)
+
+    def to_api(self) -> Dict[str, str]:
+        d = {"method": self.method, "uri": self.uri}
+        if self.body:
+            d["body"] = self.body
+        return d
+
+
+BatchRequests = Dict[str, BatchRequest]
+
+
+@dataclass
+class BatchResponse:
+    body: Any
+    headers: Dict[str, Any]
+    statusCode: int
+
+    @property
+    def ok(self) -> bool:
+        return self.statusCode == 200
+
+
+BatchResponses = Dict[str, BatchResponse]
