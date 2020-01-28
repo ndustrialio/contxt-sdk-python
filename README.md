@@ -1,6 +1,6 @@
 # Contxt Python SDK
-[![pypi version](https://pypip.in/v/contxt-sdk/badge.png)](https://pypi.org/project/contxt-sdk/)
 [![build status](https://github.com/ndustrialio/contxt-sdk-python/workflows/build/badge.svg)](https://github.com/ndustrialio/contxt-sdk-python/actions)
+[![pypi version](https://img.shields.io/pypi/v/contxt-sdk.svg)](https://pypi.org/project/contxt-sdk/)
 
 ## Dependencies
 This project **requires** Python 3.6+.

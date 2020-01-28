@@ -1,20 +1,19 @@
 # Contributing
-
-Before getting started, make sure you have [Poetry](https://poetry.eustace.io/docs/#installation) installed.
+Before getting started, make sure you have [Poetry](https://python-poetry.org/docs/#installation) installed.
 
 ## Install
-```bash
+```console
 $ poetry install -E server
 ```
 
 ## Code Quality
-To enforce code quality, we use the following tools:
+To ensure code quality, we use the following tools:
 * Formatting: [black](https://black.readthedocs.io/en/stable/) and [isort](https://isort.readthedocs.io/en/latest/)
 * Linting: [flake8](http://flake8.pycqa.org/en/latest/)
 * Testing: [pytest](https://docs.pytest.org/en/latest/)
 
 Our CI pipeline will run these tools on every git push. To run these locally:
-```bash
+```console
 # Outputs formatting + linting issues
 $ make lint
 
@@ -27,7 +26,7 @@ $ make test
 
 ## Release
 To release a new version:
-```bash
+```console
 # Updates pyproject/changelog and tags/publishes
 $ make release v=[bump rule]
 ```
