@@ -1,15 +1,12 @@
-.PHONY: help install lint fix test release
+.PHONY: help lint fix test release
 
 CMD := poetry run
 DIRS := contxt tests
+URL := https://github.com/ndustrialio/contxt-sdk-python
 VERSION := $$(poetry version | sed -n 's/contxt-sdk //p')
 
 help: ## List all commands
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z -]+:.*?## / {printf "\033[36m%-10s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
-
-install:
-	pip install poetry
-	poetry install -E server
 
 lint: ## Run formatters and linter
 	$(CMD) isort --check-only --recursive $(DIRS)
@@ -26,9 +23,10 @@ test: ## Run unit tests
 release: ## Release new version [usage: v=rule]
 	# Update pyproject and changelog
 	poetry version $(v)
-	sed -i "" "s/\[Unreleased\]/\[$(VERSION)\] - $(shell date +%F)/" CHANGELOG.md
+	sed -i "" "s|\[Unreleased\].*|\[$(VERSION)\]($(URL)/releases/tag/v$(VERSION)) - $(shell date +%F)" CHANGELOG.md
 	# Create commit and tag
-	git commit pyproject.toml CHANGELOG.md -m "Bump version to $(VERSION)" && git tag "v$(VERSION)"
+	git commit pyproject.toml CHANGELOG.md -m "Bump version to $(VERSION)"
+	git tag "v$(VERSION)"
 	git push && git push --tags
 	# Publish to pypi
 	poetry publish --build

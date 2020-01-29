@@ -1,7 +1,8 @@
 # Change Log
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [1.0.0-beta.10] - 2020-01-28
+## [1.0.0-beta.10](https://github.com/ndustrialio/contxt-sdk-python/releases/tag/v1.0.0-beta.10) - 2020-01-28
+
 ### Added
 * Support for fetching time series for multiple IOT fields via `IotService.get_time_series_for_fields` ([#52](https://github.com/ndustrialio/contxt-sdk-python/pull/52))
 * Support for new Health API via `HealthService` class ([#55](https://github.com/ndustrialio/contxt-sdk-python/pull/55))
