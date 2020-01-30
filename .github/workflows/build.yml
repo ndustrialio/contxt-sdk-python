@@ -19,7 +19,8 @@ jobs:
     - name: Install package
       run: |
         pip install poetry
-        POETRY_VIRTUALENVS_IN_PROJECT=true poetry install -E server
+        poetry config virualenvs.in-project true
+        poetry install -E server
     - name: Run linters
       run: make lint
 
@@ -44,6 +45,7 @@ jobs:
     - name: Install package
       run: |
         pip install poetry
-        POETRY_VIRTUALENVS_IN_PROJECT=true poetry install -E server
+        poetry config virualenvs.in-project true
+        poetry install -E server
     - name: Run unit tests
       run: make test
