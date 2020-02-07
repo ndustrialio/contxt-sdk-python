@@ -312,7 +312,9 @@ class IotDataService(ConfiguredApi):
         self, source_key: str, data: List[NgestRecord], batch_size: int = 50
     ) -> List[Dict]:
         responses = []
-        for batch in zip_longest(*([iter(data)] * batch_size)):
+        tail = data
+        while tail:
+            batch, tail = tail[:batch_size], tail[batch_size:]
             data = []
             for record in batch:
                 dt, field_values = record
