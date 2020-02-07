@@ -1,10 +1,8 @@
 from collections import defaultdict
 from copy import deepcopy
 from datetime import datetime, timedelta
-from itertools import zip_longest
-from typing import Dict, List, Optional, Tuple, Any
+from typing import Any, Dict, List, Optional, Tuple
 
-from more_itertools import partition
 import pytz
 from requests import Request
 
@@ -23,7 +21,7 @@ from contxt.models.iot import (
 )
 from contxt.services.api import ApiEnvironment, ConfiguredApi
 from contxt.services.pagination import PagedRecords, PagedTimeSeries, PageOptions
-from contxt.utils import make_logger, is_datetime_aware
+from contxt.utils import is_datetime_aware, make_logger
 from contxt.utils.object_mapper import ObjectMapper
 
 logger = make_logger(__name__)
