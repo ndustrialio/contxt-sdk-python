@@ -1,6 +1,7 @@
 from collections import defaultdict
+from copy import deepcopy
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 import pytz
 from requests import Request
@@ -20,7 +21,7 @@ from contxt.models.iot import (
 )
 from contxt.services.api import ApiEnvironment, ConfiguredApi
 from contxt.services.pagination import PagedRecords, PagedTimeSeries, PageOptions
-from contxt.utils import make_logger
+from contxt.utils import is_datetime_aware, make_logger
 from contxt.utils.object_mapper import ObjectMapper
 
 logger = make_logger(__name__)
@@ -230,8 +231,33 @@ class IotService(ConfiguredApi):
         return ObjectMapper.tree_to_object(resp, BatchResponses)
 
 
+def format_time_series(feed_key: str, time_series: Dict[str, Dict[datetime, float]]) -> Dict:
+    # Enforce all datetimes are tz-aware
+    assert all(
+        is_datetime_aware(dt) for time_series in time_series.values() for dt in time_series.keys()
+    ), "Timezone-aware datetimes required"
+
+    # Format for request
+    return {
+        "feedKey": feed_key,
+        "type": "timeseries",
+        "data": [
+            {
+                "timestamp": dt.astimezone(pytz.UTC).strftime("%Y-%m-%d %H:%M:%S"),
+                "data": {field_descriptor: {"value": str(value)}},
+            }
+            for field_descriptor, series in time_series.items()
+            for dt, value in series.items()
+        ],
+    }
+
+
+NgestField = str
+NgestRecord = Tuple[datetime, Dict[NgestField, Any]]
+
+
 class IotDataService(ConfiguredApi):
-    """IOT API client
+    """IOT API client v2.0
 
     Terminology
         - Feed: Data source (i.e. utility meter) with a set of fields
@@ -252,8 +278,9 @@ class IotDataService(ConfiguredApi):
         ),
     )
 
-    def __init__(self, auth: Auth, env: str = "production", **kwargs) -> None:
+    def __init__(self, org_id: str, auth: Auth, env: str = "production", **kwargs) -> None:
         super().__init__(env=env, auth=auth, **kwargs)
+        self.org_id = org_id
 
     def get_source_data(
         self, source_key: str, start: datetime, resolution: timedelta, end: Optional[datetime] = None
@@ -266,11 +293,11 @@ class IotDataService(ConfiguredApi):
             "end": end or int(datetime.now().timestamp()),
             "resolution": f"P{resolution.days}DT{resolution.seconds}S",
         }
-        return self.get(f"sources/{source_key}/data", params=params)
+        return self.get(f"org/{self.org_id}/sources/{source_key}/data", params=params)
 
     def get_source_cursor(self, source_key: str) -> datetime:
         """Get the cursor for the given source"""
-        body = self.get(f"sources/{source_key}/cursor")
+        body = self.get(f"org/{self.org_id}/sources/{source_key}/cursor")
         assert (
             body["source_key"] == source_key
         ), f"Got unexpected source key on response. Requested {source_key}, but got {body['source_key']}"
@@ -278,3 +305,69 @@ class IotDataService(ConfiguredApi):
         if epoch:
             return datetime.fromtimestamp(epoch, tz=pytz.UTC)
         return None
+
+    def ingest_source_data(
+        self, source_key: str, data: List[NgestRecord], batch_size: int = 50
+    ) -> List[Dict]:
+        responses = []
+        tail = data
+        while tail:
+            batch, tail = tail[:batch_size], tail[batch_size:]
+            data = []
+            for record in batch:
+                dt, field_values = record
+                assert is_datetime_aware(dt), f"Ngest requires timezone-aware datetimes, got: {dt}"
+                data.append(
+                    {
+                        "timestamp": dt.astimezone(pytz.UTC).strftime("%Y-%m-%d %H:%M:%S"),
+                        "data": {k: {"value": str(v)} for k, v in field_values.items()},
+                    }
+                )
+            msg = {"feedKey": source_key, "type": "timeseries", "data": data}
+
+            # Make request
+            response = self.post(f"org/{self.org_id}/ngest/{source_key}", json=msg)
+            if response["status"] != "ok":
+                logger.warning(f"{self.__class__.__name__}: got status {response['status']}")
+            responses.append(response)
+
+        return responses
+
+    # fixme: deprecated
+    def send_time_series(
+        self, feed_key: str, time_series: Dict[str, Dict[datetime, float]], per_request: int = 50
+    ) -> List[Dict]:
+        """
+        This method is deprecated, use ingest_source_data instead
+
+        Sends time series data for field(s).
+
+        :param feed_key: feed's key
+        :type feed_key: str
+        :param time_series: dictionary of field descriptors to a time series dictionary
+        :type time_series: Dict[str, Dict[datetime, float]]
+        :param per_request: number of datapoints to send per request, defaults to 50
+        :type per_request: int, optional
+        :return: responses
+        :rtype: List[Dict]
+        """
+        # Prepare data for request
+        data = format_time_series(feed_key=feed_key, time_series=time_series)
+
+        # Send the time series in chunks, partitioned by `per_request`
+        responses = []
+        while data["data"]:
+            # Create chunk for next request
+            chunk = deepcopy(data)
+            chunk["data"] = data["data"][:per_request]
+
+            # Make request
+            response = self.post(f"org/{self.org_id}/ngest/{feed_key}", json=chunk)
+            if response["status"] != "ok":
+                logger.warning(f"{self.__class__.__name__}: got status {response['status']}")
+            responses.append(response)
+
+            # Update remaining data
+            data["data"] = data["data"][per_request:]
+
+        return responses
