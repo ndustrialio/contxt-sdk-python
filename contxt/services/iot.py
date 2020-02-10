@@ -103,7 +103,7 @@ class IotService(ConfiguredApi):
     def get_time_series_for_field(
         self,
         field: Field,
-        start_time: datetime,
+        start_time: datetime = None,
         window: Window = Window.RAW,
         end_time: Optional[datetime] = None,
         per_page: int = 1000,
@@ -112,11 +112,14 @@ class IotService(ConfiguredApi):
         # Manually validate the window choice, since our API does not return a
         # helpful error message
         assert isinstance(window, Window), "window must be of type Window"
+        assert (start_time is None) == (
+            end_time is None
+        ), "Either both start and end time should be provided, or both should be missing"
         return PagedTimeSeries(
             api=self,
             url=f"outputs/{field.output_id}/fields/{field.field_human_name}/data",
             params={
-                "timeStart": int(start_time.timestamp()),
+                "timeStart": int(start_time.timestamp()) if start_time else None,
                 "timeEnd": int(end_time.timestamp()) if end_time else None,
                 "window": window.value,
             },
@@ -126,14 +129,17 @@ class IotService(ConfiguredApi):
     def get_time_series_for_fields(
         self,
         fields: List[Field],
-        start_time: datetime,
+        start_time: datetime = None,
         window: Window = Window.RAW,
         end_time: Optional[datetime] = None,
     ) -> List[FieldTimeSeries]:
         """Get complete (non-paginated) time series data for each field in `fields`"""
+        assert (start_time is None) == (
+            end_time is None
+        ), "Either both start and end time should be provided, or both should be missing"
         # Build requests queue
         params = {
-            "timeStart": int(start_time.timestamp()),
+            "timeStart": int(start_time.timestamp()) if start_time else None,
             "timeEnd": int(end_time.timestamp()) if end_time else None,
             "window": window.value,
             "limit": 5000,
