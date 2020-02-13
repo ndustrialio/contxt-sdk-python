@@ -377,3 +377,20 @@ class IotDataService(ConfiguredApi):
             data["data"] = data["data"][per_request:]
 
         return responses
+
+    def get_source_field_cursor(self, source_key: str, field_name: str = None) -> datetime:
+        """Get the cursor for the given source and field"""
+
+        url = f"org/{self.org_id}/sources/{source_key}"
+        if field_name is not None:
+            url += f"/fields/{field_name}"
+        url += "/cursor"
+
+        body = self.get(url)
+        assert (
+            body["source_key"] == source_key
+        ), f"Got unexpected source key on response. Requested {source_key}, but got {body['source_key']}"
+        epoch = body["cursor_epoch"]
+        if epoch:
+            return datetime.fromtimestamp(epoch, tz=pytz.UTC)
+        return None
