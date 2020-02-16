@@ -296,7 +296,7 @@ class IotDataService(ConfiguredApi):
         assert resolution.total_seconds() == int(resolution.total_seconds())
         params = {
             "start": int(start.timestamp()),
-            "end": end or int(datetime.now().timestamp()),
+            "end": int(end.timestamp()) if end else int(datetime.now().timestamp()),
             "resolution": f"P{resolution.days}DT{resolution.seconds}S",
         }
         return self.get(f"org/{self.org_id}/sources/{source_key}/data", params=params)
