@@ -1,24 +1,26 @@
+import json
 from enum import Enum
 
-import json
 
 class DBOperation(Enum):
     INSERT = 0
-    UPDATE = 1 
-    UPSERT = 2 
+    UPDATE = 1
+    UPSERT = 2
     DELETE = 3
 
     @classmethod
     def has_value(cls, value):
-        return value in cls._value2member_map_ 
+        return value in cls._value2member_map_
 
-class CTRHeader():
-    def __init__(self, forwardable = True, deduplicatable = True):
+
+class CTRHeader:
+    def __init__(self, forwardable=True, deduplicatable=True):
         self.forwardable = forwardable
         self.deduplicatable = deduplicatable
 
-class ChangeTrackingRecord():
-    '''A JSON Serializable ndustrial.io ChangeTrackingRecord(tm) that is
+
+class ChangeTrackingRecord:
+    """A JSON Serializable ndustrial.io ChangeTrackingRecord(tm) that is
        ingestable by the ndustrial ETL java/kotlin components.
        
        topic: Str           - the name of the canonical being ETL-ed
@@ -30,7 +32,8 @@ class ChangeTrackingRecord():
        tuple: dict          - key/value pairs that make up the data payload. This
                               value defaults to an empty dict and can be updated after creation
        headers: CTRHeader() - the header information that informs ETL devices what do with the CTR
-    '''
+    """
+
     def __init__(
         self,
         topic: str,
@@ -39,15 +42,16 @@ class ChangeTrackingRecord():
         source_host: str,
         source_table: str,
         source_database: str,
-        tuple = dict(),
-        headers = CTRHeader()):
+        tuple=dict(),
+        headers=CTRHeader(),
+    ):
 
         errors = ""
         if type(topic) is not str:
             errors += "\nTopic parameter must be a string"
         if type(version) is not int:
             errors += "\nVersion parameter must be long (int)"
-        if not(DBOperation.has_value(operation)):
+        if not (DBOperation.has_value(operation)):
             errors += "\nOperation parameter must be member of DBOperation enum"
         if type(source_host) is not str:
             errors += "\nsource_host parameter must be a string"
@@ -56,9 +60,8 @@ class ChangeTrackingRecord():
         if type(source_database) is not str:
             errors += "\nsource_database parameter must be a string"
 
-        if (errors):
+        if errors:
             raise AttributeError(errors)
-
 
         self.topic = topic
         self.version = version
@@ -69,7 +72,6 @@ class ChangeTrackingRecord():
         self.tuple = tuple
         self.headers = headers
         self.addlParams = dict()
-
 
     def getJSONString(self) -> str:
         return json.dumps(self, default=lambda x: x.__dict__)
