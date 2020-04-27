@@ -24,7 +24,7 @@ class ChangeTrackingRecord:
        ingestable by the ndustrial ETL java/kotlin components.
        
        topic: Str           - the name of the canonical being ETL-ed
-       version: Str         - some long identification I'm not sure
+       version: Str         - the change table version or CDC version number (cursor position)
        operation: enum      - a DB operation (insert/update/upsert/delete) from the DBOperation enum
        source_host: Str     - the hostname/ip/table that homes the source data
        source_table: Str    - the name of the table from where the data is being extracted
