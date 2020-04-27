@@ -1,6 +1,6 @@
 from enum import Enum
-import json
 
+import json
 
 class DBOperation(Enum):
     INSERT = 0

@@ -1,4 +1,5 @@
 import pytest
+
 from contxt.models.changetrackingrecord import ChangeTrackingRecord, CTRHeader
 
 def test_ctr_wrong_topic():
