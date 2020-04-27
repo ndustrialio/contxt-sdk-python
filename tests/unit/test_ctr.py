@@ -43,8 +43,8 @@ def test_ctr_wrong_db():
 def test_get_json_string():
     ctr = ChangeTrackingRecord("myTopic", 1020304, 0, "soruce", "table", "db", {"a": 1, "b": 2, "c": 3})
     expected = ('{"topic": "myTopic", "version": 1020304, "operation": 0, "source_host": "soruce", '
-    '"source_table": "table", "source_database": "db", "tuple": {"a": 1, "b": 2, "c": 3}, '
-    '"headers": {"forwardable": true, "deduplicatable": true}, "addlParams": {}}')
+        '"source_table": "table", "source_database": "db", "tuple": {"a": 1, "b": 2, "c": 3}, '
+        '"headers": {"forwardable": true, "deduplicatable": true}, "addlParams": {}}')
     assert ctr.getJSONString() == expected
 
 
@@ -60,8 +60,8 @@ def test_set_headers():
         CTRHeader(forwardable=False, deduplicatable=False),
     )
     expected = ('{"topic": "myTopic", "version": 1020304, "operation": 0, "source_host": "soruce", '
-    '"source_table": "table", "source_database": "db", "tuple": {"a": 1, "b": 2, "c": 3}, '
-    '"headers": {"forwardable": false, "deduplicatable": false}, "addlParams": {}}')
+        '"source_table": "table", "source_database": "db", "tuple": {"a": 1, "b": 2, "c": 3}, '
+        '"headers": {"forwardable": false, "deduplicatable": false}, "addlParams": {}}')
     assert ctr.getJSONString() == expected
 
 
@@ -69,6 +69,6 @@ def test_get_json_addl_params():
     ctr = ChangeTrackingRecord("myTopic", 1020304, 0, "soruce", "table", "db", {"a": 1, "b": 2, "c": 3})
     ctr.addlParams = {"forwardChannel": "canonical-fwd"}
     expected = ('{"topic": "myTopic", "version": 1020304, "operation": 0, "source_host": "soruce",'
-    ' "source_table": "table", "source_database": "db", "tuple": {"a": 1, "b": 2, "c": 3}, '
-    '"headers": {"forwardable": true, "deduplicatable": true}, "addlParams": {"forwardChannel": "canonical-fwd"}}')
+        ' "source_table": "table", "source_database": "db", "tuple": {"a": 1, "b": 2, "c": 3}, '
+        '"headers": {"forwardable": true, "deduplicatable": true}, "addlParams": {"forwardChannel": "canonical-fwd"}}')
     assert ctr.getJSONString() == expected
