@@ -1,34 +1,32 @@
-.PHONY: help install lint fix test release
-
-CMD := poetry run
 DIRS := contxt tests
+RUNNER := poetry run
 VERSION := $$(poetry version | sed -n 's/contxt-sdk //p')
 
-help: ## List all commands
-	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z -]+:.*?## / {printf "\033[36m%-10s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+help: ## Show this help
+	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z -]+:.*?## / {printf "\033[36m%-10s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST) | sort
 
-install:
-	pip install poetry
-	poetry install -E server
+lint: ## Report format and lint violations
+	$(RUNNER) isort --check-only --recursive $(DIRS)
+	$(RUNNER) black --check --quiet $(DIRS)
+	$(RUNNER) flake8 $(DIRS)
+	# $(RUNNER) mypy $(DIRS)
 
-lint: ## Run formatters and linter
-	$(CMD) isort --check-only --recursive $(DIRS)
-	$(CMD) black --check $(DIRS)
-	$(CMD) flake8 $(DIRS)
+fmt: ## Format code
+	$(RUNNER) isort --apply --recursive $(DIRS)
+	$(RUNNER) black $(DIRS)
 
-fix: ## Fix formatting
-	$(CMD) isort --apply --recursive $(DIRS)
-	$(CMD) black $(DIRS)
+clean: ## Remove all build artifacts
+	@rm -rf build/ dist/  *.egg-info
 
 test: ## Run unit tests
-	$(CMD) pytest tests/unit
+	$(RUNNER) pytest tests/unit
 
-release: ## Release new version [usage: v=rule]
-	# Update pyproject and changelog
-	poetry version $(v)
-	sed -i "" "s/\[Unreleased\]/\[$(VERSION)\] - $(shell date +%F)/" CHANGELOG.md
+release: ## Release a new version [usage: release v=major|minor|patch]
+	# Update version string
+	@poetry version $(v)
 	# Create commit and tag
-	git commit pyproject.toml CHANGELOG.md -m "Bump version to $(VERSION)" && git tag "v$(VERSION)"
-	git push && git push --tags
+	@git commit pyproject.toml -m "chore(release): v$(VERSION)"
+	@git tag -a "v$(VERSION)" -m "chore(release): v$(VERSION)"
+	@git push && git push --tags
 	# Publish to pypi
 	poetry publish --build
