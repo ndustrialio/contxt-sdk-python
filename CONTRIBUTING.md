@@ -1,38 +1,61 @@
 # Contributing
-Before getting started, make sure you have [Poetry](https://python-poetry.org/docs/#installation) installed.
+
+Before getting started, make sure you have [Poetry](https://python-poetry.org/docs/#installation).
 
 ## Install
-```console
-$ poetry install -E server
+
+```sh
+# Install project
+poetry install -E server
+
+# Enter poetry-managed venv
+poetry shell
+
+# Exit poetry-managed venv
+exit
 ```
 
-## Code Quality
-To ensure code quality, we use the following tools:
-* Formatting: [black](https://black.readthedocs.io/en/stable/) and [isort](https://isort.readthedocs.io/en/latest/)
-* Linting: [flake8](http://flake8.pycqa.org/en/latest/)
-* Testing: [pytest](https://docs.pytest.org/en/latest/)
+## Tasks
 
-Our CI pipeline will run these tools on every git push. To run these locally:
+We use `make` as a general task runner. To see available tasks:
+
 ```console
-# Outputs formatting + linting issues
-$ make lint
+$ make help
+clean      Remove all build artifacts
+fmt        Format code
+help       Show this help
+lint       Report format and lint violations
+release    Release a new version [usage: release v=major|minor|patch]
+test       Run unit tests
+```
 
-# Fixes formatting issues
-$ make fix
+### Code Quality
+
+To ensure code quality, we use the following tools:
+
+- Formatting: [black](https://black.readthedocs.io/en/stable/) and [isort](https://isort.readthedocs.io/en/latest/)
+- Linting: [flake8](http://flake8.pycqa.org/en/latest/)
+- Testing: [pytest](https://docs.pytest.org/en/latest/)
+
+Our [CI pipeline](.github/workflows/build.yaml) will run these tools on every git push. To run these locally:
+
+```sh
+# Reports format/lint violations
+make lint
+
+# Formats code
+make fmt
 
 # Runs unit tests
-$ make test
+make test
 ```
 
-## Release
-To release a new version:
-```console
-# Updates pyproject/changelog and tags/publishes
-$ make release v=[bump rule]
+### Create Release
+
+Creating a new release is simply bumping the version and creating a corresponding git tag. For example, to create a minor release:
+
+```sh
+make release v=minor
 ```
 
-This does the following:
-* Updates version string in [pyproject.toml](pyproject.toml)
-* Updates `Unreleased` section in [CHANGELOG.md](CHANGELOG.md) with version and date
-* Commits the changes and tags the commit
-* Builds and publishes to PyPI an sdist and wheel
+Our [release action](.github/workflows/release.yaml) will then build and publish to PyPI.
