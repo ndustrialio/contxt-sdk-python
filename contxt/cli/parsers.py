@@ -155,14 +155,13 @@ class IotParser(ContxtArgParser):
     def _field_data(self, args, auth):
         from contxt.services import IotService
         from contxt.utils.serializer import Serializer
-        from tqdm import tqdm
 
         iot_service = IotService(auth)
         fields = iot_service.get_field_grouping(args.grouping_id).fields
         print(f"Fetching iot data for {len(fields)} tags for {args.start_time}" f" - {args.end_time}...")
         try:
             field_data = {}
-            for field in tqdm(fields):
+            for field in fields:
                 for d in iot_service.get_time_series_for_field(
                     field=field, start_time=args.start_time, end_time=args.end_time, window=args.window
                 ):
