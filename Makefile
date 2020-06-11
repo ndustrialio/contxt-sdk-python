@@ -28,5 +28,3 @@ release: ## Release a new version [usage: release v=major|minor|patch]
 	@git commit pyproject.toml -m "chore(release): v$(VERSION)"
 	@git tag -a "v$(VERSION)" -m "chore(release): v$(VERSION)"
 	@git push && git push --tags
-	# Publish to pypi
-	poetry publish --build
