@@ -1,9 +1,8 @@
 from abc import ABC, abstractmethod
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Dict, Optional
 
 from jwt import decode
-from pytz import UTC
 
 from contxt.utils import make_logger
 
@@ -33,7 +32,7 @@ class TokenProvider(ABC):
         if not expiration:
             logger.debug("'exp' not in token's claims")
             return False
-        return expiration <= datetime.now(UTC).timestamp() + within
+        return expiration <= datetime.now(timezone.utc).timestamp() + within
 
     @property
     @abstractmethod

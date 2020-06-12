@@ -41,12 +41,12 @@ class UserIdentityProvider(TokenProvider):
 
             if cache:
                 # Token exists in cache, set it
-                logger.debug(f"Setting token from cache")
+                logger.debug("Setting token from cache")
                 self.access_token = cache["access_token"]
                 self.refresh_token = cache["refresh_token"]
             else:
                 # Token not in cache
-                logger.debug(f"Token not found in cache")
+                logger.debug("Token not found in cache")
 
     @TokenProvider.access_token.getter
     def access_token(self) -> Token:

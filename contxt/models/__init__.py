@@ -3,11 +3,11 @@ from ast import literal_eval
 from copy import deepcopy
 from datetime import date as _date
 from datetime import datetime as _datetime
+from datetime import timedelta, timezone
 from importlib import import_module
 from typing import Any, Callable, Dict, Optional, Tuple, Union
 
 from dateutil import parser
-from pytz import UTC, ZERO
 
 from contxt.utils import make_logger
 from contxt.utils.serializer import Serializer
@@ -29,7 +29,7 @@ class Parsers:
     @staticmethod
     def datetime(timestamp: str, strict: bool = True) -> _datetime:
         if strict:
-            return _datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%S.%fZ").replace(tzinfo=UTC)
+            return _datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%S.%fZ").replace(tzinfo=timezone.utc)
         return parser.parse(timestamp)
 
     @staticmethod
@@ -71,12 +71,12 @@ class Formatters:
 
     @staticmethod
     def datetime(dt: _datetime, strict: bool = True) -> str:
-        if dt.utcoffset() != ZERO and strict:
+        if dt.utcoffset() != timedelta() and strict:
             # Require timezone to be UTC
             raise AssertionError(f"Datetime must be UTC, not {dt.tzinfo}")
         # NOTE: almost exactly the same as isoformat(), but ensures
         # microseconds are always represented
-        return dt.astimezone(UTC).strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+        return dt.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%fZ")
 
     @staticmethod
     def normalize_label(text: str) -> str:

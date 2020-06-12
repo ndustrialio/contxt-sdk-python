@@ -1,9 +1,8 @@
 from collections import defaultdict
 from copy import deepcopy
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, List, Optional, Tuple
 
-import pytz
 from requests import Request
 
 from contxt.auth import Auth
@@ -249,7 +248,7 @@ def format_time_series(feed_key: str, time_series: Dict[str, Dict[datetime, floa
         "type": "timeseries",
         "data": [
             {
-                "timestamp": dt.astimezone(pytz.UTC).strftime("%Y-%m-%d %H:%M:%S"),
+                "timestamp": dt.astimezone(timezone.utc).strftime("%Y-%m-%d %H:%M:%S"),
                 "data": {field_descriptor: {"value": str(value)}},
             }
             for field_descriptor, series in time_series.items()
@@ -309,7 +308,7 @@ class IotDataService(ConfiguredApi):
         ), f"Got unexpected source key on response. Requested {source_key}, but got {body['source_key']}"
         epoch = body["cursor_epoch"]
         if epoch:
-            return datetime.fromtimestamp(epoch, tz=pytz.UTC)
+            return datetime.fromtimestamp(epoch, tz=timezone.utc)
         return None
 
     def ingest_source_data(
@@ -325,7 +324,7 @@ class IotDataService(ConfiguredApi):
                 assert is_datetime_aware(dt), f"Ngest requires timezone-aware datetimes, got: {dt}"
                 data.append(
                     {
-                        "timestamp": dt.astimezone(pytz.UTC).strftime("%Y-%m-%d %H:%M:%S"),
+                        "timestamp": dt.astimezone(timezone.utc).strftime("%Y-%m-%d %H:%M:%S"),
                         "data": {k: {"value": str(v)} for k, v in field_values.items()},
                     }
                 )
@@ -392,5 +391,5 @@ class IotDataService(ConfiguredApi):
         ), f"Got unexpected source key on response. Requested {source_key}, but got {body['source_key']}"
         epoch = body["cursor_epoch"]
         if epoch:
-            return datetime.fromtimestamp(epoch, tz=pytz.UTC)
+            return datetime.fromtimestamp(epoch, tz=timezone.utc)
         return None

@@ -313,7 +313,7 @@ class AssetsService(ConfiguredApi):
         with_metric_values: bool = False,
         page_options: Optional[PageOptions] = None,
     ) -> List[Asset]:
-        logger.debug(f"Fetching assets")
+        logger.debug("Fetching assets")
 
         def _build_asset(record: Dict) -> Asset:
             return self._build_asset(

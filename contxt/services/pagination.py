@@ -12,6 +12,7 @@ logger = make_logger(__name__)
 
 Record = Dict[str, Any]
 
+
 # NOTE: this is assuming all api endpoints that follow the shape pagination shape
 # also accept the same pagination filters
 @dataclass

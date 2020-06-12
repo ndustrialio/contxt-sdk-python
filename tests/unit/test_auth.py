@@ -1,9 +1,8 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 import pytest
 from jose import jwt
 from jose.constants import ALGORITHMS
-from pytz import UTC
 
 from contxt.auth import TokenProvider
 from contxt.auth.jwt import AuthError, AuthTokenValidator, ContxtAuthTokenValidator
@@ -61,7 +60,10 @@ class TestTokenProvider:
         @TokenProvider.access_token.getter
         def access_token(self):
             if self._access_token is None or self._token_expiring(within=0):
-                self._claims = {**TestTokenProvider.claims, "exp": datetime.now(UTC).timestamp()}
+                self._claims = {
+                    **TestTokenProvider.claims,
+                    "exp": datetime.now(timezone.utc).timestamp(),
+                }
                 self.access_token = jwt.encode(self._claims, PRIVATE_KEY, algorithm=ALGORITHMS.RS256)
             return self._access_token
 
