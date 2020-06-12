@@ -7,8 +7,6 @@ from datetime import timedelta, timezone
 from importlib import import_module
 from typing import Any, Callable, Dict, Optional, Tuple, Union
 
-from dateutil import parser
-
 from contxt.utils import make_logger
 from contxt.utils.serializer import Serializer
 
@@ -27,10 +25,8 @@ class Parsers:
         return _date.fromisoformat(datestamp)
 
     @staticmethod
-    def datetime(timestamp: str, strict: bool = True) -> _datetime:
-        if strict:
-            return _datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%S.%fZ").replace(tzinfo=timezone.utc)
-        return parser.parse(timestamp)
+    def datetime(timestamp: str) -> _datetime:
+        return _datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%S.%fZ").replace(tzinfo=timezone.utc)
 
     @staticmethod
     def unknown(value: Any) -> Any:
@@ -40,14 +36,9 @@ class Parsers:
             return literal_eval(value)
         except (SyntaxError, ValueError):
             pass
-        # Next, fall back to a strict datetime parser
+        # Next, fall back to a datetime parser
         try:
             return Parsers.datetime(value)
-        except (TypeError, ValueError):
-            pass
-        # Next, fall back to a general datetime parser
-        try:
-            return Parsers.datetime(value, strict=False)
         except (TypeError, ValueError):
             pass
         # Next, convert bool-type strings
