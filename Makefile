@@ -16,7 +16,8 @@ fmt: ## Format code
 	$(RUNNER) black $(DIRS)
 
 clean: ## Remove all build artifacts
-	@rm -rf build/ dist/  *.egg-info
+	@rm -rf .mypy_cache/ .pytest_cache/ build/ dist/ *.egg-info
+	@find $(DIRS) -name "*.pyc" -delete
 
 test: ## Run unit tests
 	$(RUNNER) pytest tests/unit

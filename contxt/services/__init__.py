@@ -1,3 +1,5 @@
+"""API clients"""
+
 from .assets import AssetsService
 from .auth import AuthService
 from .bus import MessageBusService

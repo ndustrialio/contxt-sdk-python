@@ -1,3 +1,5 @@
+"""General utilities"""
+
 from datetime import datetime
 from functools import partial, wraps
 from logging import Logger, getLogger

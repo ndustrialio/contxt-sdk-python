@@ -1,3 +1,5 @@
+"""Data models for API clients"""
+
 from abc import ABC, abstractmethod
 from ast import literal_eval
 from copy import deepcopy
@@ -157,11 +159,7 @@ class ApiObject(ABC):
                 field=field, value=api_dict.pop(field.api_key, None)
             )
 
-        # Warn of any unused keys
-        for k in api_dict.keys():
-            logger.warning(f"{cls.__name__}: Unexpected key from api {k}")
-
-        # Return new instance
+        # NOTE: unexpected keys: api_dict.keys()
         return cls(**clean_dict)
 
     @classmethod
