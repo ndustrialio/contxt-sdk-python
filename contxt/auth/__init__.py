@@ -4,10 +4,6 @@ from typing import Any, Dict, Optional
 
 from jwt import decode
 
-from contxt.utils import make_logger
-
-logger = make_logger(__name__)
-
 Token = str
 DecodedToken = Dict[str, Any]
 
@@ -30,7 +26,6 @@ class TokenProvider(ABC):
         Returns `False` if `exp` is not in the token's claims."""
         expiration = self.decoded_access_token.get("exp")
         if not expiration:
-            logger.debug("'exp' not in token's claims")
             return False
         return expiration <= datetime.now(timezone.utc).timestamp() + within
 

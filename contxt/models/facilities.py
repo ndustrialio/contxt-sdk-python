@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 from typing import ClassVar
 
-from contxt.models import ApiField, ApiObject, Parsers
-from contxt.models.contxt import Organization
+from . import ApiField, ApiObject, Parsers
+from .contxt import Organization
 
 
 @dataclass

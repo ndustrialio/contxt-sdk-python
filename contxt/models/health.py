@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 from enum import Enum
 from typing import ClassVar
 
-from contxt.models import ApiField, ApiObject, Parsers
+from . import ApiField, ApiObject, Parsers
 
 
 class HealthStatus(Enum):

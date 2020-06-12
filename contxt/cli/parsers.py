@@ -1,8 +1,3 @@
-from contxt.utils import make_logger
-
-logger = make_logger(__name__)
-
-
 def _get_organization_id(name, auth):
     from contxt.services import ContxtService
 

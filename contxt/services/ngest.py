@@ -2,8 +2,8 @@ from copy import deepcopy
 from datetime import datetime, timezone
 from typing import Dict, List
 
-from contxt.services.api import ApiEnvironment, ConfiguredApi
-from contxt.utils import is_datetime_aware, make_logger
+from ..utils import is_datetime_aware, make_logger
+from .api import ApiEnvironment, ConfiguredApi
 
 logger = make_logger(__name__)
 

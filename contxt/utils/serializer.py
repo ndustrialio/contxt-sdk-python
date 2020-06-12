@@ -7,10 +7,6 @@ from typing import Any, Callable, List, Optional
 
 from tabulate import tabulate
 
-from contxt.utils import make_logger
-
-logger = make_logger(__name__)
-
 
 class Serializer:
     """Serializer to transform a Python object to common data formats"""
@@ -195,13 +191,11 @@ class Serializer:
 
         # Validate file extension
         if path.suffix not in valid_exts:
-            logger.critical(
+            raise RuntimeError(
                 f"Unsupported filetype: '{path.suffix}'. Choose from {', '.join(valid_exts)}"
             )
-            return
 
         # Dump to file
-        logger.debug(f"Writing {obj.__class__.__name__} to {path}")
         if path.suffix == ".csv":
             Serializer.to_csv(obj, path)
         elif path.suffix == ".json":

@@ -8,8 +8,8 @@ from requests.auth import AuthBase
 from requests.exceptions import HTTPError
 from urllib3.util.retry import Retry
 
-from contxt.auth import Auth, TokenProvider
-from contxt.utils import make_logger
+from ..auth import Auth, TokenProvider
+from ..utils import make_logger
 
 logger = make_logger(__name__)
 

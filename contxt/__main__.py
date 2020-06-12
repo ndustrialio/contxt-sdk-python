@@ -1,10 +1,9 @@
-#!/usr/bin/env python3
-
 from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
 from typing import List, Tuple
 
-from contxt import __version__
-from contxt.cli.parsers import ContxtArgParser
+from . import __version__
+from .auth.cli import CliAuth
+from .cli.parsers import ContxtArgParser
 
 
 def create_parser() -> Tuple[ArgumentParser, List[ContxtArgParser]]:
@@ -27,8 +26,6 @@ def main() -> None:
 
     # Launch the command
     if "func" in args:
-        from contxt.auth.cli import CliAuth
-
         args.func(args, CliAuth())
 
 

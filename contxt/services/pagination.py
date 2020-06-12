@@ -3,12 +3,9 @@ from datetime import datetime
 from math import ceil
 from typing import Any, Callable, Dict, Iterator, List, Optional, Tuple, Union
 
-from contxt.models import Parsers
-from contxt.services.api import Api
-from contxt.utils import make_logger
-from contxt.utils.object_mapper import ObjectMapper
-
-logger = make_logger(__name__)
+from ..models import Parsers
+from ..utils.object_mapper import ObjectMapper
+from .api import Api
 
 Record = Dict[str, Any]
 

@@ -5,9 +5,9 @@ from typing import Any, Dict, Optional
 
 from auth0.v3.authentication import GetToken
 
-from contxt.auth import Auth, Token, TokenProvider
-from contxt.services.auth import AuthService
-from contxt.utils import make_logger
+from ..services.auth import AuthService
+from ..utils import make_logger
+from . import Auth, Token, TokenProvider
 
 logger = make_logger(__name__)
 

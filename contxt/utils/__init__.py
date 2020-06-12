@@ -13,7 +13,7 @@ def make_logger(name: str, level: Optional[str] = None) -> Logger:
     return logger
 
 
-# Ref: https://docs.python.org/3/library/datetime.html#determining-if-an-object-is-aware-or-naive # noqa: E501
+# Ref: https://docs.python.org/3/library/datetime.html#determining-if-an-object-is-aware-or-naive
 def is_datetime_aware(dt: datetime) -> bool:
     """Returns if datetime `dt` is timezone-aware"""
     return dt.tzinfo is not None and dt.tzinfo.utcoffset(dt) is not None
@@ -52,3 +52,30 @@ def dict_diff(d1: Dict, d2: Dict) -> Dict:
         return obj
 
     return expand(set(flatten(d1)) - set(flatten(d2)))
+
+
+# Source: https://boltons.readthedocs.io/en/latest/_modules/boltons/cacheutils.html#cachedproperty
+class cachedproperty(object):
+    """The ``cachedproperty`` is used similar to :class:`property`, except
+    that the wrapped method is only called once. This is commonly used
+    to implement lazy attributes.
+
+    After the property has been accessed, the value is stored on the
+    instance itself, using the same name as the cachedproperty. This
+    allows the cache to be cleared with :func:`delattr`, or through
+    manipulating the object's ``__dict__``.
+    """
+
+    def __init__(self, func):
+        self.__doc__ = getattr(func, "__doc__")
+        self.__isabstractmethod__ = getattr(func, "__isabstractmethod__", False)
+        self.func = func
+
+    def __get__(self, obj, objtype=None):
+        if obj is None:
+            return self
+        value = obj.__dict__[self.func.__name__] = self.func(obj)
+        return value
+
+    def __repr__(self):
+        return f"<{self.__class__.__name__} func={self.func}>"

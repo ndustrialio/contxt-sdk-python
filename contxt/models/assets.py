@@ -2,8 +2,8 @@ from dataclasses import InitVar, dataclass, field
 from datetime import date, datetime, timedelta
 from typing import Any, ClassVar, Dict, List, Optional
 
-from contxt.models import ApiField, ApiObject, Formatters, Parsers
-from contxt.utils import dict_diff, make_logger
+from ..utils import dict_diff, make_logger
+from . import ApiField, ApiObject, Formatters, Parsers
 
 logger = make_logger(__name__)
 

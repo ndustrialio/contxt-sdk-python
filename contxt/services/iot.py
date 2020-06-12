@@ -5,9 +5,9 @@ from typing import Any, Dict, List, Optional, Tuple
 
 from requests import Request
 
-from contxt.auth import Auth
-from contxt.models import Parsers
-from contxt.models.iot import (
+from ..auth import Auth
+from ..models import Parsers
+from ..models.iot import (
     BatchRequest,
     BatchRequests,
     BatchResponses,
@@ -18,10 +18,10 @@ from contxt.models.iot import (
     UnprovisionedField,
     Window,
 )
-from contxt.services.api import ApiEnvironment, ConfiguredApi
-from contxt.services.pagination import PagedRecords, PagedTimeSeries, PageOptions
-from contxt.utils import is_datetime_aware, make_logger
-from contxt.utils.object_mapper import ObjectMapper
+from ..utils import is_datetime_aware, make_logger
+from ..utils.object_mapper import ObjectMapper
+from .api import ApiEnvironment, ConfiguredApi
+from .pagination import PagedRecords, PagedTimeSeries, PageOptions
 
 logger = make_logger(__name__)
 

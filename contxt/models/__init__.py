@@ -7,8 +7,8 @@ from datetime import timedelta, timezone
 from importlib import import_module
 from typing import Any, Callable, Dict, Optional, Tuple, Union
 
-from contxt.utils import make_logger
-from contxt.utils.serializer import Serializer
+from ..utils import make_logger
+from ..utils.serializer import Serializer
 
 logger = make_logger(__name__)
 

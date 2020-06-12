@@ -2,12 +2,9 @@ from abc import ABC, abstractmethod
 from os import environ
 from typing import Any, Dict, Optional, Tuple
 
-from contxt.auth.machine import MachineAuth
-from contxt.models.contxt import Config
-from contxt.services.contxt import ContxtService
-from contxt.utils import make_logger
-
-logger = make_logger(__name__)
+from .auth.machine import MachineAuth
+from .models.contxt import Config
+from .services import ContxtService
 
 
 class BaseWorker(ABC):
@@ -40,16 +37,6 @@ class BaseWorker(ABC):
         config_values = {v.key: v.value for v in config.config_values} if config else {}
 
         return config, config_values
-
-    def run(self) -> None:
-        run = self.contxt_service.start_worker_run(self.client_id)
-        self.run_id = run["id"]
-        logger.info(f"Worker run id: {self.run_id}")
-        self.do_work()
-        self.contxt_service.end_worker_run(self.client_id, self.run_id)
-
-    def add_metric(self, key: str, value: Any) -> None:
-        self.contxt_service.create_worker_run_metric(self.run_id, key, value)
 
     @abstractmethod
     def do_work(self) -> None:

@@ -3,9 +3,9 @@ from datetime import datetime
 from enum import Enum
 from typing import ClassVar, Dict, List, Optional
 
-from contxt.models import ApiField, ApiObject, Parsers
-from contxt.models.events import Event
-from contxt.models.iot import Field
+from . import ApiField, ApiObject, Parsers
+from .events import Event
+from .iot import Field
 
 
 class ResourceType(Enum):

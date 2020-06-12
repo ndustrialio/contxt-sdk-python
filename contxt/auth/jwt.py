@@ -5,8 +5,8 @@ from typing import Any, Dict, List, Union
 from jwt import PyJWTError, decode, get_unverified_header
 from jwt.algorithms import RSAAlgorithm
 
-from contxt.services import AuthService
-from contxt.utils import make_logger
+from ..services import AuthService
+from ..utils import make_logger
 
 logger = make_logger(__name__)
 

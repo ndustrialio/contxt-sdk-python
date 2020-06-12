@@ -1,7 +1,7 @@
 from datetime import datetime
 from functools import wraps
 
-from contxt.utils.datetime import datetime_zulu_format
+from .datetime import datetime_zulu_format
 
 
 class Printable:

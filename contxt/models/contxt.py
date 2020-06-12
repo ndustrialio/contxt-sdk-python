@@ -3,7 +3,7 @@ from datetime import datetime
 from json import loads
 from typing import ClassVar, List, Optional
 
-from contxt.models import ApiField, ApiObject, Parsers
+from . import ApiField, ApiObject, Parsers
 
 
 @dataclass

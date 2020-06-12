@@ -6,8 +6,8 @@ from typing import Any, ClassVar, Dict, List, Optional
 
 from requests import Request
 
-from contxt.models import ApiField, ApiObject, Parsers
-from contxt.models.events import Owner
+from . import ApiField, ApiObject, Parsers
+from .events import Owner
 
 
 class Window(Enum):
