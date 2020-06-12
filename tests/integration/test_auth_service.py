@@ -1,6 +1,6 @@
 from os import environ
 
-from jose.jwt import get_unverified_claims
+from jwt import decode
 
 from contxt.services import AuthService
 
@@ -19,8 +19,8 @@ class TestAuthService:
     ):
         access_token = self.service.get_token(identity_access_token, audience)["access_token"]
         assert access_token
-        identity_claims = get_unverified_claims(identity_access_token)
-        claims = get_unverified_claims(access_token)
+        identity_claims = decode(identity_access_token, verify=False)
+        claims = decode(access_token, verify=False)
         assert claims["sub"] == identity_claims["sub"]
         assert claims["aud"][0] == audience
         assert claims["iss"] == self.service.base_url + "/"
@@ -33,7 +33,7 @@ class TestAuthService:
     ):
         access_token = self.service.get_oauth_token(client_id, client_secret, audience)["access_token"]
         assert access_token
-        claims = get_unverified_claims(access_token)
+        claims = decode(access_token, verify=False)
         assert claims["sub"] == f"{client_id}@clients"
         assert claims["aud"] == audience
         assert claims["iss"] == self.service.base_url + "/"

@@ -6,7 +6,7 @@ Before getting started, make sure you have [Poetry](https://python-poetry.org/do
 
 ```sh
 # Install project
-poetry install -E server
+poetry install
 
 # Enter poetry-managed venv
 poetry shell

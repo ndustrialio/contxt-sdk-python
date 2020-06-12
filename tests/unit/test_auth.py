@@ -1,11 +1,10 @@
 from datetime import datetime, timezone
 
+import jwt
 import pytest
-from jose import jwt
-from jose.constants import ALGORITHMS
 
 from contxt.auth import TokenProvider
-from contxt.auth.jwt import AuthError, AuthTokenValidator, ContxtAuthTokenValidator
+from contxt.auth.jwt import ContxtTokenValidator, InvalidTokenError, TokenValidator
 
 PRIVATE_KEY = """\
 -----BEGIN RSA PRIVATE KEY-----
@@ -35,21 +34,21 @@ yOQ45SZ1Kbm0ILrYaLfl1yvFr6MqHrO07HWsiW9zoHDFU31sd2CoGJsu35fTils1
 """
 
 
-class TestAuthTokenValidator:
+class TestTokenValidator:
     def test_auth(self):
         audience = "foo_audience"
         issuer = "foo_issuer"
         claims = {"foo": "bar", "aud": audience, "iss": issuer}
-        token = jwt.encode(claims, PRIVATE_KEY, algorithm=ALGORITHMS.RS256)
-        validator = AuthTokenValidator(audience=audience, issuer=issuer, public_key=PUBLIC_KEY)
+        token = jwt.encode(claims, PRIVATE_KEY, algorithm="RS256")
+        validator = TokenValidator(audience=audience, issuer=issuer, public_key=PUBLIC_KEY)
         payload = validator.validate(token)
         assert claims == payload
 
 
-class TestContxtAuthTokenValidator:
+class TestContxtTokenValidator:
     def test_contxt_auth(self):
-        token_validator = ContxtAuthTokenValidator(audience="foo_audience")
-        with pytest.raises(AuthError):
+        token_validator = ContxtTokenValidator(audience="foo_audience")
+        with pytest.raises(InvalidTokenError):
             token_validator.validate("bad_token")
 
 
@@ -64,7 +63,7 @@ class TestTokenProvider:
                     **TestTokenProvider.claims,
                     "exp": datetime.now(timezone.utc).timestamp(),
                 }
-                self.access_token = jwt.encode(self._claims, PRIVATE_KEY, algorithm=ALGORITHMS.RS256)
+                self.access_token = jwt.encode(self._claims, PRIVATE_KEY, algorithm="RS256")
             return self._access_token
 
     def test_token_provider(self):
