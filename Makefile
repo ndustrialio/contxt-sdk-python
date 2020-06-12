@@ -22,9 +22,10 @@ test: ## Run unit tests
 	$(RUNNER) pytest tests/unit
 
 release: ## Release a new version [usage: release v=major|minor|patch]
-	# Update version string
+ifndef v
+	$(error v is undefined)
+endif
 	@poetry version $(v)
-	# Create commit and tag
 	@git commit pyproject.toml -m "chore(release): v$(VERSION)"
 	@git tag -a "v$(VERSION)" -m "chore(release): v$(VERSION)"
 	@git push && git push --tags

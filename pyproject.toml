@@ -14,11 +14,11 @@ packages = [ { include = "contxt" } ]
 
 [tool.poetry.dependencies]
 python = "^3.6"
-auth0-python = "^3.9"
-dataclasses = { version = "^0.6.0", python = "<3.7" }
-pyjwt = { version = "^1.7", extras = ["crypto"] }
-requests = "^2.22"
-tabulate = "^0.8.3"
+auth0-python = "^3"
+dataclasses = { version = "*", python = "<3.7" }
+pyjwt = { version = "^1", extras = ["crypto"] }
+requests = "^2"
+tabulate = "*"
 
 [tool.poetry.dev-dependencies]
 black = "^19.10b0"
@@ -28,7 +28,7 @@ mypy = "^0.780"
 pytest = "^5.0"
 
 [tool.poetry.scripts]
-contxt = "contxt.__main__:main"
+contxt = "contxt.__main__:cli"
 
 [tool.black]
 line-length = 105

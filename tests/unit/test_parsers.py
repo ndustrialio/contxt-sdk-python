@@ -7,8 +7,7 @@ import contxt.__main__ as contxt
 
 @pytest.fixture(scope="module")
 def parser():
-    parser, subparsers = contxt.create_parser()
-    return parser
+    return contxt.create_parser()
 
 
 def test_auth_parser(parser):
@@ -19,14 +18,14 @@ def test_auth_parser(parser):
 
 @patch("contxt.cli.parsers.AuthParser._login", return_value=True)
 def test_auth_parser_login(mock_login):
-    parser, subparsers = contxt.create_parser()
+    parser = contxt.create_parser()
     login_cmd = parser.parse_args(["auth", "login"])
     login_cmd.func(login_cmd)
 
 
 @patch("contxt.cli.parsers.AuthParser._logout", return_value=True)
 def test_auth_parser_logout(mock_logout):
-    parser, subparsers = contxt.create_parser()
+    parser = contxt.create_parser()
     logout_cmd = parser.parse_args(["auth", "logout"])
     logout_cmd.func(logout_cmd)
 

@@ -1,27 +1,25 @@
 from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
-from typing import List, Tuple
 
 from . import __version__
 from .auth.cli import CliAuth
 from .cli.parsers import ContxtArgParser
 
 
-def create_parser() -> Tuple[ArgumentParser, List[ContxtArgParser]]:
+def create_parser() -> ArgumentParser:
     # Setup parser
-    root_parser = ArgumentParser(description="Contxt CLI", formatter_class=ArgumentDefaultsHelpFormatter)
-    root_parser.add_argument("-v", "--version", action="version", version=f"%(prog)s {__version__}")
-    root_parser.set_defaults(func=lambda auth, args: root_parser.print_help())
+    parser = ArgumentParser(description="Contxt CLI", formatter_class=ArgumentDefaultsHelpFormatter)
+    parser.add_argument("-v", "--version", action="version", version=f"%(prog)s {__version__}")
+    parser.set_defaults(func=lambda auth, args: parser.print_help())
 
-    # Setup our subparsers, which are subclassed from ContxtArgParser
-    parsers = root_parser.add_subparsers(title="subcommands", dest="command")
-    subparsers = [cls(parsers) for cls in ContxtArgParser.__subclasses__()]
+    # Register subparsers
+    parsers = parser.add_subparsers(title="subcommands", dest="command")
+    [cls(parsers) for cls in ContxtArgParser.__subclasses__()]
+    return parser
 
-    return root_parser, subparsers
 
-
-def main() -> None:
+def cli() -> None:
     """Main CLI"""
-    parser, subparsers = create_parser()
+    parser = create_parser()
     args = parser.parse_args()
 
     # Launch the command
@@ -30,4 +28,4 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    cli()
