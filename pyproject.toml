@@ -6,7 +6,7 @@ build-backend = "poetry.masonry.api"
 name = "contxt-sdk"
 version = "1.0.0-beta.15"
 description = "Contxt SDK from ndustrial"
-authors = ["ndustrial.io <dev@ndustrial.io>"]
+authors = ["ndustrial <dev@ndustrial.io>"]
 license = "ISC"
 readme = "README.md"
 repository = "https://github.com/ndustrialio/contxt-sdk-python"
@@ -15,17 +15,21 @@ packages = [ { include = "contxt" } ]
 [tool.poetry.dependencies]
 python = "^3.6"
 auth0-python = "^3"
+cryptography = { version = ">=1.4", optional = true } # enable pyjwt to en/decode jwt via RSA
 dataclasses = { version = "*", python = "<3.7" }
-pyjwt = { version = "^1", extras = ["crypto"] }
+pyjwt = "^1"
 requests = "^2"
 tabulate = "*"
 
 [tool.poetry.dev-dependencies]
 black = "^19.10b0"
 flake8 = "^3.8"
-isort = "^4.3"
-mypy = "^0.780"
+isort = "^5"
+mypy = "^0.782"
 pytest = "^5.0"
+
+[tool.poetry.extras]
+crypto = ["cryptography"]
 
 [tool.poetry.scripts]
 contxt = "contxt.__main__:cli"
@@ -35,7 +39,4 @@ line-length = 105
 
 [tool.isort]
 line_length = 105
-multi_line_output = 3
-include_trailing_comma = true
-force_grid_wrap = 0
-use_parentheses = true
+profile = "black"

@@ -6,7 +6,7 @@ Before getting started, make sure you have [Poetry](https://python-poetry.org/do
 
 ```sh
 # Install project
-poetry install
+poetry install -E crypto
 
 # Enter poetry-managed venv
 poetry shell
@@ -21,11 +21,11 @@ We use `make` as a general task runner. To see available tasks:
 
 ```console
 $ make help
-clean      Remove all build artifacts
+clean      Remove build artifacts
 fmt        Format code
 help       Show this help
 lint       Report format and lint violations
-release    Release a new version [usage: release v=major|minor|patch]
+release    Release new version [usage: release v=major|minor|patch]
 test       Run unit tests
 ```
 

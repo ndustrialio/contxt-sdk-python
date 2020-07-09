@@ -41,4 +41,3 @@ class BaseWorker(ABC):
     @abstractmethod
     def do_work(self) -> None:
         """Main method"""
-        pass
