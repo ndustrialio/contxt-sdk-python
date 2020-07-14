@@ -86,6 +86,7 @@ class Organization(ApiObject):
         ApiField("id"),
         ApiField("name", creatable=True),
         ApiField("legacy_organization_id", attr_key="legacy_id", optional=True),
+        ApiField("slug", optional=True),
         ApiField(
             "OrganizationUser", attr_key="organization_user", data_type=OrganizationUser, optional=True
         ),
@@ -96,6 +97,7 @@ class Organization(ApiObject):
     name: str
     id: Optional[str] = None
     legacy_id: Optional[int] = None
+    slug: Optional[str] = None
     organization_user: Optional[OrganizationUser] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
