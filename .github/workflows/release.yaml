@@ -21,5 +21,5 @@ jobs:
           POETRY_HTTP_BASIC_PYPI_USERNAME: __token__
           POETRY_HTTP_BASIC_PYPI_PASSWORD: ${{ secrets.PYPI_TOKEN }}
         run: |
-          pip install poetry
-          poetry publish --build --no-interaction
+          python -m pip install poetry
+          python -m poetry publish --build --no-interaction
