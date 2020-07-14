@@ -15,7 +15,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: .venv
-          key: ${{ runner.os }}-venv-py3.7-${{ hashFiles('**/poetry.lock') }}
+          key: ${{ runner.os }}-venv-py3.8-${{ hashFiles('**/poetry.lock') }}
       - name: Install package
         run: |
           pip install poetry

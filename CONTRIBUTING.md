@@ -22,9 +22,8 @@ We use `make` as a general task runner. To see available tasks:
 ```console
 $ make help
 clean      Remove build artifacts
-fmt        Format code
 help       Show this help
-lint       Report format and lint violations
+lint       Run all linters and formatters
 release    Release new version [usage: release v=major|minor|patch]
 test       Run unit tests
 ```
@@ -37,17 +36,10 @@ To ensure code quality, we use the following tools:
 - Linting: [flake8](http://flake8.pycqa.org/en/latest/)
 - Testing: [pytest](https://docs.pytest.org/en/latest/)
 
-Our [CI pipeline](.github/workflows/build.yaml) will run these tools on every git push. To run these locally:
+Our [CI pipeline](.github/workflows/build.yaml) will run these tools on each commit. To run these locally, we recommend [pre-commit](https://pre-commit.com/):
 
 ```sh
-# Reports format/lint violations
-make lint
-
-# Formats code
-make fmt
-
-# Runs unit tests
-make test
+poetry run pre-commit install
 ```
 
 ### Create Release
