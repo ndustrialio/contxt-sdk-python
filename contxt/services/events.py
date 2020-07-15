@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Iterable, List, Optional
 
 from ..auth import Auth
 from ..models.events import Event, EventDefinition, EventType, TriggeredEvent
@@ -36,7 +36,7 @@ class EventsService(ConfiguredApi):
                     statement += f"Event {event1.name} overlaps with {event2.name} within {mins} min "
         event_definition.human_readable_parameters = statement
 
-    def get_event_types(self, page_options: Optional[PageOptions] = None) -> List[EventType]:
+    def get_event_types(self, page_options: Optional[PageOptions] = None) -> Iterable[EventType]:
         return PagedRecords(
             api=self, url="types", options=page_options, record_parser=EventType.from_api
         )
@@ -61,7 +61,7 @@ class EventsService(ConfiguredApi):
 
     def get_events_for_type(
         self, event_type_id: str, page_options: Optional[PageOptions] = None
-    ) -> List[Event]:
+    ) -> Iterable[Event]:
         return PagedRecords(
             api=self,
             url=f"types/{event_type_id}/events",
@@ -93,7 +93,7 @@ class EventsService(ConfiguredApi):
 
     def get_triggered_events_for_event(
         self, event_id: str, page_options: Optional[PageOptions] = None
-    ) -> List[TriggeredEvent]:
+    ) -> Iterable[TriggeredEvent]:
         return PagedRecords(
             api=self,
             url=f"events/{event_id}/triggered",

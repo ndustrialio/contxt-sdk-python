@@ -46,13 +46,11 @@ class MessageBusService(ConfiguredApi):
         self, schema_id: str, channel_id: str, service_id: str
     ) -> Dict:
         # TODO: create model for this response
-        resp = self.get(f"{self._channels_url(service_id)}/{channel_id}/schemas")
-        return resp
+        return self.get(f"{self._channels_url(service_id)}/{channel_id}/schemas")
 
     def get_schemas_for_channel_and_service(self, channel_id: str, service_id: str) -> List[Dict]:
         # TODO: create model for this response
-        resp = self.get(f"{self._channels_url(service_id)}/{channel_id}/schemas")
-        return resp
+        return self.get(f"{self._channels_url(service_id)}/{channel_id}/schemas")  # type: ignore
 
     def get_stats_for_channel_and_service(self, channel_id: str, service_id: str) -> ChannelStats:
         resp = self.get(f"{self._channels_url(service_id)}/{channel_id}/statistics")

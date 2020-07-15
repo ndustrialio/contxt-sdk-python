@@ -16,7 +16,7 @@ class MachineTokenProvider(TokenProvider):
         self.client_secret = client_secret
         self.auth_service = AuthService()
 
-    @TokenProvider.access_token.getter
+    @TokenProvider.access_token.getter  # type: ignore
     def access_token(self) -> Token:
         """Gets a valid access token for audience `audience`"""
         if self._access_token is None or self._token_expiring():
@@ -25,7 +25,7 @@ class MachineTokenProvider(TokenProvider):
             self.access_token = self.auth_service.get_oauth_token(
                 self.client_id, self.client_secret, self.audience
             )["access_token"]
-        return self._access_token
+        return self._access_token  # type: ignore
 
 
 class MachineAuth(Auth):

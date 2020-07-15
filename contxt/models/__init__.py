@@ -113,8 +113,8 @@ class ApiField:
             if qualname_separator:
                 for attr in qualname.split("."):
                     obj = getattr(obj, attr)
-            self._data_type = obj
-        return self._data_type
+            self._data_type = obj  # type: ignore
+        return self._data_type  # type: ignore
 
 
 class ApiObject(ABC):
@@ -135,22 +135,26 @@ class ApiObject(ABC):
     def creatable_fields(self) -> Dict[str, ApiField]:
         cls = type(self)
         if not hasattr(cls, "_creatable_fields"):
-            cls._creatable_fields = {f.attr_key: f for f in cls._api_fields if f.creatable}
-        return cls._creatable_fields
+            cls._creatable_fields = {  # type: ignore
+                f.attr_key: f for f in cls._api_fields if f.creatable  # type: ignore
+            }
+        return cls._creatable_fields  # type: ignore
 
     @property
     def updatable_fields(self) -> Dict[str, ApiField]:
         cls = type(self)
         if not hasattr(cls, "_updatable_fields"):
-            cls._updatable_fields = {f.attr_key: f for f in cls._api_fields if f.updatable}
-        return cls._updatable_fields
+            cls._updatable_fields = {  # type: ignore
+                f.attr_key: f for f in cls._api_fields if f.updatable  # type: ignore
+            }
+        return cls._updatable_fields  # type: ignore
 
     @classmethod
     def from_api(cls, api_dict: Dict) -> Any:
         api_dict = deepcopy(api_dict)
         # Create clean dictionary to pass to init
         clean_dict = {}
-        for field in cls._api_fields:
+        for field in cls._api_fields:  # type: ignore
             if field.api_key not in api_dict and not field.optional:
                 raise KeyError(
                     f"Required API field '{field.api_key}' is missing from" f" response: {api_dict}"
@@ -160,7 +164,7 @@ class ApiObject(ABC):
             )
 
         # NOTE: unexpected keys: api_dict.keys()
-        return cls(**clean_dict)
+        return cls(**clean_dict)  # type: ignore
 
     @classmethod
     def clean_api_value(cls, field: ApiField, value: Any) -> Any:
@@ -173,7 +177,7 @@ class ApiObject(ABC):
         # elif issubclass(field.data_type, ApiObject):
         elif callable(getattr(field.data_type, "from_api", None)):
             # Type is an ApiObject, apply from_api instead of init
-            return field.data_type.from_api(value)
+            return field.data_type.from_api(value)  # type: ignore
         else:
             # Apply type
             return field.data_type(value)

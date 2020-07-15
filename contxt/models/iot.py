@@ -195,7 +195,7 @@ class BatchRequest:
     def from_request(request: Request) -> "BatchRequest":
         # NOTE: this handles url-encoding parameters and other low-level translations
         r = request.prepare()
-        return BatchRequest(method=r.method, uri=r.url, body=r.body)
+        return BatchRequest(method=r.method, uri=r.url, body=r.body)  # type: ignore
 
     def to_api(self) -> Dict[str, str]:
         d = {"method": self.method, "uri": self.uri}

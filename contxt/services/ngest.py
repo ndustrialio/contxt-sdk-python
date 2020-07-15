@@ -94,7 +94,7 @@ class SpecializedNgestService(NgestService):
         self.feed_key = feed_key
         self.feed_token = feed_token
 
-    def send_time_series(
+    def send_time_series(  # type: ignore
         self, time_series: Dict[str, Dict[datetime, float]], per_request: int = 50
     ) -> List[Dict]:
         return super().send_time_series(

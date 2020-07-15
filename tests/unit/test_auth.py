@@ -58,7 +58,7 @@ class TestTokenProvider:
     claims = {"foo": "bar", "aud": "foo_audience", "iss": "foo_issuer"}
 
     class DummyTokenProvider(TokenProvider):
-        @TokenProvider.access_token.getter
+        @TokenProvider.access_token.getter  # type: ignore
         def access_token(self):
             if self._access_token is None or self._token_expiring(within=0):
                 self._claims = {

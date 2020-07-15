@@ -2,7 +2,7 @@
 
 [![build status](https://github.com/ndustrialio/contxt-sdk-python/workflows/build/badge.svg)](https://github.com/ndustrialio/contxt-sdk-python/actions)
 [![pypi version](https://img.shields.io/pypi/v/contxt-sdk.svg)](https://pypi.org/project/contxt-sdk/)
-![python](https://img.shields.io/badge/python-3.6+-blue.svg)
+![python](https://img.shields.io/badge/python-3.7+-blue.svg)
 
 ## Installation
 

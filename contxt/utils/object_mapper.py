@@ -32,7 +32,7 @@ class ObjectMapper:
             return f"Failed to parse '{annotation}' from tree: {tree}"
 
         if tree is None or annotation == Any:
-            return tree
+            return tree  # type: ignore
         # detecting generic types
         # note: this check is hacky, don't have a better way to detect generics
         elif type(annotation).__name__ == "_GenericAlias":
@@ -42,7 +42,9 @@ class ObjectMapper:
                 assert isinstance(tree, list), failure_msg()
                 assert len(args) == 1
                 generic_param = args[0]
-                return [ObjectMapper.tree_to_object(item, generic_param) for item in tree]
+                return [
+                    ObjectMapper.tree_to_object(item, generic_param) for item in tree  # type: ignore
+                ]
             elif origin is dict:
                 assert isinstance(tree, dict), failure_msg()
                 assert len(args) == 2
@@ -50,13 +52,13 @@ class ObjectMapper:
                 return {
                     ObjectMapper.tree_to_object(k, key_ann): ObjectMapper.tree_to_object(v, value_ann)
                     for k, v in tree.items()
-                }
+                }  # type: ignore
             elif origin is Union:
                 assert any(t for t in args if isinstance(tree, t)), failure_msg()
-                return tree
+                return tree  # type: ignore
         elif annotation in _PRIMITIVES:
             try:
-                conv = annotation(tree)
+                conv = annotation(tree)  # type: ignore
                 assert conv == tree
                 return conv
             except Exception as e:
@@ -73,7 +75,7 @@ class ObjectMapper:
                 assert isinstance(
                     tree, _PRIMITIVES
                 ), "Only primitives are supported as Enum values. " + (failure_msg())
-                return annotation(tree)
+                return annotation(tree)  # type: ignore
             elif isinstance(tree, dict):
                 # parse as regular class
                 args = {}
@@ -96,7 +98,7 @@ class ObjectMapper:
                     )
 
                 # instantiate the annotation class
-                return annotation(**args)
+                return annotation(**args)  # type: ignore
 
         raise NotImplementedError(failure_msg())
 

@@ -2,8 +2,9 @@
 
 from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
 
-from .. import __version__
-from ..auth.cli import CliAuth
+from contxt import __version__
+from contxt.auth.cli import CliAuth
+
 from .commands import Assets, Auth, Bus, Contxt, Ems, Iot
 
 

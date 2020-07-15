@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Iterable, List, Optional
 
 from ..auth import Auth
 from ..models.assets import (
@@ -42,8 +42,8 @@ class AssetsService(ConfiguredApi):
         super().__init__(env=env, auth=auth, **kwargs)
         # TODO: handle multiple orgs
         self.organization_id = organization_id
-        self.types = {}
-        self.types_by_id = {}
+        self.types: Dict[str, AssetType] = {}
+        self.types_by_id: Dict[str, AssetType] = {}
 
         # Cache asset types
         if load_types:
@@ -58,7 +58,7 @@ class AssetsService(ConfiguredApi):
     ) -> None:
         # TODO: should we replace label with normalized label?
         # Store asset_type by id, label, and normalized label
-        self.types_by_id[asset_type.id] = asset_type
+        self.types_by_id[asset_type.id] = asset_type  # type: ignore
         self.types[asset_type.label] = asset_type
         self.types[asset_type.normalized_label] = asset_type
 
@@ -73,27 +73,27 @@ class AssetsService(ConfiguredApi):
         self._cache_asset_type(asset_type, with_attributes=True, with_metrics=True)
 
     def _uncache_asset_type(self, asset_type: AssetType) -> None:
-        self.types_by_id.pop(asset_type.id)
+        self.types_by_id.pop(asset_type.id)  # type: ignore
         self.types.pop(asset_type.label)
         self.types.pop(asset_type.normalized_label, None)
 
     def _cache_attributes(self, asset_type: AssetType) -> None:
         if not asset_type.attributes:
-            asset_type.attributes = self.get_attributes(asset_type.id)
+            asset_type.attributes = self.get_attributes(asset_type.id)  # type: ignore
 
     def _cache_metrics(self, asset_type: AssetType) -> None:
         if not asset_type.metrics:
-            asset_type.metrics = self.get_metrics(asset_type.id)
+            asset_type.metrics = self.get_metrics(asset_type.id)  # type: ignore
 
     def _build_asset(
         self, asset: Asset, with_attribute_values: bool = False, with_metric_values: bool = False
     ) -> Asset:
         # Fetch attribute/metric values, if requested
         if with_attribute_values and not asset.attribute_values:
-            asset.attribute_values = self.get_attribute_values(asset.id)
+            asset.attribute_values = self.get_attribute_values(asset.id)  # type: ignore
         if with_metric_values and not asset.metric_values:
             # NOTE: this is a paged response, so fetch all records
-            asset.metric_values = [mv for mv in self.get_metric_values(asset.id)]
+            asset.metric_values = [mv for mv in self.get_metric_values(asset.id)]  # type: ignore
 
         # Attach asset type
         if not asset.asset_type:
@@ -189,7 +189,7 @@ class AssetsService(ConfiguredApi):
 
     def get_asset_types(
         self, organization_id: Optional[str] = None, page_options: Optional[PageOptions] = None
-    ) -> List[AssetType]:
+    ) -> Iterable[AssetType]:
         url = f"organizations/{organization_id}/assets/types" if organization_id else "assets/types"
         return PagedRecords(api=self, url=url, options=page_options, record_parser=AssetType.from_api)
 
@@ -292,7 +292,7 @@ class AssetsService(ConfiguredApi):
         with_attribute_values: bool = False,
         with_metric_values: bool = False,
         page_options: Optional[PageOptions] = None,
-    ) -> List[Asset]:
+    ) -> Iterable[Asset]:
         def _build_asset(record: Dict) -> Asset:
             return self._build_asset(
                 Asset.from_api(record),
@@ -317,7 +317,7 @@ class AssetsService(ConfiguredApi):
         with_attribute_values: bool = False,
         with_metric_values: bool = False,
         page_options: Optional[PageOptions] = None,
-    ) -> List[Asset]:
+    ) -> Iterable[Asset]:
         # BUG: this endpoint returns globals when type_id is None
         organization_id = organization_id or self.organization_id
 
@@ -374,7 +374,7 @@ class AssetsService(ConfiguredApi):
 
     def get_attributes(
         self, asset_type_id: str, page_options: Optional[PageOptions] = None
-    ) -> List[Attribute]:
+    ) -> Iterable[Attribute]:
         return PagedRecords(
             api=self,
             url=f"assets/types/{asset_type_id}/attributes",
@@ -478,7 +478,7 @@ class AssetsService(ConfiguredApi):
 
     def get_metrics(
         self, asset_type_id: str, page_options: Optional[PageOptions] = None
-    ) -> List[Metric]:
+    ) -> Iterable[Metric]:
         return PagedRecords(
             api=self,
             url=f"assets/types/{asset_type_id}/metrics",
@@ -527,7 +527,7 @@ class AssetsService(ConfiguredApi):
 
     def get_metric_values(
         self, asset_id: str, metric_id: Optional[str] = None, page_options: Optional[PageOptions] = None
-    ) -> List[MetricValue]:
+    ) -> Iterable[MetricValue]:
         url = (
             f"assets/{asset_id}/metrics/{metric_id}/values"
             if metric_id

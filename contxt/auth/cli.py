@@ -48,7 +48,7 @@ class UserIdentityProvider(TokenProvider):
                 # Token not in cache
                 logger.debug("Token not found in cache")
 
-    @TokenProvider.access_token.getter
+    @TokenProvider.access_token.getter  # type: ignore
     def access_token(self) -> Token:
         """Gets a valid access token for audience `audience`"""
         if self._access_token is None:
@@ -68,7 +68,7 @@ class UserIdentityProvider(TokenProvider):
             self.access_token = token_info["access_token"]
             # Update cache
             self.update_cache()
-        return self._access_token
+        return self._access_token  # type: ignore
 
     @property
     def refresh_token(self) -> Token:
@@ -76,7 +76,7 @@ class UserIdentityProvider(TokenProvider):
         if self._refresh_token is None:
             # Token not yet set, fetch it now
             self.access_token
-        return self._refresh_token
+        return self._refresh_token  # type: ignore
 
     @refresh_token.setter
     def refresh_token(self, value: Token) -> None:
@@ -100,7 +100,7 @@ class UserIdentityProvider(TokenProvider):
 
     def reset(self) -> None:
         super().reset()
-        self._refresh_token: Optional[str] = None
+        self._refresh_token = None
 
     def read_cache(self) -> Dict[str, Any]:
         if self._cache_file:
@@ -135,7 +135,7 @@ class UserTokenProvider(TokenProvider):
         self.identity_provider = identity_provider
         self.auth_service = AuthService()
 
-    @TokenProvider.access_token.getter
+    @TokenProvider.access_token.getter  # type: ignore
     def access_token(self) -> Token:
         """Gets a valid access token for audience `audience`"""
         if self._access_token is None or self._token_expiring():
@@ -144,7 +144,7 @@ class UserTokenProvider(TokenProvider):
             self.access_token = self.auth_service.get_token(
                 self.identity_provider.access_token, self.audience
             )["access_token"]
-        return self._access_token
+        return self._access_token  # type: ignore
 
 
 class CliAuth(Auth):

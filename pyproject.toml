@@ -13,20 +13,20 @@ repository = "https://github.com/ndustrialio/contxt-sdk-python"
 packages = [ { include = "contxt" } ]
 
 [tool.poetry.dependencies]
-python = "^3.6"
+python = "^3.7"
 auth0-python = "^3"
 cryptography = { version = ">=1.4", optional = true } # enable pyjwt to en/decode jwt via RSA
-dataclasses = { version = "*", python = "<3.7" }
 pyjwt = "^1"
 requests = "^2"
 tabulate = "*"
 
 [tool.poetry.dev-dependencies]
 black = "^19.10b0"
-flake8 = "^3.8"
+flake8 = "^3"
 isort = "^5"
-mypy = "^0.782"
-pytest = "^5.0"
+mypy = "^0"
+pre-commit = "^2"
+pytest = "^5"
 
 [tool.poetry.extras]
 crypto = ["cryptography"]

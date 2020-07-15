@@ -48,11 +48,11 @@ class TokenProvider(ABC):
         if self._access_token_decoded is None:
             # Token not yet set, fetch it now
             self.access_token
-        return self._access_token_decoded
+        return self._access_token_decoded  # type: ignore
 
     def reset(self) -> None:
-        self._access_token: Optional[Token] = None
-        self._access_token_decoded: Optional[DecodedToken] = None
+        self._access_token = None
+        self._access_token_decoded = None
 
 
 class Auth(ABC):

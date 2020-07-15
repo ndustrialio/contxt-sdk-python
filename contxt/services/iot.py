@@ -1,7 +1,7 @@
 from collections import defaultdict
 from copy import deepcopy
 from datetime import datetime, timedelta, timezone
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 from requests import Request
 
@@ -21,7 +21,7 @@ from ..models.iot import (
 from ..utils import is_datetime_aware, make_logger
 from ..utils.object_mapper import ObjectMapper
 from .api import ApiEnvironment, ConfiguredApi
-from .pagination import PagedRecords, PagedTimeSeries, PageOptions
+from .pagination import DataPoint, PagedRecords, PagedTimeSeries, PageOptions
 
 logger = make_logger(__name__)
 
@@ -53,18 +53,19 @@ class IotService(ConfiguredApi):
     def get_feed_with_key(self, key: str) -> Optional[Feed]:
         """Get feed with key `key`"""
         feeds = self.get_feeds(key=key)
-        if len(feeds) == 0:
+        N = len(feeds)  # type: ignore
+        if N == 0:
             return None
-        elif len(feeds) == 1:
-            return feeds[0]
-        raise KeyError(f"Expected singleton feed with key {key}, not {len(feeds)}")
+        elif N == 1:
+            return feeds[0]  # type: ignore
+        raise KeyError(f"Expected singleton feed with key {key}, not {N}")
 
     def get_feeds(
         self,
         facility_id: Optional[int] = None,
         key: Optional[str] = None,
         page_options: Optional[PageOptions] = None,
-    ) -> List[Feed]:
+    ) -> Iterable[Feed]:
         """Get feeds with facility id `facility_id` and/or key `key`"""
         return PagedRecords(
             api=self,
@@ -76,7 +77,7 @@ class IotService(ConfiguredApi):
 
     def get_fields_for_facility(
         self, facility_id: int, page_options: Optional[PageOptions] = None
-    ) -> List[Field]:
+    ) -> Iterable[Field]:
         """Get fields for facility with id `facility_id`"""
         return PagedRecords(
             api=self,
@@ -87,7 +88,7 @@ class IotService(ConfiguredApi):
 
     def get_fields_for_feed(
         self, feed_id: int, page_options: Optional[PageOptions] = None
-    ) -> List[Field]:
+    ) -> Iterable[Field]:
         """Get fields for feed with id `feed_id`"""
         return PagedRecords(
             api=self, url=f"feeds/{feed_id}/fields", options=page_options, record_parser=Field.from_api
@@ -106,7 +107,7 @@ class IotService(ConfiguredApi):
         window: Window = Window.RAW,
         end_time: Optional[datetime] = None,
         per_page: int = 1000,
-    ) -> FieldTimeSeries:
+    ) -> Iterable[DataPoint]:
         """Get time series data for field `field`"""
         # Manually validate the window choice, since our API does not return a
         # helpful error message
@@ -144,7 +145,7 @@ class IotService(ConfiguredApi):
             "limit": 5000,
         }
         queue: List[Tuple[str, BatchRequest]] = [
-            (
+            (  # type: ignore
                 f.field_human_name,
                 BatchRequest.from_request(
                     Request(
@@ -195,7 +196,9 @@ class IotService(ConfiguredApi):
             for name, series in records.items()
         ]
 
-    def get_time_series_for_field_grouping(self, grouping_id: str, **kwargs) -> List[Dict]:
+    def get_time_series_for_field_grouping(
+        self, grouping_id: str, **kwargs
+    ) -> List[Iterable[DataPoint]]:
         """Get time series data for fields in grouping with id `grouping_id`"""
         grouping = self.get_field_grouping(grouping_id)
         return [self.get_time_series_for_field(field=f, **kwargs) for f in grouping.fields]
@@ -221,7 +224,7 @@ class IotService(ConfiguredApi):
 
     def get_field_groupings_for_facility(
         self, facility_id: int, page_options: Optional[PageOptions] = None
-    ) -> List[FieldGrouping]:
+    ) -> Iterable[FieldGrouping]:
         """Get field groupings for facility with id `facility_id`"""
         return PagedRecords(
             api=self,
@@ -300,7 +303,7 @@ class IotDataService(ConfiguredApi):
         }
         return self.get(f"org/{self.org_id}/sources/{source_key}/data", params=params)
 
-    def get_source_cursor(self, source_key: str) -> datetime:
+    def get_source_cursor(self, source_key: str) -> Optional[datetime]:
         """Get the cursor for the given source"""
         body = self.get(f"org/{self.org_id}/sources/{source_key}/cursor")
         assert (
@@ -318,17 +321,17 @@ class IotDataService(ConfiguredApi):
         tail = data
         while tail:
             batch, tail = tail[:batch_size], tail[batch_size:]
-            data = []
+            _data = []
             for record in batch:
                 dt, field_values = record
                 assert is_datetime_aware(dt), f"Ngest requires timezone-aware datetimes, got: {dt}"
-                data.append(
+                _data.append(
                     {
                         "timestamp": dt.astimezone(timezone.utc).strftime("%Y-%m-%d %H:%M:%S"),
                         "data": {k: {"value": str(v)} for k, v in field_values.items()},
                     }
                 )
-            msg = {"feedKey": source_key, "type": "timeseries", "data": data}
+            msg = {"feedKey": source_key, "type": "timeseries", "data": _data}
 
             # Make request
             response = self.post(f"org/{self.org_id}/ngest/{source_key}", json=msg)
@@ -377,7 +380,7 @@ class IotDataService(ConfiguredApi):
 
         return responses
 
-    def get_source_field_cursor(self, source_key: str, field_name: str = None) -> datetime:
+    def get_source_field_cursor(self, source_key: str, field_name: str = None) -> Optional[datetime]:
         """Get the cursor for the given source and field"""
 
         url = f"org/{self.org_id}/sources/{source_key}"

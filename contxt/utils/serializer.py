@@ -3,7 +3,7 @@ from datetime import date, datetime
 from enum import Enum
 from json import dump, dumps
 from pathlib import Path
-from typing import Any, Callable, List, Optional
+from typing import Any, Callable, Iterable, Optional
 
 from tabulate import tabulate
 
@@ -163,7 +163,7 @@ class Serializer:
 
     @staticmethod
     def to_file(
-        obj: Any, path: Optional[Path] = None, valid_exts: List[str] = (".csv", ".json", ".txt"),
+        obj: Any, path: Optional[Path] = None, valid_exts: Iterable[str] = (".csv", ".json", ".txt"),
     ):
         """Write an object to a file (or stdout).
 
