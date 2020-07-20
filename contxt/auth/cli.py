@@ -1,4 +1,3 @@
-from getpass import getpass
 from json import dump, load, loads
 from pathlib import Path
 from typing import Any, Dict, Optional
@@ -141,31 +140,36 @@ class UserIdentityProvider(TokenProvider):
         self._refresh_token = value
 
     def login(self) -> Dict[str, Any]:
-        """Returns an access_token from Auth0 after running the "Device Authorization Flow" successfully"""
+        """Returns an access_token from Auth0 after running the
+        "Device Authorization Flow" successfully"""
 
         # Retrieve a device code to use for the user to login with
         code = self.device_provider.get_device_code_url()
 
         # Open their default web browser so they can login with their Contxt Account
-        print(f"You're being redirected to your browser to complete your login. If your browser does not automatically "
-              f"open, please navigate to {code['verification_uri_complete']} to complete your login.")
+        print(f"You're being redirected to your browser to complete your login. If your browser "
+              f"does not automatically open, please navigate to {code['verification_uri_complete']} "
+              f"to complete your login.")
         print(f"Please ensure the code on the webpage matches the following: {code['user_code']}")
         webbrowser.open(code['verification_uri_complete'])
 
         # Continuously poll Auth0 to see if they've completed their login yet
         print("Waiting for CLI to be authorized...")
         while True:
-            # sleep between polling for the access token for the amount of time recommended in the response
+            # sleep between polling for the access token for the amount of time
+            # recommended in the response
             time.sleep(code['interval'])
             try:
                 resp = self.device_provider.get_access_token(code['device_code'])
             except DeviceAuthPendingException:
                 continue
             except DeviceAuthTimeout:
-                raise DeviceAuthTimeout('The Contxt login timed out. Please run `auth login` command to try again.')
+                raise DeviceAuthTimeout('The Contxt login timed out. Please run `auth login` command '
+                                        'to try again.')
             except DeviceAuthDenied:
-                raise DeviceAuthTimeout('You either cancelled the activation or you are currently not allowed to use '
-                                        'the Contxt CLI. Please contact support if you believe this is an error')
+                raise DeviceAuthTimeout('You either cancelled the activation or you are currently not '
+                                        'allowed to use the Contxt CLI. Please contact support if you '
+                                        'believe this is an error')
             print('Success!')
             return resp
 
