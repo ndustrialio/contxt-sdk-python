@@ -1,6 +1,6 @@
 import time
 import webbrowser
-from json import dump, load, loads
+from json import dump, load
 from pathlib import Path
 from typing import Any, Dict, Optional
 
