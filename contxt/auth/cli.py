@@ -45,27 +45,39 @@ class Auth0DeviceProvider(Api):
 
         return self.post("oauth/device/code", data)
 
-    def get_access_token(self, device_code):
+    def get_access_token(self, code_info):
+
         data = {
             "grant_type": "urn:ietf:params:oauth:grant-type:device_code",
-            "device_code": device_code,
+            "device_code": code_info['device_code'],
             "client_id": CLI_CLIENT_ID,
         }
 
-        try:
-            resp = self.post("oauth/token", data)
-        except HTTPError as e:
-            resp = loads(e.response.content)
-            if resp["error"] == "authorization_pending":
-                raise DeviceAuthPendingException("Authorization pending")
-            elif resp["error"] == "expired_token":
-                raise DeviceAuthTimeout("Login timed out.")
-            elif resp["error"] == "access_denied":
-                raise DeviceAuthDenied("Access denied to CLI")
-            else:
-                raise e
+        while True:
+            # sleep between polling for the access token for the amount of time
+            # recommended in the response
+            time.sleep(code_info["interval"])
 
-        return resp
+            try:
+                resp = self.post("oauth/token", data)
+                return resp
+            except HTTPError as e:
+                resp = e.response.json()
+                if resp["error"] == "authorization_pending":
+                    # no authorization yet...we'll wait and try again
+                    continue
+                elif resp["error"] == "expired_token":
+                    raise DeviceAuthTimeout(
+                        "The Contxt login timed out. Please run `auth login` command " "to try again."
+                    )
+                elif resp["error"] == "access_denied":
+                    raise DeviceAuthDenied(
+                        "You either cancelled the activation or you are currently not "
+                        "allowed to use the Contxt CLI. Please contact support if you "
+                        "believe this is an error"
+                    )
+                else:
+                    raise e
 
 
 class UserIdentityProvider(TokenProvider):
@@ -158,26 +170,10 @@ class UserIdentityProvider(TokenProvider):
 
         # Continuously poll Auth0 to see if they've completed their login yet
         print("Waiting for CLI to be authorized...")
-        while True:
-            # sleep between polling for the access token for the amount of time
-            # recommended in the response
-            time.sleep(code["interval"])
-            try:
-                resp = self.device_provider.get_access_token(code["device_code"])
-            except DeviceAuthPendingException:
-                continue
-            except DeviceAuthTimeout:
-                raise DeviceAuthTimeout(
-                    "The Contxt login timed out. Please run `auth login` command " "to try again."
-                )
-            except DeviceAuthDenied:
-                raise DeviceAuthTimeout(
-                    "You either cancelled the activation or you are currently not "
-                    "allowed to use the Contxt CLI. Please contact support if you "
-                    "believe this is an error"
-                )
-            print("Success!")
-            return resp
+        resp = self.device_provider.get_access_token(code)
+
+        print('Success!')
+        return resp
 
     def reset(self) -> None:
         super().reset()
