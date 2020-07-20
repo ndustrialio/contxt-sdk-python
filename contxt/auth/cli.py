@@ -1,20 +1,21 @@
+import time
+import webbrowser
 from json import dump, load, loads
 from pathlib import Path
 from typing import Any, Dict, Optional
-import webbrowser
-import time
-from requests.exceptions import HTTPError
 
 from auth0.v3.authentication import GetToken
+from requests.exceptions import HTTPError
 
 from contxt.services.api import Api
+
 from ..services.auth import AuthService
 from ..utils import make_logger
 from . import Auth, Token, TokenProvider
 
 logger = make_logger(__name__)
 
-CLI_CLIENT_ID = 'bleED0RUwb7CJ9j7D48tqSiSZRZn29AV'
+CLI_CLIENT_ID = "bleED0RUwb7CJ9j7D48tqSiSZRZn29AV"
 
 
 class DeviceAuthPendingException(Exception):
@@ -33,33 +34,33 @@ class Auth0DeviceProvider(Api):
     def __init__(self, auth0_tenant):
         self.base_url = auth0_tenant
         self.auth_service = AuthService()
-        super().__init__(base_url=f'https://{self.base_url}')
+        super().__init__(base_url=f"https://{self.base_url}")
 
     def get_device_code_url(self):
         data = {
-            'client_id': CLI_CLIENT_ID,
-            'scope': 'offline_access',
-            'audience': self.auth_service.client_id
+            "client_id": CLI_CLIENT_ID,
+            "scope": "offline_access",
+            "audience": self.auth_service.client_id,
         }
 
-        return self.post('oauth/device/code', data)
+        return self.post("oauth/device/code", data)
 
     def get_access_token(self, device_code):
         data = {
-            'grant_type': 'urn:ietf:params:oauth:grant-type:device_code',
-            'device_code': device_code,
-            'client_id': CLI_CLIENT_ID
+            "grant_type": "urn:ietf:params:oauth:grant-type:device_code",
+            "device_code": device_code,
+            "client_id": CLI_CLIENT_ID,
         }
 
         try:
-            resp = self.post('oauth/token', data)
+            resp = self.post("oauth/token", data)
         except HTTPError as e:
             resp = loads(e.response.content)
-            if resp['error'] == 'authorization_pending':
+            if resp["error"] == "authorization_pending":
                 raise DeviceAuthPendingException("Authorization pending")
-            elif resp['error'] == 'expired_token':
+            elif resp["error"] == "expired_token":
                 raise DeviceAuthTimeout("Login timed out.")
-            elif resp['error'] == 'access_denied':
+            elif resp["error"] == "access_denied":
                 raise DeviceAuthDenied("Access denied to CLI")
             else:
                 raise e
@@ -84,7 +85,7 @@ class UserIdentityProvider(TokenProvider):
         self.client_secret = client_secret
         self.auth_service = GetToken("ndustrial.auth0.com")
         self._refresh_token: Optional[Token] = None
-        self.device_provider = Auth0DeviceProvider('ndustrial.auth0.com')
+        self.device_provider = Auth0DeviceProvider("ndustrial.auth0.com")
 
         # Initialize cache
         self._cache_file = cache_file
@@ -147,30 +148,35 @@ class UserIdentityProvider(TokenProvider):
         code = self.device_provider.get_device_code_url()
 
         # Open their default web browser so they can login with their Contxt Account
-        print(f"You're being redirected to your browser to complete your login. If your browser "
-              f"does not automatically open, please navigate to {code['verification_uri_complete']} "
-              f"to complete your login.")
+        print(
+            f"You're being redirected to your browser to complete your login. If your browser "
+            f"does not automatically open, please navigate to {code['verification_uri_complete']} "
+            f"to complete your login."
+        )
         print(f"Please ensure the code on the webpage matches the following: {code['user_code']}")
-        webbrowser.open(code['verification_uri_complete'])
+        webbrowser.open(code["verification_uri_complete"])
 
         # Continuously poll Auth0 to see if they've completed their login yet
         print("Waiting for CLI to be authorized...")
         while True:
             # sleep between polling for the access token for the amount of time
             # recommended in the response
-            time.sleep(code['interval'])
+            time.sleep(code["interval"])
             try:
-                resp = self.device_provider.get_access_token(code['device_code'])
+                resp = self.device_provider.get_access_token(code["device_code"])
             except DeviceAuthPendingException:
                 continue
             except DeviceAuthTimeout:
-                raise DeviceAuthTimeout('The Contxt login timed out. Please run `auth login` command '
-                                        'to try again.')
+                raise DeviceAuthTimeout(
+                    "The Contxt login timed out. Please run `auth login` command " "to try again."
+                )
             except DeviceAuthDenied:
-                raise DeviceAuthTimeout('You either cancelled the activation or you are currently not '
-                                        'allowed to use the Contxt CLI. Please contact support if you '
-                                        'believe this is an error')
-            print('Success!')
+                raise DeviceAuthTimeout(
+                    "You either cancelled the activation or you are currently not "
+                    "allowed to use the Contxt CLI. Please contact support if you "
+                    "believe this is an error"
+                )
+            print("Success!")
             return resp
 
     def reset(self) -> None:
