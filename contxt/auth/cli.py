@@ -49,7 +49,7 @@ class Auth0DeviceProvider(Api):
 
         data = {
             "grant_type": "urn:ietf:params:oauth:grant-type:device_code",
-            "device_code": code_info['device_code'],
+            "device_code": code_info["device_code"],
             "client_id": CLI_CLIENT_ID,
         }
 
@@ -172,7 +172,7 @@ class UserIdentityProvider(TokenProvider):
         print("Waiting for CLI to be authorized...")
         resp = self.device_provider.get_access_token(code)
 
-        print('Success!')
+        print("Success!")
         return resp
 
     def reset(self) -> None:
