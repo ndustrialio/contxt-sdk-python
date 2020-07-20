@@ -1,17 +1,10 @@
 from datetime import date, timedelta
 from typing import Iterable, List, Optional
 
-from contxt.auth import Auth
-from contxt.models.ems import (
-    Facility,
-    MainService,
-    ResourceType,
-    UtilityContract,
-    UtilitySpend,
-    UtilityUsage,
-)
-from contxt.services.api import ApiEnvironment, ConfiguredApi
-from contxt.services.pagination import PagedRecords
+from ..auth import Auth
+from ..models.ems import Facility, MainService, ResourceType, UtilityContract, UtilitySpend, UtilityUsage
+from .api import ApiEnvironment, ConfiguredApi
+from .pagination import PagedRecords
 
 
 class EmsService(ConfiguredApi):

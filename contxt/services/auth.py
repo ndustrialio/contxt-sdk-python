@@ -1,9 +1,6 @@
 from typing import Dict, List, Union
 
-from contxt.services.api import ApiEnvironment, ConfiguredApi
-from contxt.utils import make_logger
-
-logger = make_logger(__name__)
+from .api import ApiEnvironment, ConfiguredApi
 
 
 class AuthService(ConfiguredApi):

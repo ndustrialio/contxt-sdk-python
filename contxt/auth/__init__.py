@@ -1,13 +1,10 @@
+"""Auth for API clients"""
+
 from abc import ABC, abstractmethod
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Dict, Optional
 
 from jwt import decode
-from pytz import UTC
-
-from contxt.utils import make_logger
-
-logger = make_logger(__name__)
 
 Token = str
 DecodedToken = Dict[str, Any]
@@ -31,9 +28,8 @@ class TokenProvider(ABC):
         Returns `False` if `exp` is not in the token's claims."""
         expiration = self.decoded_access_token.get("exp")
         if not expiration:
-            logger.debug("'exp' not in token's claims")
             return False
-        return expiration <= datetime.now(UTC).timestamp() + within
+        return expiration <= datetime.now(timezone.utc).timestamp() + within
 
     @property
     @abstractmethod
@@ -52,11 +48,11 @@ class TokenProvider(ABC):
         if self._access_token_decoded is None:
             # Token not yet set, fetch it now
             self.access_token
-        return self._access_token_decoded
+        return self._access_token_decoded  # type: ignore
 
     def reset(self) -> None:
-        self._access_token: Optional[Token] = None
-        self._access_token_decoded: Optional[DecodedToken] = None
+        self._access_token = None
+        self._access_token_decoded = None
 
 
 class Auth(ABC):

@@ -1,5 +1,6 @@
 import json
 from enum import Enum
+from typing import Any, Dict
 
 
 class DBOperation(Enum):
@@ -71,7 +72,7 @@ class ChangeTrackingRecord:
         self.source_database = source_database
         self.tuple = tuple
         self.headers = headers
-        self.addlParams = dict()
+        self.addlParams: Dict[str, Any] = dict()
 
     def getJSONString(self) -> str:
         return json.dumps(self, default=lambda x: x.__dict__)

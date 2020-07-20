@@ -1,3 +1,5 @@
+"""API clients"""
+
 from .assets import AssetsService
 from .auth import AuthService
 from .bus import MessageBusService
@@ -6,7 +8,7 @@ from .ems import EmsService
 from .events import EventsService
 from .facilities import FacilitiesService
 from .health import HealthService
-from .iot import IotService
+from .iot import IotDataService, IotService
 from .ngest import NgestService
 
 __all__ = [
@@ -19,5 +21,6 @@ __all__ = [
     "FacilitiesService",
     "HealthService",
     "IotService",
+    "IotDataService",
     "NgestService",
 ]

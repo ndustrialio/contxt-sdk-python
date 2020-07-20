@@ -1,19 +1,17 @@
 from dataclasses import dataclass
 from datetime import datetime
 from math import ceil
-from typing import Any, Callable, Dict, Iterator, List, Optional, Tuple, Union
+from typing import Any, Callable, Dict, Generic, Iterator, List, Optional, Tuple, TypeVar, Union
 
-from contxt.models import Parsers
-from contxt.services.api import Api
-from contxt.utils import make_logger
-from contxt.utils.object_mapper import ObjectMapper
+from ..models import Parsers
+from ..utils.object_mapper import ObjectMapper
+from .api import Api
 
-logger = make_logger(__name__)
-
+T = TypeVar("T")
 Record = Dict[str, Any]
+DataPoint = Tuple[datetime, Any]
 
-# NOTE: this is assuming all api endpoints that follow the shape pagination shape
-# also accept the same pagination filters
+
 @dataclass
 class PageOptions:
     per_page: int = 1000
@@ -53,20 +51,20 @@ class Page:
         return self.records[index]
 
 
-class PagedRecords:
+class PagedRecords(Generic[T]):
     def __init__(
         self,
         api: Api,
         url: str,
         params: Optional[Dict] = None,
         options: Optional[PageOptions] = None,
-        record_parser: Optional[Callable] = None,
+        record_parser: Optional[Callable[[Record], T]] = None,
     ):
         self.api = api
         self.url = url
         self.params = params or {}
         self.options = options or PageOptions()
-        self.record_parser = record_parser or (lambda x: x)
+        self.record_parser = record_parser or (lambda x: x)  # type: ignore
 
         # Fetch first page
         self.page_index = 0
@@ -75,25 +73,25 @@ class PagedRecords:
     def __len__(self) -> int:
         return self.total_records
 
-    def __iter__(self) -> Iterator[Record]:
+    def __iter__(self) -> Iterator[T]:
         for page_index in range(self.total_pages):
-            yield from self.get_page(page_index)
+            yield from self.get_page(page_index)  # type: ignore
 
-    def __getitem__(self, index: Union[int, slice]) -> Union[Record, List[Record]]:
+    def __getitem__(self, index: Union[int, slice]) -> Union[T, List[T]]:
         if isinstance(index, int):
             return self._get_item(index)
         elif isinstance(index, slice):
             return self._get_slice(index)
         raise TypeError(f"Record index must be int or slice, not {type(index).__name__}")
 
-    def _get_item(self, index: int) -> Record:
+    def _get_item(self, index: int) -> T:
         if not 0 <= index < self.total_records:
             raise IndexError(f"Record index {index} out of range")
         page = index // self.per_page
         item = index % self.per_page
-        return self.get_page(page)[item]
+        return self.get_page(page)[item]  # type: ignore
 
-    def _get_slice(self, index: slice) -> List[Record]:
+    def _get_slice(self, index: slice) -> List[T]:
         # TODO: we could optimize this by not fetching unneeded pages, i.e. pages[0:1]
         # would only need the first page fetched
         records = [r for r in self]
@@ -103,7 +101,7 @@ class PagedRecords:
         resp = self.api.get(uri=self.url, params={**self.params, **self.options.to_api(index)})
         page = ObjectMapper.tree_to_object(resp, Page)
         # NOTE: this post processing is not ideal, but works for now
-        page.records = [self.record_parser(rec) for rec in page.records]
+        page.records = [self.record_parser(rec) for rec in page.records]  # type: ignore
         return page
 
     def get_page(self, index: int, force: bool = False) -> Page:
@@ -179,16 +177,10 @@ class PagedTimeSeries:
         resp = self.api.get(url, params=params)
         page = ObjectMapper.tree_to_object(resp, TimeSeriesPage)
         # NOTE: this post processing is not ideal, but works for now
-        page.records = [self._record_parser(rec) for rec in page.records]
+        page.records = [self._record_parser(rec) for rec in page.records]  # type: ignore
         return page
 
-    # def page_parser(self, items: List[Dict]) -> Dict:
-    #     return {
-    #         Parsers.datetime(i["event_time"]): Parsers.unknown(i["value"])
-    #         for i in items
-    #     }
-
-    def _record_parser(self, record: Dict) -> Tuple[datetime, Any]:
+    def _record_parser(self, record: Dict) -> DataPoint:
         return Parsers.datetime(record["event_time"]), Parsers.unknown(record["value"])
 
     def get_next_page(self) -> TimeSeriesPage:

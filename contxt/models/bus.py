@@ -2,8 +2,8 @@ from dataclasses import dataclass
 from pprint import pformat
 from typing import Any, ClassVar, List, Optional
 
-from contxt.models import ApiField, ApiObject
-from contxt.utils.serializer import Serializer
+from ..utils.serializer import Serializer
+from . import ApiField, ApiObject
 
 
 def pretty_print(obj: Any) -> str:

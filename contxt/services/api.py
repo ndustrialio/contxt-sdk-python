@@ -8,8 +8,8 @@ from requests.auth import AuthBase
 from requests.exceptions import HTTPError
 from urllib3.util.retry import Retry
 
-from contxt.auth import Auth, TokenProvider
-from contxt.utils import make_logger
+from ..auth import Auth, TokenProvider
+from ..utils import make_logger
 
 logger = make_logger(__name__)
 
@@ -66,7 +66,7 @@ class Api:
         # Initialize session
         self.session = Session()
         self.session.auth = BearerTokenAuth(token_provider) if token_provider else None
-        self.session.hooks = {"response": self._log_response}
+        self.session.hooks = {"response": self._log_response}  # type: ignore
 
         # Attach retry adapter
         if retry:
@@ -80,7 +80,7 @@ class Api:
     def _log_response(self, response: Response, *args, **kwargs) -> None:
         t = response.elapsed.total_seconds()
         logger.debug(
-            f"Called {response.request.method} {response.url} with body"
+            f"Called {response.request.method} {response.url} with body"  # type: ignore
             f" {response.request.body} ({t} s)"
         )
 
@@ -157,7 +157,7 @@ class ConfiguredApi(Api, ABC):
     @classmethod
     def _get_env(cls, name: str) -> ApiEnvironment:
         """Get environment with name `name`"""
-        envs = {e.name: e for e in cls._envs}
+        envs = {e.name: e for e in cls._envs}  # type: ignore
         if name not in envs:
             raise KeyError(f"Invalid environment '{name}'. Choose from {list(envs.keys())}.")
         return envs[name]

@@ -3,13 +3,9 @@ from datetime import date, datetime
 from enum import Enum
 from json import dump, dumps
 from pathlib import Path
-from typing import Any, Callable, List, Optional
+from typing import Any, Callable, Iterable, Optional
 
 from tabulate import tabulate
-
-from contxt.utils import make_logger
-
-logger = make_logger(__name__)
 
 
 class Serializer:
@@ -167,7 +163,7 @@ class Serializer:
 
     @staticmethod
     def to_file(
-        obj: Any, path: Optional[Path] = None, valid_exts: List[str] = (".csv", ".json", ".txt"),
+        obj: Any, path: Optional[Path] = None, valid_exts: Iterable[str] = (".csv", ".json", ".txt"),
     ):
         """Write an object to a file (or stdout).
 
@@ -195,13 +191,11 @@ class Serializer:
 
         # Validate file extension
         if path.suffix not in valid_exts:
-            logger.critical(
+            raise RuntimeError(
                 f"Unsupported filetype: '{path.suffix}'. Choose from {', '.join(valid_exts)}"
             )
-            return
 
         # Dump to file
-        logger.debug(f"Writing {obj.__class__.__name__} to {path}")
         if path.suffix == ".csv":
             Serializer.to_csv(obj, path)
         elif path.suffix == ".json":

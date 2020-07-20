@@ -1,11 +1,9 @@
 from dataclasses import InitVar, dataclass, field
-from datetime import date, datetime
-from typing import Any, ClassVar, Dict, List, Optional
+from datetime import date, datetime, timedelta
+from typing import Any, ClassVar, Dict, List, Optional, Set
 
-from dateutil.relativedelta import relativedelta
-
-from contxt.models import ApiField, ApiObject, Formatters, Parsers
-from contxt.utils import dict_diff, make_logger
+from ..utils import dict_diff, make_logger
+from . import ApiField, ApiObject, Formatters, Parsers
 
 logger = make_logger(__name__)
 
@@ -202,7 +200,7 @@ class AssetType(ApiObject):
         else:
             return self.label.title().replace(" ", "")
 
-    @property
+    @property  # type: ignore
     def attributes(self) -> List[Attribute]:
         return self._attributes
 
@@ -217,7 +215,7 @@ class AssetType(ApiObject):
             self._attributes_by_label[attribute.label] = attribute
             self._attributes_by_label[attribute.normalized_label] = attribute
 
-    @property
+    @property  # type: ignore
     def metrics(self) -> List[Metric]:
         return self._metrics
 
@@ -232,7 +230,7 @@ class AssetType(ApiObject):
             self._metrics_by_label[metric.label] = metric
             self._metrics_by_label[metric.normalized_label] = metric
 
-    @property
+    @property  # type: ignore
     def children(self) -> List["AssetType"]:
         return self._children
 
@@ -353,12 +351,14 @@ class CompleteAsset:
 
         # Use two sets to track changes to values
         # TODO: figure out a more elegant way to track this
-        self.edited_attribute_values = set()
-        self.edited_metric_values = set()
+        self.edited_attribute_values: Set[AttributeValue] = set()
+        self.edited_metric_values: Set[MetricValue] = set()
 
     def _init_attribute_values(self) -> Dict:
         # Fetch attribute labels to use as keys
-        attribute_values_by_label = {a.normalized_label: None for a in self.asset_type.attributes}
+        attribute_values_by_label: Dict[str, Optional[AttributeValue]] = {
+            a.normalized_label: None for a in self.asset_type.attributes
+        }
 
         # TODO: this is sorted to only store the attribute value with the
         # latest effective_date. However, we may later need to keep the
@@ -371,7 +371,9 @@ class CompleteAsset:
 
     def _init_metric_values(self) -> Dict:
         # Fetch metric labels to use as keys
-        metric_values_by_label = {m.normalized_label: {} for m in self.asset_type.metrics}
+        metric_values_by_label: Dict[str, Dict[datetime, MetricValue]] = {
+            m.normalized_label: {} for m in self.asset_type.metrics
+        }
 
         for mv in self.asset.metric_values:
             label = self.asset_type.metric_with_id(mv.asset_metric_id).normalized_label
@@ -381,17 +383,19 @@ class CompleteAsset:
 
     def _effective_end_date(self, effective_start_date: date, time_interval: str) -> date:
         if time_interval == TimeIntervals.hourly:
-            delta = relativedelta(hours=1, microseconds=-1)
+            delta = timedelta(hours=1, microseconds=-1)
         elif time_interval == TimeIntervals.daily:
-            delta = relativedelta(days=1, microseconds=-1)
+            delta = timedelta(days=1, microseconds=-1)
         elif time_interval == TimeIntervals.weekly:
-            delta = relativedelta(weeks=1, microseconds=-1)
+            delta = timedelta(weeks=1, microseconds=-1)
         elif time_interval == TimeIntervals.monthly:
-            delta = relativedelta(months=1, microseconds=-1)
+            d = effective_start_date
+            m = (d.month + 1) % 12
+            delta = (d.replace(month=m, year=d.year + int(m == 1)) - d) + timedelta(microseconds=-1)
         elif time_interval == TimeIntervals.yearly:
-            delta = relativedelta(years=1, microseconds=-1)
+            delta = timedelta(days=364 + int(effective_start_date.year % 4 != 0), microseconds=-1)
         elif time_interval == TimeIntervals.sparse:
-            delta = relativedelta()
+            delta = timedelta()
         else:
             raise KeyError(f"Unrecognized time interval: {time_interval}")
         return effective_start_date + delta
@@ -424,7 +428,7 @@ class CompleteAsset:
             # Make the change, and mark as changed
             attribute = self.asset_type.attribute_with_label(label)
             attribute_value = self._attribute_values_by_label[label] or AttributeValue(
-                asset_id=self.asset.id, attribute_id=attribute.id, notes="", value=None
+                asset_id=self.asset.id, attribute_id=attribute.id, notes="", value=None  # type: ignore
             )
             prev_value = attribute_value.value
             attribute_value.value = new_value
@@ -479,12 +483,14 @@ class CompleteAsset:
             for start_date, new_value in new_metric_values.items():
                 # Make the change, and mark as changed
                 metric_value = metric_values.get(start_date) or MetricValue(
-                    asset_id=self.asset.id,
-                    asset_metric_id=metric.id,
+                    asset_id=self.asset.id,  # type: ignore
+                    asset_metric_id=metric.id,  # type: ignore
                     effective_start_date=start_date,
-                    effective_end_date=self._effective_end_date(start_date, metric.time_interval),
+                    effective_end_date=self._effective_end_date(
+                        start_date, metric.time_interval
+                    ),  # type: ignore
                     notes="",
-                    value=None,
+                    value=None,  # type: ignore
                 )
                 prev_value = metric_value.value
                 metric_value.value = new_value

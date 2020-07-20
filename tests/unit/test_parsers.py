@@ -2,13 +2,12 @@ from unittest.mock import patch
 
 import pytest
 
-import contxt.__main__ as contxt
+from contxt.cli.main import create_parser
 
 
 @pytest.fixture(scope="module")
 def parser():
-    parser, subparsers = contxt.create_parser()
-    return parser
+    return create_parser()
 
 
 def test_auth_parser(parser):
@@ -17,16 +16,16 @@ def test_auth_parser(parser):
     parser.parse_args(["auth", "logout"])
 
 
-@patch("contxt.cli.parsers.AuthParser._login", return_value=True)
+@patch("contxt.cli.commands.auth.Auth._login", return_value=True)
 def test_auth_parser_login(mock_login):
-    parser, subparsers = contxt.create_parser()
+    parser = create_parser()
     login_cmd = parser.parse_args(["auth", "login"])
     login_cmd.func(login_cmd)
 
 
-@patch("contxt.cli.parsers.AuthParser._logout", return_value=True)
+@patch("contxt.cli.commands.auth.Auth._logout", return_value=True)
 def test_auth_parser_logout(mock_logout):
-    parser, subparsers = contxt.create_parser()
+    parser = create_parser()
     logout_cmd = parser.parse_args(["auth", "logout"])
     logout_cmd.func(logout_cmd)
 

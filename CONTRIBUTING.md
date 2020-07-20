@@ -1,38 +1,53 @@
 # Contributing
-Before getting started, make sure you have [Poetry](https://python-poetry.org/docs/#installation) installed.
+
+Before getting started, make sure you have [Poetry](https://python-poetry.org/docs/#installation).
 
 ## Install
-```console
-$ poetry install -E server
+
+```sh
+# Install project
+poetry install -E crypto
+
+# Enter poetry-managed venv
+poetry shell
+
+# Exit poetry-managed venv
+exit
 ```
 
-## Code Quality
+## Tasks
+
+We use `make` as a general task runner. To see available tasks:
+
+```console
+$ make help
+clean      Remove build artifacts
+help       Show this help
+lint       Run all linters and formatters
+release    Release new version [usage: release v=major|minor|patch]
+test       Run unit tests
+```
+
+### Code Quality
+
 To ensure code quality, we use the following tools:
-* Formatting: [black](https://black.readthedocs.io/en/stable/) and [isort](https://isort.readthedocs.io/en/latest/)
-* Linting: [flake8](http://flake8.pycqa.org/en/latest/)
-* Testing: [pytest](https://docs.pytest.org/en/latest/)
 
-Our CI pipeline will run these tools on every git push. To run these locally:
-```console
-# Outputs formatting + linting issues
-$ make lint
+- Formatting: [black](https://black.readthedocs.io/en/stable/) and [isort](https://isort.readthedocs.io/en/latest/)
+- Linting: [flake8](http://flake8.pycqa.org/en/latest/)
+- Testing: [pytest](https://docs.pytest.org/en/latest/)
 
-# Fixes formatting issues
-$ make fix
+Our [CI pipeline](.github/workflows/build.yaml) will run these tools on each commit. To run these locally, we recommend [pre-commit](https://pre-commit.com/):
 
-# Runs unit tests
-$ make test
+```sh
+poetry run pre-commit install
 ```
 
-## Release
-To release a new version:
-```console
-# Updates pyproject/changelog and tags/publishes
-$ make release v=[bump rule]
+### Create Release
+
+Creating a new release is simply bumping the version and creating a corresponding git tag. For example, to create a minor release:
+
+```sh
+make release v=minor
 ```
 
-This does the following:
-* Updates version string in [pyproject.toml](pyproject.toml)
-* Updates `Unreleased` section in [CHANGELOG.md](CHANGELOG.md) with version and date
-* Commits the changes and tags the commit
-* Builds and publishes to PyPI an sdist and wheel
+Our [release action](.github/workflows/release.yaml) will then build and publish to PyPI.

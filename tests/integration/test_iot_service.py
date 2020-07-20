@@ -1,6 +1,4 @@
-from datetime import datetime, timedelta
-
-from pytz import UTC
+from datetime import datetime, timedelta, timezone
 
 from contxt.auth.cli import CliAuth
 from contxt.models.iot import Field, FieldTimeSeries, UnprovisionedField
@@ -36,7 +34,7 @@ class TestIotService:
         assert all([isinstance(f, Field) for f in fields])
 
     def test_get_time_series_for_field(self, field: Field = TestField):
-        start_time = datetime.now(UTC) - timedelta(days=30)
+        start_time = datetime.now(timezone.utc) - timedelta(days=30)
         field_data = self.service.get_time_series_for_field(field=field, start_time=start_time)
         assert field_data
         # assert field_data.field_human_name == TestField.field_human_name
@@ -46,7 +44,7 @@ class TestIotService:
 
     def test_get_time_series_for_fields(self):
         fields = self.service.get_fields_for_feed(TestField.feed_id)[:2]
-        start_time = datetime.now(UTC) - timedelta(days=7)
+        start_time = datetime.now(timezone.utc) - timedelta(days=7)
         fields_data = self.service.get_time_series_for_fields(fields=fields, start_time=start_time)
         assert fields_data
         assert len(fields_data) == len(fields)

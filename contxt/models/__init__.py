@@ -1,16 +1,16 @@
+"""Data models for API clients"""
+
 from abc import ABC, abstractmethod
 from ast import literal_eval
 from copy import deepcopy
 from datetime import date as _date
 from datetime import datetime as _datetime
+from datetime import timedelta, timezone
 from importlib import import_module
 from typing import Any, Callable, Dict, Optional, Tuple, Union
 
-from dateutil import parser
-from pytz import UTC, ZERO
-
-from contxt.utils import make_logger
-from contxt.utils.serializer import Serializer
+from ..utils import make_logger
+from ..utils.serializer import Serializer
 
 logger = make_logger(__name__)
 
@@ -27,10 +27,8 @@ class Parsers:
         return _date.fromisoformat(datestamp)
 
     @staticmethod
-    def datetime(timestamp: str, strict: bool = True) -> _datetime:
-        if strict:
-            return _datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%S.%fZ").replace(tzinfo=UTC)
-        return parser.parse(timestamp)
+    def datetime(timestamp: str) -> _datetime:
+        return _datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%S.%fZ").replace(tzinfo=timezone.utc)
 
     @staticmethod
     def unknown(value: Any) -> Any:
@@ -40,14 +38,9 @@ class Parsers:
             return literal_eval(value)
         except (SyntaxError, ValueError):
             pass
-        # Next, fall back to a strict datetime parser
+        # Next, fall back to a datetime parser
         try:
             return Parsers.datetime(value)
-        except (TypeError, ValueError):
-            pass
-        # Next, fall back to a general datetime parser
-        try:
-            return Parsers.datetime(value, strict=False)
         except (TypeError, ValueError):
             pass
         # Next, convert bool-type strings
@@ -71,12 +64,12 @@ class Formatters:
 
     @staticmethod
     def datetime(dt: _datetime, strict: bool = True) -> str:
-        if dt.utcoffset() != ZERO and strict:
+        if dt.utcoffset() != timedelta() and strict:
             # Require timezone to be UTC
             raise AssertionError(f"Datetime must be UTC, not {dt.tzinfo}")
         # NOTE: almost exactly the same as isoformat(), but ensures
         # microseconds are always represented
-        return dt.astimezone(UTC).strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+        return dt.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%fZ")
 
     @staticmethod
     def normalize_label(text: str) -> str:
@@ -120,8 +113,8 @@ class ApiField:
             if qualname_separator:
                 for attr in qualname.split("."):
                     obj = getattr(obj, attr)
-            self._data_type = obj
-        return self._data_type
+            self._data_type = obj  # type: ignore
+        return self._data_type  # type: ignore
 
 
 class ApiObject(ABC):
@@ -142,22 +135,26 @@ class ApiObject(ABC):
     def creatable_fields(self) -> Dict[str, ApiField]:
         cls = type(self)
         if not hasattr(cls, "_creatable_fields"):
-            cls._creatable_fields = {f.attr_key: f for f in cls._api_fields if f.creatable}
-        return cls._creatable_fields
+            cls._creatable_fields = {  # type: ignore
+                f.attr_key: f for f in cls._api_fields if f.creatable  # type: ignore
+            }
+        return cls._creatable_fields  # type: ignore
 
     @property
     def updatable_fields(self) -> Dict[str, ApiField]:
         cls = type(self)
         if not hasattr(cls, "_updatable_fields"):
-            cls._updatable_fields = {f.attr_key: f for f in cls._api_fields if f.updatable}
-        return cls._updatable_fields
+            cls._updatable_fields = {  # type: ignore
+                f.attr_key: f for f in cls._api_fields if f.updatable  # type: ignore
+            }
+        return cls._updatable_fields  # type: ignore
 
     @classmethod
     def from_api(cls, api_dict: Dict) -> Any:
         api_dict = deepcopy(api_dict)
         # Create clean dictionary to pass to init
         clean_dict = {}
-        for field in cls._api_fields:
+        for field in cls._api_fields:  # type: ignore
             if field.api_key not in api_dict and not field.optional:
                 raise KeyError(
                     f"Required API field '{field.api_key}' is missing from" f" response: {api_dict}"
@@ -166,12 +163,8 @@ class ApiObject(ABC):
                 field=field, value=api_dict.pop(field.api_key, None)
             )
 
-        # Warn of any unused keys
-        for k in api_dict.keys():
-            logger.warning(f"{cls.__name__}: Unexpected key from api {k}")
-
-        # Return new instance
-        return cls(**clean_dict)
+        # NOTE: unexpected keys: api_dict.keys()
+        return cls(**clean_dict)  # type: ignore
 
     @classmethod
     def clean_api_value(cls, field: ApiField, value: Any) -> Any:
@@ -184,7 +177,7 @@ class ApiObject(ABC):
         # elif issubclass(field.data_type, ApiObject):
         elif callable(getattr(field.data_type, "from_api", None)):
             # Type is an ApiObject, apply from_api instead of init
-            return field.data_type.from_api(value)
+            return field.data_type.from_api(value)  # type: ignore
         else:
             # Apply type
             return field.data_type(value)

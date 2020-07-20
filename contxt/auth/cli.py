@@ -8,10 +8,10 @@ from requests.exceptions import HTTPError
 
 from auth0.v3.authentication import GetToken
 
-from contxt.auth import Auth, Token, TokenProvider
 from contxt.services.api import Api
-from contxt.services.auth import AuthService
-from contxt.utils import make_logger
+from ..services.auth import AuthService
+from ..utils import make_logger
+from . import Auth, Token, TokenProvider
 
 logger = make_logger(__name__)
 
@@ -98,14 +98,14 @@ class UserIdentityProvider(TokenProvider):
 
             if cache:
                 # Token exists in cache, set it
-                logger.debug(f"Setting token from cache")
+                logger.debug("Setting token from cache")
                 self.access_token = cache["access_token"]
                 self.refresh_token = cache["refresh_token"]
             else:
                 # Token not in cache
-                logger.debug(f"Token not found in cache")
+                logger.debug("Token not found in cache")
 
-    @TokenProvider.access_token.getter
+    @TokenProvider.access_token.getter  # type: ignore
     def access_token(self) -> Token:
         """Gets a valid access token for audience `audience`"""
         if self._access_token is None:
@@ -125,7 +125,7 @@ class UserIdentityProvider(TokenProvider):
             self.access_token = token_info["access_token"]
             # Update cache
             self.update_cache()
-        return self._access_token
+        return self._access_token  # type: ignore
 
     @property
     def refresh_token(self) -> Token:
@@ -133,7 +133,7 @@ class UserIdentityProvider(TokenProvider):
         if self._refresh_token is None:
             # Token not yet set, fetch it now
             self.access_token
-        return self._refresh_token
+        return self._refresh_token  # type: ignore
 
     @refresh_token.setter
     def refresh_token(self, value: Token) -> None:
@@ -149,6 +149,7 @@ class UserIdentityProvider(TokenProvider):
         # Open their default web browser so they can login with their Contxt Account
         print(f"You're being redirected to your browser to complete your login. If your browser does not automatically "
               f"open, please navigate to {code['verification_uri_complete']} to complete your login.")
+        print(f"Please ensure the code on the webpage matches the following: {code['user_code']}")
         webbrowser.open(code['verification_uri_complete'])
 
         # Continuously poll Auth0 to see if they've completed their login yet
@@ -170,7 +171,7 @@ class UserIdentityProvider(TokenProvider):
 
     def reset(self) -> None:
         super().reset()
-        self._refresh_token: Optional[str] = None
+        self._refresh_token = None
 
     def read_cache(self) -> Dict[str, Any]:
         if self._cache_file:
@@ -205,7 +206,7 @@ class UserTokenProvider(TokenProvider):
         self.identity_provider = identity_provider
         self.auth_service = AuthService()
 
-    @TokenProvider.access_token.getter
+    @TokenProvider.access_token.getter  # type: ignore
     def access_token(self) -> Token:
         """Gets a valid access token for audience `audience`"""
         if self._access_token is None or self._token_expiring():
@@ -214,7 +215,7 @@ class UserTokenProvider(TokenProvider):
             self.access_token = self.auth_service.get_token(
                 self.identity_provider.access_token, self.audience
             )["access_token"]
-        return self._access_token
+        return self._access_token  # type: ignore
 
 
 class CliAuth(Auth):

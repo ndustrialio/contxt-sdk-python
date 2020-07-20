@@ -1,11 +1,9 @@
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 from typing import ClassVar
 
-from pytz import UTC
-
-from contxt.models import ApiField, ApiObject, Parsers
+from . import ApiField, ApiObject, Parsers
 
 
 class HealthStatus(Enum):
@@ -23,4 +21,4 @@ class Health(ApiObject):
     )
 
     status: HealthStatus
-    timestamp: datetime = field(default_factory=lambda: datetime.now(UTC))
+    timestamp: datetime = field(default_factory=lambda: datetime.now(timezone.utc))

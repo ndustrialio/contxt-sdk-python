@@ -3,10 +3,7 @@ from datetime import datetime
 from json import loads
 from typing import ClassVar, Optional
 
-from contxt.models import ApiField, ApiObject, Parsers
-from contxt.utils import make_logger
-
-logger = make_logger(__name__)
+from . import ApiField, ApiObject, Parsers
 
 
 @dataclass

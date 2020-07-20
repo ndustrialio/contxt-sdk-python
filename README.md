@@ -1,24 +1,26 @@
 # Contxt Python SDK
+
 [![build status](https://github.com/ndustrialio/contxt-sdk-python/workflows/build/badge.svg)](https://github.com/ndustrialio/contxt-sdk-python/actions)
 [![pypi version](https://img.shields.io/pypi/v/contxt-sdk.svg)](https://pypi.org/project/contxt-sdk/)
+![python](https://img.shields.io/badge/python-3.7+-blue.svg)
 
-## Dependencies
-This project **requires** Python 3.6+.
+## Installation
 
-## Installation 
-To install, just use pip:
-```console
-$ pip install contxt-sdk
+```sh
+pip install contxt-sdk
 ```
 
-This also installs a CLI. To see all supported commands, run the following:
-```console
-$ contxt -h
+## CLI Usage
+
+```sh
+contxt --help
 ```
 
 ## Documentation
-* [CLI](docs/cli.md)
-* [Worker](docs/worker.md)
+
+- [CLI](docs/cli.md)
+- [Worker](docs/worker.md)
 
 ## Contributing
+
 Please refer to [CONTRIBUTING.md](CONTRIBUTING.md).

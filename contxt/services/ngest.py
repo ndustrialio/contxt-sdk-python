@@ -1,11 +1,9 @@
 from copy import deepcopy
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Dict, List
 
-from pytz import UTC
-
-from contxt.services.api import ApiEnvironment, ConfiguredApi
-from contxt.utils import is_datetime_aware, make_logger
+from ..utils import is_datetime_aware, make_logger
+from .api import ApiEnvironment, ConfiguredApi
 
 logger = make_logger(__name__)
 
@@ -40,7 +38,7 @@ class NgestService(ConfiguredApi):
             "type": "timeseries",
             "data": [
                 {
-                    "timestamp": dt.astimezone(UTC).strftime("%Y-%m-%d %H:%M:%S"),
+                    "timestamp": dt.astimezone(timezone.utc).strftime("%Y-%m-%d %H:%M:%S"),
                     "data": {field_descriptor: {"value": str(value)}},
                 }
                 for field_descriptor, series in time_series.items()
@@ -96,7 +94,7 @@ class SpecializedNgestService(NgestService):
         self.feed_key = feed_key
         self.feed_token = feed_token
 
-    def send_time_series(
+    def send_time_series(  # type: ignore
         self, time_series: Dict[str, Dict[datetime, float]], per_request: int = 50
     ) -> List[Dict]:
         return super().send_time_series(
