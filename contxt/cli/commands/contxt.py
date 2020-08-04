@@ -50,7 +50,7 @@ class Contxt(BaseParser):
         contxt_service = ContxtService(args.auth)
         organization_id = args.org_id or get_org_id(args.org_name, args.auth)
         users = contxt_service.get_users_for_organization(organization_id)
-        print(users)
+        print(Serializer.to_table(users))
 
     def _add_user(self, args):
         contxt_service = ContxtService(args.auth)

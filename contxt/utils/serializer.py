@@ -108,6 +108,30 @@ class Serializer:
                 return dump(d, f, **kwargs)
         return dumps(d, **kwargs)
 
+
+    @staticmethod
+    def to_pretty_cli(obj: Any, **kwargs):
+
+        d = Serializer.to_dict(obj)
+
+        nested_sections = {}
+        for key, value in d.items():
+            if isinstance(value, (list, tuple)):
+                nested_sections[key] = value
+
+        # delete the values out of the main section that we're plucking out to print below
+        printed = "\n====" + type(obj).__name__ + "====\n"
+        for key in nested_sections:
+            del d[key]
+        printed += Serializer.to_table(d) + '\n'
+
+        for key, value in nested_sections.items():
+            printed += '\n' + key.capitalize() + '\n'
+            printed += (Serializer.to_table(value))
+            printed += '\n'
+
+        return printed
+
     @staticmethod
     def to_table(obj: Any, path: Optional[Path] = None, **kwargs):
         """Serializes `obj` to a table.
