@@ -1,6 +1,7 @@
 from contxt.models import Parsers
 from contxt.models.ems import ResourceType
 from contxt.services import EmsService, FacilitiesService, IotService
+from contxt.utils.serializer import Serializer
 
 from .common import BaseParser, get_org_id
 
@@ -66,7 +67,7 @@ class Ems(BaseParser):
         main_services = ems_service.get_main_services(
             facility_id=args.facility_id, resource_type=args.resource_type
         )
-        print(main_services)
+        print(Serializer.to_table(main_services))
 
     def _main_data(self, args):
         ems_service = EmsService(args.auth)
