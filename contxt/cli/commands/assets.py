@@ -1,4 +1,5 @@
 from contxt.services import AssetsService, FacilitiesService
+from contxt.utils.serializer import Serializer
 
 from .common import BaseParser, get_org_id
 
@@ -50,7 +51,7 @@ class Assets(BaseParser):
         facilites_service = FacilitiesService(args.auth)
         organization_id = args.org_id or get_org_id(args.org_name, args.auth)
         facilities = facilites_service.get_facilities(organization_id)
-        print(facilities)
+        print(Serializer.to_table(facilities))
 
     def _types(self, args):
         organization_id = args.org_id or get_org_id(args.org_name, args.auth)
