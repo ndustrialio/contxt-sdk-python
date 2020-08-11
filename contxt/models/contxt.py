@@ -173,11 +173,105 @@ class User(ApiObject):
 
 
 @dataclass
+class ServiceEnvironmentVariable(ApiObject):
+    _api_fields: ClassVar = (
+        ApiField("id"),
+        ApiField("service_id"),
+        ApiField("environment"),
+        ApiField("key"),
+        ApiField("value"),
+        ApiField("is_protected"),
+        ApiField("config_map_value_id"),
+        ApiField("created_at", data_type=Parsers.datetime),
+        ApiField("updated_at", data_type=Parsers.datetime)
+    )
+
+    id: int
+    service_id: int
+    environment: str
+    key: str
+    value: str
+    is_protected: bool
+    config_map_value_id: int
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+
+@dataclass
+class Domain(ApiObject):
+    _api_fields: ClassVar = (
+        ApiField("id"),
+        ApiField("name"),
+        ApiField("cert_name"),
+        ApiField("created_at", data_type=Parsers.datetime),
+        ApiField("updated_at", data_type=Parsers.datetime)
+    )
+
+    id: int
+    name: str
+    cert_name: str
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+
+
+@dataclass
+class Frontend(ApiObject):
+    _api_fields: ClassVar = (
+        ApiField("id"),
+        ApiField("service_id"),
+        ApiField("vhost"),
+        ApiField("force_ssl"),
+        ApiField("domain_id"),
+        ApiField("domain", data_type=Domain),
+        ApiField("created_at", data_type=Parsers.datetime),
+        ApiField("updated_at", data_type=Parsers.datetime)
+    )
+
+    id: int
+    service_id: int
+    vhost: str
+    force_ssl: bool
+    domain_id: int
+    domain: Optional[Domain] = None
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+
+
+@dataclass
+class Image(ApiObject):
+    _api_fields: ClassVar = (
+        ApiField("id"),
+        ApiField("provider"),
+        ApiField("image_name"),
+        ApiField("image_tag_id"),
+        ApiField("image_secret_id"),
+        ApiField("created_at", data_type=Parsers.datetime),
+        ApiField("updated_at", data_type=Parsers.datetime)
+    )
+
+    id: int
+    provider: str
+    image_name: str
+    image_tag_id: str
+    image_secret_id: int
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+
+
+@dataclass
 class Service(ApiObject):
     _api_fields: ClassVar = (
         ApiField("id"),
         ApiField("name"),
         ApiField("description"),
+        ApiField("descriptor"),
+        ApiField("client_id"),
+        ApiField("command"),
+        ApiField("arguments"),
+        ApiField("last_deployed_at"),
+        ApiField("last_configured_at"),
+        ApiField("service_env_variables", data_type=ServiceEnvironmentVariable),
+        ApiField("frontend", data_type=Frontend),
+        ApiField("image", data_type=Image),
         ApiField("service_type"),
         ApiField("created_at", data_type=Parsers.datetime)
     )
@@ -185,7 +279,16 @@ class Service(ApiObject):
     id: int
     name: str
     description: str
+    descriptor: str
+    client_id: str
+    command: str
+    arguments: str
+    last_deployed_at: Optional[datetime]
+    last_configured_at: Optional[datetime]
     service_type: str
+    service_env_variables: Optional[List[ServiceEnvironmentVariable]] = None
+    frontend: Optional[Frontend] = None
+    image: Optional[Image] = None
     created_at: Optional[datetime] = None
 
 
