@@ -5,7 +5,7 @@ from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
 from contxt import __version__
 from contxt.auth.cli import CliAuth
 
-from .commands import Assets, Auth, Bus, Contxt, Ems, Iot, Projects
+from .commands import Assets, Auth, Bus, Contxt, Ems, Iot, Projects, Services
 
 
 def create_parser() -> ArgumentParser:
@@ -16,7 +16,7 @@ def create_parser() -> ArgumentParser:
 
     # Register subparsers
     parsers = parser.add_subparsers(title="subcommands", dest="command")
-    [cls(parsers) for cls in [Assets, Auth, Bus, Contxt, Ems, Iot, Projects]]
+    [cls(parsers) for cls in [Assets, Auth, Bus, Contxt, Ems, Iot, Projects, Services]]
     return parser
 
 

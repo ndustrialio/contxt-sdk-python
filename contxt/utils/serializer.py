@@ -116,7 +116,7 @@ class Serializer:
 
         nested_sections = {}
         for key, value in d.items():
-            if isinstance(value, (list, tuple)):
+            if isinstance(value, (list, tuple, dict)):
                 nested_sections[key] = value
 
         # delete the values out of the main section that we're plucking out to print below
