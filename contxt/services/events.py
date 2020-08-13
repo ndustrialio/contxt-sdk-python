@@ -41,8 +41,8 @@ class EventsService(ConfiguredApi):
             api=self, url="types", options=page_options, record_parser=EventType.from_api
         )
 
-    def create_event_type(self, event: Event) -> EventType:
-        resp = self.post("types", data=event.post())
+    def create_event_type(self, event_type: EventType) -> EventType:
+        resp = self.post("types", data=event_type.post())
         return EventType.from_api(resp)
 
     def get_event(self, event_id: str) -> Event:
