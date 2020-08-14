@@ -11,7 +11,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Create GitHub release
-        uses: marvinpinto/action-automatic-releases@v1.0.0
+        # https://github.com/marvinpinto/actions/issues/39 We have to use latest due to a breaking change
+        uses: marvinpinto/action-automatic-releases@latest
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           prerelease: false
