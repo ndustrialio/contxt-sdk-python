@@ -148,7 +148,7 @@ class TriggeredEvent(ApiObject):
 
     event_id: str
     trigger_start_at: datetime
-    id: Optional[str]
+    id: Optional[str] = None
     owner_id: Optional[str] = None
     owner: Optional[Owner] = None
     event: Optional[Event] = None
