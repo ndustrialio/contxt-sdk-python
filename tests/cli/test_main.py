@@ -5,7 +5,7 @@ import pytest
 from contxt.cli.main import create_parser
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture
 def parser():
     return create_parser()
 

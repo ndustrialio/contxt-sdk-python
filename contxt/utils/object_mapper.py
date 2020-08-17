@@ -2,6 +2,7 @@ import inspect
 from enum import Enum
 from typing import Any, Type, TypeVar, Union
 
+T = TypeVar("T")
 _PRIMITIVES = (bool, int, float, str, type(None))
 
 
@@ -9,24 +10,10 @@ class Null:
     """Null marker"""
 
 
-T = TypeVar("T")
-
-
 class ObjectMapper:
     @staticmethod
     def tree_to_object(tree: object, annotation: Type[T]) -> T:
-        """
-        Maps a JSON like tree to an object of the class specified by the type
-        annotation `annotation`
-        :param tree: input object to recursively parse, tree should have a
-            JSON-like structure:
-            - List
-            - Dict
-            - Primitive
-        :param annotation: output type description to use for parsing,
-        if a string is received a type with the given name will be parsed
-        :return: parsed object
-        """
+        """Loads JSON-like structure `tree` into an instance of `annotation`"""
 
         def failure_msg():
             return f"Failed to parse '{annotation}' from tree: {tree}"
@@ -102,12 +89,11 @@ class ObjectMapper:
 
         raise NotImplementedError(failure_msg())
 
+    load = tree_to_object
+
     @staticmethod
     def object_to_tree(obj):
-        """
-        Maps an object to a JSON like tree
-        :return: JSON like tree
-        """
+        """Dumps `obj` to a JSON-like structure"""
         if isinstance(obj, _PRIMITIVES):
             return obj
         elif isinstance(obj, list):
@@ -121,3 +107,5 @@ class ObjectMapper:
             return {
                 ObjectMapper.object_to_tree(k): ObjectMapper.object_to_tree(v) for k, v in dic.items()
             }
+
+    dump = object_to_tree

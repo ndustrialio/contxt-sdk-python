@@ -40,7 +40,6 @@ class Serializer:
         # TODO: this may not return a dict but instead a list, or a native type
         # (for example, if passed an int, it will return it). this is likely
         # an unexpected behavior for callers
-
         # NOTE: alternative (but slower) implementations:
         # 1. d = json.dumps(d, default=lambda o: getattr(o, "__dict__", str(o)))
         # 2. d = jsonpickle.encode(d, unpicklable=False))
