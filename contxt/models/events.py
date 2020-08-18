@@ -110,35 +110,15 @@ class Event(ApiObject):
 
 
 @dataclass
-class TriggeredEventData(ApiObject):
-    _api_fields: ClassVar = (
-        ApiField("source_id"),
-        ApiField("subchain_triggered_event_id"),
-        ApiField("trigger_start_at", data_type=Parsers.datetime),
-        ApiField("trigger_end_at", data_type=Parsers.datetime),
-    )
-
-    source_id: str
-    subchain_triggered_event_id: str
-    trigger_start_at: datetime
-    trigger_end_at: datetime
-
-
-@dataclass
 class TriggeredEvent(ApiObject):
     _api_fields: ClassVar = (
         ApiField("id"),
         ApiField("event_id", creatable=True),
-        ApiField("Event", data_type=Event, attr_key="event"),
+        ApiField("Event", data_type=Event, attr_key="event", optional=True),
         ApiField("owner_id"),
-        ApiField("Owner", data_type=dict, attr_key="owner"),
+        ApiField("Owner", data_type=dict, attr_key="owner", optional=True),
         ApiField("is_public", data_type=bool),
-        ApiField(
-            "data",
-            data_type=lambda o: [TriggeredEventData.from_api(d) for d in loads(o)],
-            creatable=True,
-            updatable=True,
-        ),
+        ApiField("data", creatable=True, updatable=True),
         ApiField("trigger_start_at", data_type=Parsers.datetime, creatable=True, updatable=True),
         ApiField("trigger_end_at", data_type=Parsers.datetime, creatable=True, updatable=True),
         ApiField("created_at", data_type=Parsers.datetime),
@@ -154,7 +134,7 @@ class TriggeredEvent(ApiObject):
     event: Optional[Event] = None
     is_public: Optional[bool] = None
     trigger_end_at: Optional[datetime] = None
-    data: Optional[dict] = None
+    data: Optional[str] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
     deleted_at: Optional[datetime] = None
