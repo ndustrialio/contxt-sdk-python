@@ -1,7 +1,3 @@
-[build-system]
-requires = ["poetry>=1.0"]
-build-backend = "poetry.masonry.api"
-
 [tool.poetry]
 name = "contxt-sdk"
 version = "1.2.3"
@@ -25,6 +21,7 @@ black = "^19.10b0"
 flake8 = "^3"
 isort = "^5"
 mypy = "^0"
+poethepoet = "^0"
 pre-commit = "^2"
 pytest = "^5"
 
@@ -34,9 +31,18 @@ crypto = ["cryptography"]
 [tool.poetry.scripts]
 contxt = "contxt.__main__:cli"
 
+[tool.poe.tasks]
+clean = { cmd = "rm -rf .mypy_cache/ .pytest_cache/ build/ dist/ *.egg-info", help = "Remove build artifacts" }
+lint = { cmd = "pre-commit run --all-files", help = "Run linters and formatters" }
+test = { cmd = "pytest", help = "Run tests" }
+
 [tool.black]
 line-length = 105
 
 [tool.isort]
 line_length = 105
 profile = "black"
+
+[build-system]
+requires = ["poetry>=1.0"]
+build-backend = "poetry.masonry.api"
