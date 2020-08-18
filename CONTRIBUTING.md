@@ -35,7 +35,7 @@ To ensure code quality, we use the following tools:
 - Linting: [flake8](http://flake8.pycqa.org/en/latest/) and [mypy](https://mypy.readthedocs.io/en/stable/)
 - Testing: [pytest](https://docs.pytest.org/en/latest/)
 
-Our [CI pipeline](.github/workflows/build.yaml) will run these tools on each commit. To run these locally, we recommend [pre-commit](https://pre-commit.com/):
+Our [CI pipeline](.github/workflows/ci.yaml) will run these tools on each commit. To run these locally, we recommend [pre-commit](https://pre-commit.com/):
 
 ```sh
 poetry run pre-commit install
@@ -43,4 +43,4 @@ poetry run pre-commit install
 
 ### Create Release
 
-On a commit to master, our [CI pipeline](.github/workflows/release.yaml) will bump the version (determined by [conventional commits](https://www.conventionalcommits.org/)) and publish a new release to PyPI.
+On a commit to master, our [CI pipeline](.github/workflows/ci.yaml) will bump the version (determined by [conventional commits](https://www.conventionalcommits.org/)) and publish a new release to PyPI.

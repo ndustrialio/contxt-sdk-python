@@ -18,6 +18,6 @@ repos:
         types: [python]
       - id: mypy
         name: mypy
-        entry: poetry run mypy
+        entry: poetry run mypy --ignore-missing-imports
         language: system
         types: [python]
