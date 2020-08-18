@@ -2,8 +2,7 @@ import json
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Union
 
-from jwt import PyJWTError, decode, get_unverified_header
-from jwt.algorithms import RSAAlgorithm
+from jwt import PyJWTError, algorithms, decode, get_unverified_header
 
 from ..services import AuthService
 from ..utils import make_logger
@@ -22,7 +21,7 @@ class TokenValidator:
     public_key: Union[str, Dict]
     algorithms: List[str] = field(default_factory=lambda: ["RS256"])
 
-    def _get_public_key(self, token: str):
+    def _get_public_key(self, token: str) -> str:
         if isinstance(self.public_key, dict):
             header = get_unverified_header(token)
             return self.public_key[header["kid"]]
@@ -54,7 +53,8 @@ class ContxtTokenValidator(TokenValidator):
             audience=audience,
             issuer=api.base_url,
             public_key={
-                jwk["kid"]: RSAAlgorithm.from_jwk(json.dumps(jwk)) for jwk in api.get_jwks()["keys"]
+                jwk["kid"]: algorithms.RSAAlgorithm.from_jwk(json.dumps(jwk))
+                for jwk in api.get_jwks()["keys"]
             },
             algorithms=["RS256"],
         )
