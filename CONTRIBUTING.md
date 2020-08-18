@@ -17,15 +17,14 @@ exit
 
 ## Tasks
 
-We use `make` as a general task runner. To see available tasks:
+We use [poethepoet](https://github.com/nat-n/poethepoet) as a task runner. To see available tasks:
 
 ```console
-$ make help
-clean      Remove build artifacts
-help       Show this help
-lint       Run all linters and formatters
-release    Release new version [usage: release v=major|minor|patch]
-test       Run unit tests
+$ poe --help
+...
+  clean          Remove build artifacts
+  lint           Run linters and formatters
+  test           Run tests
 ```
 
 ### Code Quality
@@ -33,7 +32,7 @@ test       Run unit tests
 To ensure code quality, we use the following tools:
 
 - Formatting: [black](https://black.readthedocs.io/en/stable/) and [isort](https://isort.readthedocs.io/en/latest/)
-- Linting: [flake8](http://flake8.pycqa.org/en/latest/)
+- Linting: [flake8](http://flake8.pycqa.org/en/latest/) and [mypy](https://mypy.readthedocs.io/en/stable/)
 - Testing: [pytest](https://docs.pytest.org/en/latest/)
 
 Our [CI pipeline](.github/workflows/build.yaml) will run these tools on each commit. To run these locally, we recommend [pre-commit](https://pre-commit.com/):
@@ -44,10 +43,4 @@ poetry run pre-commit install
 
 ### Create Release
 
-Creating a new release is simply bumping the version and creating a corresponding git tag. For example, to create a minor release:
-
-```sh
-make release v=minor
-```
-
-Our [release action](.github/workflows/release.yaml) will then build and publish to PyPI.
+On a commit to master, our [CI pipeline](.github/workflows/release.yaml) will bump the version (determined by [conventional commits](https://www.conventionalcommits.org/)) and publish a new release to PyPI.
