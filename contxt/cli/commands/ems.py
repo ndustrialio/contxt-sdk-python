@@ -3,6 +3,7 @@ from contxt.models.ems import ResourceType, UtilityUsage
 from contxt.services import EmsService, FacilitiesService, IotService, UtilitiesService, \
     LegacyFilesService
 from contxt.utils.serializer import Serializer
+from contxt.models.iot import Window
 
 import requests
 import os
@@ -26,10 +27,13 @@ class Ems(BaseParser):
 
         # Get Main Service Data
         md_parser = _subparsers.add_parser("main-data", help="Get main service data for a facility")
-        md_parser.add_argument("facility_id", type=int, help="Facility ID")
+        md_parser.add_argument("facility_ids", type=str, help="Facilities to get main service data for")
         md_parser.add_argument("resource_type", type=ResourceType)
         md_parser.add_argument("start_time", type=Parsers.datetime, help="Start time")
         md_parser.add_argument("end_time", type=Parsers.datetime, help="End time")
+        md_parser.add_argument(
+            '--download', action="store_true", help="Write main data to file in the data-exports directory"
+        )
         md_parser.set_defaults(func=self._main_data)
 
         # Spend
@@ -97,6 +101,8 @@ class Ems(BaseParser):
                 self._download_pdf_statements(args, facility_id, bills, utilities_service)
             else:
                 print(Serializer.to_table(bills, sort_by='interval_start'))
+
+    #def _main_service_data(self, args):
 
     def _download_pdf_statements(self, args, facility_id, bills, utility_service):
         file_service = LegacyFilesService(args.auth)
@@ -201,16 +207,78 @@ class Ems(BaseParser):
     def _main_data(self, args):
         ems_service = EmsService(args.auth)
         iot_service = IotService(args.auth)
-        services = ems_service.get_main_services(
-            facility_id=args.facility_id, resource_type=args.resource_type
-        )
-        data = {
-            service.name: iot_service.get_time_series_for_field(
-                service.demand_field, start_time=args.start_time, end_time=args.end_time
-            )
-            for service in services
-        }
-        print(data)
+        facilities_service = FacilitiesService(args.auth)
+
+        print(args.facility_ids)
+        for facility_id in args.facility_ids.split(','):
+
+            # get the facility object so we can make the directory more readable
+            try:
+                facility_obj = facilities_service.get_facility_with_id(facility_id)
+            except requests.exceptions.HTTPError:
+                print('Facility not found')
+                continue
+
+            print(f'Getting interval data for {facility_obj.id} -> {facility_obj.name}')
+            try:
+                services = ems_service.get_main_services(
+                    facility_id=facility_id, resource_type=args.resource_type
+                )
+            except requests.exceptions.HTTPError:
+                print('Facility not found in EMS service')
+                continue
+
+            data = {
+                service.name: iot_service.get_time_series_for_field(
+                    service.demand_field, start_time=args.start_time, end_time=args.end_time,
+                    window=Window.MINUTELY, per_page=5000
+                )
+                for service in services
+            }
+
+            blended_data = {}
+            for service_name, data in data.items():
+                print(f"Getting data for {service_name}")
+                for ts in data:
+                    if ts[0] not in blended_data:
+                        blended_data[ts[0]] = [ts[1]]
+                    else:
+                        blended_data[ts[0]].append(ts[1])
+
+            summed_data = []
+            skipped_count = 0
+            for time, values in blended_data.items():
+                if (len(values)) == len(services):
+                    try:
+                        summed_data.append({
+                            'time': time,
+                            'value': sum(values)
+                        })
+                    except Exception as e:
+                        print(e)
+                        print(values)
+                else:
+                    skipped_count += 1
+
+            if args.download and len(summed_data) > 0:
+                # build the directory structure
+                facility_export_dir = f'./data-exports/{facility_obj.name}/'
+                ems_export_dir = os.path.join(facility_export_dir, 'ems/')
+
+                # ensure the exports directory is created
+                os.makedirs(ems_export_dir, exist_ok=True)
+
+                # Write all the metadata to a summary in a CSV file
+                summary_file_path = os.path.join(ems_export_dir, f'minute_intervals.csv')
+                with open(summary_file_path, 'w') as csv_file:
+                    writer = csv.DictWriter(csv_file, fieldnames=['time', 'value'])
+                    writer.writeheader()
+
+                    for data in summed_data:
+                        writer.writerow(data)
+            else:
+                print(Serializer.to_table(summed_data))
+
 
     def _util_spend(self, args):
         ems_service = EmsService(args.auth)
