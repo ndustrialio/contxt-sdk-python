@@ -10,6 +10,8 @@ from .facilities import FacilitiesService
 from .health import HealthService
 from .iot import IotDataService, IotService
 from .ngest import NgestService
+from .utilities import UtilitiesService
+from .files import LegacyFilesService
 
 __all__ = [
     "AssetsService",
@@ -23,4 +25,6 @@ __all__ = [
     "IotService",
     "IotDataService",
     "NgestService",
+    "UtilitiesService",
+    "LegacyFilesService"
 ]
