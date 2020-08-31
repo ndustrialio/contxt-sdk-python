@@ -269,9 +269,9 @@ class Service(ApiObject):
         ApiField("arguments"),
         ApiField("last_deployed_at"),
         ApiField("last_configured_at"),
-        ApiField("service_env_variables", data_type=ServiceEnvironmentVariable),
-        ApiField("frontend", data_type=Frontend),
-        ApiField("image", data_type=Image),
+        ApiField("service_env_variables", data_type=ServiceEnvironmentVariable, optional=True),
+        ApiField("frontend", data_type=Frontend, optional=True),
+        ApiField("image", data_type=Image, optional=True),
         ApiField("service_type"),
         ApiField("created_at", data_type=Parsers.datetime)
     )
