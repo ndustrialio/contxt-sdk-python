@@ -142,11 +142,15 @@ class Ems(BaseParser):
             account_number, meter_number, service_type, interval_start, interval_end, 
             assigned_statement_year, assigned_statement_month, has_pdf_bill, <charges_and_units> ->>
             '''
+
+            service_type = meters[bill.utility_meter_id].service_type
+            meter_number = meters[bill.utility_meter_id].label
+
             # add the general bill metadata
             bill_metadata = {
                 'account_number': accounts[meters[bill.utility_meter_id].utility_account_id].label,
-                'meter_number': meters[bill.utility_meter_id].label,
-                'service_type': meters[bill.utility_meter_id].service_type,
+                'meter_number': meter_number,
+                'service_type': service_type,
                 'interval_start': bill.interval_start,
                 'interval_end': bill.interval_end,
                 'assigned_statement_year': bill.statement_year,
@@ -177,10 +181,15 @@ class Ems(BaseParser):
                 try_count = 0
                 while try_count < 3:
                     try:
-                        r = requests.get(file_read.temporary_url)
                         file_download_path = os.path.join(bill_export_dir,
-                                                          f'utility-bill-{bill.statement_year}-'
+                                                          f'{bill.id}-{service_type}-{meter_number}-'
+                                                          f'{bill.statement_year}-'
                                                           f'{bill.statement_month}.pdf')
+                        if os.path.exists(file_download_path):
+                            print(f'Already downloaded bill {file_download_path}')
+                            break
+                        r = requests.get(file_read.temporary_url)
+
                         with open(file_download_path, 'wb') as f:
                             f.write(r.content)
                         break
@@ -230,7 +239,7 @@ class Ems(BaseParser):
 
             data = {
                 service.name: iot_service.get_time_series_for_field(
-                    service.demand_field, start_time=args.start_time, end_time=args.end_time,
+                    service.usage_field, start_time=args.start_time, end_time=args.end_time,
                     window=Window.MINUTELY, per_page=5000
                 )
                 for service in services
@@ -239,11 +248,14 @@ class Ems(BaseParser):
             blended_data = {}
             for service_name, data in data.items():
                 print(f"Getting data for {service_name}")
+                data_counter = 0
                 for ts in data:
+                    data_counter += 1
                     if ts[0] not in blended_data:
                         blended_data[ts[0]] = [ts[1]]
                     else:
                         blended_data[ts[0]].append(ts[1])
+                print(f"Total points for service: {data_counter}")
 
             summed_data = []
             skipped_count = 0
