@@ -77,14 +77,15 @@ subcommands:
 ```console
 $ contxt ems -h 
 usage: contxt ems [-h]
-                  {util-spend,util-usage,util-spend-metrics,util-usage-metrics}
+                  {bills,util-spend,util-usage,util-spend-metrics,util-usage-metrics}
                   ...
 
 optional arguments:
   -h, --help            show this help message and exit
 
 subcommands:
-  {util-spend,util-usage,util-spend-metrics,util-usage-metrics}
+  {bills,util-spend,util-usage,util-spend-metrics,util-usage-metrics}
+    bills               Utility bills
     util-spend          Utility spend
     util-usage          Utility usage
     util-spend-metrics  Utility spend metrics
