@@ -1,13 +1,16 @@
-from contxt.models import Parsers
-from contxt.models.ems import ResourceType, UtilityUsage
-from contxt.services import EmsService, FacilitiesService, IotService, UtilitiesService, \
-    LegacyFilesService
-from contxt.utils.serializer import Serializer
-from contxt.models.iot import Window
+import csv
+import os
+from datetime import date, datetime
 
 import requests
-import os
-import csv
+
+from contxt.models import Parsers
+from contxt.models.ems import ResourceType, UtilityUsage
+from contxt.models.iot import Window
+from contxt.services import (EmsService, FacilitiesService, IotService, LegacyFilesService,
+                             UtilitiesService)
+from contxt.utils.serializer import Serializer
+
 from .common import BaseParser, get_org_id
 
 
@@ -77,6 +80,8 @@ class Ems(BaseParser):
         bills_parser.add_argument(
             "--resource_type", type=ResourceType, help="Filter by type of resource"
         )
+        bills_parser.add_argument('--from_date', help="Limit the date to fetch utility bills. Format: YYYY-MM-DD")
+        bills_parser.add_argument('--to_date', help="Limit the date to fetch utility bills. Format: YYYY-MM-DD")
         bills_parser.add_argument(
             '--download', action="store_true", help="Download all PDF utility statements and their summaries"
         )
@@ -93,10 +98,21 @@ class Ems(BaseParser):
 
     def _bills(self, args):
         utilities_service = UtilitiesService(args.auth)
+        from_date = datetime.strptime(args.from_date, '%Y-%m-%d').date() if args.from_date else None
+        to_date = datetime.strptime(args.to_date, '%Y-%m-%d').date() if args.to_date else None
+
         print(args.facility_ids)
         for facility_id in args.facility_ids.split(','):
-            print(f'Exporting bills for facility {facility_id}')
-            bills = utilities_service.get_statements(facility_id=facility_id)
+            print(f'Exporting bills for facility {facility_id} from {from_date} to {to_date}')
+            bills = [
+                statement
+                for statement in utilities_service.get_statements(
+                    facility_id=facility_id, from_date=from_date, to_date=to_date
+                )
+                if (from_date is None or statement.interval_start > from_date)
+                and (to_date is None or statement.interval_end < to_date)
+            ]
+
             if args.download:
                 self._download_pdf_statements(args, facility_id, bills, utilities_service)
             else:
