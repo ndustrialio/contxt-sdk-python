@@ -203,25 +203,14 @@ class Ems(BaseParser):
                 print(f'Downloading bill {idx+1} out of {len(bills)} for '
                       f'{bill.statement_year}-{bill.statement_month}')
                 bill_metadata['has_pdf_bill'] = True
-                file_read = file_service.request_read_file(file_id=bill.file_id)
-                try_count = 0
-                while try_count < 3:
-                    try:
-                        filename = f'{bill.id}-{service_type}-{meter_number}-{bill.statement_year}' \
-                                   f'-{bill.statement_month}.pdf'.replace('/', '-')
-                        file_download_path = os.path.join(bill_export_dir, filename)
-                        if os.path.exists(file_download_path):
-                            print(f'Already downloaded bill {file_download_path}')
-                            break
-                        r = requests.get(file_read.temporary_url)
-
-                        with open(file_download_path, 'wb') as f:
-                            f.write(r.content)
-                        break
-                    except Exception as e:
-                        print(f'Exception raised during download {e}')
-                        try_count += 1
-
+                try:
+                    file_read_endpoint = file_service.request_read_file(file_id=bill.file_id)
+                    filename = f'{bill.id}-{service_type}-{meter_number}-{bill.statement_year}' \
+                               f'-{bill.statement_month}.pdf'.replace('/', '-')
+                    file_download_path = os.path.join(bill_export_dir, filename)
+                    self._download_file(file_read_endpoint, file_download_path)
+                except requests.exceptions.HTTPError:
+                    print(f'Unable to read file with id {bill.file_id}')
             else:
                 bill_metadata['has_pdf_bill'] = True
                 print(f'No PDF for bill starting: {bill.statement_year}-{bill.statement_month}')
@@ -237,6 +226,23 @@ class Ems(BaseParser):
                     if key not in row:
                         row[key] = ''
             writer.writerows(bill_summary_data)
+
+    def _download_file(self, read_endpoint, local_file_path):
+        try_count = 0
+        while try_count < 3:
+            try:
+
+                if os.path.exists(local_file_path):
+                    print(f'Already downloaded bill {local_file_path}')
+                    break
+                r = requests.get(read_endpoint.temporary_url)
+
+                with open(local_file_path, 'wb') as f:
+                    f.write(r.content)
+                break
+            except Exception as e:
+                print(f'Exception raised during download {e}')
+                try_count += 1
 
     def _main_data(self, args):
         ems_service = EmsService(args.auth)
