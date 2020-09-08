@@ -207,10 +207,9 @@ class Ems(BaseParser):
                 try_count = 0
                 while try_count < 3:
                     try:
-                        file_download_path = os.path.join(bill_export_dir,
-                                                          f'{bill.id}-{service_type}-{meter_number}-'
-                                                          f'{bill.statement_year}-'
-                                                          f'{bill.statement_month}.pdf')
+                        filename = f'{bill.id}-{service_type}-{meter_number}-{bill.statement_year}' \
+                                   f'-{bill.statement_month}.pdf'.replace('/', '-')
+                        file_download_path = os.path.join(bill_export_dir, filename)
                         if os.path.exists(file_download_path):
                             print(f'Already downloaded bill {file_download_path}')
                             break
