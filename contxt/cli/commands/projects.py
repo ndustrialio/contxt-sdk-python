@@ -1,4 +1,3 @@
-from contxt.models.contxt import Organization
 from contxt.services import ContxtService
 from contxt.utils.serializer import Serializer
 
@@ -39,7 +38,7 @@ class Projects(BaseParser):
     def _get_projects(self, args):
         contxt_service = ContxtService(args.auth)
         projects = contxt_service.get_projects()
-        print(Serializer.to_table(projects, sort_by='created_at'))
+        print(Serializer.to_table(projects, sort_by="created_at"))
 
     def _get_services(self, args):
         contxt_service = ContxtService(args.auth)
@@ -49,6 +48,5 @@ class Projects(BaseParser):
     def _get_edge_nodes(self, args):
         org_id = args.org_id or get_org_id(args.org_name, args.auth)
         contxt_service = ContxtService(args.auth)
-        nodes = contxt_service.get_edge_nodes(organization_id=org_id,
-                                              project_id=args.project_id)
+        nodes = contxt_service.get_edge_nodes(organization_id=org_id, project_id=args.project_id)
         print(Serializer.to_table(nodes))

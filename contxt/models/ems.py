@@ -1,7 +1,7 @@
 from dataclasses import dataclass
-from datetime import datetime, date
+from datetime import date, datetime
 from enum import Enum
-from typing import ClassVar, Dict, List, Optional
+from typing import ClassVar, List
 
 from . import ApiField, ApiObject, Parsers
 from .events import Event
@@ -74,7 +74,7 @@ class UtilityPeriod(ApiObject):
 
     event_time: datetime
     value: int
-    #pro_forma_date: Optional[str] = None
+    # pro_forma_date: Optional[str] = None
 
 
 UtilitySpendPeriod = UtilityPeriod

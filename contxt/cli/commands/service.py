@@ -1,8 +1,7 @@
-from contxt.models.contxt import Organization
 from contxt.services import ContxtService
 from contxt.utils.serializer import Serializer
 
-from .common import BaseParser, get_org_id
+from .common import BaseParser
 
 
 class Services(BaseParser):
