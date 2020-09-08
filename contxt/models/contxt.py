@@ -302,7 +302,7 @@ class Project(ApiObject):
         ApiField("type"),
         ApiField("created_at", data_type=Parsers.datetime),
         ApiField("Roles", attr_key="roles", data_type=Role, optional=True),
-        ApiField("Services", attr_key="Services", data_type=Service, optional=True),
+        ApiField("Services", attr_key="services", data_type=Service, optional=True),
     )
 
     id: int
@@ -310,7 +310,7 @@ class Project(ApiObject):
     description: str
     type: str
     roles: Optional[List[Role]] = None
-    Services: Optional[List[Service]] = None
+    services: Optional[List[Service]] = None
     created_at: Optional[datetime] = None
 
 

@@ -75,9 +75,9 @@ class EmsService(ConfiguredApi):
         pro_forma: bool = False,
     ) -> UtilityUsage:
         """Get monthly utility usage for facility `facility_id` and resource
-                `resource_type` (for now, this must be "electric" but will be expanded).
-                Note `start_date` defaults to 10 years ago (the API's maximum limit) and
-                `end_date` defaults to today."""
+        `resource_type` (for now, this must be "electric" but will be expanded).
+        Note `start_date` defaults to 10 years ago (the API's maximum limit) and
+        `end_date` defaults to today."""
         resp = self.get(
             f"facilities/{facility_id}/usage/{interval}",
             params={
