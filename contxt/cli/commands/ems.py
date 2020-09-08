@@ -7,13 +7,7 @@ import requests
 from contxt.models import Parsers
 from contxt.models.ems import ResourceType, UtilityUsage
 from contxt.models.iot import Window
-from contxt.services import (
-    EmsService,
-    FacilitiesService,
-    IotService,
-    LegacyFilesService,
-    UtilitiesService,
-)
+from contxt.services import EmsService, FacilitiesService, IotService, SisService
 from contxt.utils.serializer import Serializer
 
 from .common import BaseParser, get_org_id
@@ -111,7 +105,7 @@ class Ems(BaseParser):
         print(Serializer.to_table(main_services, exclude_keys=["usage_field", "demand_field"]))
 
     def _bills(self, args):
-        utilities_service = UtilitiesService(args.auth)
+        utilities_service = SisService(args.auth)
         facilities_service = FacilitiesService(args.auth)
         from_date = datetime.strptime(args.from_date, "%Y-%m-%d").date() if args.from_date else None
         to_date = datetime.strptime(args.to_date, "%Y-%m-%d").date() if args.to_date else None
@@ -141,7 +135,7 @@ class Ems(BaseParser):
                 print(Serializer.to_table(bills, sort_by="interval_start"))
 
     def _download_pdf_statements(self, args, facility_id, bills, utility_service):
-        file_service = LegacyFilesService(args.auth)
+        file_service = SisService(args.auth)
         facilities_service = FacilitiesService(args.auth)
         # get the facility object so we can make the directory more readable
         try:
