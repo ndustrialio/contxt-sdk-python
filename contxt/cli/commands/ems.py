@@ -70,7 +70,7 @@ class Ems(BaseParser):
         usage_parser.add_argument("end_date", type=Parsers.date, help="End date")
         usage_parser.add_argument("--download", action="store_true", help="Download all usage data")
         usage_group = usage_parser.add_mutually_exclusive_group(required=True)
-        usage_group.add_argument("-f" "--facility-ids", type=str, help="Facilities to get usage for")
+        usage_group.add_argument("-f", "--facility-ids", type=str, help="Facilities to get usage for")
         usage_group.add_argument("-g", "--org-id", help="Organization id")
         usage_group.add_argument("-n", "--org-name", help="Organization name")
         usage_parser.add_argument("-o", "--output", help="Filename to save data (csv)")
@@ -82,13 +82,13 @@ class Ems(BaseParser):
         # Utility Bills
         bills_parser = _subparsers.add_parser("bills", help="Get Utility Bills")
         bills_parser.add_argument(
-            "--resource_type", type=ResourceType, help="Filter by type of resource"
+            "--resource-type", type=ResourceType, help="Filter by type of resource"
         )
         bills_parser.add_argument(
-            "--from_date", help="Limit the date to fetch utility bills. Format: YYYY-MM-DD"
+            "--from-date", help="Limit the date to fetch utility bills. Format: YYYY-MM-DD"
         )
         bills_parser.add_argument(
-            "--to_date", help="Limit the date to fetch utility bills. Format: YYYY-MM-DD"
+            "--to-date", help="Limit the date to fetch utility bills. Format: YYYY-MM-DD"
         )
         bills_parser.add_argument(
             "--download",
