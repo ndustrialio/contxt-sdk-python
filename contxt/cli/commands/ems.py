@@ -76,7 +76,6 @@ class Ems(BaseParser):
 
         # Utility Bills
         bills_parser = _subparsers.add_parser("bills", help="Get Utility Bills")
-        bills_parser.add_argument("facility_ids", type=str, help="Facility to get bills for")
         bills_parser.add_argument(
             "--resource_type", type=ResourceType, help="Filter by type of resource"
         )
@@ -85,6 +84,10 @@ class Ems(BaseParser):
         bills_parser.add_argument(
             '--download', action="store_true", help="Download all PDF utility statements and their summaries"
         )
+        facility_group = bills_parser.add_mutually_exclusive_group(required=True)
+        facility_group.add_argument("-f", "--facility-ids", type=str, help="Facilities to get bills for")
+        facility_group.add_argument("-n", "--org-name", help="Organization name")
+
         bills_parser.set_defaults(func=self._bills)
 
         return parser
@@ -98,16 +101,26 @@ class Ems(BaseParser):
 
     def _bills(self, args):
         utilities_service = UtilitiesService(args.auth)
+        facilities_service = FacilitiesService(args.auth)
         from_date = datetime.strptime(args.from_date, '%Y-%m-%d').date() if args.from_date else None
         to_date = datetime.strptime(args.to_date, '%Y-%m-%d').date() if args.to_date else None
 
-        print(args.facility_ids)
-        for facility_id in args.facility_ids.split(','):
+        # if facility ids are provided
+        facility_ids_to_export = []
+        if args.facility_ids is not None:
+            facility_ids_to_export = args.facility_ids.split(',')
+        else:
+            org_id = get_org_id(args.org_name, args.auth)
+            facility_objs = facilities_service.get_facilities(org_id)
+            facility_ids_to_export = [f.id for f in facility_objs]
+            print(f'Exporting bills for {args.org_name} with {len(facility_ids_to_export)} facilities')
+
+        for facility_id in facility_ids_to_export:
             print(f'Exporting bills for facility {facility_id} from {from_date} to {to_date}')
             bills = [
                 statement
                 for statement in utilities_service.get_statements(
-                    facility_id=facility_id, from_date=from_date, to_date=to_date
+                    facility_id=facility_id
                 )
                 if (from_date is None or statement.interval_start > from_date)
                 and (to_date is None or statement.interval_end < to_date)
@@ -118,12 +131,9 @@ class Ems(BaseParser):
             else:
                 print(Serializer.to_table(bills, sort_by='interval_start'))
 
-    #def _main_service_data(self, args):
-
     def _download_pdf_statements(self, args, facility_id, bills, utility_service):
         file_service = LegacyFilesService(args.auth)
         facilities_service = FacilitiesService(args.auth)
-
         # get the facility object so we can make the directory more readable
         try:
             facility_obj = facilities_service.get_facility_with_id(facility_id)
