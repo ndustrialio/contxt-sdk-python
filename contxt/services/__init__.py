@@ -7,11 +7,11 @@ from .contxt import ContxtService
 from .ems import EmsService
 from .events import EventsService
 from .facilities import FacilitiesService
+from .files import LegacyFilesService
 from .health import HealthService
 from .iot import IotDataService, IotService
 from .ngest import NgestService
 from .utilities import UtilitiesService
-from .files import LegacyFilesService
 
 __all__ = [
     "AssetsService",
@@ -26,5 +26,5 @@ __all__ = [
     "IotDataService",
     "NgestService",
     "UtilitiesService",
-    "LegacyFilesService"
+    "LegacyFilesService",
 ]

@@ -40,7 +40,6 @@ class Serializer:
         # TODO: this may not return a dict but instead a list, or a native type
         # (for example, if passed an int, it will return it). this is likely
         # an unexpected behavior for callers
-
         # NOTE: alternative (but slower) implementations:
         # 1. d = json.dumps(d, default=lambda o: getattr(o, "__dict__", str(o)))
         # 2. d = jsonpickle.encode(d, unpicklable=False))
@@ -109,7 +108,6 @@ class Serializer:
                 return dump(d, f, **kwargs)
         return dumps(d, **kwargs)
 
-
     @staticmethod
     def to_pretty_cli(obj: Any, **kwargs):
 
@@ -124,17 +122,17 @@ class Serializer:
         printed = "\n====" + type(obj).__name__ + "====\n"
         for key in nested_sections:
             del d[key]
-        printed += Serializer.to_table(d) + '\n'
+        printed += Serializer.to_table(d) + "\n"
 
         for key, value in nested_sections.items():
-            printed += '\n' + key.capitalize() + '\n'
-            printed += (Serializer.to_table(value))
-            printed += '\n'
+            printed += "\n" + key.capitalize() + "\n"
+            printed += Serializer.to_table(value)
+            printed += "\n"
 
         return printed
 
     @staticmethod
-    def to_table(obj: Any, path: Optional[Path] = None, exclude_keys = None, sort_by = None, **kwargs):
+    def to_table(obj: Any, path: Optional[Path] = None, exclude_keys=None, sort_by=None, **kwargs):
         """Serializes `obj` to a table.
 
         :param obj: object to serialize
@@ -149,8 +147,6 @@ class Serializer:
             exclude_keys = []
 
         d = Serializer.to_dict(obj)
-
-
 
         # TODO: The above may be a list, so handle it here
         if not isinstance(d, (list, tuple)):

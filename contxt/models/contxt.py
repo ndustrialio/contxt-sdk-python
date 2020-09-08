@@ -183,7 +183,7 @@ class ServiceEnvironmentVariable(ApiObject):
         ApiField("is_protected"),
         ApiField("config_map_value_id"),
         ApiField("created_at", data_type=Parsers.datetime),
-        ApiField("updated_at", data_type=Parsers.datetime)
+        ApiField("updated_at", data_type=Parsers.datetime),
     )
 
     id: int
@@ -196,6 +196,7 @@ class ServiceEnvironmentVariable(ApiObject):
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
 
+
 @dataclass
 class Domain(ApiObject):
     _api_fields: ClassVar = (
@@ -203,7 +204,7 @@ class Domain(ApiObject):
         ApiField("name"),
         ApiField("cert_name"),
         ApiField("created_at", data_type=Parsers.datetime),
-        ApiField("updated_at", data_type=Parsers.datetime)
+        ApiField("updated_at", data_type=Parsers.datetime),
     )
 
     id: int
@@ -223,7 +224,7 @@ class Frontend(ApiObject):
         ApiField("domain_id"),
         ApiField("domain", data_type=Domain),
         ApiField("created_at", data_type=Parsers.datetime),
-        ApiField("updated_at", data_type=Parsers.datetime)
+        ApiField("updated_at", data_type=Parsers.datetime),
     )
 
     id: int
@@ -245,7 +246,7 @@ class Image(ApiObject):
         ApiField("image_tag_id"),
         ApiField("image_secret_id"),
         ApiField("created_at", data_type=Parsers.datetime),
-        ApiField("updated_at", data_type=Parsers.datetime)
+        ApiField("updated_at", data_type=Parsers.datetime),
     )
 
     id: int
@@ -273,7 +274,7 @@ class Service(ApiObject):
         ApiField("frontend", data_type=Frontend, optional=True),
         ApiField("image", data_type=Image, optional=True),
         ApiField("service_type"),
-        ApiField("created_at", data_type=Parsers.datetime)
+        ApiField("created_at", data_type=Parsers.datetime),
     )
 
     id: int
@@ -301,7 +302,7 @@ class Project(ApiObject):
         ApiField("type"),
         ApiField("created_at", data_type=Parsers.datetime),
         ApiField("Roles", attr_key="roles", data_type=Role, optional=True),
-        ApiField("Services", attr_key="Services", data_type=Service, optional=True)
+        ApiField("Services", attr_key="Services", data_type=Service, optional=True),
     )
 
     id: int
@@ -322,7 +323,7 @@ class EdgeNode(ApiObject):
         ApiField("organization_id"),
         ApiField("description"),
         ApiField("client_id"),
-        ApiField("created_at", data_type=Parsers.datetime)
+        ApiField("created_at", data_type=Parsers.datetime),
     )
 
     id: int
@@ -332,4 +333,3 @@ class EdgeNode(ApiObject):
     description: str
     client_id: str
     created_at: Optional[datetime] = None
-

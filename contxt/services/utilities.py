@@ -1,10 +1,9 @@
-from typing import List, Optional
-import json
+from typing import List
 
 from contxt.auth import Auth
+from contxt.models.ems import UtilityAccount, UtilityMeter, UtilityStatement
 from contxt.services.api import ApiEnvironment, ConfiguredApi
 from contxt.utils import make_logger
-from contxt.models.ems import UtilityStatement, UtilityAccount, UtilityMeter
 
 logger = make_logger(__name__)
 
@@ -20,12 +19,7 @@ class UtilitiesService(ConfiguredApi):
         ),
     )
 
-    def __init__(
-        self,
-        auth: Auth,
-        env: str = "production",
-        **kwargs,
-    ) -> None:
+    def __init__(self, auth: Auth, env: str = "production", **kwargs,) -> None:
         super().__init__(env=env, auth=auth, **kwargs)
 
     def get_statements(self, facility_id) -> List[UtilityStatement]:
@@ -42,6 +36,3 @@ class UtilitiesService(ConfiguredApi):
 
     def get_statement_data(self, statement_id):
         return self.get(f"utilities/statements/{statement_id}/tree")
-
-
-
