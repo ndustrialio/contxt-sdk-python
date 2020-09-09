@@ -13,19 +13,6 @@ from contxt.utils.serializer import Serializer
 from .common import BaseParser, get_org_id
 
 
-def download_file(url, path, attempts=3):
-    attempt = 0
-    while attempt < attempts:
-        try:
-            r = requests.get(url)
-            with path.open("wb") as f:
-                f.write(r.content)
-            return
-        except Exception as e:
-            print(f"Exception raised during download {e}")
-            attempt += 1
-
-
 class Ems(BaseParser):
     def _init_parser(self, subparsers):
         parser = subparsers.add_parser("ems", help="EMS service")
@@ -166,12 +153,12 @@ class Ems(BaseParser):
             # Download pdf
             if bill.file_id:
                 try:
-                    url = sis_api.request_read_file(file_id=bill.file_id).temporary_url
+                    pdf = sis_api.request_read_file(bill.file_id)
                     path = bill_dir / f"{bill.id}.pdf"
-                    download_file(url, path)
+                    pdf.download(path)
                     row["pdf"] = path
-                except requests.exceptions.HTTPError:
-                    print(f"Unable to download pdf {bill.file_id}")
+                except Exception as e:
+                    print(e)
 
             data.append(row)
 
