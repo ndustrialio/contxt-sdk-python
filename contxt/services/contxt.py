@@ -11,6 +11,7 @@ from ..models.contxt import (
     Project,
     Service,
     User,
+    Cluster,
 )
 from .api import ApiEnvironment, ConfiguredApi
 
@@ -93,6 +94,10 @@ class ContxtService(ConfiguredApi):
         data = {"key": key, "value": value}
         return self.post(f"runs/{run_id}/metrics", data=data)
 
+    '''
+    Projects
+    
+    '''
     def get_projects(self) -> List[Project]:
         resp = self.get("stacks")
         return [Project.from_api(rec) for rec in resp]
@@ -101,6 +106,16 @@ class ContxtService(ConfiguredApi):
         resp = self.get(f"stacks/{project_id}")
         return Project.from_api(resp)
 
+    '''
+    Edge Nodes
+    '''
+    def get_edge_nodes(self, organization_id: str, project_id: int) -> List[Service]:
+        resp = self.get(f"organizations/{organization_id}/stacks/{project_id}/edgenodes")
+        return [EdgeNode.from_api(rec) for rec in resp]
+
+    '''
+    Services
+    '''
     def get_services(self, project_id: int = None) -> List[Service]:
         if project_id:
             resp = self.get(f"stacks/{project_id}")
@@ -109,10 +124,17 @@ class ContxtService(ConfiguredApi):
             resp = self.get("services")
             return sorted([Service.from_api(rec) for rec in resp])
 
-    def get_edge_nodes(self, organization_id: str, project_id: int) -> List[Service]:
-        resp = self.get(f"organizations/{organization_id}/stacks/{project_id}/edgenodes")
-        return [EdgeNode.from_api(rec) for rec in resp]
-
     def get_service(self, service_id: int):
         resp = self.get(f"services/{service_id}")
         return Service.from_api(resp)
+
+    '''
+    Clusters
+    '''
+    def get_clusters(self, organization_id: str) -> List[Cluster]:
+        resp = self.get(f"organizations/{organization_id}/clusters")
+        return [Cluster.from_api(rec) for rec in resp]
+
+    def get_cluster(self, organization_id: str, cluster_slug: str) -> Cluster:
+        resp = self.get(f"{organization_id}/clusters/{cluster_slug}")
+        return Cluster.from_api(resp)

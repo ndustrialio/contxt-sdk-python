@@ -12,3 +12,4 @@ from .health import HealthService
 from .iot import IotDataService, IotService
 from .ngest import NgestService
 from .sis import SisService
+from  .contxt_deployments import ContxtDeploymentService

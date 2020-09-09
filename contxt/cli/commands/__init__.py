@@ -8,3 +8,4 @@ from .ems import Ems
 from .iot import Iot
 from .projects import Projects
 from .service import Services
+from .clusters import Clusters
