@@ -1,5 +1,4 @@
 from datetime import date, datetime, timedelta
-from functools import partial
 from typing import Iterable, List, Optional
 
 from ..auth import Auth
@@ -70,10 +69,9 @@ class EmsService(ConfiguredApi):
         )
         return UtilitySpend.from_api(resp)
 
-    def get_ems_usage(
+    def get_monthly_utility_usage(
         self,
         facility_id: int,
-        interval: str,
         resource_type: ResourceType = ResourceType.ELECTRIC,
         start_date: date = date.today() - timedelta(days=3600),
         end_date: date = date.today(),
@@ -84,19 +82,34 @@ class EmsService(ConfiguredApi):
         Note `start_date` defaults to 10 years ago (the API's maximum limit) and
         `end_date` defaults to today."""
         resp = self.get(
-            f"facilities/{facility_id}/usage/{interval}",
+            f"facilities/{facility_id}/utility/usage/monthly",
             params={
                 "type": resource_type.value,
-                "time_start": int(date_to_datetime(start_date).timestamp()),
-                "time_end": int(date_to_datetime(end_date).timestamp()),
+                "date_start": start_date.strftime("%Y-%m"),
+                "date_end": end_date.strftime("%Y-%m"),
                 "pro_forma": pro_forma,
             },
         )
         return UtilityUsage.from_api(resp)
 
-    get_monthly_utility_usage = partial(get_ems_usage, interval="monthly")
-
-    get_daily_utility_usage = partial(get_ems_usage, interval="daily")
+    def get_usage(
+        self,
+        facility_id: int,
+        interval: str,
+        resource_type: ResourceType = ResourceType.ELECTRIC,
+        start: date = date.today() - timedelta(days=365),
+        end: date = date.today(),
+    ) -> UtilityUsage:
+        """Get utility usage for facility `facility_id` and resource `resource_type`"""
+        resp = self.get(
+            f"facilities/{facility_id}/usage/{interval}",
+            params={
+                "type": resource_type.value,
+                "time_start": int(date_to_datetime(start).timestamp()),
+                "time_end": int(date_to_datetime(end).timestamp()),
+            },
+        )
+        return UtilityUsage.from_api(resp)
 
     def get_utility_contracts_for_facility(self, facility_id: int) -> Iterable[UtilityContract]:
         return PagedRecords(

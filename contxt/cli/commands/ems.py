@@ -1,11 +1,11 @@
-import csv
 import os
+from csv import DictWriter
 from pathlib import Path
 
 import requests
 
 from contxt.models import Parsers
-from contxt.models.ems import ResourceType, UtilityUsage
+from contxt.models.ems import ResourceType
 from contxt.models.iot import Window
 from contxt.services import EmsService, FacilitiesService, IotService, SisService
 from contxt.utils.serializer import Serializer
@@ -23,7 +23,7 @@ class Ems(BaseParser):
         mains_parser = _subparsers.add_parser("mains", help="Get Main Services")
         mains_parser.add_argument("facility_id", type=int, help="Facility to get main services for")
         mains_parser.add_argument(
-            "--resource_type", type=ResourceType, help="Filter by type of resource"
+            "--resource-type", type=ResourceType, help="Filter by type of resource"
         )
         mains_parser.set_defaults(func=self._mains)
 
@@ -58,19 +58,14 @@ class Ems(BaseParser):
 
         # Usage
         usage_parser = _subparsers.add_parser("util-usage", help="Utility usage")
-        usage_parser.add_argument("interval", choices=["daily", "monthly"], help="Time interval")
-        usage_parser.add_argument("resource_type", type=ResourceType, help="Type of resource")
-        usage_parser.add_argument("start_date", type=Parsers.date, help="Start date")
-        usage_parser.add_argument("end_date", type=Parsers.date, help="End date")
-        usage_parser.add_argument("--download", action="store_true", help="Download all usage data")
-        usage_group = usage_parser.add_mutually_exclusive_group(required=True)
-        usage_group.add_argument("-f", "--facility-ids", type=str, help="Facilities to get usage for")
-        usage_group.add_argument("-g", "--org-id", help="Organization id")
-        usage_group.add_argument("-n", "--org-name", help="Organization name")
-        usage_parser.add_argument("-o", "--output", help="Filename to save data (csv)")
+        usage_parser.add_argument("-f", "--facility-ids", nargs="*", type=int, help="Facility ids")
         usage_parser.add_argument(
-            "-p", "--pro-forma", action="store_true", help="Include pro forma calculations"
+            "--interval", choices=["daily", "monthly"], default="monthly", help="Time interval"
         )
+        usage_parser.add_argument("--resource-type", type=ResourceType, help="Type of resource")
+        usage_parser.add_argument("--start", type=Parsers.date, help="Start date")
+        usage_parser.add_argument("--end", type=Parsers.date, help="End date")
+        usage_parser.add_argument("-o", "--output", help="Filename to save data (csv)")
         usage_parser.set_defaults(func=self._utility_usage)
 
         # Utility Bills
@@ -107,10 +102,11 @@ class Ems(BaseParser):
         # Download
         print(f"Exporting bills for {len(facility_ids)} facilities")
         sis_api = SisService(args.auth)
+        fac_api = FacilitiesService(args.auth)
         for facility_id in facility_ids:
             print(f"Exporting bills for facility {facility_id}")
             try:
-                facility = FacilitiesService(args.auth).get_facility_with_id(facility_id)
+                facility = fac_api.get_facility_with_id(facility_id)
             except requests.exceptions.HTTPError:
                 print(f"Skipping facility {facility_id} (not found)")
                 continue
@@ -165,7 +161,7 @@ class Ems(BaseParser):
         # Dump to csv
         columns = data[0].keys() if data else []
         with (utility_dir / "summary.csv").open("w") as f:
-            writer = csv.DictWriter(f, fieldnames=columns)
+            writer = DictWriter(f, fieldnames=columns)
             writer.writeheader()
             writer.writerows(data)
 
@@ -239,7 +235,7 @@ class Ems(BaseParser):
                 # Write all the metadata to a summary in a CSV file
                 summary_file_path = os.path.join(ems_export_dir, "minute_intervals.csv")
                 with open(summary_file_path, "w") as csv_file:
-                    writer = csv.DictWriter(csv_file, fieldnames=["time", "value"])
+                    writer = DictWriter(csv_file, fieldnames=["time", "value"])
                     writer.writeheader()
 
                     for data in summed_data:
@@ -275,72 +271,51 @@ class Ems(BaseParser):
             }
             print(spend)
 
-    def _download_utility_usage(
-        self, usage_data: UtilityUsage, args, facility_id,
-    ):
-        facilities_service = FacilitiesService(args.auth)
-
-        # get the facility object so we can make the directory more readable
-        try:
-            facility_obj = facilities_service.get_facility_with_id(facility_id)
-        except requests.exceptions.HTTPError:
-            print("Facility not found")
-            return
-
-        print(f"Writing information for {facility_obj.name}")
-
-        # build the directory structure
-        facility_export_dir = f"./data-exports/{facility_obj.name}/"
-        ems_export_dir = os.path.join(facility_export_dir, "ems/")
-
-        # ensure the exports directory is created
-        os.makedirs(ems_export_dir, exist_ok=True)
-
-        # Write all the metadata to a summary in a CSV file
-        summary_file_path = os.path.join(ems_export_dir, "usage_summary.csv")
-        with open(summary_file_path, "w") as csv_file:
-            writer = csv.DictWriter(csv_file, fieldnames=["time", "value"])
-            writer.writeheader()
-
-            for data in usage_data.values:
-                if data.value is not None:
-                    writer.writerow({"time": data.event_time, "value": data.value})
-
     def _utility_usage(self, args):
-        ems_service = EmsService(args.auth)
-        if args.f__facility_ids:
-            print(args.f__facility_ids)
-            for facility_id in args.f__facility_ids.split(","):
-                print(f"Getting Utility usage for facility {facility_id}")
-                # Get facility usage
-                try:
-                    usage = ems_service.get_ems_usage(
-                        facility_id=facility_id,
-                        interval=args.interval,
-                        resource_type=args.resource_type,
-                        start_date=args.start_date,
-                        end_date=args.end_date,
-                        pro_forma=args.pro_forma,
-                    )
-                    if args.download:
-                        self._download_utility_usage(usage, args, facility_id)
-                    else:
-                        print(Serializer.to_pretty_cli(usage))
-                except requests.exceptions.HTTPError:
-                    print("Facility not found")
+        ems = EmsService(args.auth)
+        fac = FacilitiesService(args.auth)
+        kwargs = {
+            k: getattr(args, k)
+            for k in ["resource_type", "start", "end"]
+            if getattr(args, k) is not None
+        }
+        if args.facility_ids:
+            for facility_id in args.facility_ids:
+                print(f"Getting utility usage for facility {facility_id}")
 
+                # Get facility
+                try:
+                    facility = fac.get_facility_with_id(facility_id)
+                except requests.exceptions.HTTPError:
+                    print(f"Skipping facility {facility_id} (not found)")
+                    continue
+
+                # Get usage
+                usage = ems.get_usage(facility_id=facility.id, interval=args.interval, **kwargs)
+
+                # Output
+                if args.output:
+                    self._download_utility_usage(facility, usage, args.output)
+                else:
+                    print(Serializer.to_pretty_cli(usage))
         else:
             # Get organization usage
             organization_id = args.org_id or get_org_id(args.org_name, args.auth)
             facilities_service = FacilitiesService(args.auth)
             usage = {
-                f: ems_service.get_monthly_utility_usage(
-                    facility_id=f.id,
-                    resource_type=args.resource_type,
-                    start_date=args.start_date,
-                    end_date=args.end_date,
-                    pro_forma=args.pro_forma,
-                )
+                f: ems.get_monthly_utility_usage(facility_id=f.id, **kwargs)
                 for f in facilities_service.get_facilities(organization_id)
             }
             print(usage)
+
+    def _download_utility_usage(self, facility, usage, output):
+        # Build directory structure
+        path = Path(output) / facility.slug / "ems"
+        path.mkdir(parents=True, exist_ok=True)
+
+        # Dump
+        print(f"Writing information for {facility.name}")
+        with (path / "usage.csv").open("w") as f:
+            writer = DictWriter(f, fieldnames=["time", "value"])
+            writer.writeheader()
+            writer.writerows([{"time": v.event_time, "value": v.value} for v in usage.values])
