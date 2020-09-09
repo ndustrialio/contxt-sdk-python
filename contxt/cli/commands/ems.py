@@ -1,4 +1,3 @@
-import os
 from csv import DictWriter
 from pathlib import Path
 
@@ -33,11 +32,7 @@ class Ems(BaseParser):
         md_parser.add_argument("resource_type", type=ResourceType)
         md_parser.add_argument("start_time", type=Parsers.datetime, help="Start time")
         md_parser.add_argument("end_time", type=Parsers.datetime, help="End time")
-        md_parser.add_argument(
-            "--download",
-            action="store_true",
-            help="Write main data to file in the data-exports directory",
-        )
+        md_parser.add_argument("-o", "--output", help="Filename to save data (csv)")
         md_parser.set_defaults(func=self._main_data)
 
         # Spend
@@ -165,24 +160,23 @@ class Ems(BaseParser):
             writer.writeheader()
             writer.writerows(data)
 
+    # TODO: refactor me
     def _main_data(self, args):
-        ems_service = EmsService(args.auth)
-        iot_service = IotService(args.auth)
-        facilities_service = FacilitiesService(args.auth)
+        ems = EmsService(args.auth)
+        iot = IotService(args.auth)
+        fac = FacilitiesService(args.auth)
 
-        print(args.facility_ids)
         for facility_id in args.facility_ids.split(","):
-
-            # get the facility object so we can make the directory more readable
+            # Get facility
             try:
-                facility_obj = facilities_service.get_facility_with_id(facility_id)
+                facility = fac.get_facility_with_id(facility_id)
             except requests.exceptions.HTTPError:
                 print("Facility not found")
                 continue
 
-            print(f"Getting interval data for {facility_obj.id} -> {facility_obj.name}")
+            print(f"Getting interval data for {facility.id} -> {facility.name}")
             try:
-                services = ems_service.get_main_services(
+                services = ems.get_main_services(
                     facility_id=facility_id, resource_type=args.resource_type
                 )
             except requests.exceptions.HTTPError:
@@ -190,7 +184,7 @@ class Ems(BaseParser):
                 continue
 
             data = {
-                service.name: iot_service.get_time_series_for_field(
+                service.name: iot.get_time_series_for_field(
                     service.usage_field,
                     start_time=args.start_time,
                     end_time=args.end_time,
@@ -215,31 +209,21 @@ class Ems(BaseParser):
             summed_data = []
             skipped_count = 0
             for time, values in blended_data.items():
-                if (len(values)) == len(services):
+                if len(values) == len(services):
                     try:
                         summed_data.append({"time": time, "value": sum(values)})
                     except Exception as e:
                         print(e)
-                        print(values)
                 else:
                     skipped_count += 1
 
-            if args.download and len(summed_data) > 0:
-                # build the directory structure
-                facility_export_dir = f"./data-exports/{facility_obj.name}/"
-                ems_export_dir = os.path.join(facility_export_dir, "ems/")
-
-                # ensure the exports directory is created
-                os.makedirs(ems_export_dir, exist_ok=True)
-
-                # Write all the metadata to a summary in a CSV file
-                summary_file_path = os.path.join(ems_export_dir, "minute_intervals.csv")
-                with open(summary_file_path, "w") as csv_file:
-                    writer = DictWriter(csv_file, fieldnames=["time", "value"])
+            if args.output:
+                path = Path(args.output) / facility.name / "ems"
+                path.mkdir(parents=True, exist_ok=True)
+                with (path / "minute_intervals.csv").open("w") as f:
+                    writer = DictWriter(f, fieldnames=["time", "value"])
                     writer.writeheader()
-
-                    for data in summed_data:
-                        writer.writerow(data)
+                    writer.writerows(summed_data)
             else:
                 print(Serializer.to_table(summed_data))
 
