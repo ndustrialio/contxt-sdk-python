@@ -145,7 +145,7 @@ class Ems(BaseParser):
         data = []
         accounts = {a.id: a for a in sis_api.get_accounts(facility.id)}
         meters = {m.id: m for m in sis_api.get_meters(facility.id)}
-        for i, bill in enumerate(bills[:2]):
+        for i, bill in enumerate(bills):
             print(f"Fetching bill {i + 1} of {len(bills)}")
 
             # Build row

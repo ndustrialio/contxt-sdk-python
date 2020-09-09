@@ -1,10 +1,15 @@
 from datetime import date, datetime, timedelta
+from functools import partial
 from typing import Iterable, List, Optional
 
 from ..auth import Auth
 from ..models.ems import Facility, MainService, ResourceType, UtilityContract, UtilitySpend, UtilityUsage
 from .api import ApiEnvironment, ConfiguredApi
 from .pagination import PagedRecords
+
+
+def date_to_datetime(d: date) -> datetime:
+    return datetime.strptime(d.isoformat(), "%Y-%m-%d")
 
 
 class EmsService(ConfiguredApi):
@@ -82,56 +87,16 @@ class EmsService(ConfiguredApi):
             f"facilities/{facility_id}/usage/{interval}",
             params={
                 "type": resource_type.value,
-                "time_start": int(
-                    datetime(start_date.year, start_date.month, start_date.day).timestamp()
-                ),
-                "time_end": int(datetime(end_date.year, end_date.month, end_date.day).timestamp()),
+                "time_start": int(date_to_datetime(start_date).timestamp()),
+                "time_end": int(date_to_datetime(end_date).timestamp()),
                 "pro_forma": pro_forma,
             },
         )
         return UtilityUsage.from_api(resp)
 
-    def get_monthly_utility_usage(
-        self,
-        facility_id: int,
-        resource_type: ResourceType = ResourceType.ELECTRIC,
-        start_date: date = date.today() - timedelta(days=3600),
-        end_date: date = date.today(),
-        pro_forma: bool = False,
-    ) -> UtilityUsage:
-        """Get monthly utility usage for facility `facility_id` and resource
-        `resource_type` (for now, this must be "electric" but will be expanded).
-        Note `start_date` defaults to 10 years ago (the API's maximum limit) and
-        `end_date` defaults to today."""
-        return self.get_ems_usage(
-            facility_id=facility_id,
-            interval="monthly",
-            resource_type=resource_type,
-            start_date=start_date,
-            end_date=end_date,
-            pro_forma=pro_forma,
-        )
+    get_monthly_utility_usage = partial(get_ems_usage, interval="monthly")
 
-    def get_daily_utility_usage(
-        self,
-        facility_id: int,
-        resource_type: ResourceType = ResourceType.ELECTRIC,
-        start_date: date = date.today() - timedelta(days=3600),
-        end_date: date = date.today(),
-        pro_forma: bool = False,
-    ) -> UtilityUsage:
-        """Get monthly utility usage for facility `facility_id` and resource
-        `resource_type` (for now, this must be "electric" but will be expanded).
-        Note `start_date` defaults to 10 years ago (the API's maximum limit) and
-        `end_date` defaults to today."""
-        return self.get_ems_usage(
-            facility_id=facility_id,
-            interval="daily",
-            resource_type=resource_type,
-            start_date=start_date,
-            end_date=end_date,
-            pro_forma=pro_forma,
-        )
+    get_daily_utility_usage = partial(get_ems_usage, interval="daily")
 
     def get_utility_contracts_for_facility(self, facility_id: int) -> Iterable[UtilityContract]:
         return PagedRecords(
