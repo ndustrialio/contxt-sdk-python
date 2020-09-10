@@ -57,12 +57,13 @@ class Iot(BaseParser):
     def _groupings(self, args):
         iot_service = IotService(args.auth)
         groupings = iot_service.get_field_groupings_for_facility(args.facility_id)
-        print(groupings)
+        print(Serializer.to_table(groupings, exclude_keys=['owner', 'fields']))
 
     def _feeds(self, args):
         iot_service = IotService(args.auth)
         feeds = iot_service.get_feeds(args.facility_id)
-        print(feeds)
+        print(Serializer.to_table(feeds, exclude_keys=['routing_keys', 'feed_type', 'feed_status',
+                                                       'owner_id']))
 
     def _fields(self, args):
         iot_service = IotService(args.auth)
@@ -72,7 +73,7 @@ class Iot(BaseParser):
         else:
             # Get fields for grouping
             fields = iot_service.get_field_grouping(args.grouping_id).fields
-        print(fields)
+        print(Serializer.to_table(fields))
 
     def _unprovisioned(self, args):
         iot_service = IotService(args.auth)
@@ -85,7 +86,7 @@ class Iot(BaseParser):
         if args.output:
             to_csv(args.output, fields)
         else:
-            print(fields)
+            print(Serializer.to_table(fields))
 
     def _field_data(self, args):
         iot_service = IotService(args.auth)

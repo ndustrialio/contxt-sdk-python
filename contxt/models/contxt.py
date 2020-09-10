@@ -336,6 +336,63 @@ class EdgeNode(ApiObject):
 
 
 @dataclass
+class ServiceScope(ApiObject):
+    _api_fields: ClassVar = (
+        ApiField("id"),
+        ApiField("service_id"),
+        ApiField("label"),
+        ApiField("description"),
+        ApiField("created_at"),
+        ApiField("updated_at")
+    )
+
+    id: str
+    service_id: int
+    label: str
+    description: str
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+
+
+@dataclass
+class ServiceGrant(ApiObject):
+    _api_fields: ClassVar = (
+        ApiField("id"),
+        ApiField("from_service_id", creatable=True),
+        ApiField("to_service_id", creatable=True),
+        ApiField("auth0_id"),
+        ApiField("ServiceScopes", data_type=ServiceScope, optional=True),
+        ApiField("created_at", data_type=Parsers.datetime),
+        ApiField("updated_at", data_type=Parsers.datetime),
+    )
+
+    from_service_id: int
+    to_service_id: int
+    auth0_id: Optional[str] = None
+    id: Optional[str] = None
+    ServiceScopes: Optional[List[ServiceScope]] = None
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+
+
+@dataclass
+class ServiceGrantScope(ApiObject):
+    _api_fields: ClassVar = (
+        ApiField("id"),
+        ApiField("service_grant_id"),
+        ApiField("service_scope_id"),
+        ApiField("created_at", data_type=Parsers.datetime),
+        ApiField("updated_at", data_type=Parsers.datetime),
+    )
+
+    id: str
+    service_grant_id: str
+    service_scope_id: str
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+
+
+@dataclass
 class Cluster(ApiObject):
     _api_fields: ClassVar = (
         ApiField("id"),

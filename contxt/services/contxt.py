@@ -12,6 +12,9 @@ from ..models.contxt import (
     Service,
     User,
     Cluster,
+    ServiceGrant,
+    ServiceScope,
+    ServiceGrantScope,
 )
 from .api import ApiEnvironment, ConfiguredApi
 
@@ -138,3 +141,29 @@ class ContxtService(ConfiguredApi):
     def get_cluster(self, organization_id: str, cluster_slug: str) -> Cluster:
         resp = self.get(f"{organization_id}/clusters/{cluster_slug}")
         return Cluster.from_api(resp)
+
+    '''
+    Scopes
+    '''
+    def get_service_scopes(self, service_id: int) -> List[ServiceScope]:
+        resp = self.get(f"services/{service_id}/scopes")
+        return [ServiceScope.from_api(rec) for rec in resp]
+
+    def add_service_scope(self, service_grant: ServiceGrant, service_scope: ServiceScope) -> ServiceGrantScope:
+        resp = self.post(f"grants/{service_grant.id}/scopes/{service_scope.id}")
+        return ServiceGrantScope.from_api(resp)
+
+    def remove_service_scope(self, service_grant: ServiceGrant, service_scope: ServiceScope):
+        resp = self.delete(f"grants/{service_grant.id}/scopes/{service_scope.id}")
+        return resp
+
+    '''
+    Dependencies
+    '''
+    def get_service_dependencies(self, service_id: int) -> List[ServiceGrant]:
+        resp = self.get(f"services/{service_id}/grants")
+        return [ServiceGrant.from_api(rec) for rec in resp]
+
+    def create_service_dependency(self, service_grant: ServiceGrant) -> ServiceGrant:
+        resp = self.post(f"services/{service_grant.from_service_id}/grants", json=service_grant.post())
+        return ServiceGrant.from_api(resp)
