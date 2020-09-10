@@ -1,9 +1,9 @@
-from collections import defaultdict
 from typing import List
 
 import click
 
-from contxt.cli.utils import Clients, fields_option, print_table, sort_option
+from contxt.cli.clients import Clients
+from contxt.cli.utils import fields_option, print_table, sort_option
 from contxt.models.assets import Asset, AssetType
 
 
@@ -29,10 +29,6 @@ def types(clients: Clients, fields: List[str], sort: str) -> None:
 @click.pass_obj
 def get(obj: Clients, type: str, fields: List[str], sort: str) -> None:
     """Get assets"""
-    types = defaultdict(list)
-    for t in obj.assets.get_asset_types():
-        types[t.label].append(t)
-    items = []
-    for t in types[type]:
-        items += obj.assets.get_assets(t.id)
+    types = [t for t in obj.assets.get_asset_types() if t.label == type]
+    items = [a for t in types for a in obj.assets.get_assets(t.id)]
     print_table(items=items, keys=fields, sort_by=sort)

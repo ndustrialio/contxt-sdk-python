@@ -6,7 +6,7 @@ import click
 
 from contxt import __version__
 from contxt.auth.cli import CliAuth
-from contxt.cli.utils import Clients
+from contxt.cli.clients import Clients
 
 COMMAND_DIR = Path(__file__).parent / "commands"
 

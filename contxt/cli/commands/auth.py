@@ -1,6 +1,6 @@
 import click
 
-from contxt.cli.utils import Clients
+from contxt.cli.clients import Clients
 
 
 @click.group()
