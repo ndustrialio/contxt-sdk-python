@@ -6,11 +6,11 @@ from typing import Any, Dict, List
 
 import click
 
+from contxt.cli.clients import Clients
 from contxt.cli.utils import (
     LAST_WEEK,
     NOW,
     ClickPath,
-    Clients,
     Date,
     csv_callback,
     fields_option,
@@ -196,6 +196,8 @@ def export(
                         data[t][service.usage_field.field_human_name] = v
                 Serializer.to_csv(data, fpath / "ems" / "main_service_usage.csv")
 
+    print(f"Wrote data to {output}")
+
 
 def _download_bills(sis_api, facility_id, bills, output):
     # Build csv
@@ -203,8 +205,6 @@ def _download_bills(sis_api, facility_id, bills, output):
     accounts = {a.id: a for a in sis_api.get_accounts(facility_id)}
     meters = {m.id: m for m in sis_api.get_meters(facility_id)}
     for i, bill in enumerate(bills):
-        print(f"Fetching bill {i + 1} of {len(bills)}")
-
         # Build row
         row = {
             "account_number": accounts[meters[bill.utility_meter_id].utility_account_id].label,
