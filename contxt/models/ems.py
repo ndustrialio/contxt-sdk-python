@@ -1,7 +1,7 @@
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import date, datetime
 from enum import Enum
-from typing import ClassVar, Dict, List, Optional
+from typing import ClassVar, List
 
 from . import ApiField, ApiObject, Parsers
 from .events import Event
@@ -68,14 +68,12 @@ class Facility(ApiObject):
 @dataclass
 class UtilityPeriod(ApiObject):
     _api_fields: ClassVar = (
-        ApiField("date"),
-        ApiField("value"),
-        ApiField("pro_forma_date", optional=True),
+        ApiField("event_time", data_type=Parsers.datetime),
+        ApiField("value", data_type=int),
     )
 
-    date: str
-    value: str
-    pro_forma_date: Optional[str] = None
+    event_time: datetime
+    value: int
 
 
 UtilitySpendPeriod = UtilityPeriod
@@ -109,7 +107,7 @@ class UtilityUsage(ApiObject):
 
     type: str
     unit: str
-    values: Dict
+    values: List[UtilityUsagePeriod]
 
     @property
     def periods(self):
@@ -166,3 +164,86 @@ class UtilityContract(ApiObject):
     utility_contract_reminders: List[UtilityContractReminder]
     report_event_id: str
     report_event: Event
+
+
+@dataclass
+class UtilityStatement(ApiObject):
+    _api_fields: ClassVar = (
+        ApiField("id", data_type=int),
+        ApiField("utility_meter_id", data_type=int),
+        ApiField("statement_month", data_type=str),
+        ApiField("statement_year", data_type=str),
+        ApiField("interval_start", data_type=Parsers.date),
+        ApiField("interval_end", data_type=Parsers.date),
+        ApiField("file_id", data_type=int),
+        ApiField("is_validated", data_type=bool),
+        ApiField("pm_id", data_type=int),
+        ApiField("uploaded_to_pm", data_type=bool),
+        ApiField("created_at", data_type=Parsers.datetime),
+        ApiField("updated_at", data_type=Parsers.datetime),
+    )
+
+    id: int
+    utility_meter_id: int
+    statement_month: str
+    statement_year: str
+    interval_start: date
+    interval_end: date
+    file_id: int
+    is_validated: bool
+    pm_id: int
+    uploaded_to_pm: bool
+    created_at: datetime
+    updated_at: datetime
+
+
+@dataclass
+class UtilityMeter(ApiObject):
+    _api_fields: ClassVar = (
+        ApiField("id", data_type=int),
+        ApiField("label", data_type=str),
+        ApiField("utility_account_id", data_type=int),
+        ApiField("building_id", data_type=int),
+        ApiField("service_type", data_type=str),
+        ApiField("logical_meter_id", data_type=str),
+        ApiField("meter_number", data_type=str),
+        ApiField("active_start", data_type=Parsers.date),
+        ApiField("active_end", data_type=Parsers.date),
+        ApiField("pm_id", data_type=int),
+        ApiField("created_at", data_type=Parsers.datetime),
+        ApiField("updated_at", data_type=Parsers.datetime),
+    )
+
+    id: int
+    label: str
+    utility_account_id: int
+    building_id: int
+    service_type: str
+    logical_meter_id: str
+    meter_number: str
+    active_start: date
+    active_end: date
+    pm_id: int
+    created_at: datetime
+    updated_at: datetime
+
+
+@dataclass
+class UtilityAccount(ApiObject):
+    _api_fields: ClassVar = (
+        ApiField("id", data_type=int),
+        ApiField("logical_account_id", data_type=str),
+        ApiField("facility_id", data_type=int),
+        ApiField("account_number", data_type=str),
+        ApiField("label", data_type=str),
+        ApiField("created_at", data_type=Parsers.datetime),
+        ApiField("updated_at", data_type=Parsers.datetime),
+    )
+
+    id: int
+    logical_account_id: int
+    facility_id: int
+    account_number: str
+    label: str
+    created_at: datetime
+    updated_at: datetime

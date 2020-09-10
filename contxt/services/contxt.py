@@ -2,7 +2,16 @@ from datetime import datetime
 from typing import Any, Dict, List, Optional
 
 from ..auth import Auth
-from ..models.contxt import Config, ConfigValue, Organization, OrganizationUser, User
+from ..models.contxt import (
+    Config,
+    ConfigValue,
+    EdgeNode,
+    Organization,
+    OrganizationUser,
+    Project,
+    Service,
+    User,
+)
 from .api import ApiEnvironment, ConfiguredApi
 
 
@@ -83,3 +92,27 @@ class ContxtService(ConfiguredApi):
     def create_worker_run_metric(self, run_id: str, key: str, value: Any) -> Dict:
         data = {"key": key, "value": value}
         return self.post(f"runs/{run_id}/metrics", data=data)
+
+    def get_projects(self) -> List[Project]:
+        resp = self.get("stacks")
+        return [Project.from_api(rec) for rec in resp]
+
+    def get_project(self, project_id) -> Project:
+        resp = self.get(f"stacks/{project_id}")
+        return Project.from_api(resp)
+
+    def get_services(self, project_id: int = None) -> List[Service]:
+        if project_id:
+            resp = self.get(f"stacks/{project_id}")
+            return [Service.from_api(rec) for rec in resp["Services"]]
+        else:
+            resp = self.get("services")
+            return sorted([Service.from_api(rec) for rec in resp])
+
+    def get_edge_nodes(self, organization_id: str, project_id: int) -> List[Service]:
+        resp = self.get(f"organizations/{organization_id}/stacks/{project_id}/edgenodes")
+        return [EdgeNode.from_api(rec) for rec in resp]
+
+    def get_service(self, service_id: int):
+        resp = self.get(f"services/{service_id}")
+        return Service.from_api(resp)

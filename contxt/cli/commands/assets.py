@@ -1,4 +1,5 @@
 from contxt.services import AssetsService, FacilitiesService
+from contxt.utils.serializer import Serializer
 
 from .common import BaseParser, get_org_id
 
@@ -50,7 +51,9 @@ class Assets(BaseParser):
         facilites_service = FacilitiesService(args.auth)
         organization_id = args.org_id or get_org_id(args.org_name, args.auth)
         facilities = facilites_service.get_facilities(organization_id)
-        print(facilities)
+        print(
+            Serializer.to_table(facilities, exclude_keys=["info", "organization", "tags"], sort_by="id")
+        )
 
     def _types(self, args):
         organization_id = args.org_id or get_org_id(args.org_name, args.auth)
@@ -58,12 +61,12 @@ class Assets(BaseParser):
         if not args.type_label:
             # Get all asset types
             asset_types = assets_service.types_by_id.values()
-            print(asset_types)
+            print(Serializer.to_table(asset_types))
         else:
             # Get single asset type
             asset_type = assets_service.asset_type_with_label(args.type_label)
             assets_service._cache_asset_type_full(asset_type)
-            print(asset_type)
+            print(Serializer.to_table(asset_type))
 
     def _assets(self, args):
         organization_id = args.org_id or get_org_id(args.org_name, args.auth)

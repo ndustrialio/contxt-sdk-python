@@ -109,7 +109,30 @@ class Serializer:
         return dumps(d, **kwargs)
 
     @staticmethod
-    def to_table(obj: Any, path: Optional[Path] = None, **kwargs):
+    def to_pretty_cli(obj: Any, **kwargs):
+
+        d = Serializer.to_dict(obj)
+
+        nested_sections = {}
+        for key, value in d.items():
+            if isinstance(value, (list, tuple, dict)):
+                nested_sections[key] = value
+
+        # delete the values out of the main section that we're plucking out to print below
+        printed = "\n====" + type(obj).__name__ + "====\n"
+        for key in nested_sections:
+            del d[key]
+        printed += Serializer.to_table(d) + "\n"
+
+        for key, value in nested_sections.items():
+            printed += "\n" + key.capitalize() + "\n"
+            printed += Serializer.to_table(value)
+            printed += "\n"
+
+        return printed
+
+    @staticmethod
+    def to_table(obj: Any, path: Optional[Path] = None, exclude_keys=None, sort_by=None, **kwargs):
         """Serializes `obj` to a table.
 
         :param obj: object to serialize
@@ -120,13 +143,21 @@ class Serializer:
         :rtype: tabulate
         """
 
+        if exclude_keys is None:
+            exclude_keys = []
+
         d = Serializer.to_dict(obj)
 
         # TODO: The above may be a list, so handle it here
         if not isinstance(d, (list, tuple)):
             d = [d]
 
-        table = tabulate(d, headers="keys", **kwargs)
+        filtered = [{k: v for k, v in item.items() if k not in exclude_keys} for item in d]
+
+        if sort_by is not None:
+            filtered = sorted(filtered, key=lambda item: item[sort_by])
+
+        table = tabulate(filtered, headers="keys", **kwargs)
         if path:
             with path.open("w") as f:
                 return f.write(table)

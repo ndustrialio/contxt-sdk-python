@@ -1,10 +1,14 @@
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 from typing import Iterable, List, Optional
 
 from ..auth import Auth
 from ..models.ems import Facility, MainService, ResourceType, UtilityContract, UtilitySpend, UtilityUsage
 from .api import ApiEnvironment, ConfiguredApi
 from .pagination import PagedRecords
+
+
+def date_to_datetime(d: date) -> datetime:
+    return datetime.strptime(d.isoformat(), "%Y-%m-%d")
 
 
 class EmsService(ConfiguredApi):
@@ -84,6 +88,25 @@ class EmsService(ConfiguredApi):
                 "date_start": start_date.strftime("%Y-%m"),
                 "date_end": end_date.strftime("%Y-%m"),
                 "pro_forma": pro_forma,
+            },
+        )
+        return UtilityUsage.from_api(resp)
+
+    def get_usage(
+        self,
+        facility_id: int,
+        interval: str,
+        resource_type: ResourceType = ResourceType.ELECTRIC,
+        start: date = date.today() - timedelta(days=365),
+        end: date = date.today(),
+    ) -> UtilityUsage:
+        """Get utility usage for facility `facility_id` and resource `resource_type`"""
+        resp = self.get(
+            f"facilities/{facility_id}/usage/{interval}",
+            params={
+                "type": resource_type.value,
+                "time_start": int(date_to_datetime(start).timestamp()),
+                "time_end": int(date_to_datetime(end).timestamp()),
             },
         )
         return UtilityUsage.from_api(resp)
