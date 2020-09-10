@@ -179,6 +179,7 @@ class Serializer:
         d = Serializer.to_dict(obj)
 
         # Write
+        path.parent.mkdir(parents=True, exist_ok=True)
         with path.open("w") as f:
             writer = DictWriter(f, fieldnames=Serializer._keys(d), **kwargs)
             if header:

@@ -1,24 +1,22 @@
-from .common import BaseParser
+import click
+
+from contxt.cli.utils import Clients
 
 
-class Auth(BaseParser):
-    def _init_parser(self, subparsers):
-        parser = subparsers.add_parser("auth", help="Authentication")
-        parser.set_defaults(func=self._help)
-        _subparsers = parser.add_subparsers(title="subcommands", dest="subcommand")
+@click.group()
+def auth() -> None:
+    """Authenticate with Contxt."""
 
-        # Login
-        login_parser = _subparsers.add_parser("login", help="Login to contxt")
-        login_parser.set_defaults(func=self._login)
 
-        # Logout
-        logout_parser = _subparsers.add_parser("logout", help="Logout of contxt")
-        logout_parser.set_defaults(func=self._logout)
+@auth.command()
+@click.pass_obj
+def login(client: Clients):
+    """Login to Contxt."""
+    client.auth.login()
 
-        return parser
 
-    def _login(self, args):
-        args.auth.login()
-
-    def _logout(self, args):
-        args.auth.logout()
+@auth.command()
+@click.pass_obj
+def logout(client: Clients):
+    """Logout of Contxt."""
+    client.auth.logout()

@@ -1,4 +1,4 @@
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, timedelta, timezone
 from typing import Iterable, List, Optional
 
 from ..auth import Auth
@@ -97,16 +97,16 @@ class EmsService(ConfiguredApi):
         facility_id: int,
         interval: str,
         resource_type: ResourceType = ResourceType.ELECTRIC,
-        start: date = date.today() - timedelta(days=365),
-        end: date = date.today(),
+        start: datetime = datetime.now(timezone.utc) - timedelta(days=365),
+        end: datetime = datetime.now(timezone.utc),
     ) -> UtilityUsage:
         """Get utility usage for facility `facility_id` and resource `resource_type`"""
         resp = self.get(
             f"facilities/{facility_id}/usage/{interval}",
             params={
                 "type": resource_type.value,
-                "time_start": int(date_to_datetime(start).timestamp()),
-                "time_end": int(date_to_datetime(end).timestamp()),
+                "time_start": int(start.timestamp()),
+                "time_end": int(end.timestamp()),
             },
         )
         return UtilityUsage.from_api(resp)

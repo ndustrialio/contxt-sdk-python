@@ -143,7 +143,6 @@ class Feed(ApiObject):
         ApiField("timezone"),
         ApiField("token"),
         ApiField("status"),
-        ApiField("degraded_threshold", data_type=float),
         ApiField("critical_threshold", data_type=float),
         ApiField("status_event_id"),
         ApiField("created_at", data_type=Parsers.datetime),
@@ -165,7 +164,6 @@ class Feed(ApiObject):
     timezone: str
     token: str
     status: str
-    degraded_threshold: float
     critical_threshold: float
     status_event_id: str
     created_at: datetime

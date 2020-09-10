@@ -1,0 +1,22 @@
+from typing import List
+
+import click
+
+from contxt.cli.utils import Clients, fields_option, print_table, sort_option
+from contxt.models.contxt import Service
+
+
+@click.group()
+def services() -> None:
+    """Services."""
+
+
+@services.command()
+@click.argument("id", default="")  # HACK: make an optional argument
+@fields_option(default=["id", "name", "service_type", "description"], obj=Service)
+@sort_option(default="id")
+@click.pass_obj
+def get(obj: Clients, id: str, fields: List[str], sort: str) -> None:
+    """Get service(s)"""
+    items = [obj.contxt.get_service(id)] if id else obj.contxt.get_services()
+    print_table(items=items, keys=fields, sort_by=sort)
