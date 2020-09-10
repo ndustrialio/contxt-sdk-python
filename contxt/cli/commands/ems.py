@@ -1,6 +1,7 @@
 import csv
 import os
-from datetime import datetime
+from csv import DictWriter
+from pathlib import Path
 
 import requests
 
@@ -23,7 +24,7 @@ class Ems(BaseParser):
         mains_parser = _subparsers.add_parser("mains", help="Get Main Services")
         mains_parser.add_argument("facility_id", type=int, help="Facility to get main services for")
         mains_parser.add_argument(
-            "--resource_type", type=ResourceType, help="Filter by type of resource"
+            "--resource-type", type=ResourceType, help="Filter by type of resource"
         )
         mains_parser.set_defaults(func=self._mains)
 
@@ -33,11 +34,7 @@ class Ems(BaseParser):
         md_parser.add_argument("resource_type", type=ResourceType)
         md_parser.add_argument("start_time", type=Parsers.datetime, help="Start time")
         md_parser.add_argument("end_time", type=Parsers.datetime, help="End time")
-        md_parser.add_argument(
-            "--download",
-            action="store_true",
-            help="Write main data to file in the data-exports directory",
-        )
+        md_parser.add_argument("-o", "--output", help="Filename to save data (csv)")
         md_parser.set_defaults(func=self._main_data)
 
         # Spend
@@ -58,41 +55,29 @@ class Ems(BaseParser):
 
         # Usage
         usage_parser = _subparsers.add_parser("util-usage", help="Utility usage")
-        usage_parser.add_argument("interval", choices=["daily", "monthly"], help="Time interval")
-        usage_parser.add_argument("resource_type", type=ResourceType, help="Type of resource")
-        usage_parser.add_argument("start_date", type=Parsers.date, help="Start date")
-        usage_parser.add_argument("end_date", type=Parsers.date, help="End date")
-        usage_parser.add_argument("--download", action="store_true", help="Download all usage data")
-        usage_group = usage_parser.add_mutually_exclusive_group(required=True)
-        usage_group.add_argument("-f", "--facility-ids", type=str, help="Facilities to get usage for")
-        usage_group.add_argument("-g", "--org-id", help="Organization id")
-        usage_group.add_argument("-n", "--org-name", help="Organization name")
-        usage_parser.add_argument("-o", "--output", help="Filename to save data (csv)")
+        usage_parser.add_argument("-f", "--facility-ids", nargs="*", type=int, help="Facility ids")
         usage_parser.add_argument(
-            "-p", "--pro-forma", action="store_true", help="Include pro forma calculations"
+            "--interval", choices=["daily", "monthly"], default="monthly", help="Time interval"
         )
+        usage_parser.add_argument("--resource-type", type=ResourceType, help="Type of resource")
+        usage_parser.add_argument("--start", type=Parsers.date, help="Start date")
+        usage_parser.add_argument("--end", type=Parsers.date, help="End date")
+        usage_parser.add_argument("-o", "--output", help="Filename to save data (csv)")
         usage_parser.set_defaults(func=self._utility_usage)
 
         # Utility Bills
-        bills_parser = _subparsers.add_parser("bills", help="Get Utility Bills")
-        bills_parser.add_argument(
-            "--resource-type", type=ResourceType, help="Filter by type of resource"
-        )
-        bills_parser.add_argument(
-            "--from-date", help="Limit the date to fetch utility bills. Format: YYYY-MM-DD"
-        )
-        bills_parser.add_argument(
-            "--to-date", help="Limit the date to fetch utility bills. Format: YYYY-MM-DD"
-        )
-        bills_parser.add_argument(
-            "--download",
-            action="store_true",
-            help="Download all PDF utility statements and their summaries",
-        )
+        bills_parser = _subparsers.add_parser("bills", help="Get utility bills")
         facility_group = bills_parser.add_mutually_exclusive_group(required=True)
-        facility_group.add_argument("-f", "--facility-ids", type=str, help="Facilities to get bills for")
+        facility_group.add_argument("-f", "--facility-ids", nargs="*", type=int, help="Facility ids")
         facility_group.add_argument("-n", "--org-name", help="Organization name")
 
+        bills_parser.add_argument(
+            "--start", type=Parsers.date, help="Start date of bills (format: YYYY-MM-DD)"
+        )
+        bills_parser.add_argument(
+            "--end", type=Parsers.date, help="End date to bills (format: YYYY-MM-DD)"
+        )
+        bills_parser.add_argument("--output", type=Path, help="Directory to output PDF's and summaries")
         bills_parser.set_defaults(func=self._bills)
 
         return parser
@@ -105,179 +90,95 @@ class Ems(BaseParser):
         print(Serializer.to_table(main_services, exclude_keys=["usage_field", "demand_field"]))
 
     def _bills(self, args):
-        utilities_service = SisService(args.auth)
-        facilities_service = FacilitiesService(args.auth)
-        from_date = datetime.strptime(args.from_date, "%Y-%m-%d").date() if args.from_date else None
-        to_date = datetime.strptime(args.to_date, "%Y-%m-%d").date() if args.to_date else None
-
-        # if facility ids are provided
-        facility_ids_to_export = []
-        if args.facility_ids is not None:
-            facility_ids_to_export = args.facility_ids.split(",")
-        else:
+        # Determine facilities
+        facility_ids = args.facility_ids
+        if not facility_ids:
             org_id = get_org_id(args.org_name, args.auth)
-            facility_objs = facilities_service.get_facilities(org_id)
-            facility_ids_to_export = [f.id for f in facility_objs]
-            print(f"Exporting bills for {args.org_name} with {len(facility_ids_to_export)} facilities")
+            facility_ids = [f.id for f in FacilitiesService(args.auth).get_facilities(org_id)]
 
-        for facility_id in facility_ids_to_export:
-            print(f"Exporting bills for facility {facility_id} from {from_date} to {to_date}")
-            bills = [
-                statement
-                for statement in utilities_service.get_statements(facility_id=facility_id)
-                if (from_date is None or statement.interval_start > from_date)
-                and (to_date is None or statement.interval_end < to_date)
-            ]
-
-            if args.download:
-                self._download_pdf_statements(args, facility_id, bills, utilities_service)
+        # Download
+        print(f"Exporting bills for {len(facility_ids)} facilities")
+        sis_api = SisService(args.auth)
+        fac_api = FacilitiesService(args.auth)
+        for facility_id in facility_ids:
+            print(f"Exporting bills for facility {facility_id}")
+            try:
+                facility = fac_api.get_facility_with_id(facility_id)
+            except requests.exceptions.HTTPError:
+                print(f"Skipping facility {facility_id} (not found)")
+                continue
+            bills = sis_api.get_statements(facility_id=facility.id, start=args.start, end=args.end)
+            if args.output:
+                self._download_pdf_statements(sis_api, facility, args.output, bills)
             else:
                 print(Serializer.to_table(bills, sort_by="interval_start"))
 
-    def _download_pdf_statements(self, args, facility_id, bills, utility_service):
-        file_service = SisService(args.auth)
-        facilities_service = FacilitiesService(args.auth)
-        # get the facility object so we can make the directory more readable
-        try:
-            facility_obj = facilities_service.get_facility_with_id(facility_id)
-        except requests.exceptions.HTTPError:
-            print("Facility not found")
-            return
+    def _download_pdf_statements(self, sis_api, facility, output, bills):
+        print(f"Getting information for {facility.name}")
+        # Build directory structure
+        facility_dir = output / facility.slug
+        utility_dir = facility_dir / "utilities"
+        bill_dir = utility_dir / "bill-pdfs"
+        bill_dir.mkdir(parents=True, exist_ok=True)
 
-        print(f"Getting information for {facility_obj.name}")
+        # Build csv
+        data = []
+        accounts = {a.id: a for a in sis_api.get_accounts(facility.id)}
+        meters = {m.id: m for m in sis_api.get_meters(facility.id)}
+        for i, bill in enumerate(bills):
+            print(f"Fetching bill {i + 1} of {len(bills)}")
 
-        # build the directory structure
-        facility_export_dir = f"./data-exports/{facility_obj.name}/"
-        utilities_export_dir = os.path.join(facility_export_dir, "utilities/")
-        bill_export_dir = os.path.join(utilities_export_dir, "bill-pdfs/")
-
-        # ensure the exports directory is created
-        os.makedirs(bill_export_dir, exist_ok=True)
-
-        # get the account and meter information so we can map it from IDs to use in our export
-        meters = {m.id: m for m in utility_service.get_meters(facility_id)}
-        accounts = {a.id: a for a in utility_service.get_accounts(facility_id)}
-
-        bill_summary_data = []
-        unique_data_columns = [
-            "account_number",
-            "meter_number",
-            "service_type",
-            "interval_start",
-            "interval_end",
-            "assigned_statement_year",
-            "assigned_statement_month",
-            "has_pdf_bill",
-        ]
-
-        for idx, bill in enumerate(bills):
-            # go get some more information about this bill regarding charges, kw, etc.
-            raw_bill_data = utility_service.get_statement_data(bill.id)
-            """
-            Summary CSV:
-            account_number, meter_number, service_type, interval_start, interval_end,
-            assigned_statement_year, assigned_statement_month, has_pdf_bill, <charges_and_units> ->>
-            """
-
-            service_type = meters[bill.utility_meter_id].service_type
-            meter_number = meters[bill.utility_meter_id].label
-
-            # add the general bill metadata
-            bill_metadata = {
+            # Build row
+            row = {
                 "account_number": accounts[meters[bill.utility_meter_id].utility_account_id].label,
-                "meter_number": meter_number,
-                "service_type": service_type,
+                "meter_number": meters[bill.utility_meter_id].label,
+                "service_type": meters[bill.utility_meter_id].service_type,
                 "interval_start": bill.interval_start,
                 "interval_end": bill.interval_end,
-                "assigned_statement_year": bill.statement_year,
-                "assigned_statement_month": bill.statement_month,
+                "assigned_month": f"{bill.statement_year}-{bill.statement_month}-1",
+                **{
+                    f"{row['node_label'].lower()} ({row['units']})": row["value"]
+                    for row in sis_api.get_statement_data(bill.id)
+                },
+                "pdf": "",
             }
 
-            for row in raw_bill_data:
-
-                row_label = f"[Total] {row['node_label']} ({row['units']})"
-                # iterate over the bill data and add charge info to the metadata
-                bill_metadata[row_label] = row["value"]
-                if row_label not in unique_data_columns:
-                    unique_data_columns.append(row_label)
-
-                for child_charge in row["children"]:
-                    child_label = (
-                        f"[{row['node_label']}] {child_charge['node_label']} ({child_charge['units']})"
-                    )
-                    bill_metadata[child_label] = child_charge["value"]
-
-                    if child_label not in unique_data_columns:
-                        unique_data_columns.append(child_label)
-
-            # if a PDF of the bill is available, let's go fetch that
+            # Download pdf
             if bill.file_id:
-                print(
-                    f"Downloading bill {idx+1} out of {len(bills)} for "
-                    f"{bill.statement_year}-{bill.statement_month}"
-                )
-                bill_metadata["has_pdf_bill"] = True
                 try:
-                    file_read_endpoint = file_service.request_read_file(file_id=bill.file_id)
-                    filename = (
-                        f"{bill.id}-{service_type}-{meter_number}-{bill.statement_year}"
-                        f"-{bill.statement_month}.pdf".replace("/", "-")
-                    )
-                    file_download_path = os.path.join(bill_export_dir, filename)
-                    self._download_file(file_read_endpoint, file_download_path)
-                except requests.exceptions.HTTPError:
-                    print(f"Unable to read file with id {bill.file_id}")
-            else:
-                bill_metadata["has_pdf_bill"] = True
-                print(f"No PDF for bill starting: {bill.statement_year}-{bill.statement_month}")
-            bill_summary_data.append(bill_metadata)
+                    pdf = sis_api.request_read_file(bill.file_id)
+                    path = bill_dir / f"{bill.id}.pdf"
+                    pdf.download(path)
+                    row["pdf"] = path
+                except Exception as e:
+                    print(e)
 
-        # Write all the metadata to a summary in a CSV file
-        summary_file_path = os.path.join(utilities_export_dir, "summary.csv")
-        with open(summary_file_path, "w") as csv_file:
-            writer = csv.DictWriter(csv_file, fieldnames=unique_data_columns)
+            data.append(row)
+
+        # Dump to csv
+        columns = data[0].keys() if data else []
+        with (utility_dir / "summary.csv").open("w") as f:
+            writer = DictWriter(f, fieldnames=columns)
             writer.writeheader()
-            for row in bill_summary_data:
-                for key in unique_data_columns:
-                    if key not in row:
-                        row[key] = ""
-            writer.writerows(bill_summary_data)
+            writer.writerows(data)
 
-    def _download_file(self, read_endpoint, local_file_path):
-        try_count = 0
-        while try_count < 3:
-            try:
-
-                if os.path.exists(local_file_path):
-                    print(f"Already downloaded bill {local_file_path}")
-                    break
-                r = requests.get(read_endpoint.temporary_url)
-
-                with open(local_file_path, "wb") as f:
-                    f.write(r.content)
-                break
-            except Exception as e:
-                print(f"Exception raised during download {e}")
-                try_count += 1
-
+    # TODO: refactor me
     def _main_data(self, args):
-        ems_service = EmsService(args.auth)
-        iot_service = IotService(args.auth)
-        facilities_service = FacilitiesService(args.auth)
+        ems = EmsService(args.auth)
+        iot = IotService(args.auth)
+        fac = FacilitiesService(args.auth)
 
-        print(args.facility_ids)
         for facility_id in args.facility_ids.split(","):
-
-            # get the facility object so we can make the directory more readable
+            # Get facility
             try:
-                facility_obj = facilities_service.get_facility_with_id(facility_id)
+                facility = fac.get_facility_with_id(facility_id)
             except requests.exceptions.HTTPError:
                 print("Facility not found")
                 continue
 
-            print(f"Getting interval data for {facility_obj.id} -> {facility_obj.name}")
+            print(f"Getting interval data for {facility.id} -> {facility.name}")
             try:
-                services = ems_service.get_main_services(
+                services = ems.get_main_services(
                     facility_id=facility_id, resource_type=args.resource_type
                 )
             except requests.exceptions.HTTPError:
@@ -285,7 +186,7 @@ class Ems(BaseParser):
                 continue
 
             data = {
-                service.name: iot_service.get_time_series_for_field(
+                service.name: iot.get_time_series_for_field(
                     service.usage_field,
                     start_time=args.start_time,
                     end_time=args.end_time,
@@ -310,31 +211,21 @@ class Ems(BaseParser):
             summed_data = []
             skipped_count = 0
             for time, values in blended_data.items():
-                if (len(values)) == len(services):
+                if len(values) == len(services):
                     try:
                         summed_data.append({"time": time, "value": sum(values)})
                     except Exception as e:
                         print(e)
-                        print(values)
                 else:
                     skipped_count += 1
 
-            if args.download and len(summed_data) > 0:
-                # build the directory structure
-                facility_export_dir = f"./data-exports/{facility_obj.name}/"
-                ems_export_dir = os.path.join(facility_export_dir, "ems/")
-
-                # ensure the exports directory is created
-                os.makedirs(ems_export_dir, exist_ok=True)
-
-                # Write all the metadata to a summary in a CSV file
-                summary_file_path = os.path.join(ems_export_dir, "minute_intervals.csv")
-                with open(summary_file_path, "w") as csv_file:
-                    writer = csv.DictWriter(csv_file, fieldnames=["time", "value"])
+            if args.output:
+                path = Path(args.output) / facility.name / "ems"
+                path.mkdir(parents=True, exist_ok=True)
+                with (path / "minute_intervals.csv").open("w") as f:
+                    writer = DictWriter(f, fieldnames=["time", "value"])
                     writer.writeheader()
-
-                    for data in summed_data:
-                        writer.writerow(data)
+                    writer.writerows(summed_data)
             else:
                 print(Serializer.to_table(summed_data))
 
@@ -398,40 +289,50 @@ class Ems(BaseParser):
                     writer.writerow({"time": data.event_time, "value": data.value})
 
     def _utility_usage(self, args):
-        ems_service = EmsService(args.auth)
-        if args.f__facility_ids:
-            print(args.f__facility_ids)
-            for facility_id in args.f__facility_ids.split(","):
-                print(f"Getting Utility usage for facility {facility_id}")
-                # Get facility usage
-                try:
-                    usage = ems_service.get_ems_usage(
-                        facility_id=facility_id,
-                        interval=args.interval,
-                        resource_type=args.resource_type,
-                        start_date=args.start_date,
-                        end_date=args.end_date,
-                        pro_forma=args.pro_forma,
-                    )
-                    if args.download:
-                        self._download_utility_usage(usage, args, facility_id)
-                    else:
-                        print(Serializer.to_pretty_cli(usage))
-                except requests.exceptions.HTTPError:
-                    print("Facility not found")
+        ems = EmsService(args.auth)
+        fac = FacilitiesService(args.auth)
+        kwargs = {
+            k: getattr(args, k)
+            for k in ["resource_type", "start", "end"]
+            if getattr(args, k) is not None
+        }
+        if args.facility_ids:
+            for facility_id in args.facility_ids:
+                print(f"Getting utility usage for facility {facility_id}")
 
+                # Get facility
+                try:
+                    facility = fac.get_facility_with_id(facility_id)
+                except requests.exceptions.HTTPError:
+                    print(f"Skipping facility {facility_id} (not found)")
+                    continue
+
+                # Get usage
+                usage = ems.get_usage(facility_id=facility.id, interval=args.interval, **kwargs)
+
+                # Output
+                if args.output:
+                    self._download_utility_usage(facility, usage, args.output)
+                else:
+                    print(Serializer.to_pretty_cli(usage))
         else:
             # Get organization usage
             organization_id = args.org_id or get_org_id(args.org_name, args.auth)
             facilities_service = FacilitiesService(args.auth)
             usage = {
-                f: ems_service.get_monthly_utility_usage(
-                    facility_id=f.id,
-                    resource_type=args.resource_type,
-                    start_date=args.start_date,
-                    end_date=args.end_date,
-                    pro_forma=args.pro_forma,
-                )
+                f: ems.get_monthly_utility_usage(facility_id=f.id, **kwargs)
                 for f in facilities_service.get_facilities(organization_id)
             }
             print(usage)
+
+    def _download_utility_usage(self, facility, usage, output):
+        # Build directory structure
+        path = Path(output) / facility.slug / "ems"
+        path.mkdir(parents=True, exist_ok=True)
+
+        # Dump
+        print(f"Writing information for {facility.name}")
+        with (path / "usage.csv").open("w") as f:
+            writer = DictWriter(f, fieldnames=["time", "value"])
+            writer.writeheader()
+            writer.writerows([{"time": v.event_time, "value": v.value} for v in usage.values])

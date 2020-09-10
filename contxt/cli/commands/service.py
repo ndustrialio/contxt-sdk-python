@@ -178,6 +178,3 @@ class Services(BaseParser):
         grant = ServiceGrant(from_service_id=from_service.id, to_service_id=to_service.id)
         dep = contxt_service.create_service_dependency(grant)
         print(Serializer.to_pretty_cli(dep))
-
-
-

@@ -6,6 +6,9 @@ from ..models.ems import Facility, MainService, ResourceType, UtilityContract, U
 from .api import ApiEnvironment, ConfiguredApi
 from .pagination import PagedRecords
 
+def date_to_datetime(d: date) -> datetime:
+    return datetime.strptime(d.isoformat(), "%Y-%m-%d")
+
 
 class EmsService(ConfiguredApi):
     """EMS API client"""
@@ -132,6 +135,25 @@ class EmsService(ConfiguredApi):
             end_date=end_date,
             pro_forma=pro_forma,
         )
+
+    def get_usage(
+        self,
+        facility_id: int,
+        interval: str,
+        resource_type: ResourceType = ResourceType.ELECTRIC,
+        start: date = date.today() - timedelta(days=365),
+        end: date = date.today(),
+    ) -> UtilityUsage:
+        """Get utility usage for facility `facility_id` and resource `resource_type`"""
+        resp = self.get(
+            f"facilities/{facility_id}/usage/{interval}",
+            params={
+                "type": resource_type.value,
+                "time_start": int(date_to_datetime(start).timestamp()),
+                "time_end": int(date_to_datetime(end).timestamp()),
+            },
+        )
+        return UtilityUsage.from_api(resp)
 
     def get_utility_contracts_for_facility(self, facility_id: int) -> Iterable[UtilityContract]:
         return PagedRecords(

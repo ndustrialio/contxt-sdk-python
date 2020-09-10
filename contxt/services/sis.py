@@ -1,4 +1,5 @@
-from typing import List
+from datetime import date
+from typing import List, Optional
 
 from contxt.auth import Auth
 from contxt.models.ems import UtilityAccount, UtilityMeter, UtilityStatement
@@ -27,9 +28,19 @@ class SisService(ConfiguredApi):
         resp = self.get(f"files/{file_id}/read")
         return FileRead.from_api(resp)
 
-    def get_statements(self, facility_id: int) -> List[UtilityStatement]:
+    def get_statements(
+        self, facility_id: int, start: Optional[date] = None, end: Optional[date] = None
+    ) -> List[UtilityStatement]:
         resp = self.get(f"facilities/{facility_id}/utilities/statements")
-        return [UtilityStatement.from_api(rec) for rec in resp]
+        statements = [UtilityStatement.from_api(rec) for rec in resp]
+        if start or end:
+            statements = [
+                s
+                for s in statements
+                if (start or s.interval_start) <= s.interval_start
+                and s.interval_end <= (end or s.interval_end)
+            ]
+        return statements
 
     def get_meters(self, facility_id: int) -> List[UtilityMeter]:
         resp = self.get(f"facilities/{facility_id}/utilities/meters")

@@ -74,8 +74,6 @@ class UtilityPeriod(ApiObject):
 
     event_time: datetime
     value: int
-    # pro_forma_date: Optional[str] = None
-
 
 UtilitySpendPeriod = UtilityPeriod
 UtilityUsagePeriod = UtilityPeriod
