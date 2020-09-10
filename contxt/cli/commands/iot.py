@@ -19,9 +19,9 @@ def iot() -> None:
 @fields_option(default=["id", "key", "facility_id"], obj=Feed)
 @sort_option(default="id")
 @click.pass_obj
-def feeds(obj: Clients, fields: List[str], sort: str) -> None:
+def feeds(clients: Clients, fields: List[str], sort: str) -> None:
     """Get feeds"""
-    items = obj.iot.get_feeds()
+    items = clients.iot.get_feeds()
     print_table(items=items, keys=fields, sort_by=sort)
 
 
@@ -30,9 +30,9 @@ def feeds(obj: Clients, fields: List[str], sort: str) -> None:
 @fields_option(default=["id", "feed_key", "name", "field_human_name"], obj=Field)
 @sort_option(default="id")
 @click.pass_obj
-def fields(obj: Clients, facility_id: int, fields: List[str], sort: str) -> None:
+def fields(clients: Clients, facility_id: int, fields: List[str], sort: str) -> None:
     """Get fields"""
-    items = obj.iot.get_fields_for_facility(facility_id)
+    items = clients.iot.get_fields_for_facility(facility_id)
     print_table(items=items, keys=fields, sort_by=sort)
 
 
@@ -41,9 +41,9 @@ def fields(obj: Clients, facility_id: int, fields: List[str], sort: str) -> None
 @fields_option(default=["id", "label", "slug", "description"], obj=FieldGrouping)
 @sort_option(default="id")
 @click.pass_obj
-def groupings(obj: Clients, facility_id: int, fields: List[str], sort: str) -> None:
+def groupings(clients: Clients, facility_id: int, fields: List[str], sort: str) -> None:
     """Get field groupings"""
-    items = obj.iot.get_field_groupings_for_facility(facility_id)
+    items = clients.iot.get_field_groupings_for_facility(facility_id)
     print_table(items=items, keys=fields, sort_by=sort)
 
 
@@ -63,10 +63,10 @@ def groupings(obj: Clients, facility_id: int, fields: List[str], sort: str) -> N
 )
 @click.pass_obj
 def data(
-    obj: Clients, feed_id: str, start: datetime, end: datetime, interval: Window, output: Path
+    clients: Clients, feed_id: str, start: datetime, end: datetime, interval: Window, output: Path
 ) -> None:
     """Get field data"""
-    fields = obj.iot.get_fields_for_feed(feed_id)
+    fields = clients.iot.get_fields_for_feed(feed_id)
     print(f"Fetching iot data for {len(fields)} tags from {start} to {end}")
 
     data: Dict[datetime, Dict[str, Any]] = defaultdict(dict)
@@ -76,7 +76,7 @@ def data(
         item_show_func=lambda f: f"Field {f.field_human_name}" if f else "",
     ) as fields_:
         for field in fields_:
-            for (t, v) in obj.iot.get_time_series_for_field(
+            for (t, v) in clients.iot.get_time_series_for_field(
                 field=field, start_time=start, end_time=end, window=interval
             ):
                 data[t][field.field_human_name] = v

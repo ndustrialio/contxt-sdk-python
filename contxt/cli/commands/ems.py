@@ -35,10 +35,10 @@ def ems() -> None:
 @sort_option(default="id")
 @click.pass_obj
 def mains(
-    obj: Clients, facility_id: int, resource_type: ResourceType, fields: List[str], sort: str
+    clients: Clients, facility_id: int, resource_type: ResourceType, fields: List[str], sort: str
 ) -> None:
     """Get main services"""
-    items = obj.ems.get_main_services(facility_id=facility_id, resource_type=resource_type)
+    items = clients.ems.get_main_services(facility_id=facility_id, resource_type=resource_type)
     print_table(items=items, keys=fields, sort_by=sort)
 
 
@@ -49,18 +49,18 @@ def mains(
 @click.option("--end", type=click.DateTime(), help="End time")
 @click.pass_obj
 def main_data(
-    obj: Clients, facility_id: int, resource_type: ResourceType, start: datetime, end: datetime,
+    clients: Clients, facility_id: int, resource_type: ResourceType, start: datetime, end: datetime,
 ) -> None:
     """Get main service data"""
     data: Dict[datetime, Dict[str, Any]] = defaultdict(dict)
-    services = obj.ems.get_main_services(facility_id=facility_id, resource_type=resource_type)
+    services = clients.ems.get_main_services(facility_id=facility_id, resource_type=resource_type)
     with click.progressbar(
         services,
         label="Downloading main service data",
         item_show_func=lambda s: f"Service {s.name}" if s else "",
     ) as services_:
         for service in services_:
-            for (t, v) in obj.iot.get_time_series_for_field(
+            for (t, v) in clients.iot.get_time_series_for_field(
                 field=service.usage_field,
                 start_time=start,
                 end_time=end,
@@ -83,7 +83,7 @@ def main_data(
 )
 @click.pass_obj
 def spend(
-    obj: Clients,
+    clients: Clients,
     facility_id: int,
     resource_type: ResourceType,
     start: datetime,
@@ -91,7 +91,7 @@ def spend(
     interval: str,
 ) -> None:
     """Get utility spend"""
-    items = obj.ems.get_monthly_utility_spend(
+    items = clients.ems.get_monthly_utility_spend(
         facility_id=facility_id, resource_type=resource_type, start_date=start, end_date=end
     )
     print_table(items=items)
@@ -107,7 +107,7 @@ def spend(
 )
 @click.pass_obj
 def usage(
-    obj: Clients,
+    clients: Clients,
     facility_id: int,
     resource_type: ResourceType,
     start: datetime,
@@ -115,7 +115,7 @@ def usage(
     interval: str,
 ) -> None:
     """Get utility usage"""
-    usage = obj.ems.get_usage(
+    usage = clients.ems.get_usage(
         facility_id=facility_id, resource_type=resource_type, start=start, end=end, interval=interval
     )
     print_table(items=usage.values)
@@ -129,11 +129,11 @@ def usage(
 @sort_option(default="interval_start")
 @click.pass_obj
 def bills(
-    obj: Clients, facility_id: int, start: datetime, end: datetime, fields: List[str], sort: str
+    clients: Clients, facility_id: int, start: datetime, end: datetime, fields: List[str], sort: str
 ) -> None:
     """Get utility bills"""
-    facility = obj.facilities.get_facility_with_id(facility_id)
-    items = obj.sis.get_statements(facility_id=facility.id, start=start, end=end)
+    facility = clients.facilities.get_facility_with_id(facility_id)
+    items = clients.sis.get_statements(facility_id=facility.id, start=start, end=end)
     print_table(items=items, keys=fields, sort_by=sort)
 
 
@@ -150,7 +150,7 @@ def bills(
 @click.option("--output", type=ClickPath(file_okay=False), default=".", help="Path for output")
 @click.pass_obj
 def export(
-    obj: Clients,
+    clients: Clients,
     facility_ids: List[int],
     include: List[str],
     start: datetime,
@@ -162,19 +162,21 @@ def export(
         facility_ids, label="Downloading data", item_show_func=lambda f: f"Facility {f}" if f else "",
     ) as facility_ids_:
         for id in facility_ids_:
-            facility = obj.facilities.get_facility_with_id(id)
+            facility = clients.facilities.get_facility_with_id(id)
             fpath = output / facility.slug
 
             # Utility bills
             if "bills" in include:
-                statements = obj.sis.get_statements(
+                statements = clients.sis.get_statements(
                     facility_id=facility.id, start=start.date(), end=end.date(),
                 )
-                _download_bills(sis_api=obj.sis, facility_id=facility.id, bills=statements, output=fpath)
+                _download_bills(
+                    sis_api=clients.sis, facility_id=facility.id, bills=statements, output=fpath
+                )
 
             # Utility usage
             if "usage" in include:
-                usage = obj.ems.get_usage(
+                usage = clients.ems.get_usage(
                     facility_id=facility.id, start=start, end=end, interval="daily",
                 )
                 Serializer.to_csv(usage.values, fpath / "ems" / "usage.csv")
@@ -182,9 +184,9 @@ def export(
             # Main service data
             if "mains" in include:
                 data: Dict[datetime, Dict[str, Any]] = defaultdict(dict)
-                services = obj.ems.get_main_services(facility_id=facility.id)
+                services = clients.ems.get_main_services(facility_id=facility.id)
                 for service in services:
-                    for (t, v) in obj.iot.get_time_series_for_field(
+                    for (t, v) in clients.iot.get_time_series_for_field(
                         field=service.usage_field,
                         start_time=start,
                         end_time=end,

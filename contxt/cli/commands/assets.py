@@ -27,8 +27,8 @@ def types(clients: Clients, fields: List[str], sort: str) -> None:
 @fields_option(default=["id", "label", "description"], obj=Asset)
 @sort_option(default="id")
 @click.pass_obj
-def get(obj: Clients, type: str, fields: List[str], sort: str) -> None:
+def get(clients: Clients, type: str, fields: List[str], sort: str) -> None:
     """Get assets"""
-    types = [t for t in obj.assets.get_asset_types() if t.label == type]
-    items = [a for t in types for a in obj.assets.get_assets(t.id)]
+    types = [t for t in clients.assets.get_asset_types() if t.label == type]
+    items = [a for t in types for a in clients.assets.get_assets(t.id)]
     print_table(items=items, keys=fields, sort_by=sort)

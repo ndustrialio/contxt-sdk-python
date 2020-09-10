@@ -17,7 +17,7 @@ def services() -> None:
 @fields_option(default=["id", "name", "service_type", "description"], obj=Service)
 @sort_option(default="id")
 @click.pass_obj
-def get(obj: Clients, id: str, fields: List[str], sort: str) -> None:
+def get(clients: Clients, id: str, fields: List[str], sort: str) -> None:
     """Get service(s)"""
-    items = [obj.contxt.get_service(id)] if id else obj.contxt.get_services()
+    items = [clients.contxt.get_service(id)] if id else clients.contxt.get_services()
     print_table(items=items, keys=fields, sort_by=sort)

@@ -17,9 +17,9 @@ def projects() -> None:
 @fields_option(default=["id", "name", "type", "description"], obj=Project)
 @sort_option(default="id")
 @click.pass_obj
-def get(obj: Clients, id: Optional[str], fields: List[str], sort: str) -> None:
+def get(clients: Clients, id: Optional[str], fields: List[str], sort: str) -> None:
     """Get project(s)"""
-    items = [obj.contxt.get_project(id)] if id else obj.contxt.get_projects()
+    items = [clients.contxt.get_project(id)] if id else clients.contxt.get_projects()
     print_table(items=items, keys=fields, sort_by=sort)
 
 
@@ -28,9 +28,9 @@ def get(obj: Clients, id: Optional[str], fields: List[str], sort: str) -> None:
 @fields_option(default=["id", "name", "service_type", "description"], obj=Service)
 @sort_option(default="id")
 @click.pass_obj
-def get_services(obj: Clients, id: str, fields: List[str], sort: str) -> None:
+def get_services(clients: Clients, id: str, fields: List[str], sort: str) -> None:
     """Get services for a project"""
-    items = obj.contxt.get_services(id)
+    items = clients.contxt.get_services(id)
     print_table(items=items, keys=fields, sort_by=sort)
 
 
@@ -40,7 +40,7 @@ def get_services(obj: Clients, id: str, fields: List[str], sort: str) -> None:
 @fields_option(default=["id", "name", "stack_id", "description"], obj=EdgeNode)
 @sort_option(default="id")
 @click.pass_obj
-def get_edge_nodes(obj: Clients, org_id: str, project_id: int, fields: List[str], sort: str) -> None:
+def get_edge_nodes(clients: Clients, org_id: str, project_id: int, fields: List[str], sort: str) -> None:
     """Get edge nodes for a project"""
-    items = obj.contxt.get_edge_nodes(organization_id=org_id, project_id=project_id)
+    items = clients.contxt.get_edge_nodes(organization_id=org_id, project_id=project_id)
     print_table(items=items, keys=fields, sort_by=sort)
