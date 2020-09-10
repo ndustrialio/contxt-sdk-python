@@ -13,28 +13,28 @@ class Services(BaseParser):
 
         # Get Service
         service_parser = _subparsers.add_parser("get", help="Get a service")
-        service_parser.add_argument("service_id", help="Service ID")
+        service_parser.add_argument("service-id", help="Service ID")
         service_parser.set_defaults(func=self._get_service)
 
         # Service scopes
         scopes_parser = _subparsers.add_parser("get-scopes", help="Get scopes for a service")
-        scopes_parser.add_argument("service_id", help="Service ID")
+        scopes_parser.add_argument("service-id", help="Service ID")
         scopes_parser.set_defaults(func=self._get_service_scopes)
 
         # Dependencies
         dependencies_parser = _subparsers.add_parser("get-deps", help="Get dependencies for a service")
-        dependencies_parser.add_argument("service_id", help="Service ID")
+        dependencies_parser.add_argument("service-id", help="Service ID")
         dependencies_parser.set_defaults(func=self._get_dependencies)
 
         create_deps_parser = _subparsers.add_parser("add-dep", help="Create a new dependency for a service")
-        create_deps_parser.add_argument("--service_id", help="From Service ID")
-        create_deps_parser.add_argument("--to_service_id", help="To Service ID")
+        create_deps_parser.add_argument("--service-id", help="From Service ID")
+        create_deps_parser.add_argument("--to-service-id", help="To Service ID")
         create_deps_parser.set_defaults(func=self._create_dependency)
 
         add_dep_scope_parser = _subparsers.add_parser("add-dep-scope", help="Add scopes to a dependency")
-        add_dep_scope_parser.add_argument("-s", "--service_id", help="The from service ID",
+        add_dep_scope_parser.add_argument("-s", "--service-id", help="The from service ID",
                                           required=True)
-        add_dep_scope_parser.add_argument("-t", "--to_service_id", help="The \"to\" service ID",
+        add_dep_scope_parser.add_argument("-t", "--to-service-id", help="The \"to\" service ID",
                                           required=True)
         add_dep_scope_parser.add_argument("--scopes", help="Comma-delimited list of scope labels to add",
                                           required=True)
@@ -42,9 +42,9 @@ class Services(BaseParser):
 
         remove_dep_scope_parser = _subparsers.add_parser("remove-dep-scope", help="Remove scopes to a "
                                                                                   "dependency")
-        remove_dep_scope_parser.add_argument("-s", "--service_id", help="The from service ID",
+        remove_dep_scope_parser.add_argument("-s", "--service-id", help="The from service ID",
                                           required=True)
-        remove_dep_scope_parser.add_argument("-t", "--to_service_id", help="The \"to\" service ID",
+        remove_dep_scope_parser.add_argument("-t", "--to-service-id", help="The \"to\" service ID",
                                           required=True)
         remove_dep_scope_parser.add_argument("--scopes", help="Comma-delimited list of scope labels to "
                                                               "remove", required=True)
