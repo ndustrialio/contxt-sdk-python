@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from datetime import datetime, timedelta
 from functools import partial, reduce
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional
@@ -6,7 +7,6 @@ from typing import Any, Callable, Dict, List, Optional
 import click
 
 from contxt.auth.cli import CliAuth
-from contxt.models import ApiObject
 from contxt.services import (
     AssetsService,
     ContxtService,
@@ -19,6 +19,13 @@ from contxt.services import (
 )
 from contxt.utils import cachedproperty
 from contxt.utils.serializer import Serializer
+
+NOW = datetime.now().replace(microsecond=0)
+LAST_WEEK = NOW - timedelta(days=7)
+
+
+def warn(msg: str):
+    click.secho(msg, fg="red", err=True)
 
 
 def print_table(
@@ -86,14 +93,11 @@ class Clients:
         return SisService(self.auth)
 
 
-def fields_callback(obj: ApiObject):
-    """Create callback for `--fields`"""
-    options = [f.attr_key for f in obj._api_fields]
-
+def csv_callback(options: List[str], all: Optional[List[str]] = None):
     def _callback(ctx, param, value):
         # Parse
         if isinstance(value, str) and value == "all":
-            fields = []
+            fields = all or options
         elif isinstance(value, str):
             fields = [f.strip() for f in value.split(",")]
         else:
@@ -101,9 +105,7 @@ def fields_callback(obj: ApiObject):
         # Validate
         for f in fields:
             if f not in options:
-                raise click.BadParameter(
-                    f"'{f}' is not an available field. Choose from {', '.join(options)}."
-                )
+                raise click.BadParameter(f"'{f}' is not valid. Choose from {', '.join(options)}.")
         return fields
 
     return _callback
@@ -114,7 +116,7 @@ def fields_option(func: Optional[click.Command] = None, **kwargs) -> click.Comma
         return partial(fields_option, **kwargs)  # type: ignore
     return click.option(
         "--fields",
-        callback=fields_callback(kwargs.pop("obj")),
+        callback=csv_callback(options=[f.attr_key for f in kwargs.pop("obj")._api_fields], all=[]),
         help="Comma-delimited list of fields to return",
         **kwargs,
     )(func)
@@ -130,3 +132,11 @@ def sort_option(func: Optional[click.Command] = None, **kwargs) -> click.Command
 class ClickPath(click.Path):
     def convert(self, *args, **kwargs) -> Any:
         return Path(super().convert(*args, **kwargs))
+
+
+class Date(click.DateTime):
+    def __init__(self) -> None:
+        super().__init__(formats=["%Y-%m-%d"])
+
+    def convert(self, *args, **kwargs) -> Any:
+        return super().convert(*args, **kwargs).date()

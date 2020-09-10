@@ -7,10 +7,6 @@ from .api import ApiEnvironment, ConfiguredApi
 from .pagination import PagedRecords
 
 
-def date_to_datetime(d: date) -> datetime:
-    return datetime.strptime(d.isoformat(), "%Y-%m-%d")
-
-
 class EmsService(ConfiguredApi):
     """EMS API client"""
 

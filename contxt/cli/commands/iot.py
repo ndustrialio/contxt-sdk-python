@@ -1,16 +1,13 @@
 from collections import defaultdict
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List
 
 import click
 
-from contxt.cli.utils import ClickPath, Clients, fields_option, print_table, sort_option
+from contxt.cli.utils import LAST_WEEK, NOW, ClickPath, Clients, fields_option, print_table, sort_option
 from contxt.models.iot import Feed, Field, FieldGrouping, Window
 from contxt.utils.serializer import Serializer
-
-NOW = datetime.now().replace(microsecond=0)
-LAST_WEEK = NOW - timedelta(days=7)
 
 
 @click.group()
