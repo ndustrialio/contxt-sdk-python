@@ -1,52 +1,46 @@
-from contxt.services import ContxtService
-from contxt.utils.serializer import Serializer
+from typing import List, Optional
 
-from .common import BaseParser, get_org_id
+import click
+
+from contxt.cli.clients import Clients
+from contxt.cli.utils import fields_option, print_table, sort_option
+from contxt.models.contxt import EdgeNode, Project, Service
 
 
-class Projects(BaseParser):
-    def _init_parser(self, subparsers):
-        parser = subparsers.add_parser("projects", help="Contxt Projects")
-        parser.set_defaults(func=self._get_projects)
-        _subparsers = parser.add_subparsers(title="subcommands", dest="subcommand")
+@click.group()
+def projects() -> None:
+    """Projects."""
 
-        # Get Project
-        project_parser = _subparsers.add_parser("get", help="Get a project")
-        project_parser.add_argument("project_id", help="Project ID")
-        project_parser.set_defaults(func=self._get_project)
 
-        # Services
-        services_parser = _subparsers.add_parser("get-services", help="Get services for a project")
-        services_parser.add_argument("project_id", help="Project ID")
-        services_parser.set_defaults(func=self._get_services)
+@projects.command()
+@click.argument("id", default="")
+@fields_option(default=["id", "name", "type", "description"], obj=Project)
+@sort_option(default="id")
+@click.pass_obj
+def get(clients: Clients, id: Optional[str], fields: List[str], sort: str) -> None:
+    """Get project(s)"""
+    items = [clients.contxt.get_project(id)] if id else clients.contxt.get_projects()
+    print_table(items=items, keys=fields, sort_by=sort)
 
-        # Edge Nodes
-        edge_nodes_parser = _subparsers.add_parser("get-edge-nodes", help="Get edge nodes for a project")
-        edge_nodes_parser.add_argument("project_id", help="Project ID")
-        org_group = edge_nodes_parser.add_mutually_exclusive_group(required=True)
-        org_group.add_argument("-i", "--org-id", help="Organization id")
-        org_group.add_argument("-n", "--org-name", help="Organization name")
-        edge_nodes_parser.set_defaults(func=self._get_edge_nodes)
 
-        return parser
+@projects.command()
+@click.argument("id")
+@fields_option(default=["id", "name", "service_type", "description"], obj=Service)
+@sort_option(default="id")
+@click.pass_obj
+def get_services(clients: Clients, id: str, fields: List[str], sort: str) -> None:
+    """Get services for a project"""
+    items = clients.contxt.get_services(id)
+    print_table(items=items, keys=fields, sort_by=sort)
 
-    def _get_project(self, args):
-        contxt_service = ContxtService(args.auth)
-        project = contxt_service.get_project(args.project_id)
-        print(Serializer.to_pretty_cli(project))
 
-    def _get_projects(self, args):
-        contxt_service = ContxtService(args.auth)
-        projects = contxt_service.get_projects()
-        print(Serializer.to_table(projects, sort_by="created_at"))
-
-    def _get_services(self, args):
-        contxt_service = ContxtService(args.auth)
-        services = contxt_service.get_services(args.project_id)
-        print(Serializer.to_table(services))
-
-    def _get_edge_nodes(self, args):
-        org_id = args.org_id or get_org_id(args.org_name, args.auth)
-        contxt_service = ContxtService(args.auth)
-        nodes = contxt_service.get_edge_nodes(organization_id=org_id, project_id=args.project_id)
-        print(Serializer.to_table(nodes))
+@projects.command()
+@click.argument("org_id")
+@click.argument("project_id")
+@fields_option(default=["id", "name", "stack_id", "description"], obj=EdgeNode)
+@sort_option(default="id")
+@click.pass_obj
+def get_edge_nodes(clients: Clients, org_id: str, project_id: int, fields: List[str], sort: str) -> None:
+    """Get edge nodes for a project"""
+    items = clients.contxt.get_edge_nodes(organization_id=org_id, project_id=project_id)
+    print_table(items=items, keys=fields, sort_by=sort)

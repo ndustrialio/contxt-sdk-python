@@ -261,7 +261,7 @@ class Image(ApiObject):
 @dataclass
 class Service(ApiObject):
     _api_fields: ClassVar = (
-        ApiField("id"),
+        ApiField("id", data_type=int),
         ApiField("name"),
         ApiField("description"),
         ApiField("descriptor"),
@@ -296,7 +296,7 @@ class Service(ApiObject):
 @dataclass
 class Project(ApiObject):
     _api_fields: ClassVar = (
-        ApiField("id"),
+        ApiField("id", data_type=int),
         ApiField("name"),
         ApiField("description"),
         ApiField("type"),
@@ -317,7 +317,7 @@ class Project(ApiObject):
 @dataclass
 class EdgeNode(ApiObject):
     _api_fields: ClassVar = (
-        ApiField("id"),
+        ApiField("id", data_type=int),
         ApiField("name"),
         ApiField("stack_id"),
         ApiField("organization_id"),

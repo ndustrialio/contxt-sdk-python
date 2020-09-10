@@ -33,7 +33,7 @@ class AssetsService(ConfiguredApi):
     def __init__(
         self,
         auth: Auth,
-        organization_id: str,
+        organization_id: Optional[str] = None,
         env: str = "production",
         load_types: bool = True,
         types_to_fully_load: Optional[List[str]] = None,
@@ -46,7 +46,7 @@ class AssetsService(ConfiguredApi):
         self.types_by_id: Dict[str, AssetType] = {}
 
         # Cache asset types
-        if load_types:
+        if load_types and organization_id:
             full_types = types_to_fully_load or []
             for asset_type in self.get_asset_types(self.organization_id):
                 # if not asset_type.is_global:
@@ -102,7 +102,7 @@ class AssetsService(ConfiguredApi):
             asset.asset_type = self.asset_type_with_id(asset.asset_type_id, None)
 
         # Repeat for each child
-        for child in asset.children:
+        for child in asset.children or []:
             self._build_asset(
                 child, with_attribute_values=with_attribute_values, with_metric_values=with_metric_values
             )
