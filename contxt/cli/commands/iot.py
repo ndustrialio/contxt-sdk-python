@@ -49,6 +49,33 @@ def groupings(clients: Clients, facility_id: int, fields: List[str], sort: str) 
 
 
 @iot.command()
+@click.option("--output-id", required=True, type=int, help="Output ID to delete from")
+@click.option(
+    "--field-human-name", required=True, help="The field to delete from. Ex: power.demand, power.usage",
+)
+@click.option(
+    "--interval",
+    required=True,
+    type=click.Choice([str(v.value) for v in Window]),
+    callback=lambda ctx, param, value: Window(int(value)) if value is not None else None,
+    help="Time interval",
+)
+@click.option(
+    "--time",
+    required=True,
+    type=click.DateTime(),
+    help="The timestamp of the datapoint. Ex: 2020-07-21T05:31:00Z",
+)
+@click.pass_obj
+def delete_data_point(
+    clients: Clients, output_id: int, field: str, interval: Window, time: datetime
+) -> None:
+    """Delete data point"""
+    clients.iot.delete_time_series_point(output_id, field, interval, time)
+    print("Data point deleted")
+
+
+@iot.command()
 @click.argument("feed_id", type=int)
 @click.option("--start", type=click.DateTime(), default=LAST_WEEK.isoformat(), help="Start time")
 @click.option("--end", type=click.DateTime(), default=NOW.isoformat(), help="End time")
