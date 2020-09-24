@@ -46,6 +46,14 @@ class IotService(ConfiguredApi):
     def __init__(self, auth: Auth, env: str = "production", **kwargs) -> None:
         super().__init__(env=env, auth=auth, **kwargs)
 
+    def delete_time_series_point(
+        self, output_id: int, field: str, interval: Window, time: datetime
+    ) -> Optional[Dict]:
+        """Delete a point from the time series data by interval and timestamp"""
+        return self.delete(
+            f"outputs/{output_id}/fields/{field}/data/window/{interval.value}/event_time/{time}"
+        )
+
     def get_feed_with_id(self, id: int) -> Feed:
         """Get feed with id `id`"""
         return Feed.from_api(self.get(f"feeds/{id}"))

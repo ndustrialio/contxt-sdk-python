@@ -4,7 +4,6 @@ from pathlib import Path
 from typing import Any, Dict, List
 
 import click
-
 from contxt.cli.clients import Clients
 from contxt.cli.utils import LAST_WEEK, NOW, ClickPath, fields_option, print_table, sort_option
 from contxt.models.iot import Feed, Field, FieldGrouping, Window
@@ -46,6 +45,33 @@ def groupings(clients: Clients, facility_id: int, fields: List[str], sort: str) 
     """Get field groupings"""
     items = clients.iot.get_field_groupings_for_facility(facility_id)
     print_table(items=items, keys=fields, sort_by=sort)
+
+
+@iot.command()
+@click.option("--output_id", required=True, type=int, help="Output ID to delete from")
+@click.option(
+    "--field", required=True, type=str, help="The field to delete from. Ex: power.demand, power.usage",
+)
+@click.option(
+    "--interval",
+    required=True,
+    type=click.Choice([str(v.value) for v in Window]),
+    callback=lambda ctx, param, value: Window(int(value)) if value is not None else None,
+    help="Time interval",
+)
+@click.option(
+    "--time",
+    required=True,
+    type=click.DateTime(),
+    help="The timestamp of the datapoint. Ex: 2020-07-21 05:31:00",
+)
+@click.pass_obj
+def delete_data_point(
+    clients: Clients, output_id: int, field: str, interval: Window, time: datetime
+) -> None:
+    """Delete data point"""
+    clients.iot.delete_time_series_point(output_id, field, interval, time)
+    print(f"Data point deleted")
 
 
 @iot.command()
