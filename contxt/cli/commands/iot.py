@@ -49,7 +49,7 @@ def groupings(clients: Clients, facility_id: int, fields: List[str], sort: str) 
 
 
 @iot.command()
-@click.option("--output_id", required=True, type=int, help="Output ID to delete from")
+@click.option("--output-id", required=True, type=int, help="Output ID to delete from")
 @click.option(
     "--field", required=True, type=str, help="The field to delete from. Ex: power.demand, power.usage",
 )
