@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Any, Dict, List
 
 import click
+
 from contxt.cli.clients import Clients
 from contxt.cli.utils import LAST_WEEK, NOW, ClickPath, fields_option, print_table, sort_option
 from contxt.models.iot import Feed, Field, FieldGrouping, Window
@@ -71,7 +72,7 @@ def delete_data_point(
 ) -> None:
     """Delete data point"""
     clients.iot.delete_time_series_point(output_id, field, interval, time)
-    print(f"Data point deleted")
+    print("Data point deleted")
 
 
 @iot.command()
