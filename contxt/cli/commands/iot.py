@@ -4,7 +4,6 @@ from pathlib import Path
 from typing import Any, Dict, List
 
 import click
-
 from contxt.cli.clients import Clients
 from contxt.cli.utils import LAST_WEEK, NOW, ClickPath, fields_option, print_table, sort_option
 from contxt.models.iot import Feed, Field, FieldGrouping, Window
@@ -64,7 +63,7 @@ def groupings(clients: Clients, facility_id: int, fields: List[str], sort: str) 
     "--time",
     required=True,
     type=click.DateTime(),
-    help="The timestamp of the datapoint. Ex: 2020-07-21 05:31:00",
+    help="The timestamp of the datapoint. Ex: 2020-07-21T05:31:00Z",
 )
 @click.pass_obj
 def delete_data_point(
