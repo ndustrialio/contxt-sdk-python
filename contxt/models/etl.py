@@ -22,17 +22,17 @@ class CTRHeader:
 
 class ChangeTrackingRecord:
     """A JSON Serializable ndustrial.io ChangeTrackingRecord(tm) that is
-       ingestable by the ndustrial ETL java/kotlin components.
+    ingestable by the ndustrial ETL java/kotlin components.
 
-       topic: Str           - the name of the canonical being ETL-ed
-       version: Str         - the change table version or CDC version number (cursor position)
-       operation: enum      - a DB operation (insert/update/upsert/delete) from the DBOperation enum
-       source_host: Str     - the hostname/ip/table that homes the source data
-       source_table: Str    - the name of the table from where the data is being extracted
-       source_database: Str - the name of the db being extracted against
-       tuple: dict          - key/value pairs that make up the data payload. This
-                              value defaults to an empty dict and can be updated after creation
-       headers: CTRHeader() - the header information that informs ETL devices what do with the CTR
+    topic: Str           - the name of the canonical being ETL-ed
+    version: Str         - the change table version or CDC version number (cursor position)
+    operation: enum      - a DB operation (insert/update/upsert/delete) from the DBOperation enum
+    source_host: Str     - the hostname/ip/table that homes the source data
+    source_table: Str    - the name of the table from where the data is being extracted
+    source_database: Str - the name of the db being extracted against
+    tuple: dict          - key/value pairs that make up the data payload. This
+                           value defaults to an empty dict and can be updated after creation
+    headers: CTRHeader() - the header information that informs ETL devices what do with the CTR
     """
 
     def __init__(

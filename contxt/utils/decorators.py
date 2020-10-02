@@ -19,12 +19,12 @@ class Printable:
 
 
 def decorate_all_methods(decorator):
-    """ Decorator factory to decorate all methods of a class
-        Note the target of this factory is a class, sample usage:
+    """Decorator factory to decorate all methods of a class
+    Note the target of this factory is a class, sample usage:
 
-        @decorate_all_methods(my_awesome_decorator)
-        class Foo:
-            ...
+    @decorate_all_methods(my_awesome_decorator)
+    class Foo:
+        ...
     """
 
     def decorate(cls):

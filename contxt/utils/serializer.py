@@ -194,7 +194,7 @@ class Serializer:
 
     @staticmethod
     def to_file(
-        obj: Any, path: Optional[Path] = None, valid_exts: Iterable[str] = (".csv", ".json", ".txt"),
+        obj: Any, path: Optional[Path] = None, valid_exts: Iterable[str] = (".csv", ".json", ".txt")
     ):
         """Write an object to a file (or stdout).
 

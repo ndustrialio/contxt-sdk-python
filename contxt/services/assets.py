@@ -134,7 +134,7 @@ class AssetsService(ConfiguredApi):
 
     def sync_complete_asset(self, asset: CompleteAsset) -> None:
         """Push any changes to the abstracted CompleteAsset to the Asset
-        Framework API """
+        Framework API"""
         # Update attribute values
         # TODO: probably better to do a set calculation here instead of
         # multiple list comprehensions
