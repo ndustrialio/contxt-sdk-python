@@ -16,7 +16,7 @@ class Serializer:
         if isinstance(obj, dict):
             return obj.keys()
         elif isinstance(obj, (list, tuple)) and obj:
-            return list(set().union(*(Serializer._keys(i) for i in obj)))
+            return list(sorted(set().union(*(Serializer._keys(i) for i in obj))))
         else:
             return []
 

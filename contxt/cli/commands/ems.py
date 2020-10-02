@@ -1,5 +1,4 @@
 from collections import defaultdict
-from csv import DictWriter
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List
@@ -234,9 +233,4 @@ def _download_bills(sis_api, facility_id, bills, output):
         data.append(row)
 
     # Dump
-    columns = data[0].keys() if data else []
-    output.mkdir(parents=True, exist_ok=True)
-    with (output / "summary.csv").open("w") as f:
-        writer = DictWriter(f, fieldnames=columns)
-        writer.writeheader()
-        writer.writerows(data)
+    Serializer.to_csv(data, path=output / "summary.csv")
