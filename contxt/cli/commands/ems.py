@@ -48,7 +48,7 @@ def mains(
 @click.option("--end", type=click.DateTime(), help="End time")
 @click.pass_obj
 def main_data(
-    clients: Clients, facility_id: int, resource_type: ResourceType, start: datetime, end: datetime,
+    clients: Clients, facility_id: int, resource_type: ResourceType, start: datetime, end: datetime
 ) -> None:
     """Get main service data"""
     data: Dict[datetime, Dict[str, Any]] = defaultdict(dict)
@@ -158,7 +158,7 @@ def export(
 ) -> None:
     """Export data for facilities"""
     with click.progressbar(
-        facility_ids, label="Downloading data", item_show_func=lambda f: f"Facility {f}" if f else "",
+        facility_ids, label="Downloading data", item_show_func=lambda f: f"Facility {f}" if f else ""
     ) as facility_ids_:
         for id in facility_ids_:
             facility = clients.facilities.get_facility_with_id(id)
@@ -167,7 +167,7 @@ def export(
             # Utility bills
             if "bills" in include:
                 statements = clients.sis.get_statements(
-                    facility_id=facility.id, start=start.date(), end=end.date(),
+                    facility_id=facility.id, start=start.date(), end=end.date()
                 )
                 _download_bills(
                     sis_api=clients.sis, facility_id=facility.id, bills=statements, output=fpath
@@ -176,7 +176,7 @@ def export(
             # Utility usage
             if "usage" in include:
                 usage = clients.ems.get_usage(
-                    facility_id=facility.id, start=start, end=end, interval="daily",
+                    facility_id=facility.id, start=start, end=end, interval="daily"
                 )
                 Serializer.to_csv(usage.values, fpath / "ems" / "usage.csv")
 
