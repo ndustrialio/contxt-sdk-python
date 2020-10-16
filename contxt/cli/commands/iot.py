@@ -204,7 +204,8 @@ def ingest_worksheet(clients: Clients, feed_key, worksheet_file) -> None:
 
             if not grouping:
                 print(f"Creating new grouping: {grouping_name}")
-                grouping = clients.iot.create_grouping(feed.facility_id,
+                grouping = clients.iot.create_grouping(
+                    feed.facility_id,
                     Field(
                         id=feed,
                         label=grouping_name,
@@ -214,7 +215,7 @@ def ingest_worksheet(clients: Clients, feed_key, worksheet_file) -> None:
                         is_hidden=False,
                         status=feed.feed_status,
                         feed_key=feed.key,
-                    )
+                    ),
                 )
                 print(grouping)
 
