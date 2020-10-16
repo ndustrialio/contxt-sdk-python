@@ -41,10 +41,37 @@ class IotService(ConfiguredApi):
             base_url="https://feeds.api.ndustrial.io/v1",
             client_id="iznTb30Sfp2Jpaf398I5DN6MyPuDCftA",
         ),
+        ApiEnvironment(
+            name="staging",
+            base_url="https://feeds-staging.api.ndustrial.io/v1",
+            client_id="m35AEcxD8hf65sq04ZU7yFxqpqVkKzES",
+        ),
     )
 
     def __init__(self, auth: Auth, env: str = "production", **kwargs) -> None:
         super().__init__(env=env, auth=auth, **kwargs)
+
+    def provision_field_for_feed(self, feed_id: int, field_obj: Field):
+        return self.post(f"feeds/{feed_id}/fields", data=field_obj.get_dict())
+
+    def create_grouping(self, grouping_obj):
+        assert isinstance(grouping_obj, FieldGrouping)
+        return FieldGrouping(
+            self.post(
+                f"facilities/{grouping_obj.facility_id}/groupings", data=grouping_obj.get_create_dict()
+            ),
+            owner_obj=None,
+            category_obj=None,
+            field_obj_list=[],
+        )
+    
+    def set_fields_for_grouping(self, grouping_id, field_list):
+        assert isinstance(grouping_id, str)
+        assert isinstance(field_list, list)
+
+        body = {'fields': field_list}
+        return self.post(f'groupings/{grouping_id}/fields', data=body)
+
 
     def delete_time_series_point(
         self, output_id: int, field: str, interval: Window, time: datetime

@@ -4,6 +4,8 @@ from pathlib import Path
 from typing import Any, Dict, List
 
 import click
+import csv
+import os
 
 from contxt.cli.clients import Clients
 from contxt.cli.utils import LAST_WEEK, NOW, ClickPath, fields_option, print_table, sort_option
@@ -113,3 +115,125 @@ def data(
     print(f"Writing data to {output}...")
     flat_data = [{"timestamp": k, **v} for k, v in data.items()]
     Serializer.to_csv(flat_data, output)
+
+
+@iot.command()
+@click.argument("feed_key", type=str)
+@click.argument("worksheet_file", type=click.File("r"))
+@click.pass_obj
+def ingest_worksheet(clients: Clients, feed_key, worksheet_file) -> None:
+    """Field Worksheet Ingestor"""
+    feed = clients.iot.get_feed_with_key(feed_key)
+    if not feed:
+        print(f"Feed with key {args.feed_key} does not exist")
+        return
+    groupings_by_label = {}
+    groupings = clients.iot.get_field_groupings_for_facility(feed.facility_id)
+    for grouping in groupings:
+        groupings_by_label[grouping.label] = grouping
+
+    field_objs = []
+    fields_for_feed = clients.iot.get_fields_for_feed(feed_id=feed.id)
+    fields_descriptors_for_feed = [f.field_descriptor for f in fields_for_feed]
+
+    desired_groupings_by_field = {}
+    with worksheet_file as f:
+
+        headers = [
+            "Field Descriptor",
+            "Label",
+            "Data Type",
+            "Units",
+            "Scalar",
+            "Cumulative Value?",
+            "equipment group",
+            "Facility Main?",
+        ]
+        reader = csv.DictReader(f, fieldnames=headers)
+
+        # skip the header
+        next(reader)
+
+        # create a bunch of field objects
+        for row in reader:
+            if row["Label"].replace(" ", "").startswith("-"):
+                label = row["equipment group"] + row["Label"]
+            else:
+                label = row["Label"]
+
+            if row["Field Descriptor"] in fields_descriptors_for_feed:
+                print(f'Already provisioned field with descriptor {row["Field Descriptor"]}')
+            else:
+                field_objs.append(
+                    Field(
+                        {
+                            "label": label,
+                            "field_descriptor": row["Field Descriptor"],
+                            "field_human_name": row["Field Descriptor"],
+                            "units": row["Units"],
+                            "value_type": "numeric",  # TODO change me
+                            "feed_key": args.feed_key,
+                            "is_hidden": False,
+                        }
+                    )
+                )
+
+            desired_groupings_by_field[row["Field Descriptor"]] = row["equipment group"]
+
+    # go provision the fields
+    for field_obj in field_objs:
+        clients.iot.provision_field_for_feed(feed_id, field_obj)
+        print(f"Provisioned: {field_obj.field_descriptor}")
+    print("Done provisioning the fields")
+
+    fields_for_feed = clients.iot.get_fields_for_feed(feed_id=feed.id)
+
+    # organize the fields by their grouping names
+    grouping_fields = {}
+    for field in fields_for_feed:
+        if field.field_descriptor in desired_groupings_by_field:
+            grouping_name = desired_groupings_by_field[field.field_descriptor]
+            if grouping_name.replace(" ", "") == "":
+                continue
+            if grouping_name not in grouping_fields:
+                grouping_fields[grouping_name] = []
+            grouping_fields[grouping_name].append(field.id)
+
+        # go through the organized listing and create the grouping if necessary and update the fields for the grouping
+        for grouping_name, field_ids in grouping_fields.items():
+            grouping = groupings_by_label.get(grouping_name)
+
+            if not grouping:
+                print(f"Creating new grouping: {grouping_name}")
+                grouping = clients.iot.create_grouping(
+                    facility_id=feed.facility_id,
+                    label=grouping_name,
+                    description=grouping_name,
+                    is_public=True,
+                )
+
+            print(f"Setting {len(field_ids)} fields to grouping {grouping_name}")
+            clients.iot.set_fields_for_grouping(grouping.id, field_ids)
+
+        print("Successful!")
+
+
+@iot.command()
+@click.argument("feed_key", type=str)
+@click.pass_obj
+def create_worksheet(clients: Clients, feed_key) -> None:
+    """Create Field Worksheets"""
+    fields = clients.iot.get_unprovisioned_fields_for_feed_key(feed_key=feed_key)
+    filename = f'{feed_key}_unprovisioned_worksheet.csv'
+
+    with open(os.path.join('.', filename), 'w') as f:
+
+        headers = ['Field Descriptor','Label','Data Type','Units','Scalar','Cumulative Value?','equipment group','Facility Main?']
+        writer = csv.DictWriter(f, fieldnames=headers)
+        writer.writeheader()
+
+        for f in fields:
+            row = {col_name: '' if col_name != 'Field Descriptor' else f.field_descriptor for col_name in headers}
+            writer.writerow(row)
+
+    print(f'Wrote unprovisioned fields to {filename}')       
