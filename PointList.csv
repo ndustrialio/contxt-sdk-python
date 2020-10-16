@@ -1,0 +1,1055 @@
+Field Descriptor,Label,Data Type,Units,Scalar,Cumulative Value?,equipment group,Facility Main?
+1-0,Current (A),Numeric,A,1,no,Phase 1 Old Main,Yes
+1-1,Current CH1 (A),Numeric,A,1,no,Phase 1 Old Main,Yes
+1-2,Current CH2 (B),Numeric,A,1,no,Phase 1 Old Main,Yes
+1-3,Current CH3 (C),Numeric,A,1,no,Phase 1 Old Main,Yes
+1-4,L-N Voltage (V),Numeric,V,1,no,Phase 1 Old Main,Yes
+1-5,Voltage L1-N (AN),Numeric,V,1,no,Phase 1 Old Main,Yes
+1-6,Voltage L2-N (BN),Numeric,V,1,no,Phase 1 Old Main,Yes
+1-7,Voltage L3-N (CN),Numeric,V,1,no,Phase 1 Old Main,Yes
+1-8,L-L Voltage (V),Numeric,V,1,no,Phase 1 Old Main,Yes
+1-9,Voltage L1-L2,Numeric,V,1,no,Phase 1 Old Main,Yes
+1-10,Voltage L2-L3,Numeric,V,1,no,Phase 1 Old Main,Yes
+1-11,Voltage L3-L1,Numeric,V,1,no,Phase 1 Old Main,Yes
+1-12,Line Frequency,Numeric,Hz,1,no,Phase 1 Old Main,Yes
+1-13,Demand (kW),Numeric,kW,1,no,Phase 1 Old Main,Yes
+1-14,Power CH1 (A),Numeric,kW,1,no,Phase 1 Old Main,Yes
+1-15,Power CH2 (B),Numeric,kW,1,no,Phase 1 Old Main,Yes
+1-16,Power CH3 (C),Numeric,kW,1,no,Phase 1 Old Main,Yes
+1-17,Apparent Power (kVA),Numeric,kVA,1,no,Phase 1 Old Main,Yes
+1-18,VA CH1 (A),Numeric,kVA,1,no,Phase 1 Old Main,Yes
+1-19,VA CH2 (B),Numeric,kVA,1,no,Phase 1 Old Main,Yes
+1-20,VA CH3 (C),Numeric,kVA,1,no,Phase 1 Old Main,Yes
+1-21,Reactive Power (kVAR),Numeric,kVAR,1,no,Phase 1 Old Main,Yes
+1-22,VAR CH1 (A),Numeric,kVAR,1,no,Phase 1 Old Main,Yes
+1-23,VAR CH2 (B),Numeric,kVAR,1,no,Phase 1 Old Main,Yes
+1-24,VAR CH3 (C),Numeric,kVAR,1,no,Phase 1 Old Main,Yes
+1-25,Power Factor (%),Numeric,,1,no,Phase 1 Old Main,Yes
+1-26,Apparent PF CH1 (A),Numeric,,1,no,Phase 1 Old Main,Yes
+1-27,Apparent PF CH2 (B),Numeric,,1,no,Phase 1 Old Main,Yes
+1-28,Apparent PF CH3 (C),Numeric,,1,no,Phase 1 Old Main,Yes
+1-29,Exported Energy Sum,Numeric,kWh,1,no,Phase 1 Old Main,Yes
+1-30,Exported Energy CH1 (A),Numeric,kWh,1,no,Phase 1 Old Main,Yes
+1-31,Exported Energy CH2 (B),Numeric,kWh,1,no,Phase 1 Old Main,Yes
+1-32,Exported Energy CH3 (C),Numeric,kWh,1,no,Phase 1 Old Main,Yes
+1-33,Cumulative Usage (kWh),Numeric,kWh,1,no,Phase 1 Old Main,Yes
+1-34,Imported Energy CH1 (A),Numeric,kWh,1,no,Phase 1 Old Main,Yes
+1-35,Imported Energy CH2 (B),Numeric,kWh,1,no,Phase 1 Old Main,Yes
+1-36,Imported Energy CH3 (C),Numeric,kWh,1,no,Phase 1 Old Main,Yes
+1-37,Exported VAh Sum,Numeric,kVAh,1,no,Phase 1 Old Main,Yes
+1-38,Exported VAh CH1 (A),Numeric,kVAh,1,no,Phase 1 Old Main,Yes
+1-39,Exported VAh CH2 (B),Numeric,kVAh,1,no,Phase 1 Old Main,Yes
+1-40,Exported VAh CH3 (C),Numeric,kVAh,1,no,Phase 1 Old Main,Yes
+1-41,Imported VAh Sum,Numeric,kVAh,1,no,Phase 1 Old Main,Yes
+1-42,Imported VAh CH1 (A),Numeric,kVAh,1,no,Phase 1 Old Main,Yes
+1-43,Imported VAh CH2 (B),Numeric,kVAh,1,no,Phase 1 Old Main,Yes
+1-44,Imported VAh CH3 (C),Numeric,kVAh,1,no,Phase 1 Old Main,Yes
+1-45,Imported VARh Q1 Sum,Numeric,kVARh,1,no,Phase 1 Old Main,Yes
+1-46,Imported VARh Q1 (A),Numeric,kVARh,1,no,Phase 1 Old Main,Yes
+1-47,Imported VARh Q1 (B),Numeric,kVARh,1,no,Phase 1 Old Main,Yes
+1-48,imported VARh Q1 (C),Numeric,kVARh,1,no,Phase 1 Old Main,Yes
+1-49,Imported VARh Q2 Sum,Numeric,kVARh,1,no,Phase 1 Old Main,Yes
+1-50,Imported VARh Q2 (A),Numeric,kVARh,1,no,Phase 1 Old Main,Yes
+1-51,Imported VARh Q2 (B),Numeric,kVARh,1,no,Phase 1 Old Main,Yes
+1-52,Imported VARh Q2 (C),Numeric,kVARh,1,no,Phase 1 Old Main,Yes
+1-53,Exported VARh Q3 Sum,Numeric,kVARh,1,no,Phase 1 Old Main,Yes
+1-54,Exported VARh Q3 (A),Numeric,kVARh,1,no,Phase 1 Old Main,Yes
+1-55,Exported VARh Q3 (B),Numeric,kVARh,1,no,Phase 1 Old Main,Yes
+1-56,Exported VARh Q3 (C),Numeric,kVARh,1,no,Phase 1 Old Main,Yes
+1-57,Exported VARh Q4 Sum,Numeric,kVARh,1,no,Phase 1 Old Main,Yes
+1-58,Exported VARh Q4 (A),Numeric,kVARh,1,no,Phase 1 Old Main,Yes
+1-59,Exported VARh Q4 (B),Numeric,kVARh,1,no,Phase 1 Old Main,Yes
+1-60,Exported VARh Q4 (C),Numeric,kVARh,1,no,Phase 1 Old Main,Yes
+1-61,Watt Demand Element,Numeric,kW,1,no,Phase 1 Old Main,Yes
+2-0,Current (A),Numeric,A,1,no,Phase 1 New Main,Yes
+2-1,Current CH1 (A),Numeric,A,1,no,Phase 1 New Main,Yes
+2-2,Current CH2 (B),Numeric,A,1,no,Phase 1 New Main,Yes
+2-3,Current CH3 (C),Numeric,A,1,no,Phase 1 New Main,Yes
+2-4,L-N Voltage (V),Numeric,V,1,no,Phase 1 New Main,Yes
+2-5,Voltage L1-N (AN),Numeric,V,1,no,Phase 1 New Main,Yes
+2-6,Voltage L2-N (BN),Numeric,V,1,no,Phase 1 New Main,Yes
+2-7,Voltage L3-N (CN),Numeric,V,1,no,Phase 1 New Main,Yes
+2-8,L-L Voltage (V),Numeric,V,1,no,Phase 1 New Main,Yes
+2-9,Voltage L1-L2,Numeric,V,1,no,Phase 1 New Main,Yes
+2-10,Voltage L2-L3,Numeric,V,1,no,Phase 1 New Main,Yes
+2-11,Voltage L3-L1,Numeric,V,1,no,Phase 1 New Main,Yes
+2-12,Line Frequency,Numeric,Hz,1,no,Phase 1 New Main,Yes
+2-13,Demand (kW),Numeric,kW,1,no,Phase 1 New Main,Yes
+2-14,Power CH1 (A),Numeric,kW,1,no,Phase 1 New Main,Yes
+2-15,Power CH2 (B),Numeric,kW,1,no,Phase 1 New Main,Yes
+2-16,Power CH3 (C),Numeric,kW,1,no,Phase 1 New Main,Yes
+2-17,Apparent Power (kVA),Numeric,kVA,1,no,Phase 1 New Main,Yes
+2-18,VA CH1 (A),Numeric,kVA,1,no,Phase 1 New Main,Yes
+2-19,VA CH2 (B),Numeric,kVA,1,no,Phase 1 New Main,Yes
+2-20,VA CH3 (C),Numeric,kVA,1,no,Phase 1 New Main,Yes
+2-21,Reactive Power (kVAR),Numeric,kVAR,1,no,Phase 1 New Main,Yes
+2-22,VAR CH1 (A),Numeric,kVAR,1,no,Phase 1 New Main,Yes
+2-23,VAR CH2 (B),Numeric,kVAR,1,no,Phase 1 New Main,Yes
+2-24,VAR CH3 (C),Numeric,kVAR,1,no,Phase 1 New Main,Yes
+2-25,Power Factor (%),Numeric,,1,no,Phase 1 New Main,Yes
+2-26,Apparent PF CH1 (A),Numeric,,1,no,Phase 1 New Main,Yes
+2-27,Apparent PF CH2 (B),Numeric,,1,no,Phase 1 New Main,Yes
+2-28,Apparent PF CH3 (C),Numeric,,1,no,Phase 1 New Main,Yes
+2-29,Exported Energy Sum,Numeric,kWh,1,no,Phase 1 New Main,Yes
+2-30,Exported Energy CH1 (A),Numeric,kWh,1,no,Phase 1 New Main,Yes
+2-31,Exported Energy CH2 (B),Numeric,kWh,1,no,Phase 1 New Main,Yes
+2-32,Exported Energy CH3 (C),Numeric,kWh,1,no,Phase 1 New Main,Yes
+2-33,Cumulative Usage (kWh),Numeric,kWh,1,no,Phase 1 New Main,Yes
+2-34,Imported Energy CH1 (A),Numeric,kWh,1,no,Phase 1 New Main,Yes
+2-35,Imported Energy CH2 (B),Numeric,kWh,1,no,Phase 1 New Main,Yes
+2-36,Imported Energy CH3 (C),Numeric,kWh,1,no,Phase 1 New Main,Yes
+2-37,Exported VAh Sum,Numeric,kVAh,1,no,Phase 1 New Main,Yes
+2-38,Exported VAh CH1 (A),Numeric,kVAh,1,no,Phase 1 New Main,Yes
+2-39,Exported VAh CH2 (B),Numeric,kVAh,1,no,Phase 1 New Main,Yes
+2-40,Exported VAh CH3 (C),Numeric,kVAh,1,no,Phase 1 New Main,Yes
+2-41,Imported VAh Sum,Numeric,kVAh,1,no,Phase 1 New Main,Yes
+2-42,Imported VAh CH1 (A),Numeric,kVAh,1,no,Phase 1 New Main,Yes
+2-43,Imported VAh CH2 (B),Numeric,kVAh,1,no,Phase 1 New Main,Yes
+2-44,Imported VAh CH3 (C),Numeric,kVAh,1,no,Phase 1 New Main,Yes
+2-45,Imported VARh Q1 Sum,Numeric,kVARh,1,no,Phase 1 New Main,Yes
+2-46,Imported VARh Q1 (A),Numeric,kVARh,1,no,Phase 1 New Main,Yes
+2-47,Imported VARh Q1 (B),Numeric,kVARh,1,no,Phase 1 New Main,Yes
+2-48,imported VARh Q1 (C),Numeric,kVARh,1,no,Phase 1 New Main,Yes
+2-49,Imported VARh Q2 Sum,Numeric,kVARh,1,no,Phase 1 New Main,Yes
+2-50,Imported VARh Q2 (A),Numeric,kVARh,1,no,Phase 1 New Main,Yes
+2-51,Imported VARh Q2 (B),Numeric,kVARh,1,no,Phase 1 New Main,Yes
+2-52,Imported VARh Q2 (C),Numeric,kVARh,1,no,Phase 1 New Main,Yes
+2-53,Exported VARh Q3 Sum,Numeric,kVARh,1,no,Phase 1 New Main,Yes
+2-54,Exported VARh Q3 (A),Numeric,kVARh,1,no,Phase 1 New Main,Yes
+2-55,Exported VARh Q3 (B),Numeric,kVARh,1,no,Phase 1 New Main,Yes
+2-56,Exported VARh Q3 (C),Numeric,kVARh,1,no,Phase 1 New Main,Yes
+2-57,Exported VARh Q4 Sum,Numeric,kVARh,1,no,Phase 1 New Main,Yes
+2-58,Exported VARh Q4 (A),Numeric,kVARh,1,no,Phase 1 New Main,Yes
+2-59,Exported VARh Q4 (B),Numeric,kVARh,1,no,Phase 1 New Main,Yes
+2-60,Exported VARh Q4 (C),Numeric,kVARh,1,no,Phase 1 New Main,Yes
+2-61,Watt Demand Element,Numeric,kW,1,no,Phase 1 New Main,Yes
+3-0,Current (A),Numeric,A,1,no,Compressor C-2,No
+3-1,Current CH1 (A),Numeric,A,1,no,Compressor C-2,No
+3-2,Current CH2 (B),Numeric,A,1,no,Compressor C-2,No
+3-3,Current CH3 (C),Numeric,A,1,no,Compressor C-2,No
+3-4,L-N Voltage (V),Numeric,V,1,no,Compressor C-2,No
+3-5,Voltage L1-N (AN),Numeric,V,1,no,Compressor C-2,No
+3-6,Voltage L2-N (BN),Numeric,V,1,no,Compressor C-2,No
+3-7,Voltage L3-N (CN),Numeric,V,1,no,Compressor C-2,No
+3-8,L-L Voltage (V),Numeric,V,1,no,Compressor C-2,No
+3-9,Voltage L1-L2,Numeric,V,1,no,Compressor C-2,No
+3-10,Voltage L2-L3,Numeric,V,1,no,Compressor C-2,No
+3-11,Voltage L3-L1,Numeric,V,1,no,Compressor C-2,No
+3-12,Line Frequency,Numeric,Hz,1,no,Compressor C-2,No
+3-13,Demand (kW),Numeric,kW,1,no,Compressor C-2,No
+3-14,Power CH1 (A),Numeric,kW,1,no,Compressor C-2,No
+3-15,Power CH2 (B),Numeric,kW,1,no,Compressor C-2,No
+3-16,Power CH3 (C),Numeric,kW,1,no,Compressor C-2,No
+3-17,Apparent Power (kVA),Numeric,kVA,1,no,Compressor C-2,No
+3-18,VA CH1 (A),Numeric,kVA,1,no,Compressor C-2,No
+3-19,VA CH2 (B),Numeric,kVA,1,no,Compressor C-2,No
+3-20,VA CH3 (C),Numeric,kVA,1,no,Compressor C-2,No
+3-21,Reactive Power (kVAR),Numeric,kVAR,1,no,Compressor C-2,No
+3-22,VAR CH1 (A),Numeric,kVAR,1,no,Compressor C-2,No
+3-23,VAR CH2 (B),Numeric,kVAR,1,no,Compressor C-2,No
+3-24,VAR CH3 (C),Numeric,kVAR,1,no,Compressor C-2,No
+3-25,Power Factor (%),Numeric,,1,no,Compressor C-2,No
+3-26,Apparent PF CH1 (A),Numeric,,1,no,Compressor C-2,No
+3-27,Apparent PF CH2 (B),Numeric,,1,no,Compressor C-2,No
+3-28,Apparent PF CH3 (C),Numeric,,1,no,Compressor C-2,No
+3-29,Exported Energy Sum,Numeric,kWh,1,no,Compressor C-2,No
+3-30,Exported Energy CH1 (A),Numeric,kWh,1,no,Compressor C-2,No
+3-31,Exported Energy CH2 (B),Numeric,kWh,1,no,Compressor C-2,No
+3-32,Exported Energy CH3 (C),Numeric,kWh,1,no,Compressor C-2,No
+3-33,Cumulative Usage (kWh),Numeric,kWh,1,no,Compressor C-2,No
+3-34,Imported Energy CH1 (A),Numeric,kWh,1,no,Compressor C-2,No
+3-35,Imported Energy CH2 (B),Numeric,kWh,1,no,Compressor C-2,No
+3-36,Imported Energy CH3 (C),Numeric,kWh,1,no,Compressor C-2,No
+3-37,Exported VAh Sum,Numeric,kVAh,1,no,Compressor C-2,No
+3-38,Exported VAh CH1 (A),Numeric,kVAh,1,no,Compressor C-2,No
+3-39,Exported VAh CH2 (B),Numeric,kVAh,1,no,Compressor C-2,No
+3-40,Exported VAh CH3 (C),Numeric,kVAh,1,no,Compressor C-2,No
+3-41,Imported VAh Sum,Numeric,kVAh,1,no,Compressor C-2,No
+3-42,Imported VAh CH1 (A),Numeric,kVAh,1,no,Compressor C-2,No
+3-43,Imported VAh CH2 (B),Numeric,kVAh,1,no,Compressor C-2,No
+3-44,Imported VAh CH3 (C),Numeric,kVAh,1,no,Compressor C-2,No
+3-45,Imported VARh Q1 Sum,Numeric,kVARh,1,no,Compressor C-2,No
+3-46,Imported VARh Q1 (A),Numeric,kVARh,1,no,Compressor C-2,No
+3-47,Imported VARh Q1 (B),Numeric,kVARh,1,no,Compressor C-2,No
+3-48,imported VARh Q1 (C),Numeric,kVARh,1,no,Compressor C-2,No
+3-49,Imported VARh Q2 Sum,Numeric,kVARh,1,no,Compressor C-2,No
+3-50,Imported VARh Q2 (A),Numeric,kVARh,1,no,Compressor C-2,No
+3-51,Imported VARh Q2 (B),Numeric,kVARh,1,no,Compressor C-2,No
+3-52,Imported VARh Q2 (C),Numeric,kVARh,1,no,Compressor C-2,No
+3-53,Exported VARh Q3 Sum,Numeric,kVARh,1,no,Compressor C-2,No
+3-54,Exported VARh Q3 (A),Numeric,kVARh,1,no,Compressor C-2,No
+3-55,Exported VARh Q3 (B),Numeric,kVARh,1,no,Compressor C-2,No
+3-56,Exported VARh Q3 (C),Numeric,kVARh,1,no,Compressor C-2,No
+3-57,Exported VARh Q4 Sum,Numeric,kVARh,1,no,Compressor C-2,No
+3-58,Exported VARh Q4 (A),Numeric,kVARh,1,no,Compressor C-2,No
+3-59,Exported VARh Q4 (B),Numeric,kVARh,1,no,Compressor C-2,No
+3-60,Exported VARh Q4 (C),Numeric,kVARh,1,no,Compressor C-2,No
+3-61,Watt Demand Element,Numeric,kW,1,no,Compressor C-2,No
+4-0,Current (A),Numeric,A,1,no,Compressor C-3,No
+4-1,Current CH1 (A),Numeric,A,1,no,Compressor C-3,No
+4-2,Current CH2 (B),Numeric,A,1,no,Compressor C-3,No
+4-3,Current CH3 (C),Numeric,A,1,no,Compressor C-3,No
+4-4,L-N Voltage (V),Numeric,V,1,no,Compressor C-3,No
+4-5,Voltage L1-N (AN),Numeric,V,1,no,Compressor C-3,No
+4-6,Voltage L2-N (BN),Numeric,V,1,no,Compressor C-3,No
+4-7,Voltage L3-N (CN),Numeric,V,1,no,Compressor C-3,No
+4-8,L-L Voltage (V),Numeric,V,1,no,Compressor C-3,No
+4-9,Voltage L1-L2,Numeric,V,1,no,Compressor C-3,No
+4-10,Voltage L2-L3,Numeric,V,1,no,Compressor C-3,No
+4-11,Voltage L3-L1,Numeric,V,1,no,Compressor C-3,No
+4-12,Line Frequency,Numeric,Hz,1,no,Compressor C-3,No
+4-13,Demand (kW),Numeric,kW,1,no,Compressor C-3,No
+4-14,Power CH1 (A),Numeric,kW,1,no,Compressor C-3,No
+4-15,Power CH2 (B),Numeric,kW,1,no,Compressor C-3,No
+4-16,Power CH3 (C),Numeric,kW,1,no,Compressor C-3,No
+4-17,Apparent Power (kVA),Numeric,kVA,1,no,Compressor C-3,No
+4-18,VA CH1 (A),Numeric,kVA,1,no,Compressor C-3,No
+4-19,VA CH2 (B),Numeric,kVA,1,no,Compressor C-3,No
+4-20,VA CH3 (C),Numeric,kVA,1,no,Compressor C-3,No
+4-21,Reactive Power (kVAR),Numeric,kVAR,1,no,Compressor C-3,No
+4-22,VAR CH1 (A),Numeric,kVAR,1,no,Compressor C-3,No
+4-23,VAR CH2 (B),Numeric,kVAR,1,no,Compressor C-3,No
+4-24,VAR CH3 (C),Numeric,kVAR,1,no,Compressor C-3,No
+4-25,Power Factor (%),Numeric,,1,no,Compressor C-3,No
+4-26,Apparent PF CH1 (A),Numeric,,1,no,Compressor C-3,No
+4-27,Apparent PF CH2 (B),Numeric,,1,no,Compressor C-3,No
+4-28,Apparent PF CH3 (C),Numeric,,1,no,Compressor C-3,No
+4-29,Exported Energy Sum,Numeric,kWh,1,no,Compressor C-3,No
+4-30,Exported Energy CH1 (A),Numeric,kWh,1,no,Compressor C-3,No
+4-31,Exported Energy CH2 (B),Numeric,kWh,1,no,Compressor C-3,No
+4-32,Exported Energy CH3 (C),Numeric,kWh,1,no,Compressor C-3,No
+4-33,Cumulative Usage (kWh),Numeric,kWh,1,no,Compressor C-3,No
+4-34,Imported Energy CH1 (A),Numeric,kWh,1,no,Compressor C-3,No
+4-35,Imported Energy CH2 (B),Numeric,kWh,1,no,Compressor C-3,No
+4-36,Imported Energy CH3 (C),Numeric,kWh,1,no,Compressor C-3,No
+4-37,Exported VAh Sum,Numeric,kVAh,1,no,Compressor C-3,No
+4-38,Exported VAh CH1 (A),Numeric,kVAh,1,no,Compressor C-3,No
+4-39,Exported VAh CH2 (B),Numeric,kVAh,1,no,Compressor C-3,No
+4-40,Exported VAh CH3 (C),Numeric,kVAh,1,no,Compressor C-3,No
+4-41,Imported VAh Sum,Numeric,kVAh,1,no,Compressor C-3,No
+4-42,Imported VAh CH1 (A),Numeric,kVAh,1,no,Compressor C-3,No
+4-43,Imported VAh CH2 (B),Numeric,kVAh,1,no,Compressor C-3,No
+4-44,Imported VAh CH3 (C),Numeric,kVAh,1,no,Compressor C-3,No
+4-45,Imported VARh Q1 Sum,Numeric,kVARh,1,no,Compressor C-3,No
+4-46,Imported VARh Q1 (A),Numeric,kVARh,1,no,Compressor C-3,No
+4-47,Imported VARh Q1 (B),Numeric,kVARh,1,no,Compressor C-3,No
+4-48,imported VARh Q1 (C),Numeric,kVARh,1,no,Compressor C-3,No
+4-49,Imported VARh Q2 Sum,Numeric,kVARh,1,no,Compressor C-3,No
+4-50,Imported VARh Q2 (A),Numeric,kVARh,1,no,Compressor C-3,No
+4-51,Imported VARh Q2 (B),Numeric,kVARh,1,no,Compressor C-3,No
+4-52,Imported VARh Q2 (C),Numeric,kVARh,1,no,Compressor C-3,No
+4-53,Exported VARh Q3 Sum,Numeric,kVARh,1,no,Compressor C-3,No
+4-54,Exported VARh Q3 (A),Numeric,kVARh,1,no,Compressor C-3,No
+4-55,Exported VARh Q3 (B),Numeric,kVARh,1,no,Compressor C-3,No
+4-56,Exported VARh Q3 (C),Numeric,kVARh,1,no,Compressor C-3,No
+4-57,Exported VARh Q4 Sum,Numeric,kVARh,1,no,Compressor C-3,No
+4-58,Exported VARh Q4 (A),Numeric,kVARh,1,no,Compressor C-3,No
+4-59,Exported VARh Q4 (B),Numeric,kVARh,1,no,Compressor C-3,No
+4-60,Exported VARh Q4 (C),Numeric,kVARh,1,no,Compressor C-3,No
+4-61,Watt Demand Element,Numeric,kW,1,no,Compressor C-3,No
+5-0,Current (A),Numeric,A,1,no,Compressor C-5,No
+5-1,Current CH1 (A),Numeric,A,1,no,Compressor C-5,No
+5-2,Current CH2 (B),Numeric,A,1,no,Compressor C-5,No
+5-3,Current CH3 (C),Numeric,A,1,no,Compressor C-5,No
+5-4,L-N Voltage (V),Numeric,V,1,no,Compressor C-5,No
+5-5,Voltage L1-N (AN),Numeric,V,1,no,Compressor C-5,No
+5-6,Voltage L2-N (BN),Numeric,V,1,no,Compressor C-5,No
+5-7,Voltage L3-N (CN),Numeric,V,1,no,Compressor C-5,No
+5-8,L-L Voltage (V),Numeric,V,1,no,Compressor C-5,No
+5-9,Voltage L1-L2,Numeric,V,1,no,Compressor C-5,No
+5-10,Voltage L2-L3,Numeric,V,1,no,Compressor C-5,No
+5-11,Voltage L3-L1,Numeric,V,1,no,Compressor C-5,No
+5-12,Line Frequency,Numeric,Hz,1,no,Compressor C-5,No
+5-13,Demand (kW),Numeric,kW,1,no,Compressor C-5,No
+5-14,Power CH1 (A),Numeric,kW,1,no,Compressor C-5,No
+5-15,Power CH2 (B),Numeric,kW,1,no,Compressor C-5,No
+5-16,Power CH3 (C),Numeric,kW,1,no,Compressor C-5,No
+5-17,Apparent Power (kVA),Numeric,kVA,1,no,Compressor C-5,No
+5-18,VA CH1 (A),Numeric,kVA,1,no,Compressor C-5,No
+5-19,VA CH2 (B),Numeric,kVA,1,no,Compressor C-5,No
+5-20,VA CH3 (C),Numeric,kVA,1,no,Compressor C-5,No
+5-21,Reactive Power (kVAR),Numeric,kVAR,1,no,Compressor C-5,No
+5-22,VAR CH1 (A),Numeric,kVAR,1,no,Compressor C-5,No
+5-23,VAR CH2 (B),Numeric,kVAR,1,no,Compressor C-5,No
+5-24,VAR CH3 (C),Numeric,kVAR,1,no,Compressor C-5,No
+5-25,Power Factor (%),Numeric,,1,no,Compressor C-5,No
+5-26,Apparent PF CH1 (A),Numeric,,1,no,Compressor C-5,No
+5-27,Apparent PF CH2 (B),Numeric,,1,no,Compressor C-5,No
+5-28,Apparent PF CH3 (C),Numeric,,1,no,Compressor C-5,No
+5-29,Exported Energy Sum,Numeric,kWh,1,no,Compressor C-5,No
+5-30,Exported Energy CH1 (A),Numeric,kWh,1,no,Compressor C-5,No
+5-31,Exported Energy CH2 (B),Numeric,kWh,1,no,Compressor C-5,No
+5-32,Exported Energy CH3 (C),Numeric,kWh,1,no,Compressor C-5,No
+5-33,Cumulative Usage (kWh),Numeric,kWh,1,no,Compressor C-5,No
+5-34,Imported Energy CH1 (A),Numeric,kWh,1,no,Compressor C-5,No
+5-35,Imported Energy CH2 (B),Numeric,kWh,1,no,Compressor C-5,No
+5-36,Imported Energy CH3 (C),Numeric,kWh,1,no,Compressor C-5,No
+5-37,Exported VAh Sum,Numeric,kVAh,1,no,Compressor C-5,No
+5-38,Exported VAh CH1 (A),Numeric,kVAh,1,no,Compressor C-5,No
+5-39,Exported VAh CH2 (B),Numeric,kVAh,1,no,Compressor C-5,No
+5-40,Exported VAh CH3 (C),Numeric,kVAh,1,no,Compressor C-5,No
+5-41,Imported VAh Sum,Numeric,kVAh,1,no,Compressor C-5,No
+5-42,Imported VAh CH1 (A),Numeric,kVAh,1,no,Compressor C-5,No
+5-43,Imported VAh CH2 (B),Numeric,kVAh,1,no,Compressor C-5,No
+5-44,Imported VAh CH3 (C),Numeric,kVAh,1,no,Compressor C-5,No
+5-45,Imported VARh Q1 Sum,Numeric,kVARh,1,no,Compressor C-5,No
+5-46,Imported VARh Q1 (A),Numeric,kVARh,1,no,Compressor C-5,No
+5-47,Imported VARh Q1 (B),Numeric,kVARh,1,no,Compressor C-5,No
+5-48,imported VARh Q1 (C),Numeric,kVARh,1,no,Compressor C-5,No
+5-49,Imported VARh Q2 Sum,Numeric,kVARh,1,no,Compressor C-5,No
+5-50,Imported VARh Q2 (A),Numeric,kVARh,1,no,Compressor C-5,No
+5-51,Imported VARh Q2 (B),Numeric,kVARh,1,no,Compressor C-5,No
+5-52,Imported VARh Q2 (C),Numeric,kVARh,1,no,Compressor C-5,No
+5-53,Exported VARh Q3 Sum,Numeric,kVARh,1,no,Compressor C-5,No
+5-54,Exported VARh Q3 (A),Numeric,kVARh,1,no,Compressor C-5,No
+5-55,Exported VARh Q3 (B),Numeric,kVARh,1,no,Compressor C-5,No
+5-56,Exported VARh Q3 (C),Numeric,kVARh,1,no,Compressor C-5,No
+5-57,Exported VARh Q4 Sum,Numeric,kVARh,1,no,Compressor C-5,No
+5-58,Exported VARh Q4 (A),Numeric,kVARh,1,no,Compressor C-5,No
+5-59,Exported VARh Q4 (B),Numeric,kVARh,1,no,Compressor C-5,No
+5-60,Exported VARh Q4 (C),Numeric,kVARh,1,no,Compressor C-5,No
+5-61,Watt Demand Element,Numeric,kW,1,no,Compressor C-5,No
+6-0,Current (A),Numeric,A,1,no,Battery Charger 1,No
+6-1,Current CH1 (A),Numeric,A,1,no,Battery Charger 1,No
+6-2,Current CH2 (B),Numeric,A,1,no,Battery Charger 1,No
+6-3,Current CH3 (C),Numeric,A,1,no,Battery Charger 1,No
+6-4,L-N Voltage (V),Numeric,V,1,no,Battery Charger 1,No
+6-5,Voltage L1-N (AN),Numeric,V,1,no,Battery Charger 1,No
+6-6,Voltage L2-N (BN),Numeric,V,1,no,Battery Charger 1,No
+6-7,Voltage L3-N (CN),Numeric,V,1,no,Battery Charger 1,No
+6-8,L-L Voltage (V),Numeric,V,1,no,Battery Charger 1,No
+6-9,Voltage L1-L2,Numeric,V,1,no,Battery Charger 1,No
+6-10,Voltage L2-L3,Numeric,V,1,no,Battery Charger 1,No
+6-11,Voltage L3-L1,Numeric,V,1,no,Battery Charger 1,No
+6-12,Line Frequency,Numeric,Hz,1,no,Battery Charger 1,No
+6-13,Demand (kW),Numeric,kW,1,no,Battery Charger 1,No
+6-14,Power CH1 (A),Numeric,kW,1,no,Battery Charger 1,No
+6-15,Power CH2 (B),Numeric,kW,1,no,Battery Charger 1,No
+6-16,Power CH3 (C),Numeric,kW,1,no,Battery Charger 1,No
+6-17,Apparent Power (kVA),Numeric,kVA,1,no,Battery Charger 1,No
+6-18,VA CH1 (A),Numeric,kVA,1,no,Battery Charger 1,No
+6-19,VA CH2 (B),Numeric,kVA,1,no,Battery Charger 1,No
+6-20,VA CH3 (C),Numeric,kVA,1,no,Battery Charger 1,No
+6-21,Reactive Power (kVAR),Numeric,kVAR,1,no,Battery Charger 1,No
+6-22,VAR CH1 (A),Numeric,kVAR,1,no,Battery Charger 1,No
+6-23,VAR CH2 (B),Numeric,kVAR,1,no,Battery Charger 1,No
+6-24,VAR CH3 (C),Numeric,kVAR,1,no,Battery Charger 1,No
+6-25,Power Factor (%),Numeric,,1,no,Battery Charger 1,No
+6-26,Apparent PF CH1 (A),Numeric,,1,no,Battery Charger 1,No
+6-27,Apparent PF CH2 (B),Numeric,,1,no,Battery Charger 1,No
+6-28,Apparent PF CH3 (C),Numeric,,1,no,Battery Charger 1,No
+6-29,Exported Energy Sum,Numeric,kWh,1,no,Battery Charger 1,No
+6-30,Exported Energy CH1 (A),Numeric,kWh,1,no,Battery Charger 1,No
+6-31,Exported Energy CH2 (B),Numeric,kWh,1,no,Battery Charger 1,No
+6-32,Exported Energy CH3 (C),Numeric,kWh,1,no,Battery Charger 1,No
+6-33,Cumulative Usage (kWh),Numeric,kWh,1,no,Battery Charger 1,No
+6-34,Imported Energy CH1 (A),Numeric,kWh,1,no,Battery Charger 1,No
+6-35,Imported Energy CH2 (B),Numeric,kWh,1,no,Battery Charger 1,No
+6-36,Imported Energy CH3 (C),Numeric,kWh,1,no,Battery Charger 1,No
+6-37,Exported VAh Sum,Numeric,kVAh,1,no,Battery Charger 1,No
+6-38,Exported VAh CH1 (A),Numeric,kVAh,1,no,Battery Charger 1,No
+6-39,Exported VAh CH2 (B),Numeric,kVAh,1,no,Battery Charger 1,No
+6-40,Exported VAh CH3 (C),Numeric,kVAh,1,no,Battery Charger 1,No
+6-41,Imported VAh Sum,Numeric,kVAh,1,no,Battery Charger 1,No
+6-42,Imported VAh CH1 (A),Numeric,kVAh,1,no,Battery Charger 1,No
+6-43,Imported VAh CH2 (B),Numeric,kVAh,1,no,Battery Charger 1,No
+6-44,Imported VAh CH3 (C),Numeric,kVAh,1,no,Battery Charger 1,No
+6-45,Imported VARh Q1 Sum,Numeric,kVARh,1,no,Battery Charger 1,No
+6-46,Imported VARh Q1 (A),Numeric,kVARh,1,no,Battery Charger 1,No
+6-47,Imported VARh Q1 (B),Numeric,kVARh,1,no,Battery Charger 1,No
+6-48,imported VARh Q1 (C),Numeric,kVARh,1,no,Battery Charger 1,No
+6-49,Imported VARh Q2 Sum,Numeric,kVARh,1,no,Battery Charger 1,No
+6-50,Imported VARh Q2 (A),Numeric,kVARh,1,no,Battery Charger 1,No
+6-51,Imported VARh Q2 (B),Numeric,kVARh,1,no,Battery Charger 1,No
+6-52,Imported VARh Q2 (C),Numeric,kVARh,1,no,Battery Charger 1,No
+6-53,Exported VARh Q3 Sum,Numeric,kVARh,1,no,Battery Charger 1,No
+6-54,Exported VARh Q3 (A),Numeric,kVARh,1,no,Battery Charger 1,No
+6-55,Exported VARh Q3 (B),Numeric,kVARh,1,no,Battery Charger 1,No
+6-56,Exported VARh Q3 (C),Numeric,kVARh,1,no,Battery Charger 1,No
+6-57,Exported VARh Q4 Sum,Numeric,kVARh,1,no,Battery Charger 1,No
+6-58,Exported VARh Q4 (A),Numeric,kVARh,1,no,Battery Charger 1,No
+6-59,Exported VARh Q4 (B),Numeric,kVARh,1,no,Battery Charger 1,No
+6-60,Exported VARh Q4 (C),Numeric,kVARh,1,no,Battery Charger 1,No
+6-61,Watt Demand Element,Numeric,kW,1,no,Battery Charger 1,No
+7-0,Current (A),Numeric,A,1,no,Battery Charger 2,No
+7-1,Current CH1 (A),Numeric,A,1,no,Battery Charger 2,No
+7-2,Current CH2 (B),Numeric,A,1,no,Battery Charger 2,No
+7-3,Current CH3 (C),Numeric,A,1,no,Battery Charger 2,No
+7-4,L-N Voltage (V),Numeric,V,1,no,Battery Charger 2,No
+7-5,Voltage L1-N (AN),Numeric,V,1,no,Battery Charger 2,No
+7-6,Voltage L2-N (BN),Numeric,V,1,no,Battery Charger 2,No
+7-7,Voltage L3-N (CN),Numeric,V,1,no,Battery Charger 2,No
+7-8,L-L Voltage (V),Numeric,V,1,no,Battery Charger 2,No
+7-9,Voltage L1-L2,Numeric,V,1,no,Battery Charger 2,No
+7-10,Voltage L2-L3,Numeric,V,1,no,Battery Charger 2,No
+7-11,Voltage L3-L1,Numeric,V,1,no,Battery Charger 2,No
+7-12,Line Frequency,Numeric,Hz,1,no,Battery Charger 2,No
+7-13,Demand (kW),Numeric,kW,1,no,Battery Charger 2,No
+7-14,Power CH1 (A),Numeric,kW,1,no,Battery Charger 2,No
+7-15,Power CH2 (B),Numeric,kW,1,no,Battery Charger 2,No
+7-16,Power CH3 (C),Numeric,kW,1,no,Battery Charger 2,No
+7-17,Apparent Power (kVA),Numeric,kVA,1,no,Battery Charger 2,No
+7-18,VA CH1 (A),Numeric,kVA,1,no,Battery Charger 2,No
+7-19,VA CH2 (B),Numeric,kVA,1,no,Battery Charger 2,No
+7-20,VA CH3 (C),Numeric,kVA,1,no,Battery Charger 2,No
+7-21,Reactive Power (kVAR),Numeric,kVAR,1,no,Battery Charger 2,No
+7-22,VAR CH1 (A),Numeric,kVAR,1,no,Battery Charger 2,No
+7-23,VAR CH2 (B),Numeric,kVAR,1,no,Battery Charger 2,No
+7-24,VAR CH3 (C),Numeric,kVAR,1,no,Battery Charger 2,No
+7-25,Power Factor (%),Numeric,,1,no,Battery Charger 2,No
+7-26,Apparent PF CH1 (A),Numeric,,1,no,Battery Charger 2,No
+7-27,Apparent PF CH2 (B),Numeric,,1,no,Battery Charger 2,No
+7-28,Apparent PF CH3 (C),Numeric,,1,no,Battery Charger 2,No
+7-29,Exported Energy Sum,Numeric,kWh,1,no,Battery Charger 2,No
+7-30,Exported Energy CH1 (A),Numeric,kWh,1,no,Battery Charger 2,No
+7-31,Exported Energy CH2 (B),Numeric,kWh,1,no,Battery Charger 2,No
+7-32,Exported Energy CH3 (C),Numeric,kWh,1,no,Battery Charger 2,No
+7-33,Cumulative Usage (kWh),Numeric,kWh,1,no,Battery Charger 2,No
+7-34,Imported Energy CH1 (A),Numeric,kWh,1,no,Battery Charger 2,No
+7-35,Imported Energy CH2 (B),Numeric,kWh,1,no,Battery Charger 2,No
+7-36,Imported Energy CH3 (C),Numeric,kWh,1,no,Battery Charger 2,No
+7-37,Exported VAh Sum,Numeric,kVAh,1,no,Battery Charger 2,No
+7-38,Exported VAh CH1 (A),Numeric,kVAh,1,no,Battery Charger 2,No
+7-39,Exported VAh CH2 (B),Numeric,kVAh,1,no,Battery Charger 2,No
+7-40,Exported VAh CH3 (C),Numeric,kVAh,1,no,Battery Charger 2,No
+7-41,Imported VAh Sum,Numeric,kVAh,1,no,Battery Charger 2,No
+7-42,Imported VAh CH1 (A),Numeric,kVAh,1,no,Battery Charger 2,No
+7-43,Imported VAh CH2 (B),Numeric,kVAh,1,no,Battery Charger 2,No
+7-44,Imported VAh CH3 (C),Numeric,kVAh,1,no,Battery Charger 2,No
+7-45,Imported VARh Q1 Sum,Numeric,kVARh,1,no,Battery Charger 2,No
+7-46,Imported VARh Q1 (A),Numeric,kVARh,1,no,Battery Charger 2,No
+7-47,Imported VARh Q1 (B),Numeric,kVARh,1,no,Battery Charger 2,No
+7-48,imported VARh Q1 (C),Numeric,kVARh,1,no,Battery Charger 2,No
+7-49,Imported VARh Q2 Sum,Numeric,kVARh,1,no,Battery Charger 2,No
+7-50,Imported VARh Q2 (A),Numeric,kVARh,1,no,Battery Charger 2,No
+7-51,Imported VARh Q2 (B),Numeric,kVARh,1,no,Battery Charger 2,No
+7-52,Imported VARh Q2 (C),Numeric,kVARh,1,no,Battery Charger 2,No
+7-53,Exported VARh Q3 Sum,Numeric,kVARh,1,no,Battery Charger 2,No
+7-54,Exported VARh Q3 (A),Numeric,kVARh,1,no,Battery Charger 2,No
+7-55,Exported VARh Q3 (B),Numeric,kVARh,1,no,Battery Charger 2,No
+7-56,Exported VARh Q3 (C),Numeric,kVARh,1,no,Battery Charger 2,No
+7-57,Exported VARh Q4 Sum,Numeric,kVARh,1,no,Battery Charger 2,No
+7-58,Exported VARh Q4 (A),Numeric,kVARh,1,no,Battery Charger 2,No
+7-59,Exported VARh Q4 (B),Numeric,kVARh,1,no,Battery Charger 2,No
+7-60,Exported VARh Q4 (C),Numeric,kVARh,1,no,Battery Charger 2,No
+7-61,Watt Demand Element,Numeric,kW,1,no,Battery Charger 2,No
+8-0,Current (A),Numeric,A,1,no,Main Service 2,Yes
+8-1,Current CH1 (A),Numeric,A,1,no,Main Service 2,Yes
+8-2,Current CH2 (B),Numeric,A,1,no,Main Service 2,Yes
+8-3,Current CH3 (C),Numeric,A,1,no,Main Service 2,Yes
+8-4,L-N Voltage (V),Numeric,V,1,no,Main Service 2,Yes
+8-5,Voltage L1-N (AN),Numeric,V,1,no,Main Service 2,Yes
+8-6,Voltage L2-N (BN),Numeric,V,1,no,Main Service 2,Yes
+8-7,Voltage L3-N (CN),Numeric,V,1,no,Main Service 2,Yes
+8-8,L-L Voltage (V),Numeric,V,1,no,Main Service 2,Yes
+8-9,Voltage L1-L2,Numeric,V,1,no,Main Service 2,Yes
+8-10,Voltage L2-L3,Numeric,V,1,no,Main Service 2,Yes
+8-11,Voltage L3-L1,Numeric,V,1,no,Main Service 2,Yes
+8-12,Line Frequency,Numeric,Hz,1,no,Main Service 2,Yes
+8-13,Demand (kW),Numeric,kW,1,no,Main Service 2,Yes
+8-14,Power CH1 (A),Numeric,kW,1,no,Main Service 2,Yes
+8-15,Power CH2 (B),Numeric,kW,1,no,Main Service 2,Yes
+8-16,Power CH3 (C),Numeric,kW,1,no,Main Service 2,Yes
+8-17,Apparent Power (kVA),Numeric,kVA,1,no,Main Service 2,Yes
+8-18,VA CH1 (A),Numeric,kVA,1,no,Main Service 2,Yes
+8-19,VA CH2 (B),Numeric,kVA,1,no,Main Service 2,Yes
+8-20,VA CH3 (C),Numeric,kVA,1,no,Main Service 2,Yes
+8-21,Reactive Power (kVAR),Numeric,kVAR,1,no,Main Service 2,Yes
+8-22,VAR CH1 (A),Numeric,kVAR,1,no,Main Service 2,Yes
+8-23,VAR CH2 (B),Numeric,kVAR,1,no,Main Service 2,Yes
+8-24,VAR CH3 (C),Numeric,kVAR,1,no,Main Service 2,Yes
+8-25,Power Factor (%),Numeric,,1,no,Main Service 2,Yes
+8-26,Apparent PF CH1 (A),Numeric,,1,no,Main Service 2,Yes
+8-27,Apparent PF CH2 (B),Numeric,,1,no,Main Service 2,Yes
+8-28,Apparent PF CH3 (C),Numeric,,1,no,Main Service 2,Yes
+8-29,Exported Energy Sum,Numeric,kWh,1,no,Main Service 2,Yes
+8-30,Exported Energy CH1 (A),Numeric,kWh,1,no,Main Service 2,Yes
+8-31,Exported Energy CH2 (B),Numeric,kWh,1,no,Main Service 2,Yes
+8-32,Exported Energy CH3 (C),Numeric,kWh,1,no,Main Service 2,Yes
+8-33,Cumulative Usage (kWh),Numeric,kWh,1,no,Main Service 2,Yes
+8-34,Imported Energy CH1 (A),Numeric,kWh,1,no,Main Service 2,Yes
+8-35,Imported Energy CH2 (B),Numeric,kWh,1,no,Main Service 2,Yes
+8-36,Imported Energy CH3 (C),Numeric,kWh,1,no,Main Service 2,Yes
+8-37,Exported VAh Sum,Numeric,kVAh,1,no,Main Service 2,Yes
+8-38,Exported VAh CH1 (A),Numeric,kVAh,1,no,Main Service 2,Yes
+8-39,Exported VAh CH2 (B),Numeric,kVAh,1,no,Main Service 2,Yes
+8-40,Exported VAh CH3 (C),Numeric,kVAh,1,no,Main Service 2,Yes
+8-41,Imported VAh Sum,Numeric,kVAh,1,no,Main Service 2,Yes
+8-42,Imported VAh CH1 (A),Numeric,kVAh,1,no,Main Service 2,Yes
+8-43,Imported VAh CH2 (B),Numeric,kVAh,1,no,Main Service 2,Yes
+8-44,Imported VAh CH3 (C),Numeric,kVAh,1,no,Main Service 2,Yes
+8-45,Imported VARh Q1 Sum,Numeric,kVARh,1,no,Main Service 2,Yes
+8-46,Imported VARh Q1 (A),Numeric,kVARh,1,no,Main Service 2,Yes
+8-47,Imported VARh Q1 (B),Numeric,kVARh,1,no,Main Service 2,Yes
+8-48,imported VARh Q1 (C),Numeric,kVARh,1,no,Main Service 2,Yes
+8-49,Imported VARh Q2 Sum,Numeric,kVARh,1,no,Main Service 2,Yes
+8-50,Imported VARh Q2 (A),Numeric,kVARh,1,no,Main Service 2,Yes
+8-51,Imported VARh Q2 (B),Numeric,kVARh,1,no,Main Service 2,Yes
+8-52,Imported VARh Q2 (C),Numeric,kVARh,1,no,Main Service 2,Yes
+8-53,Exported VARh Q3 Sum,Numeric,kVARh,1,no,Main Service 2,Yes
+8-54,Exported VARh Q3 (A),Numeric,kVARh,1,no,Main Service 2,Yes
+8-55,Exported VARh Q3 (B),Numeric,kVARh,1,no,Main Service 2,Yes
+8-56,Exported VARh Q3 (C),Numeric,kVARh,1,no,Main Service 2,Yes
+8-57,Exported VARh Q4 Sum,Numeric,kVARh,1,no,Main Service 2,Yes
+8-58,Exported VARh Q4 (A),Numeric,kVARh,1,no,Main Service 2,Yes
+8-59,Exported VARh Q4 (B),Numeric,kVARh,1,no,Main Service 2,Yes
+8-60,Exported VARh Q4 (C),Numeric,kVARh,1,no,Main Service 2,Yes
+8-61,Watt Demand Element,Numeric,kW,1,no,Main Service 2,Yes
+9-0,Current (A),Numeric,A,1,no,Compressor C-1,No
+9-1,Current CH1 (A),Numeric,A,1,no,Compressor C-1,No
+9-2,Current CH2 (B),Numeric,A,1,no,Compressor C-1,No
+9-3,Current CH3 (C),Numeric,A,1,no,Compressor C-1,No
+9-4,L-N Voltage (V),Numeric,V,1,no,Compressor C-1,No
+9-5,Voltage L1-N (AN),Numeric,V,1,no,Compressor C-1,No
+9-6,Voltage L2-N (BN),Numeric,V,1,no,Compressor C-1,No
+9-7,Voltage L3-N (CN),Numeric,V,1,no,Compressor C-1,No
+9-8,L-L Voltage (V),Numeric,V,1,no,Compressor C-1,No
+9-9,Voltage L1-L2,Numeric,V,1,no,Compressor C-1,No
+9-10,Voltage L2-L3,Numeric,V,1,no,Compressor C-1,No
+9-11,Voltage L3-L1,Numeric,V,1,no,Compressor C-1,No
+9-12,Line Frequency,Numeric,Hz,1,no,Compressor C-1,No
+9-13,Demand (kW),Numeric,kW,1,no,Compressor C-1,No
+9-14,Power CH1 (A),Numeric,kW,1,no,Compressor C-1,No
+9-15,Power CH2 (B),Numeric,kW,1,no,Compressor C-1,No
+9-16,Power CH3 (C),Numeric,kW,1,no,Compressor C-1,No
+9-17,Apparent Power (kVA),Numeric,kVA,1,no,Compressor C-1,No
+9-18,VA CH1 (A),Numeric,kVA,1,no,Compressor C-1,No
+9-19,VA CH2 (B),Numeric,kVA,1,no,Compressor C-1,No
+9-20,VA CH3 (C),Numeric,kVA,1,no,Compressor C-1,No
+9-21,Reactive Power (kVAR),Numeric,kVAR,1,no,Compressor C-1,No
+9-22,VAR CH1 (A),Numeric,kVAR,1,no,Compressor C-1,No
+9-23,VAR CH2 (B),Numeric,kVAR,1,no,Compressor C-1,No
+9-24,VAR CH3 (C),Numeric,kVAR,1,no,Compressor C-1,No
+9-25,Power Factor (%),Numeric,,1,no,Compressor C-1,No
+9-26,Apparent PF CH1 (A),Numeric,,1,no,Compressor C-1,No
+9-27,Apparent PF CH2 (B),Numeric,,1,no,Compressor C-1,No
+9-28,Apparent PF CH3 (C),Numeric,,1,no,Compressor C-1,No
+9-29,Exported Energy Sum,Numeric,kWh,1,no,Compressor C-1,No
+9-30,Exported Energy CH1 (A),Numeric,kWh,1,no,Compressor C-1,No
+9-31,Exported Energy CH2 (B),Numeric,kWh,1,no,Compressor C-1,No
+9-32,Exported Energy CH3 (C),Numeric,kWh,1,no,Compressor C-1,No
+9-33,Cumulative Usage (kWh),Numeric,kWh,1,no,Compressor C-1,No
+9-34,Imported Energy CH1 (A),Numeric,kWh,1,no,Compressor C-1,No
+9-35,Imported Energy CH2 (B),Numeric,kWh,1,no,Compressor C-1,No
+9-36,Imported Energy CH3 (C),Numeric,kWh,1,no,Compressor C-1,No
+9-37,Exported VAh Sum,Numeric,kVAh,1,no,Compressor C-1,No
+9-38,Exported VAh CH1 (A),Numeric,kVAh,1,no,Compressor C-1,No
+9-39,Exported VAh CH2 (B),Numeric,kVAh,1,no,Compressor C-1,No
+9-40,Exported VAh CH3 (C),Numeric,kVAh,1,no,Compressor C-1,No
+9-41,Imported VAh Sum,Numeric,kVAh,1,no,Compressor C-1,No
+9-42,Imported VAh CH1 (A),Numeric,kVAh,1,no,Compressor C-1,No
+9-43,Imported VAh CH2 (B),Numeric,kVAh,1,no,Compressor C-1,No
+9-44,Imported VAh CH3 (C),Numeric,kVAh,1,no,Compressor C-1,No
+9-45,Imported VARh Q1 Sum,Numeric,kVARh,1,no,Compressor C-1,No
+9-46,Imported VARh Q1 (A),Numeric,kVARh,1,no,Compressor C-1,No
+9-47,Imported VARh Q1 (B),Numeric,kVARh,1,no,Compressor C-1,No
+9-48,imported VARh Q1 (C),Numeric,kVARh,1,no,Compressor C-1,No
+9-49,Imported VARh Q2 Sum,Numeric,kVARh,1,no,Compressor C-1,No
+9-50,Imported VARh Q2 (A),Numeric,kVARh,1,no,Compressor C-1,No
+9-51,Imported VARh Q2 (B),Numeric,kVARh,1,no,Compressor C-1,No
+9-52,Imported VARh Q2 (C),Numeric,kVARh,1,no,Compressor C-1,No
+9-53,Exported VARh Q3 Sum,Numeric,kVARh,1,no,Compressor C-1,No
+9-54,Exported VARh Q3 (A),Numeric,kVARh,1,no,Compressor C-1,No
+9-55,Exported VARh Q3 (B),Numeric,kVARh,1,no,Compressor C-1,No
+9-56,Exported VARh Q3 (C),Numeric,kVARh,1,no,Compressor C-1,No
+9-57,Exported VARh Q4 Sum,Numeric,kVARh,1,no,Compressor C-1,No
+9-58,Exported VARh Q4 (A),Numeric,kVARh,1,no,Compressor C-1,No
+9-59,Exported VARh Q4 (B),Numeric,kVARh,1,no,Compressor C-1,No
+9-60,Exported VARh Q4 (C),Numeric,kVARh,1,no,Compressor C-1,No
+9-61,Watt Demand Element,Numeric,kW,1,no,Compressor C-1,No
+10-0,Current (A),Numeric,A,1,no,Compressor C-4,No
+10-1,Current CH1 (A),Numeric,A,1,no,Compressor C-4,No
+10-2,Current CH2 (B),Numeric,A,1,no,Compressor C-4,No
+10-3,Current CH3 (C),Numeric,A,1,no,Compressor C-4,No
+10-4,L-N Voltage (V),Numeric,V,1,no,Compressor C-4,No
+10-5,Voltage L1-N (AN),Numeric,V,1,no,Compressor C-4,No
+10-6,Voltage L2-N (BN),Numeric,V,1,no,Compressor C-4,No
+10-7,Voltage L3-N (CN),Numeric,V,1,no,Compressor C-4,No
+10-8,L-L Voltage (V),Numeric,V,1,no,Compressor C-4,No
+10-9,Voltage L1-L2,Numeric,V,1,no,Compressor C-4,No
+10-10,Voltage L2-L3,Numeric,V,1,no,Compressor C-4,No
+10-11,Voltage L3-L1,Numeric,V,1,no,Compressor C-4,No
+10-12,Line Frequency,Numeric,Hz,1,no,Compressor C-4,No
+10-13,Demand (kW),Numeric,kW,1,no,Compressor C-4,No
+10-14,Power CH1 (A),Numeric,kW,1,no,Compressor C-4,No
+10-15,Power CH2 (B),Numeric,kW,1,no,Compressor C-4,No
+10-16,Power CH3 (C),Numeric,kW,1,no,Compressor C-4,No
+10-17,Apparent Power (kVA),Numeric,kVA,1,no,Compressor C-4,No
+10-18,VA CH1 (A),Numeric,kVA,1,no,Compressor C-4,No
+10-19,VA CH2 (B),Numeric,kVA,1,no,Compressor C-4,No
+10-20,VA CH3 (C),Numeric,kVA,1,no,Compressor C-4,No
+10-21,Reactive Power (kVAR),Numeric,kVAR,1,no,Compressor C-4,No
+10-22,VAR CH1 (A),Numeric,kVAR,1,no,Compressor C-4,No
+10-23,VAR CH2 (B),Numeric,kVAR,1,no,Compressor C-4,No
+10-24,VAR CH3 (C),Numeric,kVAR,1,no,Compressor C-4,No
+10-25,Power Factor (%),Numeric,,1,no,Compressor C-4,No
+10-26,Apparent PF CH1 (A),Numeric,,1,no,Compressor C-4,No
+10-27,Apparent PF CH2 (B),Numeric,,1,no,Compressor C-4,No
+10-28,Apparent PF CH3 (C),Numeric,,1,no,Compressor C-4,No
+10-29,Exported Energy Sum,Numeric,kWh,1,no,Compressor C-4,No
+10-30,Exported Energy CH1 (A),Numeric,kWh,1,no,Compressor C-4,No
+10-31,Exported Energy CH2 (B),Numeric,kWh,1,no,Compressor C-4,No
+10-32,Exported Energy CH3 (C),Numeric,kWh,1,no,Compressor C-4,No
+10-33,Cumulative Usage (kWh),Numeric,kWh,1,no,Compressor C-4,No
+10-34,Imported Energy CH1 (A),Numeric,kWh,1,no,Compressor C-4,No
+10-35,Imported Energy CH2 (B),Numeric,kWh,1,no,Compressor C-4,No
+10-36,Imported Energy CH3 (C),Numeric,kWh,1,no,Compressor C-4,No
+10-37,Exported VAh Sum,Numeric,kVAh,1,no,Compressor C-4,No
+10-38,Exported VAh CH1 (A),Numeric,kVAh,1,no,Compressor C-4,No
+10-39,Exported VAh CH2 (B),Numeric,kVAh,1,no,Compressor C-4,No
+10-40,Exported VAh CH3 (C),Numeric,kVAh,1,no,Compressor C-4,No
+10-41,Imported VAh Sum,Numeric,kVAh,1,no,Compressor C-4,No
+10-42,Imported VAh CH1 (A),Numeric,kVAh,1,no,Compressor C-4,No
+10-43,Imported VAh CH2 (B),Numeric,kVAh,1,no,Compressor C-4,No
+10-44,Imported VAh CH3 (C),Numeric,kVAh,1,no,Compressor C-4,No
+10-45,Imported VARh Q1 Sum,Numeric,kVARh,1,no,Compressor C-4,No
+10-46,Imported VARh Q1 (A),Numeric,kVARh,1,no,Compressor C-4,No
+10-47,Imported VARh Q1 (B),Numeric,kVARh,1,no,Compressor C-4,No
+10-48,imported VARh Q1 (C),Numeric,kVARh,1,no,Compressor C-4,No
+10-49,Imported VARh Q2 Sum,Numeric,kVARh,1,no,Compressor C-4,No
+10-50,Imported VARh Q2 (A),Numeric,kVARh,1,no,Compressor C-4,No
+10-51,Imported VARh Q2 (B),Numeric,kVARh,1,no,Compressor C-4,No
+10-52,Imported VARh Q2 (C),Numeric,kVARh,1,no,Compressor C-4,No
+10-53,Exported VARh Q3 Sum,Numeric,kVARh,1,no,Compressor C-4,No
+10-54,Exported VARh Q3 (A),Numeric,kVARh,1,no,Compressor C-4,No
+10-55,Exported VARh Q3 (B),Numeric,kVARh,1,no,Compressor C-4,No
+10-56,Exported VARh Q3 (C),Numeric,kVARh,1,no,Compressor C-4,No
+10-57,Exported VARh Q4 Sum,Numeric,kVARh,1,no,Compressor C-4,No
+10-58,Exported VARh Q4 (A),Numeric,kVARh,1,no,Compressor C-4,No
+10-59,Exported VARh Q4 (B),Numeric,kVARh,1,no,Compressor C-4,No
+10-60,Exported VARh Q4 (C),Numeric,kVARh,1,no,Compressor C-4,No
+10-61,Watt Demand Element,Numeric,kW,1,no,Compressor C-4,No
+11-0,Current (A),Numeric,A,1,no,EC-1 Fan,No
+11-1,Current CH1 (A),Numeric,A,1,no,EC-1 Fan,No
+11-2,Current CH2 (B),Numeric,A,1,no,EC-1 Fan,No
+11-3,Current CH3 (C),Numeric,A,1,no,EC-1 Fan,No
+11-4,L-N Voltage (V),Numeric,V,1,no,EC-1 Fan,No
+11-5,Voltage L1-N (AN),Numeric,V,1,no,EC-1 Fan,No
+11-6,Voltage L2-N (BN),Numeric,V,1,no,EC-1 Fan,No
+11-7,Voltage L3-N (CN),Numeric,V,1,no,EC-1 Fan,No
+11-8,L-L Voltage (V),Numeric,V,1,no,EC-1 Fan,No
+11-9,Voltage L1-L2,Numeric,V,1,no,EC-1 Fan,No
+11-10,Voltage L2-L3,Numeric,V,1,no,EC-1 Fan,No
+11-11,Voltage L3-L1,Numeric,V,1,no,EC-1 Fan,No
+11-12,Line Frequency,Numeric,Hz,1,no,EC-1 Fan,No
+11-13,Demand (kW),Numeric,kW,1,no,EC-1 Fan,No
+11-14,Power CH1 (A),Numeric,kW,1,no,EC-1 Fan,No
+11-15,Power CH2 (B),Numeric,kW,1,no,EC-1 Fan,No
+11-16,Power CH3 (C),Numeric,kW,1,no,EC-1 Fan,No
+11-17,Apparent Power (kVA),Numeric,kVA,1,no,EC-1 Fan,No
+11-18,VA CH1 (A),Numeric,kVA,1,no,EC-1 Fan,No
+11-19,VA CH2 (B),Numeric,kVA,1,no,EC-1 Fan,No
+11-20,VA CH3 (C),Numeric,kVA,1,no,EC-1 Fan,No
+11-21,Reactive Power (kVAR),Numeric,kVAR,1,no,EC-1 Fan,No
+11-22,VAR CH1 (A),Numeric,kVAR,1,no,EC-1 Fan,No
+11-23,VAR CH2 (B),Numeric,kVAR,1,no,EC-1 Fan,No
+11-24,VAR CH3 (C),Numeric,kVAR,1,no,EC-1 Fan,No
+11-25,Power Factor (%),Numeric,,1,no,EC-1 Fan,No
+11-26,Apparent PF CH1 (A),Numeric,,1,no,EC-1 Fan,No
+11-27,Apparent PF CH2 (B),Numeric,,1,no,EC-1 Fan,No
+11-28,Apparent PF CH3 (C),Numeric,,1,no,EC-1 Fan,No
+11-29,Exported Energy Sum,Numeric,kWh,1,no,EC-1 Fan,No
+11-30,Exported Energy CH1 (A),Numeric,kWh,1,no,EC-1 Fan,No
+11-31,Exported Energy CH2 (B),Numeric,kWh,1,no,EC-1 Fan,No
+11-32,Exported Energy CH3 (C),Numeric,kWh,1,no,EC-1 Fan,No
+11-33,Cumulative Usage (kWh),Numeric,kWh,1,no,EC-1 Fan,No
+11-34,Imported Energy CH1 (A),Numeric,kWh,1,no,EC-1 Fan,No
+11-35,Imported Energy CH2 (B),Numeric,kWh,1,no,EC-1 Fan,No
+11-36,Imported Energy CH3 (C),Numeric,kWh,1,no,EC-1 Fan,No
+11-37,Exported VAh Sum,Numeric,kVAh,1,no,EC-1 Fan,No
+11-38,Exported VAh CH1 (A),Numeric,kVAh,1,no,EC-1 Fan,No
+11-39,Exported VAh CH2 (B),Numeric,kVAh,1,no,EC-1 Fan,No
+11-40,Exported VAh CH3 (C),Numeric,kVAh,1,no,EC-1 Fan,No
+11-41,Imported VAh Sum,Numeric,kVAh,1,no,EC-1 Fan,No
+11-42,Imported VAh CH1 (A),Numeric,kVAh,1,no,EC-1 Fan,No
+11-43,Imported VAh CH2 (B),Numeric,kVAh,1,no,EC-1 Fan,No
+11-44,Imported VAh CH3 (C),Numeric,kVAh,1,no,EC-1 Fan,No
+11-45,Imported VARh Q1 Sum,Numeric,kVARh,1,no,EC-1 Fan,No
+11-46,Imported VARh Q1 (A),Numeric,kVARh,1,no,EC-1 Fan,No
+11-47,Imported VARh Q1 (B),Numeric,kVARh,1,no,EC-1 Fan,No
+11-48,imported VARh Q1 (C),Numeric,kVARh,1,no,EC-1 Fan,No
+11-49,Imported VARh Q2 Sum,Numeric,kVARh,1,no,EC-1 Fan,No
+11-50,Imported VARh Q2 (A),Numeric,kVARh,1,no,EC-1 Fan,No
+11-51,Imported VARh Q2 (B),Numeric,kVARh,1,no,EC-1 Fan,No
+11-52,Imported VARh Q2 (C),Numeric,kVARh,1,no,EC-1 Fan,No
+11-53,Exported VARh Q3 Sum,Numeric,kVARh,1,no,EC-1 Fan,No
+11-54,Exported VARh Q3 (A),Numeric,kVARh,1,no,EC-1 Fan,No
+11-55,Exported VARh Q3 (B),Numeric,kVARh,1,no,EC-1 Fan,No
+11-56,Exported VARh Q3 (C),Numeric,kVARh,1,no,EC-1 Fan,No
+11-57,Exported VARh Q4 Sum,Numeric,kVARh,1,no,EC-1 Fan,No
+11-58,Exported VARh Q4 (A),Numeric,kVARh,1,no,EC-1 Fan,No
+11-59,Exported VARh Q4 (B),Numeric,kVARh,1,no,EC-1 Fan,No
+11-60,Exported VARh Q4 (C),Numeric,kVARh,1,no,EC-1 Fan,No
+11-61,Watt Demand Element,Numeric,kW,1,no,EC-1 Fan,No
+12-0,Current (A),Numeric,A,1,no,EC-1 Pump,No
+12-1,Current CH1 (A),Numeric,A,1,no,EC-1 Pump,No
+12-2,Current CH2 (B),Numeric,A,1,no,EC-1 Pump,No
+12-3,Current CH3 (C),Numeric,A,1,no,EC-1 Pump,No
+12-4,L-N Voltage (V),Numeric,V,1,no,EC-1 Pump,No
+12-5,Voltage L1-N (AN),Numeric,V,1,no,EC-1 Pump,No
+12-6,Voltage L2-N (BN),Numeric,V,1,no,EC-1 Pump,No
+12-7,Voltage L3-N (CN),Numeric,V,1,no,EC-1 Pump,No
+12-8,L-L Voltage (V),Numeric,V,1,no,EC-1 Pump,No
+12-9,Voltage L1-L2,Numeric,V,1,no,EC-1 Pump,No
+12-10,Voltage L2-L3,Numeric,V,1,no,EC-1 Pump,No
+12-11,Voltage L3-L1,Numeric,V,1,no,EC-1 Pump,No
+12-12,Line Frequency,Numeric,Hz,1,no,EC-1 Pump,No
+12-13,Demand (kW),Numeric,kW,1,no,EC-1 Pump,No
+12-14,Power CH1 (A),Numeric,kW,1,no,EC-1 Pump,No
+12-15,Power CH2 (B),Numeric,kW,1,no,EC-1 Pump,No
+12-16,Power CH3 (C),Numeric,kW,1,no,EC-1 Pump,No
+12-17,Apparent Power (kVA),Numeric,kVA,1,no,EC-1 Pump,No
+12-18,VA CH1 (A),Numeric,kVA,1,no,EC-1 Pump,No
+12-19,VA CH2 (B),Numeric,kVA,1,no,EC-1 Pump,No
+12-20,VA CH3 (C),Numeric,kVA,1,no,EC-1 Pump,No
+12-21,Reactive Power (kVAR),Numeric,kVAR,1,no,EC-1 Pump,No
+12-22,VAR CH1 (A),Numeric,kVAR,1,no,EC-1 Pump,No
+12-23,VAR CH2 (B),Numeric,kVAR,1,no,EC-1 Pump,No
+12-24,VAR CH3 (C),Numeric,kVAR,1,no,EC-1 Pump,No
+12-25,Power Factor (%),Numeric,,1,no,EC-1 Pump,No
+12-26,Apparent PF CH1 (A),Numeric,,1,no,EC-1 Pump,No
+12-27,Apparent PF CH2 (B),Numeric,,1,no,EC-1 Pump,No
+12-28,Apparent PF CH3 (C),Numeric,,1,no,EC-1 Pump,No
+12-29,Exported Energy Sum,Numeric,kWh,1,no,EC-1 Pump,No
+12-30,Exported Energy CH1 (A),Numeric,kWh,1,no,EC-1 Pump,No
+12-31,Exported Energy CH2 (B),Numeric,kWh,1,no,EC-1 Pump,No
+12-32,Exported Energy CH3 (C),Numeric,kWh,1,no,EC-1 Pump,No
+12-33,Cumulative Usage (kWh),Numeric,kWh,1,no,EC-1 Pump,No
+12-34,Imported Energy CH1 (A),Numeric,kWh,1,no,EC-1 Pump,No
+12-35,Imported Energy CH2 (B),Numeric,kWh,1,no,EC-1 Pump,No
+12-36,Imported Energy CH3 (C),Numeric,kWh,1,no,EC-1 Pump,No
+12-37,Exported VAh Sum,Numeric,kVAh,1,no,EC-1 Pump,No
+12-38,Exported VAh CH1 (A),Numeric,kVAh,1,no,EC-1 Pump,No
+12-39,Exported VAh CH2 (B),Numeric,kVAh,1,no,EC-1 Pump,No
+12-40,Exported VAh CH3 (C),Numeric,kVAh,1,no,EC-1 Pump,No
+12-41,Imported VAh Sum,Numeric,kVAh,1,no,EC-1 Pump,No
+12-42,Imported VAh CH1 (A),Numeric,kVAh,1,no,EC-1 Pump,No
+12-43,Imported VAh CH2 (B),Numeric,kVAh,1,no,EC-1 Pump,No
+12-44,Imported VAh CH3 (C),Numeric,kVAh,1,no,EC-1 Pump,No
+12-45,Imported VARh Q1 Sum,Numeric,kVARh,1,no,EC-1 Pump,No
+12-46,Imported VARh Q1 (A),Numeric,kVARh,1,no,EC-1 Pump,No
+12-47,Imported VARh Q1 (B),Numeric,kVARh,1,no,EC-1 Pump,No
+12-48,imported VARh Q1 (C),Numeric,kVARh,1,no,EC-1 Pump,No
+12-49,Imported VARh Q2 Sum,Numeric,kVARh,1,no,EC-1 Pump,No
+12-50,Imported VARh Q2 (A),Numeric,kVARh,1,no,EC-1 Pump,No
+12-51,Imported VARh Q2 (B),Numeric,kVARh,1,no,EC-1 Pump,No
+12-52,Imported VARh Q2 (C),Numeric,kVARh,1,no,EC-1 Pump,No
+12-53,Exported VARh Q3 Sum,Numeric,kVARh,1,no,EC-1 Pump,No
+12-54,Exported VARh Q3 (A),Numeric,kVARh,1,no,EC-1 Pump,No
+12-55,Exported VARh Q3 (B),Numeric,kVARh,1,no,EC-1 Pump,No
+12-56,Exported VARh Q3 (C),Numeric,kVARh,1,no,EC-1 Pump,No
+12-57,Exported VARh Q4 Sum,Numeric,kVARh,1,no,EC-1 Pump,No
+12-58,Exported VARh Q4 (A),Numeric,kVARh,1,no,EC-1 Pump,No
+12-59,Exported VARh Q4 (B),Numeric,kVARh,1,no,EC-1 Pump,No
+12-60,Exported VARh Q4 (C),Numeric,kVARh,1,no,EC-1 Pump,No
+12-61,Watt Demand Element,Numeric,kW,1,no,EC-1 Pump,No
+13-0,Current (A),Numeric,A,1,no,EC-2 Fan,No
+13-1,Current CH1 (A),Numeric,A,1,no,EC-2 Fan,No
+13-2,Current CH2 (B),Numeric,A,1,no,EC-2 Fan,No
+13-3,Current CH3 (C),Numeric,A,1,no,EC-2 Fan,No
+13-4,L-N Voltage (V),Numeric,V,1,no,EC-2 Fan,No
+13-5,Voltage L1-N (AN),Numeric,V,1,no,EC-2 Fan,No
+13-6,Voltage L2-N (BN),Numeric,V,1,no,EC-2 Fan,No
+13-7,Voltage L3-N (CN),Numeric,V,1,no,EC-2 Fan,No
+13-8,L-L Voltage (V),Numeric,V,1,no,EC-2 Fan,No
+13-9,Voltage L1-L2,Numeric,V,1,no,EC-2 Fan,No
+13-10,Voltage L2-L3,Numeric,V,1,no,EC-2 Fan,No
+13-11,Voltage L3-L1,Numeric,V,1,no,EC-2 Fan,No
+13-12,Line Frequency,Numeric,Hz,1,no,EC-2 Fan,No
+13-13,Demand (kW),Numeric,kW,1,no,EC-2 Fan,No
+13-14,Power CH1 (A),Numeric,kW,1,no,EC-2 Fan,No
+13-15,Power CH2 (B),Numeric,kW,1,no,EC-2 Fan,No
+13-16,Power CH3 (C),Numeric,kW,1,no,EC-2 Fan,No
+13-17,Apparent Power (kVA),Numeric,kVA,1,no,EC-2 Fan,No
+13-18,VA CH1 (A),Numeric,kVA,1,no,EC-2 Fan,No
+13-19,VA CH2 (B),Numeric,kVA,1,no,EC-2 Fan,No
+13-20,VA CH3 (C),Numeric,kVA,1,no,EC-2 Fan,No
+13-21,Reactive Power (kVAR),Numeric,kVAR,1,no,EC-2 Fan,No
+13-22,VAR CH1 (A),Numeric,kVAR,1,no,EC-2 Fan,No
+13-23,VAR CH2 (B),Numeric,kVAR,1,no,EC-2 Fan,No
+13-24,VAR CH3 (C),Numeric,kVAR,1,no,EC-2 Fan,No
+13-25,Power Factor (%),Numeric,,1,no,EC-2 Fan,No
+13-26,Apparent PF CH1 (A),Numeric,,1,no,EC-2 Fan,No
+13-27,Apparent PF CH2 (B),Numeric,,1,no,EC-2 Fan,No
+13-28,Apparent PF CH3 (C),Numeric,,1,no,EC-2 Fan,No
+13-29,Exported Energy Sum,Numeric,kWh,1,no,EC-2 Fan,No
+13-30,Exported Energy CH1 (A),Numeric,kWh,1,no,EC-2 Fan,No
+13-31,Exported Energy CH2 (B),Numeric,kWh,1,no,EC-2 Fan,No
+13-32,Exported Energy CH3 (C),Numeric,kWh,1,no,EC-2 Fan,No
+13-33,Cumulative Usage (kWh),Numeric,kWh,1,no,EC-2 Fan,No
+13-34,Imported Energy CH1 (A),Numeric,kWh,1,no,EC-2 Fan,No
+13-35,Imported Energy CH2 (B),Numeric,kWh,1,no,EC-2 Fan,No
+13-36,Imported Energy CH3 (C),Numeric,kWh,1,no,EC-2 Fan,No
+13-37,Exported VAh Sum,Numeric,kVAh,1,no,EC-2 Fan,No
+13-38,Exported VAh CH1 (A),Numeric,kVAh,1,no,EC-2 Fan,No
+13-39,Exported VAh CH2 (B),Numeric,kVAh,1,no,EC-2 Fan,No
+13-40,Exported VAh CH3 (C),Numeric,kVAh,1,no,EC-2 Fan,No
+13-41,Imported VAh Sum,Numeric,kVAh,1,no,EC-2 Fan,No
+13-42,Imported VAh CH1 (A),Numeric,kVAh,1,no,EC-2 Fan,No
+13-43,Imported VAh CH2 (B),Numeric,kVAh,1,no,EC-2 Fan,No
+13-44,Imported VAh CH3 (C),Numeric,kVAh,1,no,EC-2 Fan,No
+13-45,Imported VARh Q1 Sum,Numeric,kVARh,1,no,EC-2 Fan,No
+13-46,Imported VARh Q1 (A),Numeric,kVARh,1,no,EC-2 Fan,No
+13-47,Imported VARh Q1 (B),Numeric,kVARh,1,no,EC-2 Fan,No
+13-48,imported VARh Q1 (C),Numeric,kVARh,1,no,EC-2 Fan,No
+13-49,Imported VARh Q2 Sum,Numeric,kVARh,1,no,EC-2 Fan,No
+13-50,Imported VARh Q2 (A),Numeric,kVARh,1,no,EC-2 Fan,No
+13-51,Imported VARh Q2 (B),Numeric,kVARh,1,no,EC-2 Fan,No
+13-52,Imported VARh Q2 (C),Numeric,kVARh,1,no,EC-2 Fan,No
+13-53,Exported VARh Q3 Sum,Numeric,kVARh,1,no,EC-2 Fan,No
+13-54,Exported VARh Q3 (A),Numeric,kVARh,1,no,EC-2 Fan,No
+13-55,Exported VARh Q3 (B),Numeric,kVARh,1,no,EC-2 Fan,No
+13-56,Exported VARh Q3 (C),Numeric,kVARh,1,no,EC-2 Fan,No
+13-57,Exported VARh Q4 Sum,Numeric,kVARh,1,no,EC-2 Fan,No
+13-58,Exported VARh Q4 (A),Numeric,kVARh,1,no,EC-2 Fan,No
+13-59,Exported VARh Q4 (B),Numeric,kVARh,1,no,EC-2 Fan,No
+13-60,Exported VARh Q4 (C),Numeric,kVARh,1,no,EC-2 Fan,No
+13-61,Watt Demand Element,Numeric,kW,1,no,EC-2 Fan,No
+14-0,Current (A),Numeric,A,1,no,EC-2 Pump,No
+14-1,Current CH1 (A),Numeric,A,1,no,EC-2 Pump,No
+14-2,Current CH2 (B),Numeric,A,1,no,EC-2 Pump,No
+14-3,Current CH3 (C),Numeric,A,1,no,EC-2 Pump,No
+14-4,L-N Voltage (V),Numeric,V,1,no,EC-2 Pump,No
+14-5,Voltage L1-N (AN),Numeric,V,1,no,EC-2 Pump,No
+14-6,Voltage L2-N (BN),Numeric,V,1,no,EC-2 Pump,No
+14-7,Voltage L3-N (CN),Numeric,V,1,no,EC-2 Pump,No
+14-8,L-L Voltage (V),Numeric,V,1,no,EC-2 Pump,No
+14-9,Voltage L1-L2,Numeric,V,1,no,EC-2 Pump,No
+14-10,Voltage L2-L3,Numeric,V,1,no,EC-2 Pump,No
+14-11,Voltage L3-L1,Numeric,V,1,no,EC-2 Pump,No
+14-12,Line Frequency,Numeric,Hz,1,no,EC-2 Pump,No
+14-13,Demand (kW),Numeric,kW,1,no,EC-2 Pump,No
+14-14,Power CH1 (A),Numeric,kW,1,no,EC-2 Pump,No
+14-15,Power CH2 (B),Numeric,kW,1,no,EC-2 Pump,No
+14-16,Power CH3 (C),Numeric,kW,1,no,EC-2 Pump,No
+14-17,Apparent Power (kVA),Numeric,kVA,1,no,EC-2 Pump,No
+14-18,VA CH1 (A),Numeric,kVA,1,no,EC-2 Pump,No
+14-19,VA CH2 (B),Numeric,kVA,1,no,EC-2 Pump,No
+14-20,VA CH3 (C),Numeric,kVA,1,no,EC-2 Pump,No
+14-21,Reactive Power (kVAR),Numeric,kVAR,1,no,EC-2 Pump,No
+14-22,VAR CH1 (A),Numeric,kVAR,1,no,EC-2 Pump,No
+14-23,VAR CH2 (B),Numeric,kVAR,1,no,EC-2 Pump,No
+14-24,VAR CH3 (C),Numeric,kVAR,1,no,EC-2 Pump,No
+14-25,Power Factor (%),Numeric,,1,no,EC-2 Pump,No
+14-26,Apparent PF CH1 (A),Numeric,,1,no,EC-2 Pump,No
+14-27,Apparent PF CH2 (B),Numeric,,1,no,EC-2 Pump,No
+14-28,Apparent PF CH3 (C),Numeric,,1,no,EC-2 Pump,No
+14-29,Exported Energy Sum,Numeric,kWh,1,no,EC-2 Pump,No
+14-30,Exported Energy CH1 (A),Numeric,kWh,1,no,EC-2 Pump,No
+14-31,Exported Energy CH2 (B),Numeric,kWh,1,no,EC-2 Pump,No
+14-32,Exported Energy CH3 (C),Numeric,kWh,1,no,EC-2 Pump,No
+14-33,Cumulative Usage (kWh),Numeric,kWh,1,no,EC-2 Pump,No
+14-34,Imported Energy CH1 (A),Numeric,kWh,1,no,EC-2 Pump,No
+14-35,Imported Energy CH2 (B),Numeric,kWh,1,no,EC-2 Pump,No
+14-36,Imported Energy CH3 (C),Numeric,kWh,1,no,EC-2 Pump,No
+14-37,Exported VAh Sum,Numeric,kVAh,1,no,EC-2 Pump,No
+14-38,Exported VAh CH1 (A),Numeric,kVAh,1,no,EC-2 Pump,No
+14-39,Exported VAh CH2 (B),Numeric,kVAh,1,no,EC-2 Pump,No
+14-40,Exported VAh CH3 (C),Numeric,kVAh,1,no,EC-2 Pump,No
+14-41,Imported VAh Sum,Numeric,kVAh,1,no,EC-2 Pump,No
+14-42,Imported VAh CH1 (A),Numeric,kVAh,1,no,EC-2 Pump,No
+14-43,Imported VAh CH2 (B),Numeric,kVAh,1,no,EC-2 Pump,No
+14-44,Imported VAh CH3 (C),Numeric,kVAh,1,no,EC-2 Pump,No
+14-45,Imported VARh Q1 Sum,Numeric,kVARh,1,no,EC-2 Pump,No
+14-46,Imported VARh Q1 (A),Numeric,kVARh,1,no,EC-2 Pump,No
+14-47,Imported VARh Q1 (B),Numeric,kVARh,1,no,EC-2 Pump,No
+14-48,imported VARh Q1 (C),Numeric,kVARh,1,no,EC-2 Pump,No
+14-49,Imported VARh Q2 Sum,Numeric,kVARh,1,no,EC-2 Pump,No
+14-50,Imported VARh Q2 (A),Numeric,kVARh,1,no,EC-2 Pump,No
+14-51,Imported VARh Q2 (B),Numeric,kVARh,1,no,EC-2 Pump,No
+14-52,Imported VARh Q2 (C),Numeric,kVARh,1,no,EC-2 Pump,No
+14-53,Exported VARh Q3 Sum,Numeric,kVARh,1,no,EC-2 Pump,No
+14-54,Exported VARh Q3 (A),Numeric,kVARh,1,no,EC-2 Pump,No
+14-55,Exported VARh Q3 (B),Numeric,kVARh,1,no,EC-2 Pump,No
+14-56,Exported VARh Q3 (C),Numeric,kVARh,1,no,EC-2 Pump,No
+14-57,Exported VARh Q4 Sum,Numeric,kVARh,1,no,EC-2 Pump,No
+14-58,Exported VARh Q4 (A),Numeric,kVARh,1,no,EC-2 Pump,No
+14-59,Exported VARh Q4 (B),Numeric,kVARh,1,no,EC-2 Pump,No
+14-60,Exported VARh Q4 (C),Numeric,kVARh,1,no,EC-2 Pump,No
+14-61,Watt Demand Element,Numeric,kW,1,no,EC-2 Pump,No
+15-0,Current (A),Numeric,A,1,no,EC-3 Fan 1,No
+15-1,Current CH1 (A),Numeric,A,1,no,EC-3 Fan 1,No
+15-2,Current CH2 (B),Numeric,A,1,no,EC-3 Fan 1,No
+15-3,Current CH3 (C),Numeric,A,1,no,EC-3 Fan 1,No
+15-4,L-N Voltage (V),Numeric,V,1,no,EC-3 Fan 1,No
+15-5,Voltage L1-N (AN),Numeric,V,1,no,EC-3 Fan 1,No
+15-6,Voltage L2-N (BN),Numeric,V,1,no,EC-3 Fan 1,No
+15-7,Voltage L3-N (CN),Numeric,V,1,no,EC-3 Fan 1,No
+15-8,L-L Voltage (V),Numeric,V,1,no,EC-3 Fan 1,No
+15-9,Voltage L1-L2,Numeric,V,1,no,EC-3 Fan 1,No
+15-10,Voltage L2-L3,Numeric,V,1,no,EC-3 Fan 1,No
+15-11,Voltage L3-L1,Numeric,V,1,no,EC-3 Fan 1,No
+15-12,Line Frequency,Numeric,Hz,1,no,EC-3 Fan 1,No
+15-13,Demand (kW),Numeric,kW,1,no,EC-3 Fan 1,No
+15-14,Power CH1 (A),Numeric,kW,1,no,EC-3 Fan 1,No
+15-15,Power CH2 (B),Numeric,kW,1,no,EC-3 Fan 1,No
+15-16,Power CH3 (C),Numeric,kW,1,no,EC-3 Fan 1,No
+15-17,Apparent Power (kVA),Numeric,kVA,1,no,EC-3 Fan 1,No
+15-18,VA CH1 (A),Numeric,kVA,1,no,EC-3 Fan 1,No
+15-19,VA CH2 (B),Numeric,kVA,1,no,EC-3 Fan 1,No
+15-20,VA CH3 (C),Numeric,kVA,1,no,EC-3 Fan 1,No
+15-21,Reactive Power (kVAR),Numeric,kVAR,1,no,EC-3 Fan 1,No
+15-22,VAR CH1 (A),Numeric,kVAR,1,no,EC-3 Fan 1,No
+15-23,VAR CH2 (B),Numeric,kVAR,1,no,EC-3 Fan 1,No
+15-24,VAR CH3 (C),Numeric,kVAR,1,no,EC-3 Fan 1,No
+15-25,Power Factor (%),Numeric,,1,no,EC-3 Fan 1,No
+15-26,Apparent PF CH1 (A),Numeric,,1,no,EC-3 Fan 1,No
+15-27,Apparent PF CH2 (B),Numeric,,1,no,EC-3 Fan 1,No
+15-28,Apparent PF CH3 (C),Numeric,,1,no,EC-3 Fan 1,No
+15-29,Exported Energy Sum,Numeric,kWh,1,no,EC-3 Fan 1,No
+15-30,Exported Energy CH1 (A),Numeric,kWh,1,no,EC-3 Fan 1,No
+15-31,Exported Energy CH2 (B),Numeric,kWh,1,no,EC-3 Fan 1,No
+15-32,Exported Energy CH3 (C),Numeric,kWh,1,no,EC-3 Fan 1,No
+15-33,Cumulative Usage (kWh),Numeric,kWh,1,no,EC-3 Fan 1,No
+15-34,Imported Energy CH1 (A),Numeric,kWh,1,no,EC-3 Fan 1,No
+15-35,Imported Energy CH2 (B),Numeric,kWh,1,no,EC-3 Fan 1,No
+15-36,Imported Energy CH3 (C),Numeric,kWh,1,no,EC-3 Fan 1,No
+15-37,Exported VAh Sum,Numeric,kVAh,1,no,EC-3 Fan 1,No
+15-38,Exported VAh CH1 (A),Numeric,kVAh,1,no,EC-3 Fan 1,No
+15-39,Exported VAh CH2 (B),Numeric,kVAh,1,no,EC-3 Fan 1,No
+15-40,Exported VAh CH3 (C),Numeric,kVAh,1,no,EC-3 Fan 1,No
+15-41,Imported VAh Sum,Numeric,kVAh,1,no,EC-3 Fan 1,No
+15-42,Imported VAh CH1 (A),Numeric,kVAh,1,no,EC-3 Fan 1,No
+15-43,Imported VAh CH2 (B),Numeric,kVAh,1,no,EC-3 Fan 1,No
+15-44,Imported VAh CH3 (C),Numeric,kVAh,1,no,EC-3 Fan 1,No
+15-45,Imported VARh Q1 Sum,Numeric,kVARh,1,no,EC-3 Fan 1,No
+15-46,Imported VARh Q1 (A),Numeric,kVARh,1,no,EC-3 Fan 1,No
+15-47,Imported VARh Q1 (B),Numeric,kVARh,1,no,EC-3 Fan 1,No
+15-48,imported VARh Q1 (C),Numeric,kVARh,1,no,EC-3 Fan 1,No
+15-49,Imported VARh Q2 Sum,Numeric,kVARh,1,no,EC-3 Fan 1,No
+15-50,Imported VARh Q2 (A),Numeric,kVARh,1,no,EC-3 Fan 1,No
+15-51,Imported VARh Q2 (B),Numeric,kVARh,1,no,EC-3 Fan 1,No
+15-52,Imported VARh Q2 (C),Numeric,kVARh,1,no,EC-3 Fan 1,No
+15-53,Exported VARh Q3 Sum,Numeric,kVARh,1,no,EC-3 Fan 1,No
+15-54,Exported VARh Q3 (A),Numeric,kVARh,1,no,EC-3 Fan 1,No
+15-55,Exported VARh Q3 (B),Numeric,kVARh,1,no,EC-3 Fan 1,No
+15-56,Exported VARh Q3 (C),Numeric,kVARh,1,no,EC-3 Fan 1,No
+15-57,Exported VARh Q4 Sum,Numeric,kVARh,1,no,EC-3 Fan 1,No
+15-58,Exported VARh Q4 (A),Numeric,kVARh,1,no,EC-3 Fan 1,No
+15-59,Exported VARh Q4 (B),Numeric,kVARh,1,no,EC-3 Fan 1,No
+15-60,Exported VARh Q4 (C),Numeric,kVARh,1,no,EC-3 Fan 1,No
+15-61,Watt Demand Element,Numeric,kW,1,no,EC-3 Fan 1,No
+16-0,Current (A),Numeric,A,1,no,EC-3 Fan 2,No
+16-1,Current CH1 (A),Numeric,A,1,no,EC-3 Fan 2,No
+16-2,Current CH2 (B),Numeric,A,1,no,EC-3 Fan 2,No
+16-3,Current CH3 (C),Numeric,A,1,no,EC-3 Fan 2,No
+16-4,L-N Voltage (V),Numeric,V,1,no,EC-3 Fan 2,No
+16-5,Voltage L1-N (AN),Numeric,V,1,no,EC-3 Fan 2,No
+16-6,Voltage L2-N (BN),Numeric,V,1,no,EC-3 Fan 2,No
+16-7,Voltage L3-N (CN),Numeric,V,1,no,EC-3 Fan 2,No
+16-8,L-L Voltage (V),Numeric,V,1,no,EC-3 Fan 2,No
+16-9,Voltage L1-L2,Numeric,V,1,no,EC-3 Fan 2,No
+16-10,Voltage L2-L3,Numeric,V,1,no,EC-3 Fan 2,No
+16-11,Voltage L3-L1,Numeric,V,1,no,EC-3 Fan 2,No
+16-12,Line Frequency,Numeric,Hz,1,no,EC-3 Fan 2,No
+16-13,Demand (kW),Numeric,kW,1,no,EC-3 Fan 2,No
+16-14,Power CH1 (A),Numeric,kW,1,no,EC-3 Fan 2,No
+16-15,Power CH2 (B),Numeric,kW,1,no,EC-3 Fan 2,No
+16-16,Power CH3 (C),Numeric,kW,1,no,EC-3 Fan 2,No
+16-17,Apparent Power (kVA),Numeric,kVA,1,no,EC-3 Fan 2,No
+16-18,VA CH1 (A),Numeric,kVA,1,no,EC-3 Fan 2,No
+16-19,VA CH2 (B),Numeric,kVA,1,no,EC-3 Fan 2,No
+16-20,VA CH3 (C),Numeric,kVA,1,no,EC-3 Fan 2,No
+16-21,Reactive Power (kVAR),Numeric,kVAR,1,no,EC-3 Fan 2,No
+16-22,VAR CH1 (A),Numeric,kVAR,1,no,EC-3 Fan 2,No
+16-23,VAR CH2 (B),Numeric,kVAR,1,no,EC-3 Fan 2,No
+16-24,VAR CH3 (C),Numeric,kVAR,1,no,EC-3 Fan 2,No
+16-25,Power Factor (%),Numeric,,1,no,EC-3 Fan 2,No
+16-26,Apparent PF CH1 (A),Numeric,,1,no,EC-3 Fan 2,No
+16-27,Apparent PF CH2 (B),Numeric,,1,no,EC-3 Fan 2,No
+16-28,Apparent PF CH3 (C),Numeric,,1,no,EC-3 Fan 2,No
+16-29,Exported Energy Sum,Numeric,kWh,1,no,EC-3 Fan 2,No
+16-30,Exported Energy CH1 (A),Numeric,kWh,1,no,EC-3 Fan 2,No
+16-31,Exported Energy CH2 (B),Numeric,kWh,1,no,EC-3 Fan 2,No
+16-32,Exported Energy CH3 (C),Numeric,kWh,1,no,EC-3 Fan 2,No
+16-33,Cumulative Usage (kWh),Numeric,kWh,1,no,EC-3 Fan 2,No
+16-34,Imported Energy CH1 (A),Numeric,kWh,1,no,EC-3 Fan 2,No
+16-35,Imported Energy CH2 (B),Numeric,kWh,1,no,EC-3 Fan 2,No
+16-36,Imported Energy CH3 (C),Numeric,kWh,1,no,EC-3 Fan 2,No
+16-37,Exported VAh Sum,Numeric,kVAh,1,no,EC-3 Fan 2,No
+16-38,Exported VAh CH1 (A),Numeric,kVAh,1,no,EC-3 Fan 2,No
+16-39,Exported VAh CH2 (B),Numeric,kVAh,1,no,EC-3 Fan 2,No
+16-40,Exported VAh CH3 (C),Numeric,kVAh,1,no,EC-3 Fan 2,No
+16-41,Imported VAh Sum,Numeric,kVAh,1,no,EC-3 Fan 2,No
+16-42,Imported VAh CH1 (A),Numeric,kVAh,1,no,EC-3 Fan 2,No
+16-43,Imported VAh CH2 (B),Numeric,kVAh,1,no,EC-3 Fan 2,No
+16-44,Imported VAh CH3 (C),Numeric,kVAh,1,no,EC-3 Fan 2,No
+16-45,Imported VARh Q1 Sum,Numeric,kVARh,1,no,EC-3 Fan 2,No
+16-46,Imported VARh Q1 (A),Numeric,kVARh,1,no,EC-3 Fan 2,No
+16-47,Imported VARh Q1 (B),Numeric,kVARh,1,no,EC-3 Fan 2,No
+16-48,imported VARh Q1 (C),Numeric,kVARh,1,no,EC-3 Fan 2,No
+16-49,Imported VARh Q2 Sum,Numeric,kVARh,1,no,EC-3 Fan 2,No
+16-50,Imported VARh Q2 (A),Numeric,kVARh,1,no,EC-3 Fan 2,No
+16-51,Imported VARh Q2 (B),Numeric,kVARh,1,no,EC-3 Fan 2,No
+16-52,Imported VARh Q2 (C),Numeric,kVARh,1,no,EC-3 Fan 2,No
+16-53,Exported VARh Q3 Sum,Numeric,kVARh,1,no,EC-3 Fan 2,No
+16-54,Exported VARh Q3 (A),Numeric,kVARh,1,no,EC-3 Fan 2,No
+16-55,Exported VARh Q3 (B),Numeric,kVARh,1,no,EC-3 Fan 2,No
+16-56,Exported VARh Q3 (C),Numeric,kVARh,1,no,EC-3 Fan 2,No
+16-57,Exported VARh Q4 Sum,Numeric,kVARh,1,no,EC-3 Fan 2,No
+16-58,Exported VARh Q4 (A),Numeric,kVARh,1,no,EC-3 Fan 2,No
+16-59,Exported VARh Q4 (B),Numeric,kVARh,1,no,EC-3 Fan 2,No
+16-60,Exported VARh Q4 (C),Numeric,kVARh,1,no,EC-3 Fan 2,No
+16-61,Watt Demand Element,Numeric,kW,1,no,EC-3 Fan 2,No
+17-0,Current (A),Numeric,A,1,no,EC-3 Pump,No
+17-1,Current CH1 (A),Numeric,A,1,no,EC-3 Pump,No
+17-2,Current CH2 (B),Numeric,A,1,no,EC-3 Pump,No
+17-3,Current CH3 (C),Numeric,A,1,no,EC-3 Pump,No
+17-4,L-N Voltage (V),Numeric,V,1,no,EC-3 Pump,No
+17-5,Voltage L1-N (AN),Numeric,V,1,no,EC-3 Pump,No
+17-6,Voltage L2-N (BN),Numeric,V,1,no,EC-3 Pump,No
+17-7,Voltage L3-N (CN),Numeric,V,1,no,EC-3 Pump,No
+17-8,L-L Voltage (V),Numeric,V,1,no,EC-3 Pump,No
+17-9,Voltage L1-L2,Numeric,V,1,no,EC-3 Pump,No
+17-10,Voltage L2-L3,Numeric,V,1,no,EC-3 Pump,No
+17-11,Voltage L3-L1,Numeric,V,1,no,EC-3 Pump,No
+17-12,Line Frequency,Numeric,Hz,1,no,EC-3 Pump,No
+17-13,Demand (kW),Numeric,kW,1,no,EC-3 Pump,No
+17-14,Power CH1 (A),Numeric,kW,1,no,EC-3 Pump,No
+17-15,Power CH2 (B),Numeric,kW,1,no,EC-3 Pump,No
+17-16,Power CH3 (C),Numeric,kW,1,no,EC-3 Pump,No
+17-17,Apparent Power (kVA),Numeric,kVA,1,no,EC-3 Pump,No
+17-18,VA CH1 (A),Numeric,kVA,1,no,EC-3 Pump,No
+17-19,VA CH2 (B),Numeric,kVA,1,no,EC-3 Pump,No
+17-20,VA CH3 (C),Numeric,kVA,1,no,EC-3 Pump,No
+17-21,Reactive Power (kVAR),Numeric,kVAR,1,no,EC-3 Pump,No
+17-22,VAR CH1 (A),Numeric,kVAR,1,no,EC-3 Pump,No
+17-23,VAR CH2 (B),Numeric,kVAR,1,no,EC-3 Pump,No
+17-24,VAR CH3 (C),Numeric,kVAR,1,no,EC-3 Pump,No
+17-25,Power Factor (%),Numeric,,1,no,EC-3 Pump,No
+17-26,Apparent PF CH1 (A),Numeric,,1,no,EC-3 Pump,No
+17-27,Apparent PF CH2 (B),Numeric,,1,no,EC-3 Pump,No
+17-28,Apparent PF CH3 (C),Numeric,,1,no,EC-3 Pump,No
+17-29,Exported Energy Sum,Numeric,kWh,1,no,EC-3 Pump,No
+17-30,Exported Energy CH1 (A),Numeric,kWh,1,no,EC-3 Pump,No
+17-31,Exported Energy CH2 (B),Numeric,kWh,1,no,EC-3 Pump,No
+17-32,Exported Energy CH3 (C),Numeric,kWh,1,no,EC-3 Pump,No
+17-33,Cumulative Usage (kWh),Numeric,kWh,1,no,EC-3 Pump,No
+17-34,Imported Energy CH1 (A),Numeric,kWh,1,no,EC-3 Pump,No
+17-35,Imported Energy CH2 (B),Numeric,kWh,1,no,EC-3 Pump,No
+17-36,Imported Energy CH3 (C),Numeric,kWh,1,no,EC-3 Pump,No
+17-37,Exported VAh Sum,Numeric,kVAh,1,no,EC-3 Pump,No
+17-38,Exported VAh CH1 (A),Numeric,kVAh,1,no,EC-3 Pump,No
+17-39,Exported VAh CH2 (B),Numeric,kVAh,1,no,EC-3 Pump,No
+17-40,Exported VAh CH3 (C),Numeric,kVAh,1,no,EC-3 Pump,No
+17-41,Imported VAh Sum,Numeric,kVAh,1,no,EC-3 Pump,No
+17-42,Imported VAh CH1 (A),Numeric,kVAh,1,no,EC-3 Pump,No
+17-43,Imported VAh CH2 (B),Numeric,kVAh,1,no,EC-3 Pump,No
+17-44,Imported VAh CH3 (C),Numeric,kVAh,1,no,EC-3 Pump,No
+17-45,Imported VARh Q1 Sum,Numeric,kVARh,1,no,EC-3 Pump,No
+17-46,Imported VARh Q1 (A),Numeric,kVARh,1,no,EC-3 Pump,No
+17-47,Imported VARh Q1 (B),Numeric,kVARh,1,no,EC-3 Pump,No
+17-48,imported VARh Q1 (C),Numeric,kVARh,1,no,EC-3 Pump,No
+17-49,Imported VARh Q2 Sum,Numeric,kVARh,1,no,EC-3 Pump,No
+17-50,Imported VARh Q2 (A),Numeric,kVARh,1,no,EC-3 Pump,No
+17-51,Imported VARh Q2 (B),Numeric,kVARh,1,no,EC-3 Pump,No
+17-52,Imported VARh Q2 (C),Numeric,kVARh,1,no,EC-3 Pump,No
+17-53,Exported VARh Q3 Sum,Numeric,kVARh,1,no,EC-3 Pump,No
+17-54,Exported VARh Q3 (A),Numeric,kVARh,1,no,EC-3 Pump,No
+17-55,Exported VARh Q3 (B),Numeric,kVARh,1,no,EC-3 Pump,No
+17-56,Exported VARh Q3 (C),Numeric,kVARh,1,no,EC-3 Pump,No
+17-57,Exported VARh Q4 Sum,Numeric,kVARh,1,no,EC-3 Pump,No
+17-58,Exported VARh Q4 (A),Numeric,kVARh,1,no,EC-3 Pump,No
+17-59,Exported VARh Q4 (B),Numeric,kVARh,1,no,EC-3 Pump,No
+17-60,Exported VARh Q4 (C),Numeric,kVARh,1,no,EC-3 Pump,No
+17-61,Watt Demand Element,Numeric,kW,1,no,EC-3 Pump,No

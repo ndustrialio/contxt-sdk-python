@@ -46,7 +46,7 @@ class Clients:
 
     @cachedproperty
     def iot(self) -> IotService:
-        return IotService(self.auth)
+        return IotService(self.auth, env="staging")
 
     @cachedproperty
     def sis(self) -> SisService:

@@ -9,7 +9,7 @@ import click
 
 from contxt.cli.clients import Clients
 from contxt.cli.utils import LAST_WEEK, NOW, ClickPath, fields_option, print_table, sort_option
-from contxt.models.iot import Feed, Field, FieldGrouping, Window
+from contxt.models.iot import Feed, Field, FieldGrouping, FieldValueType, Window
 from contxt.utils.serializer import Serializer
 
 
@@ -166,28 +166,14 @@ def ingest_worksheet(clients: Clients, feed_key, worksheet_file) -> None:
             else:
                 field_objs.append(
                     Field(
-                        {
-                            "id": None,
-                            "field_name": None,
-                            "label": label,
-                            "output_id": None,
-                            "field_descriptor": row["Field Descriptor"],
-                            "field_human_name": row["Field Descriptor"],
-                            "units": row["Units"],
-                            "scalar": None,
-                            "divisor": None,
-                            "value_type": "numeric",
-                            "feed_key": feed_key,
-                            "FieldGroupingField": None,
-                            "is_hidden": False,
-                            "is_default": None,
-                            "is_totalizer": None,
-                            "can_aggregate": None,
-                            "is_windowed": None,
-                            "status": None,
-                            "created_at": None,
-                            "updated_at": None,
-                        }
+                        label=label,
+                        output_id=feed.id,
+                        field_descriptor=row["Field Descriptor"],
+                        units=row["Units"],
+                        field_human_name=row["Field Descriptor"],
+                        feed_key=feed_key,
+                        value_type=FieldValueType("numeric"),
+                        is_hidden=False,
                     )
                 )
 
@@ -202,7 +188,7 @@ def ingest_worksheet(clients: Clients, feed_key, worksheet_file) -> None:
     fields_for_feed = clients.iot.get_fields_for_feed(feed_id=feed.id)
 
     # organize the fields by their grouping names
-    grouping_fields = {}
+    grouping_fields: Dict = {}
     for field in fields_for_feed:
         if field.field_descriptor in desired_groupings_by_field:
             grouping_name = desired_groupings_by_field[field.field_descriptor]
@@ -212,18 +198,25 @@ def ingest_worksheet(clients: Clients, feed_key, worksheet_file) -> None:
                 grouping_fields[grouping_name] = []
             grouping_fields[grouping_name].append(field.id)
 
-        # go through the organized listing and create the grouping if necessary and update the fields for the grouping
+        # go through organized listing, create grouping if necessary, update fields for grouping
         for grouping_name, field_ids in grouping_fields.items():
             grouping = groupings_by_label.get(grouping_name)
 
             if not grouping:
                 print(f"Creating new grouping: {grouping_name}")
                 grouping = clients.iot.create_grouping(
-                    facility_id=feed.facility_id,
-                    label=grouping_name,
-                    description=grouping_name,
-                    is_public=True,
+                    Field(
+                        id=feed.id,
+                        label=grouping_name,
+                        output_id=feed.key,
+                        field_descriptor=grouping_name,
+                        field_human_name=feed.key,
+                        is_hidden=False,
+                        status=feed.feed_status,
+                        feed_key=feed.key,
+                    )
                 )
+                print(grouping)
 
             print(f"Setting {len(field_ids)} fields to grouping {grouping_name}")
             clients.iot.set_fields_for_grouping(grouping.id, field_ids)
