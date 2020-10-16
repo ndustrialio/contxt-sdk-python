@@ -52,18 +52,19 @@ class IotService(ConfiguredApi):
         super().__init__(env=env, auth=auth, **kwargs)
 
     def provision_field_for_feed(self, feed_id: int, field_obj: Field):
-        return self.post(f"feeds/{feed_id}/fields", data=field_obj.__dict__)
+        return self.post(f"feeds/{feed_id}/fields", data=field_obj.post())
 
-    def create_grouping(self, grouping_obj):
-        print(grouping_obj.__dict__)
-        return (self.post(f"facilities/{grouping_obj.id}/groupings", data=grouping_obj.__dict__),)
+
+
+    def create_grouping(self, facility_id, grouping_obj):
+        return (self.post(f"facilities/{facility_id}/groupings", json={"label": grouping_obj.label,"description": grouping_obj.field_descriptor,"is_public":True, "fileds":[]}),)
 
     def set_fields_for_grouping(self, grouping_id, field_list):
         assert isinstance(grouping_id, str)
         assert isinstance(field_list, list)
 
         body = {"fields": field_list}
-        return self.post(f"groupings/{grouping_id}/fields", data=body)
+        return self.post(f"groupings/{grouping_id}/fields", json=body)
 
     def delete_time_series_point(
         self, output_id: int, field: str, interval: Window, time: datetime
