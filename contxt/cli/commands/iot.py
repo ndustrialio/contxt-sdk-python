@@ -1,11 +1,11 @@
+import csv
+import os
 from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List
 
 import click
-import csv
-import os
 
 from contxt.cli.clients import Clients
 from contxt.cli.utils import LAST_WEEK, NOW, ClickPath, fields_option, print_table, sort_option
@@ -125,7 +125,7 @@ def ingest_worksheet(clients: Clients, feed_key, worksheet_file) -> None:
     """Field Worksheet Ingestor"""
     feed = clients.iot.get_feed_with_key(feed_key)
     if not feed:
-        print(f"Feed with key {args.feed_key} does not exist")
+        print(f"Feed with key {feed_key} does not exist")
         return
     groupings_by_label = {}
     groupings = clients.iot.get_field_groupings_for_facility(feed.facility_id)
@@ -167,13 +167,26 @@ def ingest_worksheet(clients: Clients, feed_key, worksheet_file) -> None:
                 field_objs.append(
                     Field(
                         {
+                            "id": None,
+                            "field_name": None,
                             "label": label,
+                            "output_id": None,
                             "field_descriptor": row["Field Descriptor"],
                             "field_human_name": row["Field Descriptor"],
                             "units": row["Units"],
-                            "value_type": "numeric",  # TODO change me
-                            "feed_key": args.feed_key,
+                            "scalar": None,
+                            "divisor": None,
+                            "value_type": "numeric",
+                            "feed_key": feed_key,
+                            "FieldGroupingField": None,
                             "is_hidden": False,
+                            "is_default": None,
+                            "is_totalizer": None,
+                            "can_aggregate": None,
+                            "is_windowed": None,
+                            "status": None,
+                            "created_at": None,
+                            "updated_at": None,
                         }
                     )
                 )
@@ -182,7 +195,7 @@ def ingest_worksheet(clients: Clients, feed_key, worksheet_file) -> None:
 
     # go provision the fields
     for field_obj in field_objs:
-        clients.iot.provision_field_for_feed(feed_id, field_obj)
+        clients.iot.provision_field_for_feed(feed.id, field_obj)
         print(f"Provisioned: {field_obj.field_descriptor}")
     print("Done provisioning the fields")
 
@@ -224,16 +237,28 @@ def ingest_worksheet(clients: Clients, feed_key, worksheet_file) -> None:
 def create_worksheet(clients: Clients, feed_key) -> None:
     """Create Field Worksheets"""
     fields = clients.iot.get_unprovisioned_fields_for_feed_key(feed_key=feed_key)
-    filename = f'{feed_key}_unprovisioned_worksheet.csv'
+    filename = f"{feed_key}_unprovisioned_worksheet.csv"
 
-    with open(os.path.join('.', filename), 'w') as f:
+    with open(os.path.join(".", filename), "w") as f:
 
-        headers = ['Field Descriptor','Label','Data Type','Units','Scalar','Cumulative Value?','equipment group','Facility Main?']
+        headers = [
+            "Field Descriptor",
+            "Label",
+            "Data Type",
+            "Units",
+            "Scalar",
+            "Cumulative Value?",
+            "equipment group",
+            "Facility Main?",
+        ]
         writer = csv.DictWriter(f, fieldnames=headers)
         writer.writeheader()
 
         for f in fields:
-            row = {col_name: '' if col_name != 'Field Descriptor' else f.field_descriptor for col_name in headers}
+            row = {
+                col_name: "" if col_name != "Field Descriptor" else f.field_descriptor
+                for col_name in headers
+            }
             writer.writerow(row)
 
-    print(f'Wrote unprovisioned fields to {filename}')       
+    print(f"Wrote unprovisioned fields to {filename}")

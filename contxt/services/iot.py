@@ -64,14 +64,13 @@ class IotService(ConfiguredApi):
             category_obj=None,
             field_obj_list=[],
         )
-    
+
     def set_fields_for_grouping(self, grouping_id, field_list):
         assert isinstance(grouping_id, str)
         assert isinstance(field_list, list)
 
-        body = {'fields': field_list}
-        return self.post(f'groupings/{grouping_id}/fields', data=body)
-
+        body = {"fields": field_list}
+        return self.post(f"groupings/{grouping_id}/fields", data=body)
 
     def delete_time_series_point(
         self, output_id: int, field: str, interval: Window, time: datetime

@@ -70,6 +70,7 @@ class Field(ApiObject):
     updated_at: Optional[datetime] = None
 
 
+
 @dataclass
 class FieldCategory(ApiObject):
     _api_fields: ClassVar = (
@@ -125,10 +126,9 @@ class FieldGrouping(ApiObject):
 
     def get_dict(self):
         return {
-            **super().get_dict(), 'field_category_name':
-            self.category.name if self.category else None,
-            'field_count':
-            len(self.fields)
+            **super().get_dict(),
+            "field_category_name": self.category.name if self.category else None,
+            "field_count": len(self.fields),
         }
 
     def get_create_dict(self):
