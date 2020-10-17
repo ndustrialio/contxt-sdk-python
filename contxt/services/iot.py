@@ -54,18 +54,21 @@ class IotService(ConfiguredApi):
     def provision_field_for_feed(self, feed_id: int, field_obj: Field):
         return self.post(f"feeds/{feed_id}/fields", data=field_obj.post())
 
-    def create_grouping(self, facility_id, grouping_obj):
+    def create_grouping(self, grouping):
         return (
             self.post(
-                f"facilities/{facility_id}/groupings",
+                f"facilities/{grouping.facility_id}/groupings",
                 json={
-                    "label": grouping_obj.label,
-                    "description": grouping_obj.field_descriptor,
-                    "is_public": True,
-                    "fileds": [],
+                    "label": grouping.label,
+                    "description": grouping.description,
+                    "is_public": grouping.is_public,
+                    "fileds": grouping.field_category_id,
                 },
             ),
         )
+
+    def add_field_to_grouping(self, grouping_id, field_id):
+        return self.post(f"groupings/{grouping_id}/fields/{field_id}")
 
     def set_fields_for_grouping(self, grouping_id, field_list):
         assert isinstance(grouping_id, str)

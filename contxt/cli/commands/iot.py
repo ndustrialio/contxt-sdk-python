@@ -205,17 +205,11 @@ def ingest_worksheet(clients: Clients, feed_key, worksheet_file) -> None:
             if not grouping:
                 print(f"Creating new grouping: {grouping_name}")
                 grouping = clients.iot.create_grouping(
-                    feed.facility_id,
-                    Field(
-                        id=feed,
-                        label=grouping_name,
-                        output_id=feed.key,
-                        field_descriptor=grouping_name,
-                        field_human_name=feed.key,
-                        is_hidden=False,
-                        status=feed.feed_status,
-                        feed_key=feed.key,
-                    ),
+                    facility_id=feed.facility_id,
+                    label=grouping_name,
+                    description=grouping_name,
+                    is_public=True,
+                    field_category_id=[],
                 )
                 print(grouping)
 
@@ -256,3 +250,32 @@ def create_worksheet(clients: Clients, feed_key) -> None:
             writer.writerow(row)
 
     print(f"Wrote unprovisioned fields to {filename}")
+
+
+@iot.command()
+@click.argument("facility_id", type=str)
+@click.argument("label", type=str)
+@click.argument("description", type=str)
+@click.argument("is_public", type=bool)
+@click.argument("field_category_id", type=int)
+@click.pass_obj
+def create_grouping(clients: Clients, facility_id, label, description, is_public, field_category_id):
+    """Create a new IOT Grouping"""
+    grouping = clients.iot.create_grouping(
+        facility_id=facility_id,
+        label=label,
+        description=description,
+        is_public=is_public,
+        field_category_id=[field_category_id],
+    )
+    print(grouping)
+
+
+@iot.command()
+@click.argument("grouping_id", type=str)
+@click.argument("field_id", type=str)
+@click.pass_obj
+def add_field_to_grouping(clients: Clients, grouping_id, field_id):
+    """Add field to grouping"""
+    grouping_field = clients.iot.add_field_to_grouping(grouping_id=grouping_id, field_id=field_id)
+    print(grouping_field)
