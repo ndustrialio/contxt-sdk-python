@@ -123,26 +123,6 @@ class FieldGrouping(ApiObject):
     created_at: datetime
     updated_at: datetime
 
-    def get_dict(self):
-        return {
-            **super().get_dict(),
-            "field_category_name": self.category.name if self.category else None,
-            "field_count": len(self.fields),
-        }
-
-    def get_create_dict(self):
-        create_dict = {
-            "label": self.label,
-            "description": self.description,
-            "is_public": self.is_public,
-        }
-
-        # API can't handle sending None / null for field_category_id at the moment. remove when able to
-        if self.field_category_id:
-            create_dict["field_category_id"] = self.field_category_id
-
-        return create_dict
-
 
 @dataclass
 class UnprovisionedField(ApiObject):

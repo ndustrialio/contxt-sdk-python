@@ -250,7 +250,7 @@ def create_worksheet(clients: Clients, feed_key) -> None:
 
         for f in fields:
             row = {
-                col_name: "" if col_name != "Field Descriptor" else f.field_descriptor
+                col_name: "" if col_name != "Field Descriptor" else f.field_descriptor  # type: ignore
                 for col_name in headers
             }
             writer.writerow(row)
