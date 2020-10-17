@@ -257,7 +257,7 @@ def create_worksheet(clients: Clients, feed_key) -> None:
 @click.argument("label", type=str)
 @click.argument("description", type=str)
 @click.argument("is_public", type=bool)
-@click.argument("field_category_id", type=int)
+@click.argument("field_category_id", type=str)
 @click.pass_obj
 def create_grouping(clients: Clients, facility_id, label, description, is_public, field_category_id):
     """Create a new IOT Grouping"""
