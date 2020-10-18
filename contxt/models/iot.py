@@ -32,7 +32,7 @@ class Field(ApiObject):
         ApiField("output_id", data_type=int, creatable=True),
         ApiField("field_descriptor", creatable=True),
         ApiField("field_human_name"),
-        ApiField("units", creatable=True, updatable=True, optional=True),
+        ApiField("units", creatable=True, updatable=True),
         ApiField("scalar", data_type=float, optional=True, creatable=True, updatable=True),
         ApiField("divisor", data_type=float, optional=True, creatable=True, updatable=True),
         ApiField("value_type", data_type=FieldValueType, optional=True, creatable=True),
@@ -51,7 +51,7 @@ class Field(ApiObject):
     label: str
     output_id: str
     field_descriptor: str
-    units: Optional[str] = None
+    units: str
     id: Optional[int] = None
     name: Optional[str] = None
     field_human_name: Optional[str] = None
