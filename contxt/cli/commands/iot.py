@@ -282,6 +282,15 @@ def add_field_to_grouping(clients: Clients, grouping_id, field_id):
 
 
 @iot.command()
+@click.argument("field_id_list", type=List[str])
+@click.pass_obj
+def unprovision_fields(clients: Clients, field_id_list: List[str]):
+    """Unprovision fields"""
+    for field_id in field_id_list:
+        clients.iot.unprovision_field(field_id)
+
+
+@iot.command()
 @fields_option(default=["id", "key"], obj=Feed)
 @sort_option(default="id")
 @click.pass_obj
