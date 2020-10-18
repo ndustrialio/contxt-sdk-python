@@ -279,3 +279,20 @@ def add_field_to_grouping(clients: Clients, grouping_id, field_id):
     """Add field to grouping"""
     grouping_field = clients.iot.add_field_to_grouping(grouping_id=grouping_id, field_id=field_id)
     print(grouping_field)
+
+
+@iot.command()
+@fields_option(default=["id", "key"], obj=Feed)
+@sort_option(default="id")
+@click.pass_obj
+def unprovision_all_fields_in_feed(clients: Clients, fields: List[str]) -> None:
+    """Unprovision all fields in feed"""
+    for feed_id in fields:
+        feed_id = (
+            clients.iot.get_feed_with_id(feed_id).id
+            if feed_id.isnumeric()
+            else clients.iot.get_feed_with_key(feed_id).id
+        )
+    field_res = clients.iot.get_fields_for_feed(feed_id)
+    for field in field_res:
+        clients.iot.unprovision_field(field.id)

@@ -77,6 +77,9 @@ class IotService(ConfiguredApi):
         body = {"fields": field_list}
         return self.post(f"groupings/{grouping_id}/fields", json=body)
 
+    def unprovision_field(self, field_id: int):
+        return self.delete(uri=f"fields/{field_id}")
+
     def delete_time_series_point(
         self, output_id: int, field: str, interval: Window, time: datetime
     ) -> Optional[Dict]:
