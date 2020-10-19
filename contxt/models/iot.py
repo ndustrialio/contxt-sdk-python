@@ -102,8 +102,8 @@ class FieldGrouping(ApiObject):
         ApiField("owner_id"),
         ApiField("is_public", data_type=bool),
         ApiField("field_category_id"),
-        ApiField("Owner", attr_key="owner", data_type=Owner),
-        ApiField("FieldCategory", attr_key="field_category", data_type=FieldCategory),
+        ApiField("Owner", attr_key="owner", data_type=Owner, optional=True),
+        ApiField("FieldCategory", attr_key="field_category", data_type=FieldCategory, optional=True),
         ApiField("Fields", attr_key="fields", data_type=Field),
         ApiField("created_at", data_type=Parsers.datetime),
         ApiField("updated_at", data_type=Parsers.datetime),
@@ -116,12 +116,12 @@ class FieldGrouping(ApiObject):
     facility_id: int
     is_public: bool
     owner_id: str
-    owner: Owner
     field_category_id: str
-    field_category: FieldCategory
     fields: List[Field]
     created_at: datetime
     updated_at: datetime
+    owner: Optional[Owner] = None
+    field_category: Optional[FieldCategory] = None
 
 
 @dataclass
