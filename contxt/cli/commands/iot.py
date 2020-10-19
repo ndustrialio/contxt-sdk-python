@@ -119,25 +119,22 @@ def data(
 
 @iot.command()
 @click.argument("feed_key", type=str)
-@click.argument("worksheet_file", type=click.File("r"))
+@click.option("--input", required=True, type=click.File("r"), help="CSV of fields to provision")
 @click.pass_obj
-def ingest_worksheet(clients: Clients, feed_key, worksheet_file) -> None:
-    """Field Worksheet Ingestor"""
+def provision_fields(clients: Clients, feed_key: str, input) -> None:
+    """Process CSV for creation of fields"""
     feed = clients.iot.get_feed_with_key(feed_key)
     if not feed:
-        print(f"Feed with key {feed_key} does not exist")
-        return
-    groupings_by_label = {}
-    groupings = clients.iot.get_field_groupings_for_facility(feed.facility_id)
-    for grouping in groupings:
-        groupings_by_label[grouping.label] = grouping
-
+        raise click.ClickException(f"Feed with key {feed_key} does not exist.")
+    groupings_by_label = {
+        g.label: g for g in clients.iot.get_field_groupings_for_facility(feed.facility_id)
+    }
     field_objs = []
-    fields_for_feed = clients.iot.get_fields_for_feed(feed_id=feed.id)
-    fields_descriptors_for_feed = [f.field_descriptor for f in fields_for_feed]
-
+    fields_descriptors_for_feed = [
+        f.field_descriptor for f in clients.iot.get_fields_for_feed(feed_id=feed.id)
+    ]
     desired_groupings_by_field = {}
-    with worksheet_file as f:
+    with input as f:
 
         headers = [
             "Field Descriptor",
@@ -160,7 +157,6 @@ def ingest_worksheet(clients: Clients, feed_key, worksheet_file) -> None:
                 label = row["equipment group"] + row["Label"]
             else:
                 label = row["Label"]
-
             if row["Field Descriptor"] in fields_descriptors_for_feed:
                 print(f'Already provisioned field with descriptor {row["Field Descriptor"]}')
             else:
@@ -243,10 +239,7 @@ def create_worksheet(clients: Clients, feed_key) -> None:
         writer.writeheader()
 
         for f in fields:
-            row = {
-                col_name: "" if col_name != "Field Descriptor" else f.field_descriptor  # type: ignore
-                for col_name in headers
-            }
+            row = {"Field Descriptor": f.field_descriptor}  # type: ignore
             writer.writerow(row)
 
     print(f"Wrote unprovisioned fields to {filename}")
@@ -254,10 +247,10 @@ def create_worksheet(clients: Clients, feed_key) -> None:
 
 @iot.command()
 @click.argument("facility_id", type=str)
-@click.argument("label", type=str)
-@click.argument("description", type=str)
-@click.argument("is_public", type=bool)
-@click.argument("field_category_id", type=str)
+@click.option("--label", required=True, type=str)
+@click.option("--description", required=True, type=str)
+@click.option("--is_public", required=True, type=bool)
+@click.option("--field_category_id", required=True, type=str)
 @click.pass_obj
 def create_grouping(clients: Clients, facility_id, label, description, is_public, field_category_id):
     """Create a new IOT Grouping"""
@@ -282,26 +275,9 @@ def add_field_to_grouping(clients: Clients, grouping_id, field_id):
 
 
 @iot.command()
-@click.argument("field_id_list", type=List[str])
+@click.argument("field_id_list", nargs=-1)
 @click.pass_obj
 def unprovision_fields(clients: Clients, field_id_list: List[str]):
     """Unprovision fields"""
     for field_id in field_id_list:
         clients.iot.unprovision_field(field_id)
-
-
-@iot.command()
-@fields_option(default=["id", "key"], obj=Feed)
-@sort_option(default="id")
-@click.pass_obj
-def unprovision_all_fields_in_feed(clients: Clients, fields: List[str]) -> None:
-    """Unprovision all fields in feed"""
-    for feed_id in fields:
-        feed_id = (
-            clients.iot.get_feed_with_id(feed_id).id
-            if feed_id.isnumeric()
-            else clients.iot.get_feed_with_key(feed_id).id
-        )
-    field_res = clients.iot.get_fields_for_feed(feed_id)
-    for field in field_res:
-        clients.iot.unprovision_field(field.id)
