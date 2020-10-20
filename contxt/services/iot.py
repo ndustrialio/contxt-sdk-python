@@ -72,12 +72,8 @@ class IotService(ConfiguredApi):
     def add_field_to_grouping(self, grouping_id: int, field_id: int):
         return self.post(f"groupings/{grouping_id}/fields/{field_id}")
 
-    def set_fields_for_grouping(self, grouping_id: str, field_list):
-        assert isinstance(grouping_id, str)
-        assert isinstance(field_list, list)
-
-        body = {"fields": field_list}
-        return self.post(f"groupings/{grouping_id}/fields", json=body)
+    def set_fields_for_grouping(self, grouping_id: str, fields: List[str]):
+        return self.post(f"groupings/{grouping_id}/fields", json={"fields": fields})
 
     def unprovision_field(self, field_id: int):
         return self.delete(uri=f"fields/{field_id}")
