@@ -51,10 +51,13 @@ class IotService(ConfiguredApi):
     def __init__(self, auth: Auth, env: str = "production", **kwargs) -> None:
         super().__init__(env=env, auth=auth, **kwargs)
 
-    def provision_field_for_feed(self, feed_id: int, field_obj: Field):
-        return self.post(f"feeds/{feed_id}/fields", data=field_obj.post())
+    def provision_field_for_feed(self, feed_id: int, field: Field) -> Field:
+        resp = self.post(f"feeds/{feed_id}/fields", data=field.post())
+        return Field.from_api(resp)
 
-    def create_grouping(self, facility_id, label, description, is_public, field_category_id):
+    def create_grouping(
+        self, facility_id: int, label: str, description: str, is_public: bool, field_category_id: str
+    ) -> FieldGrouping:
         res = self.post(
             f"facilities/{facility_id}/groupings",
             json={
@@ -64,10 +67,9 @@ class IotService(ConfiguredApi):
                 "fileds": field_category_id,
             },
         )
-
         return FieldGrouping.from_api(res)
 
-    def add_field_to_grouping(self, grouping_id, field_id):
+    def add_field_to_grouping(self, grouping_id: int, field_id: int):
         return self.post(f"groupings/{grouping_id}/fields/{field_id}")
 
     def set_fields_for_grouping(self, grouping_id: str, field_list):

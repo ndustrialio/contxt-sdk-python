@@ -49,10 +49,10 @@ class Field(ApiObject):
     )
 
     label: str
-    output_id: str
     field_descriptor: str
     units: str
     id: Optional[int] = None
+    output_id: Optional[str] = None
     name: Optional[str] = None
     field_human_name: Optional[str] = None
     feed_key: Optional[str] = None

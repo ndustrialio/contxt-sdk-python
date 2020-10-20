@@ -1,9 +1,8 @@
-import csv
-import os
 from collections import defaultdict
+from csv import DictReader, DictWriter
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import IO, Any, Dict, List, Optional, cast
 
 import click
 
@@ -12,10 +11,27 @@ from contxt.cli.utils import LAST_WEEK, NOW, ClickPath, fields_option, print_tab
 from contxt.models.iot import Feed, Field, FieldGrouping, FieldValueType, Window
 from contxt.utils.serializer import Serializer
 
+NEW_FIELD_ATTRS = ["field_descriptor", "label", "value_type", "units", "grouping"]
+
 
 @click.group()
 def iot() -> None:
     """Internet-of-Things."""
+
+
+@iot.group()
+def fields() -> None:
+    """IoT Fields"""
+
+
+@iot.group()
+def groupings() -> None:
+    """IoT Field Groupings"""
+
+
+@iot.group()
+def data() -> None:
+    """IoT Field Data"""
 
 
 @iot.command()
@@ -28,29 +44,29 @@ def feeds(clients: Clients, fields: List[str], sort: str) -> None:
     print_table(items=items, keys=fields, sort_by=sort)
 
 
-@iot.command()
+@fields.command()
 @click.argument("facility_id", type=int)
 @fields_option(default=["id", "feed_key", "name", "field_human_name"], obj=Field)
 @sort_option(default="id")
 @click.pass_obj
-def fields(clients: Clients, facility_id: int, fields: List[str], sort: str) -> None:
+def get(clients: Clients, facility_id: int, fields: List[str], sort: str) -> None:
     """Get fields"""
     items = clients.iot.get_fields_for_facility(facility_id)
     print_table(items=items, keys=fields, sort_by=sort)
 
 
-@iot.command()
+@groupings.command("get")
 @click.argument("facility_id", type=int)
 @fields_option(default=["id", "label", "slug", "description"], obj=FieldGrouping)
 @sort_option(default="id")
 @click.pass_obj
-def groupings(clients: Clients, facility_id: int, fields: List[str], sort: str) -> None:
+def groupings_get(clients: Clients, facility_id: int, fields: List[str], sort: str) -> None:
     """Get field groupings"""
     items = clients.iot.get_field_groupings_for_facility(facility_id)
     print_table(items=items, keys=fields, sort_by=sort)
 
 
-@iot.command()
+@data.command()
 @click.option("--output-id", required=True, type=int, help="Output ID to delete from")
 @click.option(
     "--field-human-name", required=True, help="The field to delete from. Ex: power.demand, power.usage"
@@ -69,15 +85,13 @@ def groupings(clients: Clients, facility_id: int, fields: List[str], sort: str) 
     help="The timestamp of the datapoint. Ex: 2020-07-21T05:31:00Z",
 )
 @click.pass_obj
-def delete_data_point(
-    clients: Clients, output_id: int, field: str, interval: Window, time: datetime
-) -> None:
-    """Delete data point"""
+def delete(clients: Clients, output_id: int, field: str, interval: Window, time: datetime) -> None:
+    """Delete a data point"""
     clients.iot.delete_time_series_point(output_id, field, interval, time)
     print("Data point deleted")
 
 
-@iot.command()
+@data.command("get")
 @click.argument("feed_id", type=int)
 @click.option("--start", type=click.DateTime(), default=LAST_WEEK.isoformat(), help="Start time")
 @click.option("--end", type=click.DateTime(), default=NOW.isoformat(), help="End time")
@@ -92,7 +106,7 @@ def delete_data_point(
     "--output", type=ClickPath(dir_okay=False, writable=True), default="data.csv", help="Path for output"
 )
 @click.pass_obj
-def data(
+def data_get(
     clients: Clients, feed_id: str, start: datetime, end: datetime, interval: Window, output: Path
 ) -> None:
     """Get field data"""
@@ -117,143 +131,99 @@ def data(
     Serializer.to_csv(flat_data, output)
 
 
-@iot.command()
-@click.argument("feed_key", type=str)
-@click.option("--input", required=True, type=click.File("r"), help="CSV of fields to provision")
+@fields.command()
+@click.argument("feed_key")
+@click.option("--input", required=True, type=click.File(), help="CSV of fields to create")
 @click.pass_obj
-def provision_fields(clients: Clients, feed_key: str, input) -> None:
-    """Process CSV for creation of fields"""
+def create(clients: Clients, feed_key: str, input: IO[str]) -> None:
+    """Create (provision) fields"""
+    # Get feed
     feed = clients.iot.get_feed_with_key(feed_key)
     if not feed:
         raise click.ClickException(f"Feed with key {feed_key} does not exist.")
-    groupings_by_label = {
-        g.label: g for g in clients.iot.get_field_groupings_for_facility(feed.facility_id)
-    }
-    field_objs = []
-    fields_descriptors_for_feed = [
-        f.field_descriptor for f in clients.iot.get_fields_for_feed(feed_id=feed.id)
-    ]
-    desired_groupings_by_field = {}
-    with input as f:
 
-        headers = [
-            "Field Descriptor",
-            "Label",
-            "Data Type",
-            "Units",
-            "Scalar",
-            "Cumulative Value?",
-            "equipment group",
-            "Facility Main?",
+    # Parse fields
+    try:
+        fields = [
+            [
+                Field(
+                    feed_key=feed_key,
+                    field_descriptor=r["field_descriptor"],
+                    label=r["label"],
+                    units=r["units"],
+                    value_type=FieldValueType(r["value_type"].lower()),
+                    is_hidden=False,
+                ),
+                r["grouping"],
+            ]
+            for r in DictReader(input)
         ]
-        reader = csv.DictReader(f, fieldnames=headers)
+    except KeyError:
+        raise click.ClickException(f"The following columns are required: {NEW_FIELD_ATTRS}")
 
-        # skip the header
-        next(reader)
-
-        # create a bunch of field objects
-        for row in reader:
-            if row["Label"].replace(" ", "").startswith("-"):
-                label = row["equipment group"] + row["Label"]
+    # Provision fields
+    curr_fields = {f.field_descriptor: f for f in clients.iot.get_fields_for_feed(feed.id)}
+    with click.progressbar([t[0] for t in fields], label="Provisioning fields") as _fields:
+        for i, field in enumerate(_fields):
+            field = cast(Field, field)
+            if field.field_descriptor not in curr_fields:
+                # New field, create it
+                fields[i][0] = clients.iot.provision_field_for_feed(feed.id, field)
             else:
-                label = row["Label"]
-            if row["Field Descriptor"] in fields_descriptors_for_feed:
-                print(f'Already provisioned field with descriptor {row["Field Descriptor"]}')
-            else:
-                field_objs.append(
-                    Field(
-                        label=label,
-                        output_id=feed.id,
-                        field_descriptor=row["Field Descriptor"],
-                        units=row["Units"],
-                        field_human_name=row["Field Descriptor"],
-                        feed_key=feed_key,
-                        value_type=FieldValueType("numeric"),
-                        is_hidden=False,
-                    )
-                )
+                # Existing field, ignore it
+                fields[i][0] = curr_fields[field.field_descriptor]
 
-            desired_groupings_by_field[row["Field Descriptor"]] = row["equipment group"]
-
-    # go provision the fields
-    for field_obj in field_objs:
-        clients.iot.provision_field_for_feed(feed.id, field_obj)
-        print(f"Provisioned: {field_obj.field_descriptor}")
-    print("Done provisioning the fields")
-
-    fields_for_feed = clients.iot.get_fields_for_feed(feed_id=feed.id)
-
-    # organize the fields by their grouping names
-    grouping_fields: Dict = {}
-    for field in fields_for_feed:
-        if field.field_descriptor in desired_groupings_by_field:
-            grouping_name = desired_groupings_by_field[field.field_descriptor]
-            if grouping_name.replace(" ", "") == "":
-                continue
-            if grouping_name not in grouping_fields:
-                grouping_fields[grouping_name] = []
-            grouping_fields[grouping_name].append(field.id)
-
-        # go through organized listing, create grouping if necessary, update fields for grouping
-        for grouping_name, field_ids in grouping_fields.items():
-            grouping = groupings_by_label.get(grouping_name)
-
-            if not grouping:
-                print(f"Creating new grouping: {grouping_name}")
+    # Add fields to grouping
+    groupings = {g.label: g for g in clients.iot.get_field_groupings_for_facility(feed.facility_id)}
+    with click.progressbar(fields, label="Adding fields to groupings") as fields_:
+        for (field, grouping_label) in fields_:
+            field = cast(Field, field)
+            if grouping_label not in groupings:
+                # New grouping, create it
                 grouping = clients.iot.create_grouping(
                     facility_id=feed.facility_id,
-                    label=grouping_name,
-                    description=grouping_name,
+                    label=grouping_label,
+                    description=grouping_label,
                     is_public=True,
                     field_category_id=[],
                 )
-                print(grouping)
-
-            print(f"Setting {len(field_ids)} fields to grouping {grouping_name}")
-            clients.iot.set_fields_for_grouping(grouping.id, field_ids)
-
-        print("Successful!")
+            else:
+                # Existing grouping, grab it
+                grouping = groupings[grouping_label]
+            clients.iot.add_field_to_grouping(grouping.id, field.id)
 
 
-@iot.command()
-@click.argument("feed_key", type=str)
+@fields.command()
+@click.argument("feed_key")
+@click.option("--output", type=click.File(mode="w"), help="Path for output")
 @click.pass_obj
-def create_worksheet(clients: Clients, feed_key) -> None:
-    """Create Field Worksheets"""
-    fields = clients.iot.get_unprovisioned_fields_for_feed_key(feed_key=feed_key)
-    filename = f"{feed_key}_unprovisioned_worksheet.csv"
-
-    with open(os.path.join(".", filename), "w") as f:
-
-        headers = [
-            "Field Descriptor",
-            "Label",
-            "Data Type",
-            "Units",
-            "Scalar",
-            "Cumulative Value?",
-            "equipment group",
-            "Facility Main?",
-        ]
-        writer = csv.DictWriter(f, fieldnames=headers)
+def unprovisioned(clients: Clients, feed_key: str, output: Optional[IO[str]]) -> None:
+    """Get unprovisioned fields"""
+    items = clients.iot.get_unprovisioned_fields_for_feed_key(feed_key)
+    if not output:
+        print_table(items=items or [], keys=["field_descriptor"])
+    else:
+        writer = DictWriter(output, fieldnames=NEW_FIELD_ATTRS)
         writer.writeheader()
-
-        for f in fields:
-            row = {"Field Descriptor": f.field_descriptor}  # type: ignore
-            writer.writerow(row)
-
-    print(f"Wrote unprovisioned fields to {filename}")
+        writer.writerows([{"field_descriptor": f.field_descriptor} for f in items])
 
 
-@iot.command()
-@click.argument("facility_id", type=str)
-@click.option("--label", required=True, type=str)
-@click.option("--description", required=True, type=str)
-@click.option("--is_public", required=True, type=bool)
-@click.option("--field_category_id", required=True, type=str)
+@groupings.command("create")
+@click.argument("facility_id")
+@click.option("--label", required=True)
+@click.option("--description", required=True)
+@click.option("--is-public", required=True, type=bool)
+@click.option("--field-category-id", required=True)
 @click.pass_obj
-def create_grouping(clients: Clients, facility_id, label, description, is_public, field_category_id):
-    """Create a new IOT Grouping"""
+def groupings_create(
+    clients: Clients,
+    facility_id: int,
+    label: str,
+    description: str,
+    is_public: bool,
+    field_category_id: str,
+) -> None:
+    """Create a new grouping"""
     grouping = clients.iot.create_grouping(
         facility_id=facility_id,
         label=label,
@@ -264,20 +234,20 @@ def create_grouping(clients: Clients, facility_id, label, description, is_public
     print(grouping)
 
 
-@iot.command()
-@click.argument("grouping_id", type=str)
-@click.argument("field_id", type=str)
+@groupings.command()
+@click.argument("grouping_id")
+@click.argument("field_id")
 @click.pass_obj
-def add_field_to_grouping(clients: Clients, grouping_id, field_id):
+def add_field(clients: Clients, grouping_id: str, field_id: str) -> None:
     """Add field to grouping"""
     grouping_field = clients.iot.add_field_to_grouping(grouping_id=grouping_id, field_id=field_id)
     print(grouping_field)
 
 
-@iot.command()
-@click.argument("field_id_list", nargs=-1)
+@fields.command("delete")
+@click.argument("field_id", nargs=-1)
 @click.pass_obj
-def unprovision_fields(clients: Clients, field_id_list: List[str]):
-    """Unprovision fields"""
-    for field_id in field_id_list:
-        clients.iot.unprovision_field(field_id)
+def fields_delete(clients: Clients, field_id: List[str]):
+    """Delete (unprovision) fields"""
+    for id in field_id:
+        clients.iot.unprovision_field(id)
