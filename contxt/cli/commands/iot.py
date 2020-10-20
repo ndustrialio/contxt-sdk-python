@@ -176,11 +176,12 @@ def create(clients: Clients, feed_key: str, input: IO[str]) -> None:
                 fields[i][0] = curr_fields[field.field_descriptor]
 
     # Add fields to grouping
-    groupings = {g.label: g for g in clients.iot.get_field_groupings_for_facility(feed.facility_id)}
+    groupings = {g.slug: g for g in clients.iot.get_field_groupings_for_facility(feed.facility_id)}
     with click.progressbar(fields, label="Adding fields to groupings") as fields_:
         for (field, grouping_label) in fields_:
+            grouping_slug = cast(str, grouping_label).lower().replace(" ", "-")
             field = cast(Field, field)
-            if grouping_label not in groupings:
+            if grouping_slug not in groupings:
                 # New grouping, create it
                 grouping = clients.iot.create_grouping(
                     facility_id=feed.facility_id,
@@ -189,10 +190,10 @@ def create(clients: Clients, feed_key: str, input: IO[str]) -> None:
                     is_public=True,
                     field_category_id=[],
                 )
-                groupings[grouping_label] = grouping
+                groupings[grouping.slug] = grouping
             else:
                 # Existing grouping, grab it
-                grouping = groupings[grouping_label]
+                grouping = groupings[grouping_slug]
             try:
                 clients.iot.add_field_to_grouping(grouping.id, field.id)
             except HTTPError as e:
