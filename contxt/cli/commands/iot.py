@@ -1,3 +1,4 @@
+import logging
 from collections import defaultdict
 from csv import DictReader, DictWriter
 from datetime import datetime
@@ -5,6 +6,7 @@ from pathlib import Path
 from typing import IO, Any, Dict, List, Optional, cast
 
 import click
+from requests import HTTPError
 
 from contxt.cli.clients import Clients
 from contxt.cli.utils import LAST_WEEK, NOW, ClickPath, fields_option, print_table, sort_option
@@ -187,10 +189,14 @@ def create(clients: Clients, feed_key: str, input: IO[str]) -> None:
                     is_public=True,
                     field_category_id=[],
                 )
+                groupings[grouping_label] = grouping
             else:
                 # Existing grouping, grab it
                 grouping = groupings[grouping_label]
-            clients.iot.add_field_to_grouping(grouping.id, field.id)
+            try:
+                clients.iot.add_field_to_grouping(grouping.id, field.id)
+            except HTTPError as e:
+                logging.debug(e)
 
 
 @fields.command()

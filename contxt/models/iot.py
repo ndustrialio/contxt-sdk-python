@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
 from json import loads
@@ -104,7 +104,7 @@ class FieldGrouping(ApiObject):
         ApiField("field_category_id"),
         ApiField("Owner", attr_key="owner", data_type=Owner, optional=True),
         ApiField("FieldCategory", attr_key="field_category", data_type=FieldCategory, optional=True),
-        ApiField("Fields", attr_key="fields", data_type=Field),
+        ApiField("Fields", attr_key="fields", data_type=Field, optional=True),
         ApiField("created_at", data_type=Parsers.datetime),
         ApiField("updated_at", data_type=Parsers.datetime),
     )
@@ -117,11 +117,11 @@ class FieldGrouping(ApiObject):
     is_public: bool
     owner_id: str
     field_category_id: str
-    fields: List[Field]
     created_at: datetime
     updated_at: datetime
     owner: Optional[Owner] = None
     field_category: Optional[FieldCategory] = None
+    fields: List[Field] = field(default_factory=list)
 
 
 @dataclass
