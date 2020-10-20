@@ -13,17 +13,17 @@ class Services(BaseParser):
 
         # Get Service
         service_parser = _subparsers.add_parser("get", help="Get a service")
-        service_parser.add_argument("service-id", help="Service ID")
+        service_parser.add_argument("service_id", help="Service ID")
         service_parser.set_defaults(func=self._get_service)
 
         # Service scopes
         scopes_parser = _subparsers.add_parser("get-scopes", help="Get scopes for a service")
-        scopes_parser.add_argument("service-id", help="Service ID")
+        scopes_parser.add_argument("service_id", help="Service ID")
         scopes_parser.set_defaults(func=self._get_service_scopes)
 
         # Dependencies
         dependencies_parser = _subparsers.add_parser("get-deps", help="Get dependencies for a service")
-        dependencies_parser.add_argument("service-id", help="Service ID")
+        dependencies_parser.add_argument("service_id", help="Service ID")
         dependencies_parser.set_defaults(func=self._get_dependencies)
 
         create_deps_parser = _subparsers.add_parser("add-dep", help="Create a new dependency for a service")

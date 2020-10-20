@@ -15,7 +15,7 @@ from . import Auth, Token, TokenProvider
 
 logger = make_logger(__name__)
 
-CLI_CLIENT_ID = "bleED0RUwb7CJ9j7D48tqSiSZRZn29AV"
+CLI_CLIENT_ID = "13aateh06zMHCk4CFr0cwyOK50rodTi8"
 
 
 class DeviceAuthPendingException(Exception):
@@ -31,15 +31,16 @@ class DeviceAuthDenied(Exception):
 
 
 class Auth0DeviceProvider(Api):
-    def __init__(self, auth0_tenant):
+    def __init__(self, auth0_tenant, client_id):
         self.base_url = auth0_tenant
+        self.client_id = client_id
         self.auth_service = AuthService()
         super().__init__(base_url=f"https://{self.base_url}")
 
     def get_device_code_url(self):
         data = {
-            "client_id": CLI_CLIENT_ID,
-            "scope": "offline_access",
+            "client_id": self.client_id,
+            "scope": "offline_access openid email",
             "audience": self.auth_service.client_id,
         }
 
@@ -50,7 +51,7 @@ class Auth0DeviceProvider(Api):
         data = {
             "grant_type": "urn:ietf:params:oauth:grant-type:device_code",
             "device_code": code_info["device_code"],
-            "client_id": CLI_CLIENT_ID,
+            "client_id": self.client_id,
         }
 
         while True:
@@ -90,14 +91,15 @@ class UserIdentityProvider(TokenProvider):
     """
 
     def __init__(
-        self, client_id: str, client_secret: str, audience: str, cache_file: Optional[Path] = None
+        self, source_client_id, client_id: str, client_secret: str, audience: str, cache_file: Optional[Path] = None
     ) -> None:
         super().__init__(audience)
         self.client_id = client_id
         self.client_secret = client_secret
-        self.auth_service = GetToken("ndustrial.auth0.com")
+        self.auth_service = GetToken("contxt.auth0.com")
         self._refresh_token: Optional[Token] = None
-        self.device_provider = Auth0DeviceProvider("ndustrial.auth0.com")
+        self.device_provider = Auth0DeviceProvider("contxt.auth0.com", source_client_id)
+        self.token_info = None
 
         # Initialize cache
         self._cache_file = cache_file
@@ -124,6 +126,7 @@ class UserIdentityProvider(TokenProvider):
             # Token not yet set, fetch one
             logger.debug(f"Fetching new access_token for {self.audience}")
             token_info = self.login()
+            self.token_info = token_info
             self.access_token = token_info["access_token"]
             self.refresh_token = token_info["refresh_token"]
             # Update cache
@@ -202,6 +205,13 @@ class UserIdentityProvider(TokenProvider):
                 self._cache_file.unlink()
 
 
+class ClusterTokenProvider(TokenProvider):
+    def __init__(self, identity_provider: UserIdentityProvider, audience: str) -> None:
+        super().__init__(audience)
+        self.identity_provider = identity_provider
+        self.auth_service = AuthService()
+
+
 class UserTokenProvider(TokenProvider):
     """Concrete `TokenProvider` for a user, where `identity_provider` serves as the
     identity provider.
@@ -224,6 +234,46 @@ class UserTokenProvider(TokenProvider):
         return self._access_token  # type: ignore
 
 
+class ClusterAuth(Auth):
+    def __init__(self, cluster_client_id) -> None:
+        super().__init__(client_id=cluster_client_id, client_secret="")
+        self.auth_service = AuthService()
+        self.identity_provider = UserIdentityProvider(
+            source_client_id=cluster_client_id,
+            client_id=self.client_id,
+            client_secret=self.client_secret,
+            audience=self.auth_service.client_id,
+            cache_file=Path.home() / ".contxt" / "cluster_token",
+        )
+
+    def get_token_provider(self, audience: str) -> ClusterTokenProvider:
+        """Get `TokenProvider` for audience `audience`"""
+        return ClusterTokenProvider(self.identity_provider, audience)
+
+    @property
+    def user_id(self) -> str:
+        return self.identity_provider.decoded_access_token["sub"]
+
+    def logged_in(self) -> bool:
+        return bool(self.identity_provider._access_token)
+
+    def login(self) -> None:
+        """Force a prompt for the user to login. Note this will happen automatically."""
+        if self.logged_in() and not self.query_user("Already logged in. Continue?"):
+            return None
+        # NOTE: this works by unsetting the current access token, and then
+        # calling the getter, which triggers a login prompt
+        self.identity_provider.reset()
+        self.identity_provider.access_token
+        return self.identity_provider
+
+    def logout(self) -> None:
+        """Logs the user out by clearing the cache"""
+        # Reset both the instance and the cache
+        self.identity_provider.reset()
+        self.identity_provider.clear_cache()
+
+
 class CliAuth(Auth):
     """Concrete `Auth` for a CLI user, where `identity_provider` authenticates requests
     for an access token for target clients defined by `audience`.
@@ -244,6 +294,7 @@ class CliAuth(Auth):
         super().__init__(client_id=CLI_CLIENT_ID, client_secret="")
         self.auth_service = AuthService()
         self.identity_provider = UserIdentityProvider(
+            source_client_id=CLI_CLIENT_ID,
             client_id=self.client_id,
             client_secret=self.client_secret,
             audience=self.auth_service.client_id,
