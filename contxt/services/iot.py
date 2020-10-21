@@ -41,10 +41,42 @@ class IotService(ConfiguredApi):
             base_url="https://feeds.api.ndustrial.io/v1",
             client_id="iznTb30Sfp2Jpaf398I5DN6MyPuDCftA",
         ),
+        ApiEnvironment(
+            name="staging",
+            base_url="https://feeds-staging.api.ndustrial.io/v1",
+            client_id="m35AEcxD8hf65sq04ZU7yFxqpqVkKzES",
+        ),
     )
 
     def __init__(self, auth: Auth, env: str = "production", **kwargs) -> None:
         super().__init__(env=env, auth=auth, **kwargs)
+
+    def provision_field_for_feed(self, feed_id: int, field: Field) -> Field:
+        resp = self.post(f"feeds/{feed_id}/fields", data=field.post())
+        return Field.from_api(resp)
+
+    def create_grouping(
+        self, facility_id: int, label: str, description: str, is_public: bool, field_category_id: str
+    ) -> FieldGrouping:
+        res = self.post(
+            f"facilities/{facility_id}/groupings",
+            json={
+                "label": label,
+                "description": description,
+                "is_public": is_public,
+                "fileds": field_category_id,
+            },
+        )
+        return FieldGrouping.from_api(res)
+
+    def add_field_to_grouping(self, grouping_id: int, field_id: int):
+        return self.post(f"groupings/{grouping_id}/fields/{field_id}")
+
+    def set_fields_for_grouping(self, grouping_id: str, fields: List[str]):
+        return self.post(f"groupings/{grouping_id}/fields", json={"fields": fields})
+
+    def unprovision_field(self, field_id: int):
+        return self.delete(uri=f"fields/{field_id}")
 
     def delete_time_series_point(
         self, output_id: int, field: str, interval: Window, time: datetime
