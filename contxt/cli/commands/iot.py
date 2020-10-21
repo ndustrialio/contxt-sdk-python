@@ -39,21 +39,31 @@ def data() -> None:
 @iot.command()
 @fields_option(default=["id", "key", "facility_id"], obj=Feed)
 @sort_option(default="id")
+@click.option(
+    "--facility_id",
+    required=False,
+    type=int,
+    help="Filter on Facility ID",
+)
 @click.pass_obj
-def feeds(clients: Clients, fields: List[str], sort: str) -> None:
+def feeds(clients: Clients, fields: List[str], sort: str, facility_id: Optional[int]) -> None:
     """Get feeds"""
-    items = clients.iot.get_feeds()
+    items = clients.iot.get_feeds(facility_id=facility_id)
     print_table(items=items, keys=fields, sort_by=sort)
 
 
 @fields.command()
-@click.argument("facility_id", type=int)
+@click.argument("feed_key", type=str)
 @fields_option(default=["id", "feed_key", "name", "field_human_name"], obj=Field)
 @sort_option(default="id")
 @click.pass_obj
-def get(clients: Clients, facility_id: int, fields: List[str], sort: str) -> None:
+def get(clients: Clients, feed_key: str, fields: List[str], sort: str) -> None:
     """Get fields"""
-    items = clients.iot.get_fields_for_facility(facility_id)
+    feed = clients.iot.get_feed_with_key(key=feed_key)
+    if not feed:
+        raise click.ClickException(f"Feed with key {feed_key} does not exist.")
+
+    items = clients.iot.get_fields_for_feed(feed.id)
     print_table(items=items, keys=fields, sort_by=sort)
 
 
