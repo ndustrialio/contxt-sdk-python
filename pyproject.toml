@@ -24,7 +24,7 @@ isort = "^5"
 mypy = "^0"
 poethepoet = "^0"
 pre-commit = "^2"
-pytest = "^5"
+pytest = "^6"
 
 [tool.poetry.extras]
 crypto = ["cryptography"]
