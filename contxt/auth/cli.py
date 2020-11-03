@@ -273,6 +273,15 @@ class ClusterAuth(Auth):
         self.identity_provider.reset()
         self.identity_provider.clear_cache()
 
+    def query_user(self, question: str) -> bool:
+        """Query the user with `question`, and return if user confirmed"""
+        choices = ("y", "n")
+        # Get only the first character in the response
+        answer = input(f"{question} ({'/'.join(choices)}) ").lower()[0:1]
+        while answer not in choices:
+            answer = input(f"Please enter {' or '.join(choices)}. ").lower()[0:1]
+        return answer == "y"
+
 
 class CliAuth(Auth):
     """Concrete `Auth` for a CLI user, where `identity_provider` authenticates requests
