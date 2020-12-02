@@ -9,6 +9,7 @@ class Clusters(BaseParser):
     def _init_parser(self, subparsers):
         parser = subparsers.add_parser("clusters", help="Contxt Clusters")
         parser.add_argument("-n", "--org-name", help="Organization name", required=True)
+        parser.set_defaults(func=self._get_cluster_collection)
         _subparsers = parser.add_subparsers(title="subcommands", dest="subcommand")
 
         # Get Cluster
@@ -28,6 +29,12 @@ class Clusters(BaseParser):
         create_parser.set_defaults(func=self._register_cluster)
 
         return parser
+
+    def _get_cluster_collection(self, args):
+        org_id = get_org_id(args.org_name, args.auth)
+        contxt_service = ContxtDeploymentService(args.auth)
+        clusters = contxt_service.get_clusters(org_id)
+        print(Serializer.to_pretty_cli(clusters))
 
     def _get_cluster(self, args):
         org_id = get_org_id(args.org_name, args.auth)
