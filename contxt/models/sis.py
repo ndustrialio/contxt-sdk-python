@@ -34,6 +34,7 @@ class FileRead(ApiObject):
     file_created_at: Optional[datetime] = None
 
     def download(self, path: Path, attempts: int = 1) -> None:
+        path.parent.mkdir(parents=True, exist_ok=True)
         attempt = 1
         while attempt <= attempts:
             try:

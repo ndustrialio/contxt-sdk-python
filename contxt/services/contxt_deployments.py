@@ -2,7 +2,7 @@ from typing import List, Optional
 
 from ..auth import Auth
 from ..models.contxt import (
-    Cluster,
+    Cluster, ServiceGrant
 )
 from .api import ApiEnvironment, ConfiguredApi
 
@@ -42,3 +42,9 @@ class ContxtDeploymentService(ConfiguredApi):
 
         resp = self.post(f"{organization_id}/clusters", json=obj)
         return Cluster.from_api(resp)
+
+    '''
+    Dependencies
+    '''
+    def remove_service_dependency(self, organization_id: str, service_grant: ServiceGrant) -> None:
+        self.delete(f"{organization_id}/grants/{service_grant.id}")

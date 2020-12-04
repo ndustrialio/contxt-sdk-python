@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
 from json import loads
@@ -49,10 +49,10 @@ class Field(ApiObject):
     )
 
     label: str
-    output_id: str
     field_descriptor: str
     units: str
     id: Optional[int] = None
+    output_id: Optional[str] = None
     name: Optional[str] = None
     field_human_name: Optional[str] = None
     feed_key: Optional[str] = None
@@ -102,9 +102,9 @@ class FieldGrouping(ApiObject):
         ApiField("owner_id"),
         ApiField("is_public", data_type=bool),
         ApiField("field_category_id"),
-        ApiField("Owner", attr_key="owner", data_type=Owner),
-        ApiField("FieldCategory", attr_key="field_category", data_type=FieldCategory),
-        ApiField("Fields", attr_key="fields", data_type=Field),
+        ApiField("Owner", attr_key="owner", data_type=Owner, optional=True),
+        ApiField("FieldCategory", attr_key="field_category", data_type=FieldCategory, optional=True),
+        ApiField("Fields", attr_key="fields", data_type=Field, optional=True),
         ApiField("created_at", data_type=Parsers.datetime),
         ApiField("updated_at", data_type=Parsers.datetime),
     )
@@ -116,12 +116,12 @@ class FieldGrouping(ApiObject):
     facility_id: int
     is_public: bool
     owner_id: str
-    owner: Owner
     field_category_id: str
-    field_category: FieldCategory
-    fields: List[Field]
     created_at: datetime
     updated_at: datetime
+    owner: Optional[Owner] = None
+    field_category: Optional[FieldCategory] = None
+    fields: List[Field] = field(default_factory=list)
 
 
 @dataclass

@@ -261,7 +261,7 @@ class Image(ApiObject):
 @dataclass
 class Service(ApiObject):
     _api_fields: ClassVar = (
-        ApiField("id"),
+        ApiField("id", data_type=int),
         ApiField("name"),
         ApiField("description"),
         ApiField("descriptor"),
@@ -274,6 +274,7 @@ class Service(ApiObject):
         ApiField("frontend", data_type=Frontend, optional=True),
         ApiField("image", data_type=Image, optional=True),
         ApiField("service_type"),
+        ApiField("stack_id"),
         ApiField("created_at", data_type=Parsers.datetime),
     )
 
@@ -287,6 +288,7 @@ class Service(ApiObject):
     last_deployed_at: Optional[datetime]
     last_configured_at: Optional[datetime]
     service_type: str
+    stack_id: int
     service_env_variables: Optional[List[ServiceEnvironmentVariable]] = None
     frontend: Optional[Frontend] = None
     image: Optional[Image] = None
@@ -296,10 +298,11 @@ class Service(ApiObject):
 @dataclass
 class Project(ApiObject):
     _api_fields: ClassVar = (
-        ApiField("id"),
+        ApiField("id", data_type=int),
         ApiField("name"),
         ApiField("description"),
         ApiField("type"),
+        ApiField("organization_id"),
         ApiField("created_at", data_type=Parsers.datetime),
         ApiField("Roles", attr_key="roles", data_type=Role, optional=True),
         ApiField("Services", attr_key="services", data_type=Service, optional=True),
@@ -309,6 +312,7 @@ class Project(ApiObject):
     name: str
     description: str
     type: str
+    organization_id: str
     roles: Optional[List[Role]] = None
     services: Optional[List[Service]] = None
     created_at: Optional[datetime] = None
@@ -317,7 +321,7 @@ class Project(ApiObject):
 @dataclass
 class EdgeNode(ApiObject):
     _api_fields: ClassVar = (
-        ApiField("id"),
+        ApiField("id", data_type=int),
         ApiField("name"),
         ApiField("stack_id"),
         ApiField("organization_id"),

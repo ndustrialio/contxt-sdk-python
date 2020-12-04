@@ -1,34 +1,36 @@
 """Main CLI"""
 
-from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
+from pathlib import Path
+
+import click
 
 from contxt import __version__
 from contxt.auth.cli import CliAuth
+from contxt.cli.clients import Clients
 
-from .commands import Assets, Auth, Bus, Contxt, Ems, Iot, Projects, Services, Clusters
-
-
-def create_parser() -> ArgumentParser:
-    # Setup parser
-    parser = ArgumentParser(description="Contxt CLI", formatter_class=ArgumentDefaultsHelpFormatter)
-    parser.add_argument("-v", "--version", action="version", version=f"%(prog)s {__version__}")
-    parser.set_defaults(func=lambda args: parser.print_help())
-
-    # Register subparsers
-    parsers = parser.add_subparsers(title="subcommands", dest="command")
-    [cls(parsers) for cls in [Assets, Auth, Bus, Contxt, Ems, Iot, Projects, Services, Clusters]]
-    return parser
+COMMAND_DIR = Path(__file__).parent / "commands"
 
 
-def cli() -> None:
-    # Parse args
-    parser = create_parser()
-    args = parser.parse_args()
+class Cli(click.MultiCommand):
+    def list_commands(self, ctx):
+        return sorted([p.stem for p in COMMAND_DIR.glob("*.py")])
 
-    # Launch command
-    if "func" in args:
-        args.auth = CliAuth()
-        args.func(args)
+    def get_command(self, ctx, name):
+        f = COMMAND_DIR / f"{name}.py"
+        if not f.exists():
+            return None
+        ns = {}
+        code = compile(f.read_text(), f, "exec")
+        eval(code, ns, ns)
+        return ns[name]
+
+
+@click.group(cls=Cli, context_settings=dict(help_option_names=["-h", "--help"]))
+@click.version_option(__version__, "-v", "--version")
+@click.pass_context
+def cli(ctx: click.Context) -> None:
+    """Contxt CLI"""
+    ctx.obj = Clients(auth=CliAuth())
 
 
 if __name__ == "__main__":

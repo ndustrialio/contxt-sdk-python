@@ -1,58 +1,52 @@
-from contxt.services import ContxtDeploymentService
+import click
+from typing import Optional
+
+from contxt.cli.clients import Clients
 from contxt.models.contxt import Cluster
 from contxt.utils.serializer import Serializer
 
-from .common import BaseParser, get_org_id
+
+def fetch_organization_from_name(clients: Clients, organization_name: str):
+    organization = clients.contxt.get_organization_with_name(organization_name)
+    if not organization:
+        raise click.ClickException(f"Organization with name {organization_name} does not exist.")
+    return organization
 
 
-class Clusters(BaseParser):
-    def _init_parser(self, subparsers):
-        parser = subparsers.add_parser("clusters", help="Contxt Clusters")
-        parser.add_argument("-n", "--org-name", help="Organization name", required=True)
-        parser.set_defaults(func=self._get_cluster_collection)
-        _subparsers = parser.add_subparsers(title="subcommands", dest="subcommand")
+@click.group()
+def clusters() -> None:
+    """Contxt Clusters"""
 
-        # Get Cluster
-        cluster_parser = _subparsers.add_parser("get", help="Get a cluster")
-        cluster_parser.add_argument("cluster_slug", help="Cluster Slug")
-        cluster_parser.set_defaults(func=self._get_cluster)
 
-        # Create Cluster
-        create_parser = _subparsers.add_parser("register", help="Register a new cluster")
-        create_parser.add_argument("--description", required=True)
-        create_parser.add_argument("--infrastructure_id", required=True)
-        create_parser.add_argument("--region", required=True)
-        create_parser.add_argument("--slug", required=True)
-        create_parser.add_argument("--host")
-        create_parser.add_argument("--type", required=True)
-        create_parser.add_argument("--token", required=True)
-        create_parser.set_defaults(func=self._register_cluster)
+@clusters.command()
+@click.argument("cluster_slug")
+@click.option("--org", required=True)
+@click.pass_obj
+def get(clients: Clients, org: str, cluster_slug: str):
+    organization = fetch_organization_from_name(clients, org)
+    cluster = clients.deployments.get_cluster(organization.id, cluster_slug)
+    print(Serializer.to_pretty_cli(cluster))
 
-        return parser
 
-    def _get_cluster_collection(self, args):
-        org_id = get_org_id(args.org_name, args.auth)
-        contxt_service = ContxtDeploymentService(args.auth)
-        clusters = contxt_service.get_clusters(org_id)
-        print(Serializer.to_pretty_cli(clusters))
+@clusters.command()
+@click.option("--description", required=True)
+@click.option("--infrastructure_id", required=True)
+@click.option("--region", required=True)
+@click.option("--slug", required=True)
+@click.option("--host")
+@click.option("--token")
+def register(clients: Clients, org: str, description: str, infrastructure_id: int, region: str,
+             slug: str, host: Optional[str], token: Optional[str]):
+    organization = fetch_organization_from_name(clients, org)
 
-    def _get_cluster(self, args):
-        org_id = get_org_id(args.org_name, args.auth)
-        contxt_service = ContxtDeploymentService(args.auth)
-        cluster = contxt_service.get_cluster(org_id, args.cluster_slug)
-        print(Serializer.to_pretty_cli(cluster))
+    cluster = Cluster(description=description,
+                      infrastructure_id=infrastructure_id,
+                      region=region,
+                      slug=slug,
+                      host=host,
+                      type='kubernetes',    # only supporting creation of new k8s clusters
+                      organization_id=organization.id)
 
-    def _register_cluster(self, args):
-        org_id = get_org_id(args.org_name, args.auth)
-        contxt_service = ContxtDeploymentService(args.auth)
-        cluster = Cluster(description=args.description,
-                          infrastructure_id=args.infrastructure_id,
-                          region=args.region,
-                          slug=args.slug,
-                          host=args.host,
-                          type=args.type,
-                          organization_id=org_id)
-
-        contxt_service.register_cluster(organization_id=org_id,
-                                        cluster=cluster,
-                                        secret_bearer_token=args.token)
+    clients.deployments.register_cluster(organization_id=organization.id,
+                                         cluster=cluster,
+                                         secret_bearer_token=token)

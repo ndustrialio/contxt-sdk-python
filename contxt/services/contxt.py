@@ -125,9 +125,13 @@ class ContxtService(ConfiguredApi):
             return [Service.from_api(rec) for rec in resp["Services"]]
         else:
             resp = self.get("services")
-            return sorted([Service.from_api(rec) for rec in resp])
+            return [Service.from_api(rec) for rec in resp]
 
-    def get_service(self, service_id: int):
+    def get_edge_nodes(self, organization_id: str, project_id: int) -> List[EdgeNode]:
+        resp = self.get(f"organizations/{organization_id}/stacks/{project_id}/edgenodes")
+        return [EdgeNode.from_api(rec) for rec in resp]
+
+    def get_service(self, service_id: int) -> Service:
         resp = self.get(f"services/{service_id}")
         return Service.from_api(resp)
 

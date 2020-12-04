@@ -16,7 +16,7 @@ class Serializer:
         if isinstance(obj, dict):
             return obj.keys()
         elif isinstance(obj, (list, tuple)) and obj:
-            return list(set().union(*(Serializer._keys(i) for i in obj)))
+            return list(sorted(set().union(*(Serializer._keys(i) for i in obj))))
         else:
             return []
 
@@ -179,6 +179,7 @@ class Serializer:
         d = Serializer.to_dict(obj)
 
         # Write
+        path.parent.mkdir(parents=True, exist_ok=True)
         with path.open("w") as f:
             writer = DictWriter(f, fieldnames=Serializer._keys(d), **kwargs)
             if header:
@@ -193,7 +194,7 @@ class Serializer:
 
     @staticmethod
     def to_file(
-        obj: Any, path: Optional[Path] = None, valid_exts: Iterable[str] = (".csv", ".json", ".txt"),
+        obj: Any, path: Optional[Path] = None, valid_exts: Iterable[str] = (".csv", ".json", ".txt")
     ):
         """Write an object to a file (or stdout).
 

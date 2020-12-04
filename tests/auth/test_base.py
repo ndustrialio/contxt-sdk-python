@@ -14,7 +14,7 @@ class DummyTokenProvider(TokenProvider):
     def access_token(self):
         if self._access_token is None or self._token_expiring(within=0):
             self.access_token = jwt.encode(
-                {**CLAIMS, "exp": datetime.now(timezone.utc).timestamp()}, "prvkey", algorithm="HS256",
+                {**CLAIMS, "exp": datetime.now(timezone.utc).timestamp()}, "prvkey", algorithm="HS256"
             )
         return self._access_token
 
