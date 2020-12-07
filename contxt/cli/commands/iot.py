@@ -268,4 +268,3 @@ def fields_delete(clients: Clients, field_id: List[str]):
     """Delete (unprovision) fields"""
     for id in field_id:
         clients.iot.unprovision_field(id)
-
