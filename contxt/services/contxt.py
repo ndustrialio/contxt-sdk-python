@@ -99,7 +99,6 @@ class ContxtService(ConfiguredApi):
 
     '''
     Projects
-    
     '''
     def get_projects(self) -> List[Project]:
         resp = self.get("stacks")
@@ -112,7 +111,7 @@ class ContxtService(ConfiguredApi):
     '''
     Edge Nodes
     '''
-    def get_edge_nodes(self, organization_id: str, project_id: int) -> List[Service]:
+    def get_edge_nodes(self, organization_id: str, project_id: int) -> List[EdgeNode]:
         resp = self.get(f"organizations/{organization_id}/stacks/{project_id}/edgenodes")
         return [EdgeNode.from_api(rec) for rec in resp]
 
@@ -126,10 +125,6 @@ class ContxtService(ConfiguredApi):
         else:
             resp = self.get("services")
             return [Service.from_api(rec) for rec in resp]
-
-    def get_edge_nodes(self, organization_id: str, project_id: int) -> List[EdgeNode]:
-        resp = self.get(f"organizations/{organization_id}/stacks/{project_id}/edgenodes")
-        return [EdgeNode.from_api(rec) for rec in resp]
 
     def get_service(self, service_id: int) -> Service:
         resp = self.get(f"services/{service_id}")
