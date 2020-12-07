@@ -50,12 +50,12 @@ def _get_dependency_info_for_scopes(clients: Clients, from_service_id: int, to_s
 '''
 Services Commands
 '''
-@services.command()
+@services.command("get")
 @click.argument("id", default="")  # HACK: make an optional argument
 @fields_option(default=["id", "name", "service_type", "description"], obj=Service)
 @sort_option(default="id")
 @click.pass_obj
-def get(clients: Clients, id: Optional[str], fields: List[str], sort: str) -> None:
+def get_services(clients: Clients, id: Optional[str], fields: List[str], sort: str) -> None:
     """Get service(s)"""
     items = [clients.contxt.get_service(id)] if id else clients.contxt.get_services()
     if id:
@@ -67,12 +67,12 @@ def get(clients: Clients, id: Optional[str], fields: List[str], sort: str) -> No
 '''
 Scopes Commands
 '''
-@scopes.command()
+@scopes.command("get")
 @click.argument("service_id")
 @fields_option(default=["label", "description"], obj=ServiceScope)
 @sort_option(default="label")
 @click.pass_obj
-def get(clients: Clients, service_id: str, fields: List[str], sort: str) -> None:
+def get_scopes(clients: Clients, service_id: str, fields: List[str], sort: str) -> None:
     scopes = clients.contxt.get_service_scopes(service_id)
     print_table(items=scopes, keys=fields, sort_by=sort)
 
@@ -80,10 +80,10 @@ def get(clients: Clients, service_id: str, fields: List[str], sort: str) -> None
 '''
 Dependency Commands
 '''
-@dependencies.command()
+@dependencies.command("get")
 @click.argument("service_id")
 @click.pass_obj
-def get(clients: Clients, service_id: str) -> None:
+def get_dependencies(clients: Clients, service_id: str) -> None:
     dependencies = clients.contxt.get_service_dependencies(service_id)
     objs = []
     for dep in dependencies:
