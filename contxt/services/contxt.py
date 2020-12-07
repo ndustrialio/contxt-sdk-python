@@ -3,6 +3,7 @@ from typing import Any, Dict, List, Optional
 
 from ..auth import Auth
 from ..models.contxt import (
+    Cluster,
     Config,
     ConfigValue,
     EdgeNode,
@@ -10,11 +11,10 @@ from ..models.contxt import (
     OrganizationUser,
     Project,
     Service,
-    User,
-    Cluster,
     ServiceGrant,
-    ServiceScope,
     ServiceGrantScope,
+    ServiceScope,
+    User,
 )
 from .api import ApiEnvironment, ConfiguredApi
 
@@ -97,9 +97,10 @@ class ContxtService(ConfiguredApi):
         data = {"key": key, "value": value}
         return self.post(f"runs/{run_id}/metrics", data=data)
 
-    '''
+    """
     Projects
-    '''
+    """
+
     def get_projects(self) -> List[Project]:
         resp = self.get("stacks")
         return [Project.from_api(rec) for rec in resp]
@@ -108,16 +109,18 @@ class ContxtService(ConfiguredApi):
         resp = self.get(f"stacks/{project_id}")
         return Project.from_api(resp)
 
-    '''
+    """
     Edge Nodes
-    '''
+    """
+
     def get_edge_nodes(self, organization_id: str, project_id: int) -> List[EdgeNode]:
         resp = self.get(f"organizations/{organization_id}/stacks/{project_id}/edgenodes")
         return [EdgeNode.from_api(rec) for rec in resp]
 
-    '''
+    """
     Services
-    '''
+    """
+
     def get_services(self, project_id: int = None) -> List[Service]:
         if project_id:
             resp = self.get(f"stacks/{project_id}")
@@ -130,9 +133,10 @@ class ContxtService(ConfiguredApi):
         resp = self.get(f"services/{service_id}")
         return Service.from_api(resp)
 
-    '''
+    """
     Clusters
-    '''
+    """
+
     def get_clusters(self, organization_id: str) -> List[Cluster]:
         resp = self.get(f"organizations/{organization_id}/clusters")
         return [Cluster.from_api(rec) for rec in resp]
@@ -141,14 +145,17 @@ class ContxtService(ConfiguredApi):
         resp = self.get(f"{organization_id}/clusters/{cluster_slug}")
         return Cluster.from_api(resp)
 
-    '''
+    """
     Scopes
-    '''
+    """
+
     def get_service_scopes(self, service_id: int) -> List[ServiceScope]:
         resp = self.get(f"services/{service_id}/scopes")
         return [ServiceScope.from_api(rec) for rec in resp]
 
-    def add_service_scope(self, service_grant: ServiceGrant, service_scope: ServiceScope) -> ServiceGrantScope:
+    def add_service_scope(
+        self, service_grant: ServiceGrant, service_scope: ServiceScope
+    ) -> ServiceGrantScope:
         resp = self.post(f"grants/{service_grant.id}/scopes/{service_scope.id}")
         return ServiceGrantScope.from_api(resp)
 
@@ -156,9 +163,10 @@ class ContxtService(ConfiguredApi):
         resp = self.delete(f"grants/{service_grant.id}/scopes/{service_scope.id}")
         return resp
 
-    '''
+    """
     Dependencies
-    '''
+    """
+
     def get_service_dependencies(self, service_id: int) -> List[ServiceGrant]:
         resp = self.get(f"services/{service_id}/grants")
         return [ServiceGrant.from_api(rec) for rec in resp]

@@ -4,7 +4,7 @@ import click
 
 from contxt.cli.clients import Clients
 from contxt.cli.utils import fields_option, print_table, sort_option
-from contxt.models.contxt import Service, ServiceScope, ServiceGrant
+from contxt.models.contxt import Service, ServiceGrant, ServiceScope
 from contxt.utils.serializer import Serializer
 
 
@@ -36,9 +36,11 @@ def _get_dependency_info_for_scopes(clients: Clients, from_service_id: int, to_s
     # find the dependency for this "to service"
     to_dependency = next((g for g in deps if int(g.to_service_id) == int(to_service.id)), None)
     if to_dependency is None:
-        print(f'Service ID {from_service.id} ({from_service.name}) does not currently have a '
-              f'dependency on Service ID {to_service.id} ({to_service.name}). You can add it via '
-              f'the "contxt services dependencies add" CLI command')
+        print(
+            f"Service ID {from_service.id} ({from_service.name}) does not currently have a "
+            f"dependency on Service ID {to_service.id} ({to_service.name}). You can add it via "
+            f'the "contxt services dependencies add" CLI command'
+        )
         return None, None, None
 
     to_service_scopes = {s.label: s for s in clients.contxt.get_service_scopes(to_service.id)}
@@ -47,9 +49,11 @@ def _get_dependency_info_for_scopes(clients: Clients, from_service_id: int, to_s
     return to_service_scopes, existing_dep_scopes, to_dependency
 
 
-'''
+"""
 Services Commands
-'''
+"""
+
+
 @services.command("get")
 @click.argument("id", default="")  # HACK: make an optional argument
 @fields_option(default=["id", "name", "service_type", "description"], obj=Service)
@@ -64,9 +68,11 @@ def get_services(clients: Clients, id: Optional[str], fields: List[str], sort: s
         print_table(items=items, keys=fields, sort_by=sort)
 
 
-'''
+"""
 Scopes Commands
-'''
+"""
+
+
 @scopes.command("get")
 @click.argument("service_id")
 @fields_option(default=["label", "description"], obj=ServiceScope)
@@ -77,9 +83,11 @@ def get_scopes(clients: Clients, service_id: str, fields: List[str], sort: str) 
     print_table(items=scopes, keys=fields, sort_by=sort)
 
 
-'''
+"""
 Dependency Commands
-'''
+"""
+
+
 @dependencies.command("get")
 @click.argument("service_id")
 @click.pass_obj
@@ -90,19 +98,23 @@ def get_dependencies(clients: Clients, service_id: str) -> None:
         to_service = clients.contxt.get_service(dep.to_service_id)
         if len(dep.ServiceScopes):
             for row in dep.ServiceScopes:
-                objs.append({
-                    'to_service_id': dep.to_service_id,
-                    'to_service_name': to_service.name,
-                    'scope': row.label,
-                    'description': row.description
-                })
+                objs.append(
+                    {
+                        "to_service_id": dep.to_service_id,
+                        "to_service_name": to_service.name,
+                        "scope": row.label,
+                        "description": row.description,
+                    }
+                )
         else:
-            objs.append({
-                'to_service_id': dep.to_service_id,
-                'to_service_name': to_service.name,
-                'scope': '<No Scopes>',
-                'description': '<No Scopes>'
-            })
+            objs.append(
+                {
+                    "to_service_id": dep.to_service_id,
+                    "to_service_name": to_service.name,
+                    "scope": "<No Scopes>",
+                    "description": "<No Scopes>",
+                }
+            )
     print(Serializer.to_table(objs))
 
 
@@ -114,7 +126,7 @@ def add(clients: Clients, from_service_id: int, to_service_id: int) -> None:
     from_service = clients.contxt.get_service(from_service_id)
     to_service = clients.contxt.get_service(to_service_id)
 
-    print(f'Creating dependency between {from_service.name} -> {to_service.name}')
+    print(f"Creating dependency between {from_service.name} -> {to_service.name}")
     grant = ServiceGrant(from_service_id=from_service.id, to_service_id=to_service.id)
     dep = clients.contxt.create_service_dependency(grant)
     print(Serializer.to_pretty_cli(dep))
@@ -133,17 +145,16 @@ def remove(clients: Clients, from_service_id: int, to_service_id: int) -> None:
     # fetch the org of the from service since we'll need it to call DELETE
     project = clients.contxt.get_project(from_service.stack_id)
 
-    (_, _, existing_grant) = _get_dependency_info_for_scopes(clients,
-                                                             from_service_id,
-                                                             to_service_id)
+    (_, _, existing_grant) = _get_dependency_info_for_scopes(clients, from_service_id, to_service_id)
     if not existing_grant:
-        print('Dependency does not exist between specified services')
+        print("Dependency does not exist between specified services")
         return
 
-    print(f'Removing dependency between {from_service.name} -> {to_service.name}')
-    clients.deployments.remove_service_dependency(organization_id=project.organization_id,
-                                                  service_grant=existing_grant)
-    print('Success!')
+    print(f"Removing dependency between {from_service.name} -> {to_service.name}")
+    clients.deployments.remove_service_dependency(
+        organization_id=project.organization_id, service_grant=existing_grant
+    )
+    print("Success!")
 
 
 @dependencies.command()
@@ -153,13 +164,13 @@ def remove(clients: Clients, from_service_id: int, to_service_id: int) -> None:
 @click.pass_obj
 def add_scope(clients: Clients, from_service_id: int, to_service_id: int, scopes: str) -> None:
 
-    (to_service_scopes, existing_dep_scopes, to_dep) = _get_dependency_info_for_scopes(clients,
-                                                                                       from_service_id,
-                                                                                       to_service_id)
+    (to_service_scopes, existing_dep_scopes, to_dep) = _get_dependency_info_for_scopes(
+        clients, from_service_id, to_service_id
+    )
     if to_dep is None:
         return
 
-    intended_scopes = scopes.split(',')
+    intended_scopes = scopes.split(",")
     to_add = []
     for scope in intended_scopes:
         # check to make sure the scope is value
@@ -167,14 +178,15 @@ def add_scope(clients: Clients, from_service_id: int, to_service_id: int, scopes
             print(f'Invalid scope "{scope}" -- does not exist in to_service')
             continue
         if scope not in existing_dep_scopes:
-            print(f'Adding scope {scope}')
+            print(f"Adding scope {scope}")
             to_add.append(to_service_scopes[scope])
         else:
-            print(f'{scope} already exists for dependency')
+            print(f"{scope} already exists for dependency")
 
     for scope in to_add:
         r = clients.contxt.add_service_scope(to_dep, scope)
         print(r)
+
 
 @dependencies.command()
 @click.option("--from-service-id", help="From Service ID", required=True)
@@ -183,14 +195,14 @@ def add_scope(clients: Clients, from_service_id: int, to_service_id: int, scopes
 @click.pass_obj
 def remove_scope(clients: Clients, from_service_id: int, to_service_id: int, scopes: str) -> None:
 
-    (to_service_scopes, existing_dep_scopes, to_dep) = _get_dependency_info_for_scopes(clients,
-                                                                                       from_service_id,
-                                                                                       to_service_id)
+    (to_service_scopes, existing_dep_scopes, to_dep) = _get_dependency_info_for_scopes(
+        clients, from_service_id, to_service_id
+    )
 
     if to_dep is None:
         return
 
-    scopes_to_remove = scopes.split(',')
+    scopes_to_remove = scopes.split(",")
     to_remove = []
     for scope in scopes_to_remove:
         # check to make sure the scope actually exists
@@ -198,10 +210,10 @@ def remove_scope(clients: Clients, from_service_id: int, to_service_id: int, sco
             print(f'Invalid scope "{scope}" -- does not exist in to_service')
             continue
         if scope not in existing_dep_scopes:
-            print(f'Scope {scope} is not currently granted in dependency -- doing nothing')
+            print(f"Scope {scope} is not currently granted in dependency -- doing nothing")
         else:
             to_remove.append(to_service_scopes[scope])
 
     for scope in to_remove:
         clients.contxt.remove_service_scope(to_dep, scope)
-        print(f'Removed {scope}')
+        print(f"Removed {scope}")

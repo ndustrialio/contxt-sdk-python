@@ -347,7 +347,7 @@ class ServiceScope(ApiObject):
         ApiField("label"),
         ApiField("description"),
         ApiField("created_at"),
-        ApiField("updated_at")
+        ApiField("updated_at"),
     )
 
     id: str

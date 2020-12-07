@@ -161,6 +161,7 @@ def create(clients: Clients, feed_key: str, input: IO[str]) -> None:
                 Field(
                     feed_key=feed_key,
                     field_descriptor=r["field_descriptor"],
+                    field_human_name=r["field_descriptor"],
                     label=r["label"],
                     units=r["units"],
                     value_type=FieldValueType(r["value_type"].lower()),

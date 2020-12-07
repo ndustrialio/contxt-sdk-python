@@ -75,6 +75,7 @@ class UtilityPeriod(ApiObject):
     event_time: datetime
     value: int
 
+
 UtilitySpendPeriod = UtilityPeriod
 UtilityUsagePeriod = UtilityPeriod
 
