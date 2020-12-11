@@ -30,7 +30,7 @@ class ApiRetry(Retry):
         self,
         total: int = 3,
         backoff_factor: float = 0.1,
-        method_whitelist: FrozenSet = frozenset(
+        allowed_methods: FrozenSet = frozenset(
             # NOTE: be careful as some of these methods are not idempotent
             ["DELETE", "GET", "OPTIONS", "POST", "PUT", "TRACE", "HEAD"]
         ),
@@ -41,7 +41,7 @@ class ApiRetry(Retry):
         super().__init__(
             total=total,
             backoff_factor=backoff_factor,
-            method_whitelist=method_whitelist,
+            allowed_methods=allowed_methods,
             status_forcelist=status_forcelist,
             raise_on_status=raise_on_status,
             **kwargs,
