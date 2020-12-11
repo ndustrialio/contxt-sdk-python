@@ -6,8 +6,7 @@ from requests.exceptions import HTTPError
 from contxt.services.api import Api, ApiRetry
 
 
-@pytest.mark.skip(reason="Mock this instead")
-def test_retries(self):
+def test_retries():
     retry = ApiRetry()
     api = Api("https://httpbin.org", retry=retry)
     t0 = time()
@@ -18,8 +17,7 @@ def test_retries(self):
     assert t >= sum(retry.backoff_factor * (2 ** n) for n in range(retry.total))
 
 
-@pytest.mark.skip(reason="Mock this instead")
-def test_without_retries(self):
+def test_without_retries():
     api = Api("https://httpbin.org", retry=None)
     with pytest.raises(HTTPError) as e:
         api.get("status/500")
