@@ -78,7 +78,7 @@ jobs:
           preset: conventionalcommits
           output-file: false
       - name: Set new commit hash
-        run: echo "::set-env name=SHA::$(git rev-parse HEAD)"
+        run: echo "SHA=$(git rev-parse HEAD)" >> $GITHUB_ENV
       - name: Create release
         uses: actions/create-release@v1
         if: ${{ steps.version.outputs.skipped == 'false' }}
