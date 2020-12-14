@@ -13,6 +13,11 @@ from ..utils import make_logger
 
 logger = make_logger(__name__)
 
+# NOTE: support breaking change in urllib3: https://github.com/urllib3/urllib3/issues/2092
+RETRY_METHODS_PARM = (
+    "allowed_methods" if hasattr(Retry.DEFAULT, "allowed_methods") else "method_whitelist"
+)
+
 
 class BearerTokenAuth(AuthBase):
     """Bearer token to authorize requests"""
@@ -30,7 +35,7 @@ class ApiRetry(Retry):
         self,
         total: int = 3,
         backoff_factor: float = 0.1,
-        allowed_methods: FrozenSet = frozenset(
+        method_whitelist: FrozenSet = frozenset(
             # NOTE: be careful as some of these methods are not idempotent
             ["DELETE", "GET", "OPTIONS", "POST", "PUT", "TRACE", "HEAD"]
         ),
@@ -38,10 +43,10 @@ class ApiRetry(Retry):
         raise_on_status: bool = False,
         **kwargs,
     ) -> None:
+        kwargs[RETRY_METHODS_PARM] = method_whitelist
         super().__init__(
             total=total,
             backoff_factor=backoff_factor,
-            allowed_methods=allowed_methods,
             status_forcelist=status_forcelist,
             raise_on_status=raise_on_status,
             **kwargs,
