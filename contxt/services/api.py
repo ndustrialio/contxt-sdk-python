@@ -13,6 +13,11 @@ from ..utils import make_logger
 
 logger = make_logger(__name__)
 
+# NOTE: support breaking change in urllib3: https://github.com/urllib3/urllib3/issues/2092
+RETRY_METHODS_PARM = (
+    "allowed_methods" if hasattr(Retry.DEFAULT, "allowed_methods") else "method_whitelist"
+)
+
 
 class BearerTokenAuth(AuthBase):
     """Bearer token to authorize requests"""
@@ -38,10 +43,10 @@ class ApiRetry(Retry):
         raise_on_status: bool = False,
         **kwargs,
     ) -> None:
+        kwargs[RETRY_METHODS_PARM] = method_whitelist
         super().__init__(
             total=total,
             backoff_factor=backoff_factor,
-            method_whitelist=method_whitelist,
             status_forcelist=status_forcelist,
             raise_on_status=raise_on_status,
             **kwargs,
