@@ -30,12 +30,19 @@ def get(clients: Clients, org: str, cluster_slug: str):
 
 
 @clusters.command()
-@click.option("--description", required=True)
-@click.option("--infrastructure_id", required=True)
-@click.option("--region", required=True)
-@click.option("--slug", required=True)
-@click.option("--host")
-@click.option("--token")
+@click.option("--description", required=True, help="Information about what this cluster is for and "
+                                                   "what environment it belongs to")
+@click.option("--infrastructure-id", required=True, help="The ID of the infrastructure registered in "
+                                                         "our system. Ask ndustrial.io DevOps "
+                                                         "what this value should be")
+@click.option("--region", required=True, help="The AWS region where this cluster is deployed")
+@click.option("--slug", required=True, help="The slugified name you would like to use for this cluster."
+                                            " You will need to reference this in other commands so it's "
+                                            "ideal to make this value easy to remember")
+@click.option("--host", help="If a Kubernetes cluster, this value should be the OIDC Proxy addressed "
+                             "used for making K8S API Commands. ndustrial.io DevOps should provide "
+                             "this value")
+@click.option("--token", help="Used for legacy DC/OS clusters. Leave blank for K8S Clusters")
 def register(
     clients: Clients,
     org: str,
