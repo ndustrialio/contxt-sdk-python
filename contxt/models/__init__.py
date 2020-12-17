@@ -187,7 +187,6 @@ class ApiObject(ABC):
         # Transform api fields to dict
         d = Serializer.to_dict(self, key_filter=lambda k: k in set(self.creatable_fields.keys()))
         # Swap attr_keys for api_keys
-        print(self.creatable_fields)
         return {self.creatable_fields[k].api_key: v for k, v in d.items()}
 
     def put(self) -> Dict[str, Any]:

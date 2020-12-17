@@ -374,7 +374,7 @@ class ServiceGrant(ApiObject):
     to_service_id: int
     auth0_id: Optional[str] = None
     id: Optional[str] = None
-    ServiceScopes: Optional[List[ServiceScope]] = None
+    service_scopes: Optional[List[ServiceScope]] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
 
