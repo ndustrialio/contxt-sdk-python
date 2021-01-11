@@ -14,9 +14,14 @@ class ContxtDeploymentService(ConfiguredApi):
             base_url="https://contxt.api.ndustrial.io/deploy/v1",
             client_id="8qY2xJob1JAxhmVhIDLCNnGriTM9bct8",
         ),
+        ApiEnvironment(
+            name="staging",
+            base_url="https://contxt-api.staging.ndustrial.io/deploy/v1",
+            client_id="qGzdTXcmB57zlTp86rYsivG9qEss1lbF",
+        ),
     )
 
-    def __init__(self, auth: Auth, env: str = "production", **kwargs) -> None:
+    def __init__(self, auth: Auth, env: str = "staging", **kwargs) -> None:
         super().__init__(env=env, auth=auth, **kwargs)
 
     """

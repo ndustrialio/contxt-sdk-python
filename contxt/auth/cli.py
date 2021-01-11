@@ -15,8 +15,8 @@ from . import Auth, Token, TokenProvider
 
 logger = make_logger(__name__)
 
-CLI_CLIENT_ID = "bleED0RUwb7CJ9j7D48tqSiSZRZn29AV"
-
+CLI_CLIENT_ID = "yJw7FCGBKg7nTT4CJ4n05QaVzhTIgtAf"
+PRODUCTION_CLI_CLIENT_ID = "bleED0RUwb7CJ9j7D48tqSiSZRZn29AV"
 
 class DeviceAuthPendingException(Exception):
     pass
@@ -95,9 +95,9 @@ class UserIdentityProvider(TokenProvider):
         super().__init__(audience)
         self.client_id = client_id
         self.client_secret = client_secret
-        self.auth_service = GetToken("ndustrial.auth0.com")
+        self.auth_service = GetToken("contxt-staging.us.auth0.com")
         self._refresh_token: Optional[Token] = None
-        self.device_provider = Auth0DeviceProvider("ndustrial.auth0.com")
+        self.device_provider = Auth0DeviceProvider("contxt-staging.us.auth0.com")
 
         # Initialize cache
         self._cache_file = cache_file

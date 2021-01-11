@@ -12,9 +12,14 @@ class AuthService(ConfiguredApi):
             base_url="https://contxtauth.com/v1",
             client_id="75wT048QcpE7ujwBJPPjr263eTHl4gEX",
         ),
+        ApiEnvironment(
+            name="staging",
+            base_url="https://contxt-auth-service.staging.ndustrial.io/v1",
+            client_id="7TceUsM1eC4nKmdoC717383DWyfc9QoY",
+        ),
     )
 
-    def __init__(self, env: str = "production", **kwargs) -> None:
+    def __init__(self, env: str = "staging", **kwargs) -> None:
         super().__init__(env=env, **kwargs)
 
     def get_jwks(self) -> Dict:

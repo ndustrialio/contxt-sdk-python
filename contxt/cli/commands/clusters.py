@@ -42,7 +42,9 @@ def get(clients: Clients, org: str, cluster_slug: str):
 @click.option("--host", help="If a Kubernetes cluster, this value should be the OIDC Proxy addressed "
                              "used for making K8S API Commands. ndustrial.io DevOps should provide "
                              "this value")
+@click.option("--org", required=True, help="Organization Name")
 @click.option("--token", help="Used for legacy DC/OS clusters. Leave blank for K8S Clusters")
+@click.pass_obj
 def register(
     clients: Clients,
     org: str,
