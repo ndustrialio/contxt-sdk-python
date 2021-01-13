@@ -18,7 +18,11 @@ def fetch_organization_from_name(clients: Clients, organization_name: str):
 
 @click.group()
 def clusters() -> None:
-    """Contxt Clusters"""
+    """
+    Contxt Clusters
+
+    After a cluster is registered with Contxt, you can get or unregister it.
+    """
 
 
 @clusters.command()
@@ -26,6 +30,7 @@ def clusters() -> None:
 @click.option("--org", required=True)
 @click.pass_obj
 def get(clients: Clients, org: str, cluster_slug: str = None):
+    """Get cluster info based on organization and cluster slug"""
     organization = fetch_organization_from_name(clients, org)
     try:
         cluster = clients.deployments.get_cluster(organization.id, cluster_slug)
@@ -64,6 +69,7 @@ def register(
     host: Optional[str],
     token: Optional[str],
 ):
+    """Register a Kubernetes cluster with Contxt"""
     organization = fetch_organization_from_name(clients, org)
 
     cluster = Cluster(
@@ -85,6 +91,7 @@ def register(
 @click.argument("filepath")
 @click.pass_context
 def register_from_file(ctx, filepath: str):
+    """Register a Kubernetes cluster with Contxt from a configuration file"""
     if path.exists(filepath):
         argsdict = {}
         with open(filepath) as f:
@@ -105,6 +112,7 @@ def unregister(
     org: str,
     cluster_slug: str,
 ):
+    """Unregister a cluster from Contxt- Use with caution"""
     organization = fetch_organization_from_name(clients, org)
 
     if clients.auth.query_user(f"Are you sure you want to unregister cluster {cluster_slug}?"):
