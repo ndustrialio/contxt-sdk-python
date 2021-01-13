@@ -21,7 +21,7 @@ class ContxtDeploymentService(ConfiguredApi):
         ),
     )
 
-    def __init__(self, auth: Auth, env: str = "staging", **kwargs) -> None:
+    def __init__(self, auth: Auth, env: str = "production", **kwargs) -> None:
         super().__init__(env=env, auth=auth, **kwargs)
 
     """
