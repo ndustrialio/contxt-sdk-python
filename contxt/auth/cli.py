@@ -1,8 +1,11 @@
 import time
 import webbrowser
+from dataclasses import dataclass
 from json import dump, load
 from pathlib import Path
 from typing import Any, Dict, Optional
+import os
+from dotenv import load_dotenv
 
 from auth0.v3.authentication import GetToken
 from requests.exceptions import HTTPError
@@ -15,8 +18,19 @@ from . import Auth, Token, TokenProvider
 
 logger = make_logger(__name__)
 
-CLI_CLIENT_ID = "yJw7FCGBKg7nTT4CJ4n05QaVzhTIgtAf"
-PRODUCTION_CLI_CLIENT_ID = "bleED0RUwb7CJ9j7D48tqSiSZRZn29AV"
+
+@dataclass
+class Env:
+    CLI_CLIENT_ID: str
+    auth0_tenant_base_url: str
+
+
+environments = {
+    "staging": Env(CLI_CLIENT_ID="yJw7FCGBKg7nTT4CJ4n05QaVzhTIgtAf", auth0_tenant_base_url="contxt-staging.us.auth0.com"),
+    "production": Env(CLI_CLIENT_ID="bleED0RUwb7CJ9j7D48tqSiSZRZn29AV", auth0_tenant_base_url="ndustrial.auth0.com")
+}
+load_dotenv()
+
 
 class DeviceAuthPendingException(Exception):
     pass
@@ -38,7 +52,7 @@ class Auth0DeviceProvider(Api):
 
     def get_device_code_url(self):
         data = {
-            "client_id": CLI_CLIENT_ID,
+            "client_id": environments[os.getenv("env")].CLI_CLIENT_ID,
             "scope": "offline_access",
             "audience": self.auth_service.client_id,
         }
@@ -50,7 +64,7 @@ class Auth0DeviceProvider(Api):
         data = {
             "grant_type": "urn:ietf:params:oauth:grant-type:device_code",
             "device_code": code_info["device_code"],
-            "client_id": CLI_CLIENT_ID,
+            "client_id": environments[os.getenv("env")].CLI_CLIENT_ID,
         }
 
         while True:
@@ -95,9 +109,9 @@ class UserIdentityProvider(TokenProvider):
         super().__init__(audience)
         self.client_id = client_id
         self.client_secret = client_secret
-        self.auth_service = GetToken("contxt-staging.us.auth0.com")
+        self.auth_service = GetToken(environments[os.getenv("env")].auth0_tenant_base_url)
         self._refresh_token: Optional[Token] = None
-        self.device_provider = Auth0DeviceProvider("contxt-staging.us.auth0.com")
+        self.device_provider = Auth0DeviceProvider(environments[os.getenv("env")].auth0_tenant_base_url)
 
         # Initialize cache
         self._cache_file = cache_file
@@ -241,7 +255,7 @@ class CliAuth(Auth):
     """
 
     def __init__(self) -> None:
-        super().__init__(client_id=CLI_CLIENT_ID, client_secret="")
+        super().__init__(client_id=environments[os.getenv("env")].CLI_CLIENT_ID, client_secret="")
         self.auth_service = AuthService()
         self.identity_provider = UserIdentityProvider(
             client_id=self.client_id,
