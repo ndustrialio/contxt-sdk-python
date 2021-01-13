@@ -5,6 +5,8 @@ import click
 from contxt.cli.clients import Clients
 from contxt.models.contxt import Cluster
 from contxt.utils.serializer import Serializer
+from requests.exceptions import HTTPError
+from os import path
 
 
 def fetch_organization_from_name(clients: Clients, organization_name: str):
@@ -23,13 +25,21 @@ def clusters() -> None:
 @click.argument("cluster_slug")
 @click.option("--org", required=True)
 @click.pass_obj
-def get(clients: Clients, org: str, cluster_slug: str):
+def get(clients: Clients, org: str, cluster_slug: str = None):
     organization = fetch_organization_from_name(clients, org)
-    cluster = clients.deployments.get_cluster(organization.id, cluster_slug)
-    print(Serializer.to_pretty_cli(cluster))
+    try:
+        cluster = clients.deployments.get_cluster(organization.id, cluster_slug)
+        print(Serializer.to_pretty_cli(cluster))
+    except HTTPError as e:
+        if e.response.status_code == 404:
+            cluster_slugs = [cluster.slug for cluster in clients.deployments.get_clusters(organization.id)]
+            print(f"Provided cluster slug '{cluster_slug}' was not found, available options include {cluster_slugs}")
+        else:
+            raise
 
 
 @clusters.command()
+@click.option("--org", required=True, help="Organization Name")
 @click.option("--description", required=True, help="Information about what this cluster is for and "
                                                    "what environment it belongs to")
 @click.option("--infrastructure-id", required=True, help="The ID of the infrastructure registered in "
@@ -42,7 +52,6 @@ def get(clients: Clients, org: str, cluster_slug: str):
 @click.option("--host", help="If a Kubernetes cluster, this value should be the OIDC Proxy addressed "
                              "used for making K8S API Commands. ndustrial.io DevOps should provide "
                              "this value")
-@click.option("--org", required=True, help="Organization Name")
 @click.option("--token", help="Used for legacy DC/OS clusters. Leave blank for K8S Clusters")
 @click.pass_obj
 def register(
@@ -70,3 +79,35 @@ def register(
     clients.deployments.register_cluster(
         organization_id=organization.id, cluster=cluster, secret_bearer_token=token
     )
+
+
+@clusters.command()
+@click.argument("filepath")
+@click.pass_context
+def register_from_file(ctx, filepath: str):
+    if path.exists(filepath):
+        argsdict = {}
+        with open(filepath) as f:
+            for line in f:
+                (key, value) = line.split(" ", 1)
+                argsdict[key.replace("-", "_")] = value.rstrip()
+        ctx.invoke(register, **argsdict)
+    else:
+        print(f"Path {filepath} does not exist.")
+
+
+@clusters.command()
+@click.option("--org", required=True)
+@click.argument("cluster_slug")
+@click.pass_obj
+def unregister(
+    clients: Clients,
+    org: str,
+    cluster_slug: str,
+):
+    organization = fetch_organization_from_name(clients, org)
+
+    if clients.auth.query_user(f"Are you sure you want to unregister cluster {cluster_slug}?"):
+        clients.deployments.unregister_cluster(
+            organization_id=organization.id, cluster=cluster_slug
+        )

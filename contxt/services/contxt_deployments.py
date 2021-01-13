@@ -47,6 +47,11 @@ class ContxtDeploymentService(ConfiguredApi):
         resp = self.post(f"{organization_id}/clusters", json=obj)
         return Cluster.from_api(resp)
 
+    def unregister_cluster(self, organization_id: str, cluster: str) -> Cluster:
+
+        resp = self.delete(f"{organization_id}/clusters/{cluster}")
+        return Cluster.from_api(resp)
+
     """
     Dependencies
     """
