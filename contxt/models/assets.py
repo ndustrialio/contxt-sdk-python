@@ -486,9 +486,9 @@ class CompleteAsset:
                     asset_id=self.asset.id,  # type: ignore
                     asset_metric_id=metric.id,  # type: ignore
                     effective_start_date=start_date,
-                    effective_end_date=self._effective_end_date(
+                    effective_end_date=self._effective_end_date(  # type: ignore
                         start_date, metric.time_interval
-                    ),  # type: ignore
+                    ),
                     notes="",
                     value=None,  # type: ignore
                 )

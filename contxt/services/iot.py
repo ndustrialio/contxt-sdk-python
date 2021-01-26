@@ -185,8 +185,8 @@ class IotService(ConfiguredApi):
             "limit": 5000,
         }
         queue: List[Tuple[str, BatchRequest]] = [
-            (  # type: ignore
-                f.field_human_name,
+            (
+                f.field_human_name,  # type: ignore
                 BatchRequest.from_request(
                     Request(
                         method="GET",

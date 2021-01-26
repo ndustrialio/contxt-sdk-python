@@ -1,13 +1,13 @@
 import os
 import time
 import webbrowser
+from dataclasses import dataclass
 from json import dump, load
 from pathlib import Path
-from dataclasses import dataclass
-from dotenv import load_dotenv
 from typing import Any, Dict, Optional
 
 from auth0.v3.authentication import GetToken
+from dotenv import load_dotenv
 from requests.exceptions import HTTPError
 
 from contxt.services.api import Api
@@ -18,6 +18,7 @@ from . import Auth, Token, TokenProvider
 
 logger = make_logger(__name__)
 
+
 @dataclass
 class Env:
     CLI_CLIENT_ID: str
@@ -25,8 +26,13 @@ class Env:
 
 
 environments = {
-    "staging": Env(CLI_CLIENT_ID="yJw7FCGBKg7nTT4CJ4n05QaVzhTIgtAf", auth0_tenant_base_url="contxt-staging.us.auth0.com"),
-    "production": Env(CLI_CLIENT_ID="bleED0RUwb7CJ9j7D48tqSiSZRZn29AV", auth0_tenant_base_url="ndustrial.auth0.com")
+    "staging": Env(
+        CLI_CLIENT_ID="yJw7FCGBKg7nTT4CJ4n05QaVzhTIgtAf",
+        auth0_tenant_base_url="contxt-staging.us.auth0.com",
+    ),
+    "production": Env(
+        CLI_CLIENT_ID="bleED0RUwb7CJ9j7D48tqSiSZRZn29AV", auth0_tenant_base_url="ndustrial.auth0.com"
+    ),
 }
 
 load_dotenv()
@@ -111,7 +117,9 @@ class UserIdentityProvider(TokenProvider):
         self.client_secret = client_secret
         self.auth_service = GetToken(environments[os.getenv("env", "production")].auth0_tenant_base_url)
         self._refresh_token: Optional[Token] = None
-        self.device_provider = Auth0DeviceProvider(environments[os.getenv("env", "production")].auth0_tenant_base_url)
+        self.device_provider = Auth0DeviceProvider(
+            environments[os.getenv("env", "production")].auth0_tenant_base_url
+        )
 
         # Initialize cache
         self._cache_file = cache_file
@@ -255,7 +263,9 @@ class CliAuth(Auth):
     """
 
     def __init__(self) -> None:
-        super().__init__(client_id=environments[os.getenv("env", "production")].CLI_CLIENT_ID, client_secret="")
+        super().__init__(
+            client_id=environments[os.getenv("env", "production")].CLI_CLIENT_ID, client_secret=""
+        )
         self.auth_service = AuthService()
         self.identity_provider = UserIdentityProvider(
             client_id=self.client_id,

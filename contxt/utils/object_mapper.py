@@ -36,10 +36,10 @@ class ObjectMapper:
                 assert isinstance(tree, dict), failure_msg()
                 assert len(args) == 2
                 key_ann, value_ann = args
-                return {
+                return {  # type: ignore
                     ObjectMapper.tree_to_object(k, key_ann): ObjectMapper.tree_to_object(v, value_ann)
                     for k, v in tree.items()
-                }  # type: ignore
+                }
             elif origin is Union:
                 assert any(t for t in args if isinstance(tree, t)), failure_msg()
                 return tree  # type: ignore

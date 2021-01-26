@@ -1,14 +1,15 @@
 import os
-from dotenv import load_dotenv
 from typing import List, Optional
-from ..auth import Auth
-from ..models.contxt import (
-    Cluster,
-)
-from .api import ApiEnvironment, ConfiguredApi
+
+from dotenv import load_dotenv
 from requests.exceptions import HTTPError
 
+from ..auth import Auth
+from ..models.contxt import Cluster
+from .api import ApiEnvironment, ConfiguredApi
+
 load_dotenv()
+
 
 class ContxtDeploymentService(ConfiguredApi):
     """Contxt API client"""
@@ -36,7 +37,9 @@ class ContxtDeploymentService(ConfiguredApi):
         resp = self.get(f"{organization_id}/clusters/{cluster_slug}")
         return Cluster.from_api(resp)
 
-    def register_cluster(self, organization_id: str, cluster: Cluster, secret_bearer_token: Optional[str]) -> Cluster:
+    def register_cluster(
+        self, organization_id: str, cluster: Cluster, secret_bearer_token: Optional[str]
+    ) -> None:
         obj = cluster.post()
         # for legacy / DC/OS cluster registration, a token should be provided
         if secret_bearer_token:
@@ -44,5 +47,6 @@ class ContxtDeploymentService(ConfiguredApi):
         try:
             resp = self.post(f"{organization_id}/clusters", json=obj)
             return Cluster.from_api(resp)
-        except HTTPError as e:
+        except HTTPError:
             pass
+            return

@@ -1,7 +1,8 @@
 import os
-from dotenv import load_dotenv
 from datetime import datetime
 from typing import Any, Dict, List, Optional
+
+from dotenv import load_dotenv
 
 from ..auth import Auth
 from ..models.contxt import (
@@ -17,6 +18,7 @@ from ..models.contxt import (
 from .api import ApiEnvironment, ConfiguredApi
 
 load_dotenv()
+
 
 class ContxtService(ConfiguredApi):
     """Contxt API client"""
@@ -34,7 +36,7 @@ class ContxtService(ConfiguredApi):
         ),
     )
 
-    def __init__(self, auth: Auth, env: str = os.getenv("env"), **kwargs) -> None:
+    def __init__(self, auth: Auth, env: str = os.getenv("env", "production"), **kwargs) -> None:
         super().__init__(env=env, auth=auth, **kwargs)
 
     def get_organizations(self) -> List[Organization]:

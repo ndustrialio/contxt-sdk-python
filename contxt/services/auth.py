@@ -1,11 +1,13 @@
 import os
-from dotenv import load_dotenv
 from pathlib import Path
 from typing import Dict, List, Union
+
+from dotenv import load_dotenv
 
 from .api import ApiEnvironment, ConfiguredApi
 
 load_dotenv()
+
 
 class AuthService(ConfiguredApi):
     """Auth API client"""
@@ -14,7 +16,7 @@ class AuthService(ConfiguredApi):
         ApiEnvironment(
             name="production",
             base_url="https://contxtauth.com/v1",
-            client_id="https://auth.opencontxt.com", #75wT048QcpE7ujwBJPPjr263eTHl4gEX
+            client_id="75wT048QcpE7ujwBJPPjr263eTHl4gEX",
         ),
         ApiEnvironment(
             name="staging",
@@ -23,9 +25,12 @@ class AuthService(ConfiguredApi):
         ),
     )
 
-    def __init__(self, env: str = os.getenv("env", "production"),
-                 cache_file: str = Path.home() / ".contxt" / "tokens",
-                 **kwargs) -> None:
+    def __init__(
+        self,
+        env: str = os.getenv("env", "production"),
+        cache_file: str = Path.home() / ".contxt" / "tokens",  # type: ignore
+        **kwargs,
+    ) -> None:
         super().__init__(env=env, **kwargs)
 
     def get_jwks(self) -> Dict:
