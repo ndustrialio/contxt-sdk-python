@@ -16,6 +16,7 @@ cryptography = { version = ">=1.4", optional = true } # enable pyjwt to en/decod
 pyjwt = "^1"
 requests = "^2"
 tabulate = "*"
+python-dotenv = "^0.15.0"
 
 [tool.poetry.dev-dependencies]
 black = "^20.8b0"
