@@ -1,9 +1,12 @@
+import os
+from dotenv import load_dotenv
 from dataclasses import dataclass
 
 from contxt.auth.cli import CliAuth
 from contxt.services import (
     AssetsService,
     ContxtService,
+    ContxtDeploymentService,
     EmsService,
     EventsService,
     FacilitiesService,
@@ -19,35 +22,41 @@ class Clients:
     """Holds a user and all client API's"""
 
     auth: CliAuth
+    load_dotenv()
+    env: str = os.getenv("env", "production")
 
     @cachedproperty
     def assets(self) -> AssetsService:
-        return AssetsService(self.auth)
+        return AssetsService(self.auth, env=self.env)
 
     @cachedproperty
     def contxt(self) -> ContxtService:
-        return ContxtService(self.auth)
+        return ContxtService(self.auth, env=self.env)
+
+    @cachedproperty
+    def contxt_deployments(self) -> ContxtDeploymentService:
+        return ContxtDeploymentService(self.auth, env=self.env)
 
     @cachedproperty
     def ems(self) -> EmsService:
-        return EmsService(self.auth)
+        return EmsService(self.auth, env=self.env)
 
     @cachedproperty
     def events(self) -> EventsService:
-        return EventsService(self.auth)
+        return EventsService(self.auth, env=self.env)
 
     @cachedproperty
     def facilities(self) -> FacilitiesService:
-        return FacilitiesService(self.auth)
+        return FacilitiesService(self.auth, env=self.env)
 
     @cachedproperty
     def health(self) -> HealthService:
-        return HealthService(self.auth)
+        return HealthService(self.auth, env=self.env)
 
     @cachedproperty
     def iot(self) -> IotService:
-        return IotService(self.auth)
+        return IotService(self.auth, env=self.env)
 
     @cachedproperty
     def sis(self) -> SisService:
-        return SisService(self.auth)
+        return SisService(self.auth, env=self.env)

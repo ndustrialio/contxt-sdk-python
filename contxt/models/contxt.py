@@ -333,3 +333,30 @@ class EdgeNode(ApiObject):
     description: str
     client_id: str
     created_at: Optional[datetime] = None
+
+
+@dataclass
+class Cluster(ApiObject):
+    _api_fields: ClassVar = (
+        ApiField("id"),
+        ApiField("description", creatable=True),
+        ApiField("infrastructure_id", creatable=True),
+        ApiField("organization_id", creatable=True),
+        ApiField("region", creatable=True),
+        ApiField("slug", creatable=True),
+        ApiField("host", creatable=True),
+        ApiField("type", creatable=True),
+        ApiField("created_at", data_type=Parsers.datetime),
+        ApiField("updated_at", data_type=Parsers.datetime),
+    )
+
+    description: str
+    infrastructure_id: int
+    organization_id: str
+    region: str
+    slug: str
+    type: str
+    host: Optional[str] = None
+    id: Optional[str] = None
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
