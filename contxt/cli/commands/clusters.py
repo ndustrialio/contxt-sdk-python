@@ -91,7 +91,6 @@ def login(clients: Clients, host: str, org: str) -> None:
     " You will need to reference this in other commands so it's "
     "ideal to make this value easy to remember",
 )
-@click.option("--token", help="Used for legacy DC/OS clusters. Leave blank for K8S Clusters")
 @click.pass_obj
 def register(
     clients: Clients,
