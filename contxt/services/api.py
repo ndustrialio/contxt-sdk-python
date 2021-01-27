@@ -71,6 +71,7 @@ class Api:
         # Initialize session
         self.session = Session()
         self.session.auth = BearerTokenAuth(token_provider) if token_provider else None
+        self.session.headers.update({"Cache-Control": "no-cache"})
         self.session.hooks = {"response": self._log_response}  # type: ignore
 
         # Attach retry adapter

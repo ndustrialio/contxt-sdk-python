@@ -20,11 +20,12 @@ class NgestService(ConfiguredApi):
     )
 
     def __init__(self, env: str = "production", **kwargs) -> None:
+        self.env = env
         super().__init__(env=env, **kwargs)
 
     @staticmethod
-    def specialize(feed_key: str, feed_token: str) -> "SpecializedNgestService":
-        return SpecializedNgestService(feed_key=feed_key, feed_token=feed_token)
+    def specialize(feed_key: str, feed_token: str, env: str = "production") -> "SpecializedNgestService":
+        return SpecializedNgestService(env=env, feed_key=feed_key, feed_token=feed_token)
 
     def _format_time_series(self, feed_key: str, time_series: Dict[str, Dict[datetime, float]]) -> Dict:
         # Enforce all datetimes are tz-aware
@@ -89,8 +90,8 @@ class NgestService(ConfiguredApi):
 
 
 class SpecializedNgestService(NgestService):
-    def __init__(self, feed_key: str, feed_token: str) -> None:
-        super().__init__()
+    def __init__(self, feed_key: str, feed_token: str, env: str = "production") -> None:
+        super().__init__(env=env)
         self.feed_key = feed_key
         self.feed_token = feed_token
 

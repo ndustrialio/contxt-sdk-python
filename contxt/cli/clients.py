@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from contxt.auth.cli import CliAuth
 from contxt.services import (
     AssetsService,
+    ContxtDeploymentService,
     ContxtService,
     EmsService,
     EventsService,
@@ -18,36 +19,44 @@ from contxt.utils import cachedproperty
 class Clients:
     """Holds a user and all client API's"""
 
-    auth: CliAuth
+    env: str
+
+    @cachedproperty
+    def auth(self) -> CliAuth:
+        return CliAuth(env=self.env)
 
     @cachedproperty
     def assets(self) -> AssetsService:
-        return AssetsService(self.auth)
+        return AssetsService(auth=self.auth, env=self.env)
 
     @cachedproperty
     def contxt(self) -> ContxtService:
-        return ContxtService(self.auth)
+        return ContxtService(auth=self.auth, env=self.env)
+
+    @cachedproperty
+    def contxt_deployments(self) -> ContxtDeploymentService:
+        return ContxtDeploymentService(auth=self.auth, env=self.env)
 
     @cachedproperty
     def ems(self) -> EmsService:
-        return EmsService(self.auth)
+        return EmsService(auth=self.auth, env=self.env)
 
     @cachedproperty
     def events(self) -> EventsService:
-        return EventsService(self.auth)
+        return EventsService(auth=self.auth, env=self.env)
 
     @cachedproperty
     def facilities(self) -> FacilitiesService:
-        return FacilitiesService(self.auth)
+        return FacilitiesService(auth=self.auth, env=self.env)
 
     @cachedproperty
     def health(self) -> HealthService:
-        return HealthService(self.auth)
+        return HealthService(auth=self.auth, env=self.env)
 
     @cachedproperty
     def iot(self) -> IotService:
-        return IotService(self.auth)
+        return IotService(auth=self.auth, env=self.env)
 
     @cachedproperty
     def sis(self) -> SisService:
-        return SisService(self.auth)
+        return SisService(auth=self.auth, env=self.env)
