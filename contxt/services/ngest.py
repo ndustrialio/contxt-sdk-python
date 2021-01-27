@@ -19,7 +19,7 @@ class NgestService(ConfiguredApi):
         ),
     )
 
-    def __init__(self, env: str, **kwargs) -> None:
+    def __init__(self, env: str = "production", **kwargs) -> None:
         self.env = env
         super().__init__(env=env, **kwargs)
 
@@ -90,7 +90,7 @@ class NgestService(ConfiguredApi):
 
 
 class SpecializedNgestService(NgestService):
-    def __init__(self, env: str, feed_key: str, feed_token: str) -> None:
+    def __init__(self, feed_key: str, feed_token: str, env: str = "production") -> None:
         super().__init__(env=env)
         self.feed_key = feed_key
         self.feed_token = feed_token
