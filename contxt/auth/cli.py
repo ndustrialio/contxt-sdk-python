@@ -264,9 +264,6 @@ class CliAuth(Auth):
     """
 
     def __init__(self, env: str) -> None:
-        if environments.get(env) is None:
-            print(f"Environment '{env}' is not valid - choose from {list(environments.keys())}")
-            exit(1)
         super().__init__(client_id=environments[env].cli_client_id, client_secret="")
         self.env = env
         self.auth_service = AuthService(env)
