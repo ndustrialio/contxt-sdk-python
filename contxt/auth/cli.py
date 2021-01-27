@@ -47,7 +47,7 @@ class DeviceAuthDenied(Exception):
 
 
 class Auth0DeviceProvider(Api):
-    def __init__(self, env: str):
+    def __init__(self, env: str = "production"):
         self.env = env
         self.base_url = environments[env].auth0_tenant_base_url
         self.auth_service = AuthService(env=env)
@@ -108,10 +108,10 @@ class UserIdentityProvider(TokenProvider):
 
     def __init__(
         self,
-        env: str,
         client_id: str,
         client_secret: str,
         audience: str,
+        env: str = "production",
         cache_file: Optional[Path] = None,
     ) -> None:
         super().__init__(audience)
@@ -230,7 +230,7 @@ class UserTokenProvider(TokenProvider):
     identity provider.
     """
 
-    def __init__(self, identity_provider: UserIdentityProvider, env: str, audience: str) -> None:
+    def __init__(self, identity_provider: UserIdentityProvider, audience: str, env: str = "production") -> None:
         super().__init__(audience)
         self.identity_provider = identity_provider
         self.auth_service = AuthService(env)
@@ -277,7 +277,7 @@ class CliAuth(Auth):
 
     def get_token_provider(self, audience: str) -> UserTokenProvider:
         """Get `TokenProvider` for audience `audience`"""
-        return UserTokenProvider(self.identity_provider, self.env, audience)
+        return UserTokenProvider(identity_provider=self.identity_provider, audience=audience, env=self.env)
 
     @property
     def user_id(self) -> str:
