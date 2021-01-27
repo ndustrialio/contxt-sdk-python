@@ -23,7 +23,7 @@ class ContxtDeploymentService(ConfiguredApi):
         ),
     )
 
-    def __init__(self, env: str, auth: Auth, **kwargs) -> None:
+    def __init__(self, auth: Auth, env: str = "production", **kwargs) -> None:
         super().__init__(env=env, auth=auth, **kwargs)
 
     def get_clusters(self, organization_id: str) -> List[Cluster]:
@@ -34,12 +34,9 @@ class ContxtDeploymentService(ConfiguredApi):
         return Cluster.from_api(resp)
 
     def register_cluster(
-        self, organization_id: str, cluster: Cluster, secret_bearer_token: Optional[str]
+        self, organization_id: str, cluster: Cluster
     ) -> None:
         obj = cluster.post()
-        # for legacy / DC/OS cluster registration, a token should be provided
-        if secret_bearer_token:
-            obj["secrets"] = {"BEARER_TOKEN": secret_bearer_token}
         try:
             resp = self.post(f"{organization_id}/clusters", json=obj)
             return Cluster.from_api(resp)

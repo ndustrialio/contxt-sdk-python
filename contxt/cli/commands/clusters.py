@@ -101,7 +101,6 @@ def register(
     region: str,
     slug: str,
     host: str,
-    token: Optional[str],
 ):
     organization = _get_org(clients, org)
 
@@ -116,5 +115,5 @@ def register(
     )
 
     clients.contxt_deployments.register_cluster(
-        organization_id=organization.id, cluster=cluster, secret_bearer_token=token
+        organization_id=organization.id, cluster=cluster
     )

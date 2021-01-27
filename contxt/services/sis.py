@@ -21,7 +21,7 @@ class SisService(ConfiguredApi):
         ),
     )
 
-    def __init__(self, env: str, auth: Auth, **kwargs) -> None:
+    def __init__(self, auth: Auth, env: str = "production", **kwargs) -> None:
         super().__init__(env=env, auth=auth, **kwargs)
 
     def request_read_file(self, file_id) -> FileRead:

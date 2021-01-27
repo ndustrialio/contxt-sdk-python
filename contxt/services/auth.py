@@ -23,7 +23,6 @@ class AuthService(ConfiguredApi):
     def __init__(
         self,
         env: str = "production",
-        cache_file: str = Path.home() / ".contxt" / "tokens",  # type: ignore
         **kwargs,
     ) -> None:
         super().__init__(env=env, **kwargs)

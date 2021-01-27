@@ -11,7 +11,7 @@ class FacilitiesService(ConfiguredApi):
 
     _envs = AssetsService._envs
 
-    def __init__(self, env: str, auth: Auth, **kwargs) -> None:
+    def __init__(self, auth: Auth, env: str = "production", **kwargs) -> None:
         super().__init__(env=env, auth=auth, **kwargs)
 
     def get_facilities(self, organization_id: Optional[str] = None) -> List[Facility]:

@@ -18,9 +18,11 @@ from contxt.utils import cachedproperty
 @dataclass
 class Clients:
     """Holds a user and all client API's"""
-
-    auth: CliAuth
     env: str
+
+    @cachedproperty
+    def auth(self) -> CliAuth:
+        return CliAuth(env=self.env)
 
     @cachedproperty
     def assets(self) -> AssetsService:

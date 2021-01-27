@@ -326,7 +326,7 @@ class IotDataService(ConfiguredApi):
         ),
     )
 
-    def __init__(self, env: str, auth: Auth, org_id: str, **kwargs) -> None:
+    def __init__(self, auth: Auth, org_id: str, env: str = "production", **kwargs) -> None:
         super().__init__(env=env, auth=auth, **kwargs)
         self.org_id = org_id
 
