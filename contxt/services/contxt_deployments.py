@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List
 
 from requests.exceptions import HTTPError
 
@@ -33,9 +33,7 @@ class ContxtDeploymentService(ConfiguredApi):
         resp = self.get(f"{organization_id}/clusters/{cluster_slug}")
         return Cluster.from_api(resp)
 
-    def register_cluster(
-        self, organization_id: str, cluster: Cluster
-    ) -> None:
+    def register_cluster(self, organization_id: str, cluster: Cluster) -> None:
         obj = cluster.post()
         try:
             resp = self.post(f"{organization_id}/clusters", json=obj)

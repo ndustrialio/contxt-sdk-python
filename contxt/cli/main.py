@@ -5,7 +5,6 @@ from pathlib import Path
 import click
 
 from contxt import __version__
-from contxt.auth.cli import CliAuth
 from contxt.cli.clients import Clients
 
 COMMAND_DIR = Path(__file__).parent / "commands"
@@ -26,7 +25,12 @@ class Cli(click.MultiCommand):
 
 
 @click.group(cls=Cli, context_settings=dict(help_option_names=["-h", "--help"]))
-@click.option("--env", type=click.Choice(["production", "staging"]), default="production", help="Environment for all API's")
+@click.option(
+    "--env",
+    type=click.Choice(["production", "staging"]),
+    default="production",
+    help="Environment for all API's",
+)
 @click.version_option(__version__, "-v", "--version")
 @click.pass_context
 def cli(ctx: click.Context, env: str) -> None:

@@ -1,4 +1,3 @@
-from pathlib import Path
 from typing import Dict, List, Union
 
 from .api import ApiEnvironment, ConfiguredApi

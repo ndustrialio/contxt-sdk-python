@@ -114,6 +114,4 @@ def register(
         organization_id=organization.id,
     )
 
-    clients.contxt_deployments.register_cluster(
-        organization_id=organization.id, cluster=cluster
-    )
+    clients.contxt_deployments.register_cluster(organization_id=organization.id, cluster=cluster)

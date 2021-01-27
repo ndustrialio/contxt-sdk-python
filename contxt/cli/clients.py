@@ -18,6 +18,7 @@ from contxt.utils import cachedproperty
 @dataclass
 class Clients:
     """Holds a user and all client API's"""
+
     env: str
 
     @cachedproperty
