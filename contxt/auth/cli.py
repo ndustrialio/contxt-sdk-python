@@ -230,7 +230,9 @@ class UserTokenProvider(TokenProvider):
     identity provider.
     """
 
-    def __init__(self, identity_provider: UserIdentityProvider, audience: str, env: str = "production") -> None:
+    def __init__(
+        self, identity_provider: UserIdentityProvider, audience: str, env: str = "production"
+    ) -> None:
         super().__init__(audience)
         self.identity_provider = identity_provider
         self.auth_service = AuthService(env)
@@ -277,7 +279,9 @@ class CliAuth(Auth):
 
     def get_token_provider(self, audience: str) -> UserTokenProvider:
         """Get `TokenProvider` for audience `audience`"""
-        return UserTokenProvider(identity_provider=self.identity_provider, audience=audience, env=self.env)
+        return UserTokenProvider(
+            identity_provider=self.identity_provider, audience=audience, env=self.env
+        )
 
     @property
     def user_id(self) -> str:
