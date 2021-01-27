@@ -48,7 +48,7 @@ class IotService(ConfiguredApi):
         ),
     )
 
-    def __init__(self, auth: Auth, env: str = "production", **kwargs) -> None:
+    def __init__(self, env: str, auth: Auth, **kwargs) -> None:
         super().__init__(env=env, auth=auth, **kwargs)
 
     def provision_field_for_feed(self, feed_id: int, field: Field) -> Field:
@@ -326,7 +326,7 @@ class IotDataService(ConfiguredApi):
         ),
     )
 
-    def __init__(self, org_id: str, auth: Auth, env: str = "production", **kwargs) -> None:
+    def __init__(self, env: str, auth: Auth, org_id: str, **kwargs) -> None:
         super().__init__(env=env, auth=auth, **kwargs)
         self.org_id = org_id
 

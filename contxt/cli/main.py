@@ -26,11 +26,12 @@ class Cli(click.MultiCommand):
 
 
 @click.group(cls=Cli, context_settings=dict(help_option_names=["-h", "--help"]))
+@click.option("--env", required=False, default="production")
 @click.version_option(__version__, "-v", "--version")
 @click.pass_context
-def cli(ctx: click.Context) -> None:
+def cli(ctx: click.Context, env: str) -> None:
     """Contxt CLI"""
-    ctx.obj = Clients(auth=CliAuth())
+    ctx.obj = Clients(auth=CliAuth(env=env), env=env)
 
 
 if __name__ == "__main__":

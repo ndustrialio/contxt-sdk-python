@@ -1,12 +1,7 @@
-import os
 from pathlib import Path
 from typing import Dict, List, Union
 
-from dotenv import load_dotenv
-
 from .api import ApiEnvironment, ConfiguredApi
-
-load_dotenv()
 
 
 class AuthService(ConfiguredApi):
@@ -27,7 +22,7 @@ class AuthService(ConfiguredApi):
 
     def __init__(
         self,
-        env: str = os.getenv("env", "production"),
+        env: str = "production",
         cache_file: str = Path.home() / ".contxt" / "tokens",  # type: ignore
         **kwargs,
     ) -> None:

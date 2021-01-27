@@ -30,10 +30,10 @@ def clusters() -> None:
 def get(clients: Clients, org: str, fields: List[str], sort: str, cluster_slug: Optional[str]) -> None:
     """Get clusters"""
     organization = _get_org(clients, org)
-    items = (
-        [clients.contxt_deployments.get_cluster(organization.id, cluster_slug)]
+    (items, fields) = (
+        ([clients.contxt_deployments.get_cluster(organization.id, cluster_slug)], None)  # type: ignore
         if cluster_slug
-        else clients.contxt_deployments.get_clusters(organization.id)
+        else (clients.contxt_deployments.get_clusters(organization.id), fields)
     )
     print_table(items=items, keys=fields, sort_by=sort)
 

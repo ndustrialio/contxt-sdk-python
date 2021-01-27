@@ -32,9 +32,9 @@ class AssetsService(ConfiguredApi):
 
     def __init__(
         self,
+        env: str,
         auth: Auth,
         organization_id: Optional[str] = None,
-        env: str = "production",
         load_types: bool = True,
         types_to_fully_load: Optional[List[str]] = None,
         **kwargs,

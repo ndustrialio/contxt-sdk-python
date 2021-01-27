@@ -1,4 +1,3 @@
-import os
 import time
 import webbrowser
 from dataclasses import dataclass
@@ -7,7 +6,6 @@ from pathlib import Path
 from typing import Any, Dict, Optional
 
 from auth0.v3.authentication import GetToken
-from dotenv import load_dotenv
 from requests.exceptions import HTTPError
 
 from contxt.services.api import Api
@@ -21,21 +19,19 @@ logger = make_logger(__name__)
 
 @dataclass
 class Env:
-    CLI_CLIENT_ID: str
+    cli_client_id: str
     auth0_tenant_base_url: str
 
 
 environments = {
     "staging": Env(
-        CLI_CLIENT_ID="yJw7FCGBKg7nTT4CJ4n05QaVzhTIgtAf",
+        cli_client_id="yJw7FCGBKg7nTT4CJ4n05QaVzhTIgtAf",
         auth0_tenant_base_url="contxt-staging.us.auth0.com",
     ),
     "production": Env(
-        CLI_CLIENT_ID="bleED0RUwb7CJ9j7D48tqSiSZRZn29AV", auth0_tenant_base_url="ndustrial.auth0.com"
+        cli_client_id="bleED0RUwb7CJ9j7D48tqSiSZRZn29AV", auth0_tenant_base_url="ndustrial.auth0.com"
     ),
 }
-
-load_dotenv()
 
 
 class DeviceAuthPendingException(Exception):
@@ -51,14 +47,15 @@ class DeviceAuthDenied(Exception):
 
 
 class Auth0DeviceProvider(Api):
-    def __init__(self, auth0_tenant):
-        self.base_url = auth0_tenant
-        self.auth_service = AuthService()
+    def __init__(self, env: str):
+        self.env = env
+        self.base_url = environments[env].auth0_tenant_base_url
+        self.auth_service = AuthService(env=env)
         super().__init__(base_url=f"https://{self.base_url}")
 
     def get_device_code_url(self):
         data = {
-            "client_id": environments[os.getenv("env", "production")].CLI_CLIENT_ID,
+            "client_id": environments[self.env].cli_client_id,
             "scope": "offline_access",
             "audience": self.auth_service.client_id,
         }
@@ -70,7 +67,7 @@ class Auth0DeviceProvider(Api):
         data = {
             "grant_type": "urn:ietf:params:oauth:grant-type:device_code",
             "device_code": code_info["device_code"],
-            "client_id": environments[os.getenv("env", "production")].CLI_CLIENT_ID,
+            "client_id": environments[self.env].cli_client_id,
         }
 
         while True:
@@ -110,16 +107,20 @@ class UserIdentityProvider(TokenProvider):
     """
 
     def __init__(
-        self, client_id: str, client_secret: str, audience: str, cache_file: Optional[Path] = None
+        self,
+        env: str,
+        client_id: str,
+        client_secret: str,
+        audience: str,
+        cache_file: Optional[Path] = None,
     ) -> None:
         super().__init__(audience)
+        self.env = env
         self.client_id = client_id
         self.client_secret = client_secret
-        self.auth_service = GetToken(environments[os.getenv("env", "production")].auth0_tenant_base_url)
+        self.auth_service = GetToken(environments[env].auth0_tenant_base_url)
         self._refresh_token: Optional[Token] = None
-        self.device_provider = Auth0DeviceProvider(
-            environments[os.getenv("env", "production")].auth0_tenant_base_url
-        )
+        self.device_provider = Auth0DeviceProvider(env)
 
         # Initialize cache
         self._cache_file = cache_file
@@ -229,10 +230,10 @@ class UserTokenProvider(TokenProvider):
     identity provider.
     """
 
-    def __init__(self, identity_provider: UserIdentityProvider, audience: str) -> None:
+    def __init__(self, identity_provider: UserIdentityProvider, env: str, audience: str) -> None:
         super().__init__(audience)
         self.identity_provider = identity_provider
-        self.auth_service = AuthService()
+        self.auth_service = AuthService(env)
 
     @TokenProvider.access_token.getter  # type: ignore
     def access_token(self) -> Token:
@@ -262,12 +263,15 @@ class CliAuth(Auth):
        for the target service, authenticating with the above Auth0 access token
     """
 
-    def __init__(self) -> None:
-        super().__init__(
-            client_id=environments[os.getenv("env", "production")].CLI_CLIENT_ID, client_secret=""
-        )
-        self.auth_service = AuthService()
+    def __init__(self, env: str) -> None:
+        if environments.get(env) is None:
+            print(f"Environment '{env}' is not valid - choose from {list(environments.keys())}")
+            exit(1)
+        super().__init__(client_id=environments[env].cli_client_id, client_secret="")
+        self.env = env
+        self.auth_service = AuthService(env)
         self.identity_provider = UserIdentityProvider(
+            env=env,
             client_id=self.client_id,
             client_secret=self.client_secret,
             audience=self.auth_service.client_id,
@@ -276,7 +280,7 @@ class CliAuth(Auth):
 
     def get_token_provider(self, audience: str) -> UserTokenProvider:
         """Get `TokenProvider` for audience `audience`"""
-        return UserTokenProvider(self.identity_provider, audience)
+        return UserTokenProvider(self.identity_provider, self.env, audience)
 
     @property
     def user_id(self) -> str:

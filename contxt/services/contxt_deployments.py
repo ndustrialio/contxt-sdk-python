@@ -1,14 +1,10 @@
-import os
 from typing import List, Optional
 
-from dotenv import load_dotenv
 from requests.exceptions import HTTPError
 
 from ..auth import Auth
 from ..models.contxt import Cluster
 from .api import ApiEnvironment, ConfiguredApi
-
-load_dotenv()
 
 
 class ContxtDeploymentService(ConfiguredApi):
@@ -27,7 +23,7 @@ class ContxtDeploymentService(ConfiguredApi):
         ),
     )
 
-    def __init__(self, auth: Auth, env: str = os.getenv("env", "production"), **kwargs) -> None:
+    def __init__(self, env: str, auth: Auth, **kwargs) -> None:
         super().__init__(env=env, auth=auth, **kwargs)
 
     def get_clusters(self, organization_id: str) -> List[Cluster]:
