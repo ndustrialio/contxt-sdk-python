@@ -263,7 +263,7 @@ class CliAuth(Auth):
        for the target service, authenticating with the above Auth0 access token
     """
 
-    def __init__(self, env: str) -> None:
+    def __init__(self, env: str = "production") -> None:
         super().__init__(client_id=environments[env].cli_client_id, client_secret="")
         self.env = env
         self.auth_service = AuthService(env)
