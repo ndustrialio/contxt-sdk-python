@@ -21,6 +21,8 @@ tabulate = "*"
 black = "^20.8b0"
 flake8 = "^3"
 isort = "^5"
+mkdocs = "^1.1.2"
+mkdocs-click = "^0.2.0"
 mypy = "^0"
 poethepoet = "^0"
 pre-commit = "^2"
@@ -34,6 +36,7 @@ contxt = "contxt.__main__:cli"
 
 [tool.poe.tasks]
 clean = { cmd = "rm -rf .mypy_cache/ .pytest_cache/ build/ dist/ *.egg-info", help = "Remove build artifacts" }
+docs = { cmd = "mkdocs serve", help = "Serve documentation site" }
 lint = { cmd = "pre-commit run --all-files", help = "Run linters and formatters" }
 test = { cmd = "pytest", help = "Run tests" }
 

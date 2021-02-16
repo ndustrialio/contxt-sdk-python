@@ -18,8 +18,7 @@ contxt --help
 
 ## Documentation
 
-- [CLI](docs/cli.md)
-- [Worker](docs/worker.md)
+Please refer to <https://ndustrialio.github.io/contxt-sdk-python>.
 
 ## Contributing
 
