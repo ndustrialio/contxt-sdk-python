@@ -24,7 +24,7 @@ class Cli(click.MultiCommand):
         return ns[name]
 
 
-@click.group(cls=Cli, context_settings=dict(help_option_names=["-h", "--help"]))
+@click.group(cls=Cli, name="contxt", context_settings=dict(help_option_names=["-h", "--help"]))
 @click.option(
     "--env",
     type=click.Choice(["production", "staging"]),

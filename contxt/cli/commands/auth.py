@@ -26,6 +26,6 @@ def logout(client: Clients) -> None:
 @click.argument("audience")
 @click.pass_obj
 def token(client: Clients, audience: str) -> None:
-    """Fetch token for an API."""
+    """Fetch an access token for an API."""
     token = client.auth.get_token_provider(audience).access_token
     print(token)

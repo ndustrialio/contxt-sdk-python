@@ -1,4 +1,4 @@
 ::: mkdocs-click
-    :module: contxt.cli.main
+    :module: contxt.__main__
     :command: cli
     :prog_name: contxt

@@ -1,7 +1,8 @@
 site_name: Contxt SDK
 theme: readthedocs
-repo_url: https://github.com/ndustrial/contxt-sdk-python/
+repo_url: https://github.com/ndustrialio/contxt-sdk-python/
 markdown_extensions:
-    - mkdocs-click
-    - toc:
-        permalink: True
+  - footnotes
+  - mkdocs-click
+  - toc:
+      permalink: True
