@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  
+  <link rel="shortcut icon" href="../../img/favicon.ico">
+  <title>Commands - Contxt SDK</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+
+  <link rel="stylesheet" href="../../css/theme.css" />
+  <link rel="stylesheet" href="../../css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Commands";
+    var mkdocs_page_input_path = "cli/commands.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href="../.." class="icon icon-home"> Contxt SDK</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../..">Overview</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Cli</span></p>
+                <ul class="current">
+                    <li class="toctree-l1"><a class="reference internal" href="../">Quickstart</a>
+                    </li>
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Commands</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#assets">assets</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#get">get</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#types">types</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#auth">auth</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#login">login</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#logout">logout</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#token">token</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#clusters">clusters</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#get_1">get</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#login_1">login</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#register">register</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#ems">ems</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#bills">bills</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#export">export</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#main-data">main-data</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#mains">mains</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#spend">spend</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#usage">usage</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#facilities">facilities</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#create">create</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#get_2">get</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#iot">iot</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#data">data</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#delete">delete</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#get_3">get</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#feeds">feeds</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#fields">fields</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#create_1">create</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#delete_1">delete</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#get_4">get</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#unprovisioned">unprovisioned</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#groupings">groupings</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#add-field">add-field</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#create_2">create</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#get_5">get</a>
+    </li>
+        </ul>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#orgs">orgs</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#get_6">get</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#projects">projects</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#get_7">get</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#get-edge-nodes">get-edge-nodes</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#get-services">get-services</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#services">services</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#get_8">get</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Sdk</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../sdk/worker/">Worker</a>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../..">Contxt SDK</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>Cli &raquo;</li>
+        
+      
+    
+    <li>Commands</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        <a href="https://github.com/ndustrialio/contxt-sdk-python/edit/master/docs/cli/commands.md"
+          class="icon icon-github"> Edit on GitHub</a>
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="contxt">contxt<a class="headerlink" href="#contxt" title="Permanent link">&para;</a></h1>
+<p>Contxt CLI</p>
+<p>Usage:</p>
+<pre><code>contxt [OPTIONS] COMMAND [ARGS]...
+</code></pre>
+<p>Options:</p>
+<pre><code>  --env [production|staging]  Environment for all API's
+  -v, --version               Show the version and exit.
+</code></pre>
+<h2 id="assets">assets<a class="headerlink" href="#assets" title="Permanent link">&para;</a></h2>
+<p>Assets.</p>
+<p>Usage:</p>
+<pre><code>contxt assets [OPTIONS] COMMAND [ARGS]...
+</code></pre>
+<h3 id="get">get<a class="headerlink" href="#get" title="Permanent link">&para;</a></h3>
+<p>Get assets</p>
+<p>Usage:</p>
+<pre><code>contxt assets get [OPTIONS] TYPE
+</code></pre>
+<p>Options:</p>
+<pre><code>  --fields TEXT  Comma-delimited list of fields to return
+  --sort TEXT    Field to sort by
+</code></pre>
+<h3 id="types">types<a class="headerlink" href="#types" title="Permanent link">&para;</a></h3>
+<p>Get asset types</p>
+<p>Usage:</p>
+<pre><code>contxt assets types [OPTIONS]
+</code></pre>
+<p>Options:</p>
+<pre><code>  --fields TEXT  Comma-delimited list of fields to return
+  --sort TEXT    Field to sort by
+</code></pre>
+<h2 id="auth">auth<a class="headerlink" href="#auth" title="Permanent link">&para;</a></h2>
+<p>Authenticate with Contxt.</p>
+<p>Usage:</p>
+<pre><code>contxt auth [OPTIONS] COMMAND [ARGS]...
+</code></pre>
+<h3 id="login">login<a class="headerlink" href="#login" title="Permanent link">&para;</a></h3>
+<p>Login to Contxt.</p>
+<p>Usage:</p>
+<pre><code>contxt auth login [OPTIONS]
+</code></pre>
+<h3 id="logout">logout<a class="headerlink" href="#logout" title="Permanent link">&para;</a></h3>
+<p>Logout of Contxt.</p>
+<p>Usage:</p>
+<pre><code>contxt auth logout [OPTIONS]
+</code></pre>
+<h3 id="token">token<a class="headerlink" href="#token" title="Permanent link">&para;</a></h3>
+<p>Fetch an access token for an API.</p>
+<p>Usage:</p>
+<pre><code>contxt auth token [OPTIONS] AUDIENCE
+</code></pre>
+<h2 id="clusters">clusters<a class="headerlink" href="#clusters" title="Permanent link">&para;</a></h2>
+<p>Clusters</p>
+<p>Usage:</p>
+<pre><code>contxt clusters [OPTIONS] COMMAND [ARGS]...
+</code></pre>
+<h3 id="get_1">get<a class="headerlink" href="#get_1" title="Permanent link">&para;</a></h3>
+<p>Get clusters</p>
+<p>Usage:</p>
+<pre><code>contxt clusters get [OPTIONS] [CLUSTER_SLUG]
+</code></pre>
+<p>Options:</p>
+<pre><code>  --org TEXT     Org slug  [required]
+  --fields TEXT  Comma-delimited list of fields to return
+  --sort TEXT    Field to sort by
+</code></pre>
+<h3 id="login_1">login<a class="headerlink" href="#login_1" title="Permanent link">&para;</a></h3>
+<p>Get clusters</p>
+<p>Usage:</p>
+<pre><code>contxt clusters login [OPTIONS] HOST
+</code></pre>
+<p>Options:</p>
+<pre><code>  --org TEXT  Org slug  [required]
+</code></pre>
+<h3 id="register">register<a class="headerlink" href="#register" title="Permanent link">&para;</a></h3>
+<p>Usage:</p>
+<pre><code>contxt clusters register [OPTIONS] HOST
+</code></pre>
+<p>Options:</p>
+<pre><code>  --org TEXT                Org slug  [required]
+  --description TEXT        Information about what this cluster is for and
+                            what environment it belongs to  [required]
+
+  --infrastructure-id TEXT  The ID of the infrastructure registered in our
+                            system. Ask ndustrial.io DevOps what this value
+                            should be  [required]
+
+  --region TEXT             The AWS region where this cluster is deployed
+                            [required]
+
+  --slug TEXT               The slugified name you would like to use for this
+                            cluster. You will need to reference this in other
+                            commands so it's ideal to make this value easy to
+                            remember  [required]
+
+</code></pre>
+<h2 id="ems">ems<a class="headerlink" href="#ems" title="Permanent link">&para;</a></h2>
+<p>Energy Management System.</p>
+<p>Usage:</p>
+<pre><code>contxt ems [OPTIONS] COMMAND [ARGS]...
+</code></pre>
+<h3 id="bills">bills<a class="headerlink" href="#bills" title="Permanent link">&para;</a></h3>
+<p>Get utility bills</p>
+<p>Usage:</p>
+<pre><code>contxt ems bills [OPTIONS] FACILITY_ID
+</code></pre>
+<p>Options:</p>
+<pre><code>  --start [%Y-%m-%d]  Start date
+  --end [%Y-%m-%d]    End date
+  --fields TEXT       Comma-delimited list of fields to return
+  --sort TEXT         Field to sort by
+</code></pre>
+<h3 id="export">export<a class="headerlink" href="#export" title="Permanent link">&para;</a></h3>
+<p>Export data for facilities</p>
+<p>Usage:</p>
+<pre><code>contxt ems export [OPTIONS] [FACILITY_IDS]...
+</code></pre>
+<p>Options:</p>
+<pre><code>  --include TEXT                  Data to export
+  --start [%Y-%m-%d|%Y-%m-%dT%H:%M:%S|%Y-%m-%d %H:%M:%S]
+                                  Start time
+  --end [%Y-%m-%d|%Y-%m-%dT%H:%M:%S|%Y-%m-%d %H:%M:%S]
+                                  End time
+  --output DIRECTORY              Path for output
+</code></pre>
+<h3 id="main-data">main-data<a class="headerlink" href="#main-data" title="Permanent link">&para;</a></h3>
+<p>Get main service data</p>
+<p>Usage:</p>
+<pre><code>contxt ems main-data [OPTIONS] FACILITY_ID
+</code></pre>
+<p>Options:</p>
+<pre><code>  --resource-type RESOURCETYPE    Resource type
+  --start [%Y-%m-%d|%Y-%m-%dT%H:%M:%S|%Y-%m-%d %H:%M:%S]
+                                  Start time
+  --end [%Y-%m-%d|%Y-%m-%dT%H:%M:%S|%Y-%m-%d %H:%M:%S]
+                                  End time
+</code></pre>
+<h3 id="mains">mains<a class="headerlink" href="#mains" title="Permanent link">&para;</a></h3>
+<p>Get main services</p>
+<p>Usage:</p>
+<pre><code>contxt ems mains [OPTIONS] FACILITY_ID
+</code></pre>
+<p>Options:</p>
+<pre><code>  --resource-type RESOURCETYPE  Resource type
+  --fields TEXT                 Comma-delimited list of fields to return
+  --sort TEXT                   Field to sort by
+</code></pre>
+<h3 id="spend">spend<a class="headerlink" href="#spend" title="Permanent link">&para;</a></h3>
+<p>Get utility spend</p>
+<p>Usage:</p>
+<pre><code>contxt ems spend [OPTIONS] FACILITY_ID
+</code></pre>
+<p>Options:</p>
+<pre><code>  --resource-type RESOURCETYPE    Resource type
+  --start [%Y-%m-%d|%Y-%m-%dT%H:%M:%S|%Y-%m-%d %H:%M:%S]
+                                  Start time
+  --end [%Y-%m-%d|%Y-%m-%dT%H:%M:%S|%Y-%m-%d %H:%M:%S]
+                                  End time
+  --interval [daily|monthly]      Time interval
+</code></pre>
+<h3 id="usage">usage<a class="headerlink" href="#usage" title="Permanent link">&para;</a></h3>
+<p>Get utility usage</p>
+<p>Usage:</p>
+<pre><code>contxt ems usage [OPTIONS] FACILITY_ID
+</code></pre>
+<p>Options:</p>
+<pre><code>  --resource-type RESOURCETYPE    Resource type
+  --start [%Y-%m-%d|%Y-%m-%dT%H:%M:%S|%Y-%m-%d %H:%M:%S]
+                                  Start time
+  --end [%Y-%m-%d|%Y-%m-%dT%H:%M:%S|%Y-%m-%d %H:%M:%S]
+                                  End time
+  --interval [daily|monthly]      Time interval
+</code></pre>
+<h2 id="facilities">facilities<a class="headerlink" href="#facilities" title="Permanent link">&para;</a></h2>
+<p>Facilities.</p>
+<p>Usage:</p>
+<pre><code>contxt facilities [OPTIONS] COMMAND [ARGS]...
+</code></pre>
+<h3 id="create">create<a class="headerlink" href="#create" title="Permanent link">&para;</a></h3>
+<p>Create facilities</p>
+<p>Usage:</p>
+<pre><code>contxt facilities create [OPTIONS] ORG_ID
+</code></pre>
+<p>Options:</p>
+<pre><code>  --input FILENAME  CSV of facilities to create  [required]
+</code></pre>
+<h3 id="get_2">get<a class="headerlink" href="#get_2" title="Permanent link">&para;</a></h3>
+<p>Get facilities</p>
+<p>Usage:</p>
+<pre><code>contxt facilities get [OPTIONS]
+</code></pre>
+<p>Options:</p>
+<pre><code>  --fields TEXT  Comma-delimited list of fields to return
+  --sort TEXT    Field to sort by
+</code></pre>
+<h2 id="iot">iot<a class="headerlink" href="#iot" title="Permanent link">&para;</a></h2>
+<p>Internet-of-Things.</p>
+<p>Usage:</p>
+<pre><code>contxt iot [OPTIONS] COMMAND [ARGS]...
+</code></pre>
+<h3 id="data">data<a class="headerlink" href="#data" title="Permanent link">&para;</a></h3>
+<p>IoT Field Data</p>
+<p>Usage:</p>
+<pre><code>contxt iot data [OPTIONS] COMMAND [ARGS]...
+</code></pre>
+<h4 id="delete">delete<a class="headerlink" href="#delete" title="Permanent link">&para;</a></h4>
+<p>Delete a data point</p>
+<p>Usage:</p>
+<pre><code>contxt iot data delete [OPTIONS]
+</code></pre>
+<p>Options:</p>
+<pre><code>  --output-id INTEGER             Output ID to delete from  [required]
+  --field-human-name TEXT         The field to delete from. Ex: power.demand,
+                                  power.usage  [required]
+
+  --interval [0|60|900|3600]      Time interval  [required]
+  --time [%Y-%m-%d|%Y-%m-%dT%H:%M:%S|%Y-%m-%d %H:%M:%S]
+                                  The timestamp of the datapoint. Ex:
+                                  2020-07-21T05:31:00Z  [required]
+
+</code></pre>
+<h4 id="get_3">get<a class="headerlink" href="#get_3" title="Permanent link">&para;</a></h4>
+<p>Get field data</p>
+<p>Usage:</p>
+<pre><code>contxt iot data get [OPTIONS] FEED_ID
+</code></pre>
+<p>Options:</p>
+<pre><code>  --start [%Y-%m-%d|%Y-%m-%dT%H:%M:%S|%Y-%m-%d %H:%M:%S]
+                                  Start time
+  --end [%Y-%m-%d|%Y-%m-%dT%H:%M:%S|%Y-%m-%d %H:%M:%S]
+                                  End time
+  --interval [0|60|900|3600]      Time interval
+  --output FILE                   Path for output
+</code></pre>
+<h3 id="feeds">feeds<a class="headerlink" href="#feeds" title="Permanent link">&para;</a></h3>
+<p>Get feeds</p>
+<p>Usage:</p>
+<pre><code>contxt iot feeds [OPTIONS]
+</code></pre>
+<p>Options:</p>
+<pre><code>  --fields TEXT          Comma-delimited list of fields to return
+  --sort TEXT            Field to sort by
+  --facility_id INTEGER  Filter on Facility ID
+</code></pre>
+<h3 id="fields">fields<a class="headerlink" href="#fields" title="Permanent link">&para;</a></h3>
+<p>IoT Fields</p>
+<p>Usage:</p>
+<pre><code>contxt iot fields [OPTIONS] COMMAND [ARGS]...
+</code></pre>
+<h4 id="create_1">create<a class="headerlink" href="#create_1" title="Permanent link">&para;</a></h4>
+<p>Create (provision) fields</p>
+<p>Usage:</p>
+<pre><code>contxt iot fields create [OPTIONS] FEED_KEY
+</code></pre>
+<p>Options:</p>
+<pre><code>  --input FILENAME  CSV of fields to create  [required]
+</code></pre>
+<h4 id="delete_1">delete<a class="headerlink" href="#delete_1" title="Permanent link">&para;</a></h4>
+<p>Delete (unprovision) fields</p>
+<p>Usage:</p>
+<pre><code>contxt iot fields delete [OPTIONS] [FIELD_ID]...
+</code></pre>
+<h4 id="get_4">get<a class="headerlink" href="#get_4" title="Permanent link">&para;</a></h4>
+<p>Get fields</p>
+<p>Usage:</p>
+<pre><code>contxt iot fields get [OPTIONS] FEED_KEY
+</code></pre>
+<p>Options:</p>
+<pre><code>  --fields TEXT  Comma-delimited list of fields to return
+  --sort TEXT    Field to sort by
+</code></pre>
+<h4 id="unprovisioned">unprovisioned<a class="headerlink" href="#unprovisioned" title="Permanent link">&para;</a></h4>
+<p>Get unprovisioned fields</p>
+<p>Usage:</p>
+<pre><code>contxt iot fields unprovisioned [OPTIONS] FEED_KEY
+</code></pre>
+<p>Options:</p>
+<pre><code>  --output FILENAME  Path for output
+</code></pre>
+<h3 id="groupings">groupings<a class="headerlink" href="#groupings" title="Permanent link">&para;</a></h3>
+<p>IoT Field Groupings</p>
+<p>Usage:</p>
+<pre><code>contxt iot groupings [OPTIONS] COMMAND [ARGS]...
+</code></pre>
+<h4 id="add-field">add-field<a class="headerlink" href="#add-field" title="Permanent link">&para;</a></h4>
+<p>Add field to grouping</p>
+<p>Usage:</p>
+<pre><code>contxt iot groupings add-field [OPTIONS] GROUPING_ID FIELD_ID
+</code></pre>
+<h4 id="create_2">create<a class="headerlink" href="#create_2" title="Permanent link">&para;</a></h4>
+<p>Create a new grouping</p>
+<p>Usage:</p>
+<pre><code>contxt iot groupings create [OPTIONS] FACILITY_ID
+</code></pre>
+<p>Options:</p>
+<pre><code>  --label TEXT              [required]
+  --description TEXT        [required]
+  --is-public BOOLEAN       [required]
+  --field-category-id TEXT  [required]
+</code></pre>
+<h4 id="get_5">get<a class="headerlink" href="#get_5" title="Permanent link">&para;</a></h4>
+<p>Get field groupings</p>
+<p>Usage:</p>
+<pre><code>contxt iot groupings get [OPTIONS] FACILITY_ID
+</code></pre>
+<p>Options:</p>
+<pre><code>  --fields TEXT  Comma-delimited list of fields to return
+  --sort TEXT    Field to sort by
+</code></pre>
+<h2 id="orgs">orgs<a class="headerlink" href="#orgs" title="Permanent link">&para;</a></h2>
+<p>Organizations.</p>
+<p>Usage:</p>
+<pre><code>contxt orgs [OPTIONS] COMMAND [ARGS]...
+</code></pre>
+<h3 id="get_6">get<a class="headerlink" href="#get_6" title="Permanent link">&para;</a></h3>
+<p>Get organizations</p>
+<p>Usage:</p>
+<pre><code>contxt orgs get [OPTIONS]
+</code></pre>
+<p>Options:</p>
+<pre><code>  --fields TEXT  Comma-delimited list of fields to return
+  --sort TEXT    Field to sort by
+</code></pre>
+<h2 id="projects">projects<a class="headerlink" href="#projects" title="Permanent link">&para;</a></h2>
+<p>Projects.</p>
+<p>Usage:</p>
+<pre><code>contxt projects [OPTIONS] COMMAND [ARGS]...
+</code></pre>
+<h3 id="get_7">get<a class="headerlink" href="#get_7" title="Permanent link">&para;</a></h3>
+<p>Get project(s)</p>
+<p>Usage:</p>
+<pre><code>contxt projects get [OPTIONS] [ID]
+</code></pre>
+<p>Options:</p>
+<pre><code>  --fields TEXT  Comma-delimited list of fields to return
+  --sort TEXT    Field to sort by
+</code></pre>
+<h3 id="get-edge-nodes">get-edge-nodes<a class="headerlink" href="#get-edge-nodes" title="Permanent link">&para;</a></h3>
+<p>Get edge nodes for a project</p>
+<p>Usage:</p>
+<pre><code>contxt projects get-edge-nodes [OPTIONS] ORG_ID PROJECT_ID
+</code></pre>
+<p>Options:</p>
+<pre><code>  --fields TEXT  Comma-delimited list of fields to return
+  --sort TEXT    Field to sort by
+</code></pre>
+<h3 id="get-services">get-services<a class="headerlink" href="#get-services" title="Permanent link">&para;</a></h3>
+<p>Get services for a project</p>
+<p>Usage:</p>
+<pre><code>contxt projects get-services [OPTIONS] ID
+</code></pre>
+<p>Options:</p>
+<pre><code>  --fields TEXT  Comma-delimited list of fields to return
+  --sort TEXT    Field to sort by
+</code></pre>
+<h2 id="services">services<a class="headerlink" href="#services" title="Permanent link">&para;</a></h2>
+<p>Services.</p>
+<p>Usage:</p>
+<pre><code>contxt services [OPTIONS] COMMAND [ARGS]...
+</code></pre>
+<h3 id="get_8">get<a class="headerlink" href="#get_8" title="Permanent link">&para;</a></h3>
+<p>Get service(s)</p>
+<p>Usage:</p>
+<pre><code>contxt services get [OPTIONS] [ID]
+</code></pre>
+<p>Options:</p>
+<pre><code>  --fields TEXT  Comma-delimited list of fields to return
+  --sort TEXT    Field to sort by
+</code></pre>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../../sdk/worker/" class="btn btn-neutral float-right" title="Worker">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../" class="btn btn-neutral" title="Quickstart"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+          <a href="https://github.com/ndustrialio/contxt-sdk-python/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+        <span><a href="../" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../../sdk/worker/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '../..';</script>
+    <script src="../../js/theme.js" defer></script>
+      <script src="../../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>
