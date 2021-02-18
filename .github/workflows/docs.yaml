@@ -1,0 +1,28 @@
+name: Documentation
+
+on:
+  workflow_dispatch:
+  release:
+    types: [released]
+
+jobs:
+  docs:
+    name: Build Documentation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - run: pip install poetry
+      - name: Set up cache
+        uses: actions/cache@v2
+        with:
+          path: .venv
+          key: ${{ runner.os }}-venv-py3.8-${{ hashFiles('**/poetry.lock') }}
+      - name: Install package
+        run: poetry install
+      - name: Publish documentation
+        run: poetry run mkdocs gh-deploy
