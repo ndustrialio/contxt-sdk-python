@@ -27,7 +27,7 @@ def get(clients: Clients, slug: Optional[str], sort: str) -> None:
 
 
 @projects.command()
-@click.option("--name", required=True, prompt=True)
+@click.option("--name", prompt=True)
 @click.option("--slug", **OPTIONAL_PROMPT_KWARGS)
 @click.option("--type", type=click.Choice(["Core", "Custom"]), default="Custom", prompt=True)
 @click.option("--description", **OPTIONAL_PROMPT_KWARGS)

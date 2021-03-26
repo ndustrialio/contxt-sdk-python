@@ -23,17 +23,13 @@ def get(clients: Clients, project_slug: str) -> None:
 
 @project_envs.command()
 @click.argument("project_slug")
-@click.option("--name", required=True, prompt=True)
-@click.option("--slug", required=True, prompt=True)
+@click.option("--name", prompt=True)
+@click.option("--slug", prompt=True)
 @click.option("--description", **OPTIONAL_PROMPT_KWARGS)
 @click.option(
-    "--type",
-    type=click.Choice(["production", "nonproduction"]),
-    default="nonproduction",
-    required=True,
-    prompt=True,
+    "--type", type=click.Choice(["production", "nonproduction"]), default="nonproduction", prompt=True
 )
-@click.option("--cluster-id", required=True, prompt=True)
+@click.option("--cluster-id", prompt=True)
 @click.option(
     "--deployment-strategy",
     type=click.Choice(["contxt-managed", "self-managed"]),
