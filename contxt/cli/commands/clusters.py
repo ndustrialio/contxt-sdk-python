@@ -8,12 +8,23 @@ from contxt.cli.clients import Clients
 from contxt.cli.utils import fields_option, print_table, sort_option
 from contxt.models.contxt import Cluster
 
-
-def _get_org(clients: Clients, name: str):
-    organization = clients.contxt.get_organization_with_name(name)
-    if not organization:
-        raise click.ClickException(f"Organization {name!r} does not exist.")
-    return organization
+AWS_CERT = """LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUN5RENDQWJDZ0F3SUJBZ0lCQURBTkJna3Foa2lHOXcwQk
+FRc0ZBREFWTVJNd0VRWURWUVFERXdwcmRXSmwKY201bGRHVnpNQjRYRFRJd01EZ3lNVEEwTVRNME1Wb1hEVE13TURneE9UQTBNVE
+0wTVZvd0ZURVRNQkVHQTFVRQpBeE1LYTNWaVpYSnVaWFJsY3pDQ0FTSXdEUVlKS29aSWh2Y05BUUVCQlFBRGdnRVBBRENDQVFvQ2
+dnRUJBTHJBCm83STNYaDRWTHRXZnljcVF6bjJ2ZTR5MnJzQWMxaDZYai9BQnVacmxLZklXcXRUQVllLzQvL012QTh1UmJnRkQKYV
+UvbForR0EyaGxqMVQ2L1N2dUc1WXRrMTNZaGxwMUxBT0R6VVNxaVpiRUhqTHQzcXMrTVRaSzRRSUdRdUROSgpLUEh6RGVQckt2dF
+ZuM2lnZ2ZSRW1EdzJaUjNncXBmaEZQSUtSWnlYNDBXUitUSis4eGlHaGwxVk84a1hSSDdBCmNGR056KzlsNWtLTTltZHJva3FTRW
+FROW5relBzVEpQK2JKWnQxMWlnVndneGFmQkNYeVRPLzdMSGJKTEZtdEgKQlc5QWtEQU05ODkvd3ZGN3BCcWEvbERGMWR4Z3M4TG
+ZyVkE4Uk1pN1NCRVo5eUJqa20yMFYxb1R0OVNybGdhSQpuRWRpQ0RXcUJRZDhzS0ttTE9jQ0F3RUFBYU1qTUNFd0RnWURWUjBQQV
+FIL0JBUURBZ0trTUE4R0ExVWRFd0VCCi93UUZNQU1CQWY4d0RRWUpLb1pJaHZjTkFRRUxCUUFEZ2dFQkFCSnlmV3pCd2diYnhOVH
+JnaWx5V1pIcVlUaWEKc2JVTmV3eEdvWlZMYjJGS05wTytqMEZ6d2ZXSVFGMEVnYTNEZmZjOTB2LzBRdllPbmpZMDVGTUpoVUswTU
+4xNApRUGhVdTl2YzhtTHd0ekF3NldSUGtldHBsa0FFb0VGVmxFMFMzQlR4M2lMOGFxUGZWajBkd0doZFFyMXNGTU5aCjdLQUdKaX
+JMY2l1WXlnOHovWW50UkFrTjFyOU95SW95VitvSHJHbXI4Y2ZHazJjQWhWSTlMSHcwTTVnSWRiMVIKNVdKMDYzQ0FmK0xYd0drYT
+RHdlFIUkhCcjZ1R0ZmVi9mdlJ1eXEwWDE1M2NMaDFRbmRwNkVocCtLWDQ1ekxhaQpHVXpkbHV2TlkwZzRad2YvTjR3clR4YXFhTG
+c5WEk1TTZJVFliRGZjajhSQzIzelA0Y1RWWnZ5QmZmQT0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=
+""".replace(
+    "\n", ""
+)
 
 
 @click.group()
@@ -23,31 +34,27 @@ def clusters() -> None:
 
 @clusters.command()
 @click.argument("cluster_slug", required=False)
-@click.option("--org", required=True, help="Org slug")
 @fields_option(default=["id", "host", "slug"], obj=Cluster)
 @sort_option(default="id")
 @click.pass_obj
-def get(clients: Clients, org: str, fields: List[str], sort: str, cluster_slug: Optional[str]) -> None:
+def get(clients: Clients, fields: List[str], sort: str, cluster_slug: Optional[str]) -> None:
     """Get clusters"""
-    organization = _get_org(clients, org)
     (items, fields) = (
-        ([clients.contxt_deployments.get_cluster(organization.id, cluster_slug)], None)  # type: ignore
+        ([clients.contxt_deployments.get_cluster(clients.org_id, cluster_slug)], None)  # type: ignore
         if cluster_slug
-        else (clients.contxt_deployments.get_clusters(organization.id), fields)
+        else (clients.contxt_deployments.get_clusters(clients.org_id), fields)
     )
     print_table(items=items, keys=fields, sort_by=sort)
 
 
 @clusters.command()
 @click.argument("host")
-@click.option("--org", required=True, help="Org slug")
 @click.pass_obj
-def login(clients: Clients, host: str, org: str) -> None:
+def login(clients: Clients, host: str) -> None:
     """Get clusters"""
     try:
         token = clients.auth.get_token_provider(audience=host).access_token
-        organization = _get_org(clients, org)
-        clusters = clients.contxt_deployments.get_clusters(organization.id)
+        clusters = clients.contxt_deployments.get_clusters(clients.org_id)
         cluster = next((cluster.slug for cluster in clusters if cluster.host == host), None)
         kubeconfig = {
             "kind": "Config",
@@ -55,7 +62,15 @@ def login(clients: Clients, host: str, org: str) -> None:
             "preferences": {},
             "current-context": cluster,
             "users": [{"name": cluster, "user": {"token": token}}],
-            "clusters": [{"name": cluster, "cluster": {"server": host}}],
+            "clusters": [
+                {
+                    "name": cluster,
+                    "cluster": {
+                        "server": host,
+                        "certificate-authority-data": AWS_CERT,
+                    },
+                }
+            ],
             "contexts": [
                 {
                     "name": cluster,
@@ -70,7 +85,6 @@ def login(clients: Clients, host: str, org: str) -> None:
 
 @clusters.command()
 @click.argument("host")
-@click.option("--org", required=True, help="Org slug")
 @click.option(
     "--description",
     required=True,
@@ -93,16 +107,8 @@ def login(clients: Clients, host: str, org: str) -> None:
 )
 @click.pass_obj
 def register(
-    clients: Clients,
-    org: str,
-    description: str,
-    infrastructure_id: int,
-    region: str,
-    slug: str,
-    host: str,
+    clients: Clients, description: str, infrastructure_id: int, region: str, slug: str, host: str
 ):
-    organization = _get_org(clients, org)
-
     cluster = Cluster(
         description=description,
         infrastructure_id=infrastructure_id,
@@ -110,7 +116,6 @@ def register(
         slug=slug,
         host=host,
         type="kubernetes",  # only supporting creation of new k8s clusters
-        organization_id=organization.id,
+        organization_id=clients.org_id,
     )
-
-    clients.contxt_deployments.register_cluster(organization_id=organization.id, cluster=cluster)
+    clients.contxt_deployments.register_cluster(organization_id=clients.org_id, cluster=cluster)

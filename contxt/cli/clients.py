@@ -1,4 +1,7 @@
 from dataclasses import dataclass
+from typing import Optional
+
+import click
 
 from contxt.auth.cli import CliAuth
 from contxt.services import (
@@ -20,6 +23,21 @@ class Clients:
     """Holds a user and all client API's"""
 
     env: str
+    org_slug: Optional[str]
+
+    @cachedproperty
+    def org_id(self) -> str:
+        if not self.org_slug:
+            # Check if user only has access to a single org
+            token = self.contxt.session.auth.token_provider.decoded_access_token
+            orgs = token.get("organizations", [])
+            if len(orgs) != 1:
+                raise click.ClickException("Organization required. Try again with `contxt --org=...`.")
+            return orgs[0]
+        for org in self.contxt.get("organizations"):
+            if org["slug"] == self.org_slug:
+                return org["id"]
+        raise click.ClickException(f"Organization {self.org_slug!r} does not exist.")
 
     @cachedproperty
     def auth(self) -> CliAuth:
