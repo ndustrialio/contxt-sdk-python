@@ -1,16 +1,15 @@
-name: GitHub Security Alerts for Jira
+name: Security Alerts
 
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 */6 * * *'
+    - cron: "0 */6 * * *"
 
 jobs:
-  syncSecurityAlerts:
+  sync:
     runs-on: ubuntu-latest
     steps:
-      - name: "Sync security alerts to Jira issues"
-        uses: reload/github-security-jira@v1.x
+      - uses: reload/github-security-jira@v1.x
         env:
           GH_SECURITY_TOKEN: ${{ secrets.GITHUBORGSECURITYTOKEN }}
           JIRA_TOKEN: ${{ secrets.JIRAORGAPITOKEN }}
