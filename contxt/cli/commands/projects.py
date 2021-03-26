@@ -1,10 +1,10 @@
-from typing import List, Optional
+from pprint import pprint
+from typing import Optional
 
 import click
 
 from contxt.cli.clients import Clients
-from contxt.cli.utils import fields_option, print_table, sort_option
-from contxt.models.contxt import EdgeNode, Project, Service
+from contxt.cli.utils import OPTIONAL_PROMPT_KWARGS, print_table, sort_option
 
 
 @click.group()
@@ -13,34 +13,73 @@ def projects() -> None:
 
 
 @projects.command()
-@click.argument("id", default="")
-@fields_option(default=["id", "name", "type", "description"], obj=Project)
-@sort_option(default="id")
+@click.argument("slug", default="")
+@sort_option(default="slug")
 @click.pass_obj
-def get(clients: Clients, id: Optional[str], fields: List[str], sort: str) -> None:
+def get(clients: Clients, slug: Optional[str], sort: str) -> None:
     """Get project(s)"""
-    items = [clients.contxt.get_project(id)] if id else clients.contxt.get_projects()
-    print_table(items=items, keys=fields, sort_by=sort)
+    items = (
+        [clients.contxt_deployments.get(f"{clients.org_id}/projects/{slug}")]
+        if slug
+        else clients.contxt_deployments.get(f"{clients.org_id}/projects")
+    )
+    print_table(items=items, keys=["slug", "name", "type", "description"], sort_by=sort)
 
 
 @projects.command()
-@click.argument("id")
-@fields_option(default=["id", "name", "service_type", "description"], obj=Service)
-@sort_option(default="id")
+@click.option("--name", required=True, prompt=True)
+@click.option("--slug", **OPTIONAL_PROMPT_KWARGS)
+@click.option("--type", type=click.Choice(["Core", "Custom"]), default="Custom", prompt=True)
+@click.option("--description", **OPTIONAL_PROMPT_KWARGS)
+@click.option("--owner-role-id", **OPTIONAL_PROMPT_KWARGS)
 @click.pass_obj
-def get_services(clients: Clients, id: str, fields: List[str], sort: str) -> None:
-    """Get services for a project"""
-    items = clients.contxt.get_services(id)
-    print_table(items=items, keys=fields, sort_by=sort)
+def create(
+    clients: Clients,
+    name: str,
+    description: str,
+    type: str,
+    slug: Optional[str],
+    owner_role_id: Optional[str],
+) -> None:
+    """Create a project"""
+    result = clients.contxt_deployments.post(
+        f"{clients.org_id}/projects",
+        {
+            "name": name,
+            "slug": slug,
+            "description": description,
+            "type": type,
+            "owner_role_id": owner_role_id,
+        },
+    )
+    pprint(result)
 
 
 @projects.command()
-@click.argument("org_id")
-@click.argument("project_id")
-@fields_option(default=["id", "name", "stack_id", "description"], obj=EdgeNode)
-@sort_option(default="id")
+@click.argument("curr_slug", metavar="SLUG")
+@click.option("--name")
+@click.option("--slug")
+@click.option("--type")
+@click.option("--description")
 @click.pass_obj
-def get_edge_nodes(clients: Clients, org_id: str, project_id: int, fields: List[str], sort: str) -> None:
-    """Get edge nodes for a project"""
-    items = clients.contxt.get_edge_nodes(organization_id=org_id, project_id=project_id)
-    print_table(items=items, keys=fields, sort_by=sort)
+def update(
+    clients: Clients,
+    curr_slug: str,
+    name: Optional[str],
+    slug: Optional[str],
+    type: Optional[str],
+    description: Optional[str],
+) -> None:
+    """Update a project"""
+    clients.contxt_deployments.put(
+        f"{clients.org_id}/projects/{curr_slug}",
+        {"name": name, "slug": slug, "type": type, "description": description},
+    )
+
+
+@projects.command()
+@click.argument("slug", default="")
+@click.pass_obj
+def delete(clients: Clients, slug: str) -> None:
+    """Delete a project"""
+    clients.contxt_deployments.delete(f"{clients.org_id}/projects/{slug}")

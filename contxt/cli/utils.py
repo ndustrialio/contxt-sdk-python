@@ -10,6 +10,13 @@ from contxt.utils.serializer import Serializer
 NOW = datetime.now().replace(microsecond=0)
 LAST_WEEK = NOW - timedelta(days=7)
 
+# FIXME
+OPTIONAL_PROMPT_KWARGS = {
+    "prompt": True,
+    "default": "<none>",
+    "callback": lambda ctx, param, value: value if value != "<none>" else None,
+}
+
 
 def warn(msg: str):
     click.secho(msg, fg="red", err=True)
@@ -36,7 +43,12 @@ def pluck(
     """Pluck `keys` from `items`. Nested keys can be specified by concatenating with
     `key_sep` (i.e. `key1.key2`). Returned keys are set via `key_func`."""
     return [
-        {key_func(k): reduce(lambda d, k: getattr(d, k), k.split(key_sep), d) for k in keys}
+        {
+            key_func(k): reduce(
+                lambda d, k: d[k] if isinstance(d, dict) else getattr(d, k), k.split(key_sep), d
+            )
+            for k in keys
+        }
         for d in items
     ]
 
