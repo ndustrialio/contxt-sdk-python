@@ -35,7 +35,8 @@ class Cli(click.MultiCommand):
         except RequestException as e:
             logger.error(f"{e} (response: {e.response.content})")
         except Exception as e:
-            logger.error(e)
+            logger.error(f"An unexpected error occurred: {e}")
+            raise
 
 
 @click.group(cls=Cli, name="contxt", context_settings=dict(help_option_names=["-h", "--help"]))
