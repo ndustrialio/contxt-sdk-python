@@ -99,7 +99,7 @@ class Api:
             # Try to decode the response as json, else fall back to raw text
             response_json = self._get_json(response)
             msg = response_json.get("message") or response_json or response.text
-            logger.error(f"HTTP Error: {response.reason} - {msg}")
+            logger.debug(f"HTTP Error: {response.reason} - {msg}")
             raise
 
         # Return json, if any
