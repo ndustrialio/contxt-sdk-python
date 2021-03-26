@@ -1,6 +1,7 @@
 """Main CLI"""
 
 from pathlib import Path
+from typing import Optional
 
 import click
 
@@ -12,9 +13,10 @@ COMMAND_DIR = Path(__file__).parent / "commands"
 
 class Cli(click.MultiCommand):
     def list_commands(self, ctx):
-        return sorted([p.stem for p in COMMAND_DIR.glob("*.py")])
+        return sorted([p.stem.replace("_", "-") for p in COMMAND_DIR.glob("*.py")])
 
     def get_command(self, ctx, name):
+        name = name.replace("-", "_")
         f = COMMAND_DIR / f"{name}.py"
         if not f.exists():
             return None
@@ -29,13 +31,15 @@ class Cli(click.MultiCommand):
     "--env",
     type=click.Choice(["production", "staging"]),
     default="production",
+    envvar="CONTXT_ENV",
     help="Environment for all API's",
 )
+@click.option("--org", envvar="CONTXT_ORG", help="Organization slug")
 @click.version_option(__version__, "-v", "--version")
 @click.pass_context
-def cli(ctx: click.Context, env: str) -> None:
+def cli(ctx: click.Context, env: str, org: Optional[str]) -> None:
     """Contxt CLI"""
-    ctx.obj = Clients(env=env)
+    ctx.obj = Clients(env=env, org_slug=org)
 
 
 if __name__ == "__main__":
