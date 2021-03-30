@@ -1,3 +1,5 @@
+from typing import Optional
+
 import click
 
 from contxt.cli.clients import Clients
@@ -10,10 +12,15 @@ def service_instances() -> None:
 
 
 @service_instances.command()
+@click.option("--service-id")
 @click.pass_obj
-def get(clients: Clients) -> None:
+def get(clients: Clients, service_id: Optional[str]) -> None:
     """Get service instance(s)"""
-    items = clients.contxt_deployments.get(f"{clients.org_id}/service_instances")
+    items = (
+        clients.contxt_deployments.get(f"{clients.org_id}/services/{service_id}/service_instances")
+        if service_id
+        else clients.contxt_deployments.get(f"{clients.org_id}/service_instances")
+    )
     print_table(items, keys=["id", "slug", "service_id", "description"])
 
 
