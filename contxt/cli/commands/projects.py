@@ -1,10 +1,9 @@
-from pprint import pprint
 from typing import Optional
 
 import click
 
 from contxt.cli.clients import Clients
-from contxt.cli.utils import OPTIONAL_PROMPT_KWARGS, print_table, sort_option
+from contxt.cli.utils import OPTIONAL_PROMPT_KWARGS, print_item, print_table, sort_option
 
 
 @click.group()
@@ -52,7 +51,7 @@ def create(
             "owner_role_id": owner_role_id,
         },
     )
-    pprint(result)
+    print_item(result)
 
 
 @projects.command()

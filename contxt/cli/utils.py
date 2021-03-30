@@ -34,6 +34,10 @@ def print_table(
         print(f"Count: {len(items)}")
 
 
+def print_item(item: Dict[str, Any]) -> None:
+    print_table([{"key": k, "value": v} for k, v in item.items()], count=False)
+
+
 def pluck(
     keys: List[str],
     items: List[Dict[str, Any]],
