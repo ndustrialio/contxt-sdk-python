@@ -1,10 +1,9 @@
-from pprint import pprint
 from typing import Optional
 
 import click
 
 from contxt.cli.clients import Clients
-from contxt.cli.utils import OPTIONAL_PROMPT_KWARGS, print_table
+from contxt.cli.utils import OPTIONAL_PROMPT_KWARGS, print_item, print_table
 
 
 @click.group()
@@ -18,11 +17,11 @@ def project_envs() -> None:
 def get(clients: Clients, project_slug: str) -> None:
     """Get project environment(s)"""
     result = clients.contxt_deployments.get(f"{clients.org_id}/projects/{project_slug}/environments")
-    print_table(result, keys=["slug", "name", "type", "description"])
+    print_table(result, keys=["id", "slug", "name", "type", "description"])
 
 
 @project_envs.command()
-@click.argument("project_slug")
+@click.option("--project-slug", prompt=True)
 @click.option("--name", prompt=True)
 @click.option("--slug", prompt=True)
 @click.option("--description", **OPTIONAL_PROMPT_KWARGS)
@@ -59,7 +58,7 @@ def create(
             "description": description,
         },
     )
-    pprint(result)
+    print_item(result)
 
 
 @project_envs.command()

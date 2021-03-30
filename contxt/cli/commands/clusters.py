@@ -5,7 +5,7 @@ import yaml
 from requests.exceptions import HTTPError
 
 from contxt.cli.clients import Clients
-from contxt.cli.utils import fields_option, print_table, sort_option
+from contxt.cli.utils import fields_option, print_item, print_table, sort_option
 from contxt.models.contxt import Cluster
 
 AWS_CERT = """LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUN5RENDQWJDZ0F3SUJBZ0lCQURBTkJna3Foa2lHOXcwQk
@@ -84,38 +84,53 @@ def login(clients: Clients, host: str) -> None:
 
 
 @clusters.command()
-@click.argument("host")
-@click.option(
-    "--description",
-    required=True,
-    help="Information about what this cluster is for and " "what environment it belongs to",
-)
-@click.option(
-    "--infrastructure-id",
-    required=True,
-    help="The ID of the infrastructure registered in "
-    "our system. Ask ndustrial.io DevOps "
-    "what this value should be",
-)
-@click.option("--region", required=True, help="The AWS region where this cluster is deployed")
+@click.option("--host", prompt=True)
 @click.option(
     "--slug",
-    required=True,
+    prompt=True,
     help="The slugified name you would like to use for this cluster."
     " You will need to reference this in other commands so it's "
     "ideal to make this value easy to remember",
 )
+@click.option(
+    "--description",
+    prompt=True,
+    help="Information about what this cluster is for and what environment it belongs to",
+)
+@click.option(
+    "--infrastructure-id",
+    prompt=True,
+    help="The ID of the infrastructure registered in "
+    "our system. Ask ndustrial.io DevOps "
+    "what this value should be",
+)
+@click.option("--region", prompt=True, help="The AWS region where this cluster is deployed")
+@click.option(
+    "--environment-type",
+    type=click.Choice(["production", "nonproduction", "blended"]),
+    default="production",
+    prompt=True,
+)
 @click.pass_obj
 def register(
-    clients: Clients, description: str, infrastructure_id: int, region: str, slug: str, host: str
-):
-    cluster = Cluster(
-        description=description,
-        infrastructure_id=infrastructure_id,
-        region=region,
-        slug=slug,
-        host=host,
-        type="kubernetes",  # only supporting creation of new k8s clusters
-        organization_id=clients.org_id,
+    clients: Clients,
+    description: str,
+    infrastructure_id: int,
+    region: str,
+    slug: str,
+    host: str,
+    environment_type: str,
+) -> None:
+    result = clients.contxt_deployments.post(
+        f"{clients.org_id}/clusters",
+        json={
+            "host": host,
+            "slug": slug,
+            "description": description,
+            "region": region,
+            "type": "kubernetes",
+            "infrastructure_id": infrastructure_id,
+            "environment_type": environment_type,
+        },
     )
-    clients.contxt_deployments.register_cluster(organization_id=clients.org_id, cluster=cluster)
+    print_item(result)
