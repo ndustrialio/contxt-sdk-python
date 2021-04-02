@@ -83,7 +83,7 @@ jobs:
         uses: actions/create-release@v1
         if: ${{ steps.version.outputs.skipped == 'false' }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.NIO_BOT_TOKEN }}
         with:
           tag_name: ${{ steps.version.outputs.tag }}
           release_name: ${{ steps.version.outputs.tag }}
