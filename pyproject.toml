@@ -39,7 +39,7 @@ contxt = "contxt.__main__:cli"
 clean = { cmd = "rm -rf .mypy_cache/ .pytest_cache/ build/ dist/ *.egg-info", help = "Remove build artifacts" }
 docs = { cmd = "mkdocs serve", help = "Serve documentation site" }
 lint = { cmd = "pre-commit run --all-files", help = "Run linters and formatters" }
-test = { cmd = "pytest", help = "Run tests" }
+test = { cmd = "pytest tests", help = "Run tests" }
 
 [tool.black]
 line-length = 105
