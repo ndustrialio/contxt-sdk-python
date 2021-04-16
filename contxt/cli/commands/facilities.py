@@ -28,7 +28,12 @@ def get(clients: Clients, fields: List[str], sort: str) -> None:
 @click.option("--input", required=True, type=click.File(), help="CSV of facilities to create")
 @click.pass_obj
 def create(clients: Clients, org_id: str, input: IO[str]) -> None:
-    """Create facilities"""
+    """Create facilities from a CSV file, containing the columns:
+
+    \b
+    - name: string
+    - timezone: IANA timezone database name (ex: America/New_York)
+    """
     # Parse file
     try:
         facilities = [
