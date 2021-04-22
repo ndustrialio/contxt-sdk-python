@@ -98,14 +98,6 @@ def login(clients: Clients, host: str) -> None:
     help="Information about what this cluster is for and what environment it belongs to",
 )
 @click.option(
-    "--infrastructure-id",
-    prompt=True,
-    help="The ID of the infrastructure registered in "
-    "our system. Ask ndustrial.io DevOps "
-    "what this value should be",
-)
-@click.option("--region", prompt=True, help="The AWS region where this cluster is deployed")
-@click.option(
     "--environment-type",
     type=click.Choice(["production", "nonproduction", "blended"]),
     default="production",
@@ -115,8 +107,6 @@ def login(clients: Clients, host: str) -> None:
 def register(
     clients: Clients,
     description: str,
-    infrastructure_id: int,
-    region: str,
     slug: str,
     host: str,
     environment_type: str,
@@ -127,9 +117,7 @@ def register(
             "host": host,
             "slug": slug,
             "description": description,
-            "region": region,
             "type": "kubernetes",
-            "infrastructure_id": infrastructure_id,
             "environment_type": environment_type,
         },
     )
