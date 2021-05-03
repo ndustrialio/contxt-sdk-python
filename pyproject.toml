@@ -19,7 +19,7 @@ requests = "^2"
 tabulate = "*"
 
 [tool.poetry.dev-dependencies]
-black = "^21.4b0"
+black = "^21.4b2"
 flake8 = "^3"
 isort = "^5"
 mkdocs = "^1.1.2"
