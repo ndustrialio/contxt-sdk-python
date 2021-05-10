@@ -4,7 +4,7 @@ from typing import Any, Dict, Optional, Tuple
 
 from .auth.machine import MachineAuth
 from .models.contxt import Config
-from .services import ContxtService
+from .services import ContxtDeploymentService, ContxtService
 
 
 class BaseWorker(ABC):
@@ -15,10 +15,12 @@ class BaseWorker(ABC):
         client_id: Optional[str] = None,
         client_secret: Optional[str] = None,
         environment_id: Optional[str] = None,
+        organization_id: Optional[str] = None,
     ) -> None:
         self.client_id = client_id or environ["CLIENT_ID"]
         self.client_secret = client_secret or environ["CLIENT_SECRET"]
         self.environment_id = environment_id or environ.get("ENVIRONMENT_ID")
+        self.organization_id = organization_id or environ.get("ORGANIZATION_ID")
         self.auth = MachineAuth(self.client_id, self.client_secret)
         self.contxt_service = ContxtService(self.auth)
 
@@ -30,11 +32,16 @@ class BaseWorker(ABC):
             # No env specified, no values to fetch
             return None, {}
 
+        if not self.organization_id:
+            raise AssertionError("organization_id required to fetch configuration")
+
         # Fetch contxt config
-        config = self.contxt_service.get_config_for_client(self.client_id, self.environment_id)
+        config = ContxtDeploymentService(self.auth).get_config_for_client(
+            self.organization_id, self.client_id, self.environment_id
+        )
 
         # Cache values in a simple dict for easy consumption
-        config_values = {v.key: v.value for v in config.config_values} if config else {}
+        config_values = {v["key"]: v["value"] for v in config["ConfigurationValues"]} if config else {}
 
         return config, config_values
 

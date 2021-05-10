@@ -41,3 +41,8 @@ class ContxtDeploymentService(ConfiguredApi):
         except HTTPError:
             pass
             return
+
+    def get_config_for_client(self, organization_id: str, client_id: str, environment_id: str):
+        params = {"environment_id": environment_id}
+        resp = self.get(f"{organization_id}/clients/{client_id}/configurations", params=params)
+        return resp
