@@ -287,6 +287,12 @@ class CliAuth(Auth):
     def user_id(self) -> str:
         return self.identity_provider.decoded_access_token["sub"]
 
+    def get_cluster_config(self, host: str) -> Dict[str, Dict]:
+        return self.auth_service.get_cluster_config(
+            access_token=self.identity_provider.access_token,
+            host=host
+        )
+
     def logged_in(self) -> bool:
         return bool(self.identity_provider._access_token)
 

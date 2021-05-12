@@ -31,6 +31,15 @@ class AuthService(ConfiguredApi):
             "token", json={"audiences": audiences}, headers={"Authorization": f"Bearer {access_token}"}
         )
 
+    def get_cluster_config(self, access_token: str, host: str) -> Dict:
+        return self.post(
+            "clusterconfig",
+            headers={"Authorization": f"Bearer {access_token}"},
+            json={
+                "host": host
+            }
+        )
+
     def get_oauth_token(self, client_id: str, client_secret: str, audience: str) -> Dict:
         return self.post(
             "oauth/token",
