@@ -8,24 +8,6 @@ from contxt.cli.clients import Clients
 from contxt.cli.utils import fields_option, print_item, print_table, sort_option
 from contxt.models.contxt import Cluster
 
-AWS_CERT = """LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUN5RENDQWJDZ0F3SUJBZ0lCQURBTkJna3Foa2lHOXcwQk
-FRc0ZBREFWTVJNd0VRWURWUVFERXdwcmRXSmwKY201bGRHVnpNQjRYRFRJd01EZ3lNVEEwTVRNME1Wb1hEVE13TURneE9UQTBNVE
-0wTVZvd0ZURVRNQkVHQTFVRQpBeE1LYTNWaVpYSnVaWFJsY3pDQ0FTSXdEUVlKS29aSWh2Y05BUUVCQlFBRGdnRVBBRENDQVFvQ2
-dnRUJBTHJBCm83STNYaDRWTHRXZnljcVF6bjJ2ZTR5MnJzQWMxaDZYai9BQnVacmxLZklXcXRUQVllLzQvL012QTh1UmJnRkQKYV
-UvbForR0EyaGxqMVQ2L1N2dUc1WXRrMTNZaGxwMUxBT0R6VVNxaVpiRUhqTHQzcXMrTVRaSzRRSUdRdUROSgpLUEh6RGVQckt2dF
-ZuM2lnZ2ZSRW1EdzJaUjNncXBmaEZQSUtSWnlYNDBXUitUSis4eGlHaGwxVk84a1hSSDdBCmNGR056KzlsNWtLTTltZHJva3FTRW
-FROW5relBzVEpQK2JKWnQxMWlnVndneGFmQkNYeVRPLzdMSGJKTEZtdEgKQlc5QWtEQU05ODkvd3ZGN3BCcWEvbERGMWR4Z3M4TG
-ZyVkE4Uk1pN1NCRVo5eUJqa20yMFYxb1R0OVNybGdhSQpuRWRpQ0RXcUJRZDhzS0ttTE9jQ0F3RUFBYU1qTUNFd0RnWURWUjBQQV
-FIL0JBUURBZ0trTUE4R0ExVWRFd0VCCi93UUZNQU1CQWY4d0RRWUpLb1pJaHZjTkFRRUxCUUFEZ2dFQkFCSnlmV3pCd2diYnhOVH
-JnaWx5V1pIcVlUaWEKc2JVTmV3eEdvWlZMYjJGS05wTytqMEZ6d2ZXSVFGMEVnYTNEZmZjOTB2LzBRdllPbmpZMDVGTUpoVUswTU
-4xNApRUGhVdTl2YzhtTHd0ekF3NldSUGtldHBsa0FFb0VGVmxFMFMzQlR4M2lMOGFxUGZWajBkd0doZFFyMXNGTU5aCjdLQUdKaX
-JMY2l1WXlnOHovWW50UkFrTjFyOU95SW95VitvSHJHbXI4Y2ZHazJjQWhWSTlMSHcwTTVnSWRiMVIKNVdKMDYzQ0FmK0xYd0drYT
-RHdlFIUkhCcjZ1R0ZmVi9mdlJ1eXEwWDE1M2NMaDFRbmRwNkVocCtLWDQ1ekxhaQpHVXpkbHV2TlkwZzRad2YvTjR3clR4YXFhTG
-c5WEk1TTZJVFliRGZjajhSQzIzelA0Y1RWWnZ5QmZmQT0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=
-""".replace(
-    "\n", ""
-)
-
 
 @click.group()
 def clusters() -> None:
@@ -48,37 +30,18 @@ def get(clients: Clients, fields: List[str], sort: str, cluster_slug: Optional[s
 
 
 @clusters.command()
-@click.argument("host")
+@click.argument("slug")
 @click.pass_obj
-def login(clients: Clients, host: str) -> None:
+def login(clients: Clients, slug: str) -> None:
     """Get clusters"""
     try:
-        token = clients.auth.get_token_provider(audience=host).access_token
         clusters = clients.contxt_deployments.get_clusters(clients.org_id)
-        cluster = next((cluster.slug for cluster in clusters if cluster.host == host), None)
-        kubeconfig = {
-            "kind": "Config",
-            "apiVersion": "v1",
-            "preferences": {},
-            "current-context": cluster,
-            "users": [{"name": cluster, "user": {"token": token}}],
-            "clusters": [
-                {
-                    "name": cluster,
-                    "cluster": {
-                        "server": host,
-                        "certificate-authority-data": AWS_CERT,
-                    },
-                }
-            ],
-            "contexts": [
-                {
-                    "name": cluster,
-                    "context": {"cluster": cluster, "namespace": "default", "user": cluster},
-                }
-            ],
-        }
-        print(yaml.safe_dump(kubeconfig))
+        cluster_host = next((cluster.host for cluster in clusters if cluster.slug == slug), None)
+        if cluster_host is None:
+            raise click.ClickException(f"Unable to locate cluster with the slug {slug}")
+
+        config = clients.auth.get_cluster_config(cluster_host)
+        print(yaml.safe_dump(config))
     except HTTPError:
         pass
 
@@ -103,6 +66,12 @@ def login(clients: Clients, host: str) -> None:
     default="production",
     prompt=True,
 )
+@click.option(
+    "--certificate-authority",
+    type=str,
+    prompt=True,
+    help="Base64 encoded certificate authority (CA) for the cluster",
+)
 @click.pass_obj
 def register(
     clients: Clients,
@@ -110,6 +79,7 @@ def register(
     slug: str,
     host: str,
     environment_type: str,
+    certificate_authority: str,
 ) -> None:
     result = clients.contxt_deployments.post(
         f"{clients.org_id}/clusters",
@@ -119,6 +89,43 @@ def register(
             "description": description,
             "type": "kubernetes",
             "environment_type": environment_type,
+            "certificate_authority": certificate_authority,
         },
+    )
+    print_item(result)
+
+
+@clusters.command()
+@click.argument("curr_slug", metavar="SLUG")
+@click.option("--host")
+@click.option(
+    "--description",
+    help="Information about what this cluster is for and what environment it belongs to",
+)
+@click.option("--environment-type", type=click.Choice(["production", "nonproduction", "blended"]))
+@click.option("--certificate-authority", type=str)
+@click.pass_obj
+def update(
+    clients: Clients,
+    curr_slug: str,
+    host: Optional[str],
+    description: Optional[str],
+    environment_type: Optional[str],
+    certificate_authority: Optional[str],
+) -> None:
+    """Update a cluster"""
+    params = {
+        k: v
+        for k, v in {
+            "host": host,
+            "description": description,
+            "environment_type": environment_type,
+            "certificate_authority": certificate_authority,
+        }.items()
+        if v is not None
+    }
+    result = clients.contxt_deployments.put(
+        f"{clients.org_id}/clusters/{curr_slug}",
+        json=params,
     )
     print_item(result)
