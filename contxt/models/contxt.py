@@ -346,6 +346,7 @@ class Cluster(ApiObject):
         ApiField("slug", creatable=True),
         ApiField("host", creatable=True),
         ApiField("type", creatable=True),
+        ApiField("certificate_authority", creatable=True),
         ApiField("created_at", data_type=Parsers.datetime),
         ApiField("updated_at", data_type=Parsers.datetime),
     )
@@ -358,5 +359,6 @@ class Cluster(ApiObject):
     type: str
     host: Optional[str] = None
     id: Optional[str] = None
+    certificate_authority: Optional[str] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
