@@ -289,8 +289,7 @@ class CliAuth(Auth):
 
     def get_cluster_config(self, host: str) -> Dict[str, Dict]:
         return self.auth_service.get_cluster_config(
-            access_token=self.identity_provider.access_token,
-            host=host
+            access_token=self.identity_provider.access_token, host=host
         )
 
     def logged_in(self) -> bool:

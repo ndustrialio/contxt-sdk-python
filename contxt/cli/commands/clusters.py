@@ -30,13 +30,16 @@ def get(clients: Clients, fields: List[str], sort: str, cluster_slug: Optional[s
 
 
 @clusters.command()
-@click.argument("host")
+@click.argument("slug")
 @click.pass_obj
 def login(clients: Clients, slug: str) -> None:
     """Get clusters"""
     try:
         clusters = clients.contxt_deployments.get_clusters(clients.org_id)
         cluster_host = next((cluster.host for cluster in clusters if cluster.slug == slug), None)
+        if cluster_host is None:
+            raise click.ClickException(f"Unable to locate cluster with the slug {slug}")
+
         config = clients.auth.get_cluster_config(cluster_host)
         print(yaml.safe_dump(config))
     except HTTPError:
@@ -67,6 +70,7 @@ def login(clients: Clients, slug: str) -> None:
     "--certificate-authority",
     type=str,
     prompt=True,
+    help="Base64 encoded certificate authority (CA) for the cluster",
 )
 @click.pass_obj
 def register(
@@ -85,7 +89,7 @@ def register(
             "description": description,
             "type": "kubernetes",
             "environment_type": environment_type,
-            "certificate_authority": certificate_authority
+            "certificate_authority": certificate_authority,
         },
     )
     print_item(result)
@@ -93,43 +97,35 @@ def register(
 
 @clusters.command()
 @click.argument("curr_slug", metavar="SLUG")
-@click.option("--host", prompt=True)
-@click.option(
-    "--slug",
-    help="The slugified name you would like to use for this cluster."
-    " You will need to reference this in other commands so it's "
-    "ideal to make this value easy to remember",
-)
+@click.option("--host")
 @click.option(
     "--description",
     help="Information about what this cluster is for and what environment it belongs to",
 )
-@click.option(
-    "--environment-type",
-    type=click.Choice(["production", "nonproduction", "blended"]),
-    default="production"
-)
-@click.option(
-    "--certificate-authority",
-    type=str
-)
+@click.option("--environment-type", type=click.Choice(["production", "nonproduction", "blended"]))
+@click.option("--certificate-authority", type=str)
 @click.pass_obj
 def update(
     clients: Clients,
     curr_slug: str,
-    host: str,
-    description: str,
-    environment_type: str,
-    certificate_authority: str,
+    host: Optional[str],
+    description: Optional[str],
+    environment_type: Optional[str],
+    certificate_authority: Optional[str],
 ) -> None:
     """Update a cluster"""
-    result = clients.contxt_deployments.put(
-        f"{clients.org_id}/clusters/{curr_slug}",
-        json={
+    params = {
+        k: v
+        for k, v in {
             "host": host,
             "description": description,
             "environment_type": environment_type,
-            "certificate_authority": certificate_authority
-        },
+            "certificate_authority": certificate_authority,
+        }.items()
+        if v is not None
+    }
+    result = clients.contxt_deployments.put(
+        f"{clients.org_id}/clusters/{curr_slug}",
+        json=params,
     )
     print_item(result)
