@@ -83,6 +83,8 @@
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#register">register</a>
     </li>
+    <li class="toctree-l3"><a class="reference internal" href="#update">update</a>
+    </li>
         </ul>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#edge-nodes">edge-nodes</a>
@@ -165,7 +167,7 @@
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#get_8">get</a>
     </li>
-    <li class="toctree-l3"><a class="reference internal" href="#update">update</a>
+    <li class="toctree-l3"><a class="reference internal" href="#update_1">update</a>
     </li>
         </ul>
     </li>
@@ -177,7 +179,7 @@
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#get_9">get</a>
     </li>
-    <li class="toctree-l3"><a class="reference internal" href="#update_1">update</a>
+    <li class="toctree-l3"><a class="reference internal" href="#update_2">update</a>
     </li>
         </ul>
     </li>
@@ -341,7 +343,7 @@
 <h3 id="login_1">login<a class="headerlink" href="#login_1" title="Permanent link">&para;</a></h3>
 <p>Get clusters</p>
 <p><strong>Usage:</strong></p>
-<pre><code>contxt clusters login [OPTIONS] HOST
+<pre><code>contxt clusters login [OPTIONS] SLUG
 </code></pre>
 <p><strong>Options:</strong></p>
 <pre><code>  --help  Show this message and exit.
@@ -360,14 +362,24 @@
   --description TEXT              Information about what this cluster is for
                                   and what environment it belongs to
 
-  --infrastructure-id TEXT        The ID of the infrastructure registered in
-                                  our system. Ask ndustrial.io DevOps what
-                                  this value should be
+  --environment-type [production|nonproduction|blended]
+  --certificate-authority TEXT    Base64 encoded certificate authority (CA)
+                                  for the cluster
 
-  --region TEXT                   The AWS region where this cluster is
-                                  deployed
+  --help                          Show this message and exit.
+</code></pre>
+<h3 id="update">update<a class="headerlink" href="#update" title="Permanent link">&para;</a></h3>
+<p>Update a cluster</p>
+<p><strong>Usage:</strong></p>
+<pre><code>contxt clusters update [OPTIONS] SLUG
+</code></pre>
+<p><strong>Options:</strong></p>
+<pre><code>  --host TEXT
+  --description TEXT              Information about what this cluster is for
+                                  and what environment it belongs to
 
   --environment-type [production|nonproduction|blended]
+  --certificate-authority TEXT
   --help                          Show this message and exit.
 </code></pre>
 <h2 id="edge-nodes">edge-nodes<a class="headerlink" href="#edge-nodes" title="Permanent link">&para;</a></h2>
@@ -702,7 +714,7 @@
 <p><strong>Options:</strong></p>
 <pre><code>  --help  Show this message and exit.
 </code></pre>
-<h3 id="update">update<a class="headerlink" href="#update" title="Permanent link">&para;</a></h3>
+<h3 id="update_1">update<a class="headerlink" href="#update_1" title="Permanent link">&para;</a></h3>
 <p>Update a project environment</p>
 <p><strong>Usage:</strong></p>
 <pre><code>contxt project-envs update [OPTIONS] PROJECT_SLUG SLUG
@@ -754,7 +766,7 @@
 <pre><code>  --sort TEXT  Field to sort by
   --help       Show this message and exit.
 </code></pre>
-<h3 id="update_1">update<a class="headerlink" href="#update_1" title="Permanent link">&para;</a></h3>
+<h3 id="update_2">update<a class="headerlink" href="#update_2" title="Permanent link">&para;</a></h3>
 <p>Update a project</p>
 <p><strong>Usage:</strong></p>
 <pre><code>contxt projects update [OPTIONS] SLUG
