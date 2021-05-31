@@ -30,7 +30,7 @@ tests_no_zope = ["coverage[toml] (>=5.0.2)", "hypothesis", "pympler", "pytest (>
 
 [[package]]
 name = "auth0-python"
-version = "3.16.1"
+version = "3.16.2"
 description = "Auth0 Python SDK"
 category = "main"
 optional = false
@@ -713,8 +713,8 @@ attrs = [
     {file = "attrs-20.3.0.tar.gz", hash = "sha256:832aa3cde19744e49938b91fea06d69ecb9e649c93ba974535d08ad92164f700"},
 ]
 auth0-python = [
-    {file = "auth0-python-3.16.1.tar.gz", hash = "sha256:e42d50be3dc8637d82c9cf95ac59f76b4a40ed3d52f4093c017c11fda22091a7"},
-    {file = "auth0_python-3.16.1-py2.py3-none-any.whl", hash = "sha256:6748b0048655f5cb2e3ffb660e298b453ac8ef7925cfaff49049b8a22e0c4e6e"},
+    {file = "auth0-python-3.16.2.tar.gz", hash = "sha256:4a5a709a5d460ddc406783fa567d9baebba94687e2387be6405dba97482d4c93"},
+    {file = "auth0_python-3.16.2-py2.py3-none-any.whl", hash = "sha256:ea4ca51b13fdb46b02e12f162c5dd7187751f0e477ee8f67c27b73fcbc607244"},
 ]
 black = [
     {file = "black-21.5b1-py3-none-any.whl", hash = "sha256:8a60071a0043876a4ae96e6c69bd3a127dad2c1ca7c8083573eb82f92705d008"},
