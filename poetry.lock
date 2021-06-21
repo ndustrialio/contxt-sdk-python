@@ -670,7 +670,7 @@ python-versions = "*"
 
 [[package]]
 name = "types-requests"
-version = "0.1.11"
+version = "0.1.13"
 description = "Typing stubs for requests"
 category = "dev"
 optional = false
@@ -753,7 +753,7 @@ crypto = ["cryptography"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "529c6e862170e21891f258d925d42c58357c480c086d04e573ceacaab37d146a"
+content-hash = "8dfd9b92f3c33c77cc7b6ba062764dc8c0c323dc7611f78c60cd620c80908cc2"
 
 [metadata.files]
 appdirs = [
@@ -1217,7 +1217,8 @@ types-pyyaml = [
     {file = "types_PyYAML-5.4.0-py2.py3-none-any.whl", hash = "sha256:aa65d32ad13fe67bf1ffb08b03056406fce82b1195dab3aa528e0ccb830b9a6f"},
 ]
 types-requests = [
-    {file = "types_requests-0.1.11-py2.py3-none-any.whl", hash = "sha256:e79c09e5866c6520cdf23dc260573a0a190444f36b112116fadc5542656c8309"},
+    {file = "types-requests-0.1.13.tar.gz", hash = "sha256:917d6d0a8d8fe2d084ab6dc28d379ec4e6fa34738e905908680bbfa0ce2d8485"},
+    {file = "types_requests-0.1.13-py3-none-any.whl", hash = "sha256:f7e611082208358045fdeac6edb5d20422ce8cfc935d57dbbef6a6b3a59bfae2"},
 ]
 types-tabulate = [
     {file = "types_tabulate-0.1.0-py2.py3-none-any.whl", hash = "sha256:756430aa053fb6e72a0e33a74cd451ec71b1dc493ab24b5be8abe34d874d0f13"},
