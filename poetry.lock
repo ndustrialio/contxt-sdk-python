@@ -679,7 +679,7 @@ python-versions = "*"
 
 [[package]]
 name = "types-tabulate"
-version = "0.1.0"
+version = "0.1.1"
 description = "Typing stubs for tabulate"
 category = "dev"
 optional = false
@@ -754,7 +754,7 @@ crypto = ["cryptography"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "9ced38e1e35ecb846ceaf5df1903ab0f4a5f10cb3e283650ae410c89d77b02ef"
+content-hash = "d4f55f6790c685cb67c34e73f92e9331586c9620a8bb9999116caf563cccbd96"
 
 [metadata.files]
 appdirs = [
@@ -1223,7 +1223,8 @@ types-requests = [
     {file = "types_requests-2.25.0-py3-none-any.whl", hash = "sha256:fa5c1e5e832ff6193507d8da7e1159281383908ee193a2f4b37bc08140b51844"},
 ]
 types-tabulate = [
-    {file = "types_tabulate-0.1.0-py2.py3-none-any.whl", hash = "sha256:756430aa053fb6e72a0e33a74cd451ec71b1dc493ab24b5be8abe34d874d0f13"},
+    {file = "types-tabulate-0.1.1.tar.gz", hash = "sha256:d1a415a8601391bc8450a669402ad57a1b620acf8d8d206fcbb3accc1440b106"},
+    {file = "types_tabulate-0.1.1-py2.py3-none-any.whl", hash = "sha256:34a4900c32a56db8c7e5a1c8857332e8d02fe45077ea0ed53a3a12a10cbdbd0c"},
 ]
 typing-extensions = [
     {file = "typing_extensions-3.7.4.3-py2-none-any.whl", hash = "sha256:dafc7639cde7f1b6e1acc0f457842a83e722ccca8eef5270af2d74792619a89f"},
