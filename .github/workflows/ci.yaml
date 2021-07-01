@@ -89,12 +89,3 @@ jobs:
           release_name: ${{ steps.version.outputs.tag }}
           body: ${{ steps.version.outputs.clean_changelog }}
           commitish: ${{ env.SHA }}
-      - name: Publish to PyPI
-        if: ${{ steps.version.outputs.skipped == 'false' }}
-        env:
-          # https://github.com/python-poetry/poetry/issues/2359
-          POETRY_HTTP_BASIC_PYPI_USERNAME: __token__
-          POETRY_HTTP_BASIC_PYPI_PASSWORD: ${{ secrets.PYPI_TOKEN }}
-        run: |
-          pip install poetry
-          poetry publish --build --no-interaction
