@@ -18,32 +18,32 @@ Boolean = sgqlc.types.Boolean
 
 class ControlEventLogsOrderBy(sgqlc.types.Enum):
     __schema__ = control_schema
-    __choices__ = ('NATURAL', 'ID_ASC', 'ID_DESC', 'EVENT_TIME_ASC', 'EVENT_TIME_DESC', 'BY_USER_ID_ASC', 'BY_USER_ID_DESC', 'BY_EDGE_NODE_ID_ASC', 'BY_EDGE_NODE_ID_DESC', 'CONTROL_EVENT_ID_ASC', 'CONTROL_EVENT_ID_DESC', 'PREVIOUS_STATE_ASC', 'PREVIOUS_STATE_DESC', 'CURRENT_STATE_ASC', 'CURRENT_STATE_DESC', 'LABEL_ASC', 'LABEL_DESC', 'EVENT_TYPE_ASC', 'EVENT_TYPE_DESC', 'DATA_ASC', 'DATA_DESC', 'PRIMARY_KEY_ASC', 'PRIMARY_KEY_DESC')
+    __choices__ = ('BY_EDGE_NODE_ID_ASC', 'BY_EDGE_NODE_ID_DESC', 'BY_USER_ID_ASC', 'BY_USER_ID_DESC', 'CONTROL_EVENT_ID_ASC', 'CONTROL_EVENT_ID_DESC', 'CURRENT_STATE_ASC', 'CURRENT_STATE_DESC', 'DATA_ASC', 'DATA_DESC', 'EVENT_TIME_ASC', 'EVENT_TIME_DESC', 'EVENT_TYPE_ASC', 'EVENT_TYPE_DESC', 'ID_ASC', 'ID_DESC', 'LABEL_ASC', 'LABEL_DESC', 'NATURAL', 'PREVIOUS_STATE_ASC', 'PREVIOUS_STATE_DESC', 'PRIMARY_KEY_ASC', 'PRIMARY_KEY_DESC')
 
 
 class ControlEventMetricsOrderBy(sgqlc.types.Enum):
     __schema__ = control_schema
-    __choices__ = ('NATURAL', 'CONTROL_EVENT_ID_ASC', 'CONTROL_EVENT_ID_DESC', 'PROJECT_SUCCESS_METRIC_ID_ASC', 'PROJECT_SUCCESS_METRIC_ID_DESC', 'PROJECTED_IMPACT_AMOUNT_ASC', 'PROJECTED_IMPACT_AMOUNT_DESC', 'CREATED_AT_ASC', 'CREATED_AT_DESC', 'UPDATED_AT_ASC', 'UPDATED_AT_DESC')
+    __choices__ = ('ACTUAL_IMPACT_AMOUNT_ASC', 'ACTUAL_IMPACT_AMOUNT_DESC', 'CONTROLLABLE_COMPONENT_ID_ASC', 'CONTROLLABLE_COMPONENT_ID_DESC', 'CONTROL_EVENT_ID_ASC', 'CONTROL_EVENT_ID_DESC', 'CREATED_AT_ASC', 'CREATED_AT_DESC', 'ID_ASC', 'ID_DESC', 'NATURAL', 'PRIMARY_KEY_ASC', 'PRIMARY_KEY_DESC', 'PROJECTED_IMPACT_AMOUNT_ASC', 'PROJECTED_IMPACT_AMOUNT_DESC', 'PROJECT_SUCCESS_METRIC_ID_ASC', 'PROJECT_SUCCESS_METRIC_ID_DESC', 'UPDATED_AT_ASC', 'UPDATED_AT_DESC')
 
 
 class ControlEventStatesOrderBy(sgqlc.types.Enum):
     __schema__ = control_schema
-    __choices__ = ('NATURAL', 'STATE_ASC', 'STATE_DESC', 'RULES_ASC', 'RULES_DESC', 'CREATED_AT_ASC', 'CREATED_AT_DESC', 'UPDATED_AT_ASC', 'UPDATED_AT_DESC', 'PRIMARY_KEY_ASC', 'PRIMARY_KEY_DESC')
+    __choices__ = ('CREATED_AT_ASC', 'CREATED_AT_DESC', 'NATURAL', 'PRIMARY_KEY_ASC', 'PRIMARY_KEY_DESC', 'RULES_ASC', 'RULES_DESC', 'STATE_ASC', 'STATE_DESC', 'UPDATED_AT_ASC', 'UPDATED_AT_DESC')
 
 
 class ControlEventsControlledComponentsOrderBy(sgqlc.types.Enum):
     __schema__ = control_schema
-    __choices__ = ('NATURAL', 'CONTROL_EVENT_ID_ASC', 'CONTROL_EVENT_ID_DESC', 'CONTROLLABLE_COMPONENT_ID_ASC', 'CONTROLLABLE_COMPONENT_ID_DESC', 'CREATED_AT_ASC', 'CREATED_AT_DESC', 'UPDATED_AT_ASC', 'UPDATED_AT_DESC')
+    __choices__ = ('CONTROLLABLE_COMPONENT_ID_ASC', 'CONTROLLABLE_COMPONENT_ID_DESC', 'CONTROL_EVENT_ID_ASC', 'CONTROL_EVENT_ID_DESC', 'CREATED_AT_ASC', 'CREATED_AT_DESC', 'NATURAL', 'UPDATED_AT_ASC', 'UPDATED_AT_DESC')
 
 
 class ControlEventsOrderBy(sgqlc.types.Enum):
     __schema__ = control_schema
-    __choices__ = ('NATURAL', 'ID_ASC', 'ID_DESC', 'START_TIME_ASC', 'START_TIME_DESC', 'END_TIME_ASC', 'END_TIME_DESC', 'FACILITY_ID_ASC', 'FACILITY_ID_DESC', 'CREATED_AT_ASC', 'CREATED_AT_DESC', 'UPDATED_AT_ASC', 'UPDATED_AT_DESC', 'PROJECT_ID_ASC', 'PROJECT_ID_DESC', 'TYPE_ASC', 'TYPE_DESC', 'CURRENT_STATE_ASC', 'CURRENT_STATE_DESC', 'PRIMARY_KEY_ASC', 'PRIMARY_KEY_DESC')
+    __choices__ = ('CREATED_AT_ASC', 'CREATED_AT_DESC', 'CURRENT_STATE_ASC', 'CURRENT_STATE_DESC', 'END_TIME_ASC', 'END_TIME_DESC', 'FACILITY_ID_ASC', 'FACILITY_ID_DESC', 'ID_ASC', 'ID_DESC', 'NATURAL', 'PRIMARY_KEY_ASC', 'PRIMARY_KEY_DESC', 'PROJECT_ID_ASC', 'PROJECT_ID_DESC', 'START_TIME_ASC', 'START_TIME_DESC', 'TYPE_ASC', 'TYPE_DESC', 'UPDATED_AT_ASC', 'UPDATED_AT_DESC')
 
 
 class ControllableComponentsOrderBy(sgqlc.types.Enum):
     __schema__ = control_schema
-    __choices__ = ('NATURAL', 'ID_ASC', 'ID_DESC', 'SLUG_ASC', 'SLUG_DESC', 'FACILITY_ID_ASC', 'FACILITY_ID_DESC', 'LABEL_ASC', 'LABEL_DESC', 'DESCRIPTION_ASC', 'DESCRIPTION_DESC', 'CONTROLLED_BY_EDGE_NODE_CLIENT_ID_ASC', 'CONTROLLED_BY_EDGE_NODE_CLIENT_ID_DESC', 'CREATED_AT_ASC', 'CREATED_AT_DESC', 'UPDATED_AT_ASC', 'UPDATED_AT_DESC', 'PRIMARY_KEY_ASC', 'PRIMARY_KEY_DESC')
+    __choices__ = ('CONTROLLED_BY_EDGE_NODE_CLIENT_ID_ASC', 'CONTROLLED_BY_EDGE_NODE_CLIENT_ID_DESC', 'CREATED_AT_ASC', 'CREATED_AT_DESC', 'DESCRIPTION_ASC', 'DESCRIPTION_DESC', 'FACILITY_ID_ASC', 'FACILITY_ID_DESC', 'ID_ASC', 'ID_DESC', 'LABEL_ASC', 'LABEL_DESC', 'NATURAL', 'PRIMARY_KEY_ASC', 'PRIMARY_KEY_DESC', 'SLUG_ASC', 'SLUG_DESC', 'UPDATED_AT_ASC', 'UPDATED_AT_DESC')
 
 
 class Cursor(sgqlc.types.Scalar):
@@ -56,22 +56,22 @@ class Datetime(sgqlc.types.Scalar):
 
 class EdgeNodesOrderBy(sgqlc.types.Enum):
     __schema__ = control_schema
-    __choices__ = ('NATURAL', 'CLIENT_ID_ASC', 'CLIENT_ID_DESC', 'ORGANIZATION_ID_ASC', 'ORGANIZATION_ID_DESC', 'PROJECT_ID_ASC', 'PROJECT_ID_DESC', 'CREATED_AT_ASC', 'CREATED_AT_DESC', 'UPDATED_AT_ASC', 'UPDATED_AT_DESC', 'PRIMARY_KEY_ASC', 'PRIMARY_KEY_DESC')
+    __choices__ = ('CLIENT_ID_ASC', 'CLIENT_ID_DESC', 'CREATED_AT_ASC', 'CREATED_AT_DESC', 'FACILITY_ID_ASC', 'FACILITY_ID_DESC', 'NATURAL', 'ORGANIZATION_ID_ASC', 'ORGANIZATION_ID_DESC', 'PRIMARY_KEY_ASC', 'PRIMARY_KEY_DESC', 'UPDATED_AT_ASC', 'UPDATED_AT_DESC')
 
 
 class FacilitiesOrderBy(sgqlc.types.Enum):
     __schema__ = control_schema
-    __choices__ = ('NATURAL', 'ID_ASC', 'ID_DESC', 'NAME_ASC', 'NAME_DESC', 'ORGANIZATION_ID_ASC', 'ORGANIZATION_ID_DESC', 'CREATED_AT_ASC', 'CREATED_AT_DESC', 'UPDATED_AT_ASC', 'UPDATED_AT_DESC', 'PRIMARY_KEY_ASC', 'PRIMARY_KEY_DESC')
+    __choices__ = ('CREATED_AT_ASC', 'CREATED_AT_DESC', 'ID_ASC', 'ID_DESC', 'NAME_ASC', 'NAME_DESC', 'NATURAL', 'ORGANIZATION_ID_ASC', 'ORGANIZATION_ID_DESC', 'PRIMARY_KEY_ASC', 'PRIMARY_KEY_DESC', 'UPDATED_AT_ASC', 'UPDATED_AT_DESC')
 
 
 class FacilityProjectsOrderBy(sgqlc.types.Enum):
     __schema__ = control_schema
-    __choices__ = ('NATURAL', 'FACILITY_ID_ASC', 'FACILITY_ID_DESC', 'PROJECT_ID_ASC', 'PROJECT_ID_DESC', 'CREATED_AT_ASC', 'CREATED_AT_DESC', 'UPDATED_AT_ASC', 'UPDATED_AT_DESC', 'ENROLLMENT_STATUS_ASC', 'ENROLLMENT_STATUS_DESC')
+    __choices__ = ('CREATED_AT_ASC', 'CREATED_AT_DESC', 'ENROLLMENT_STATUS_ASC', 'ENROLLMENT_STATUS_DESC', 'FACILITY_ID_ASC', 'FACILITY_ID_DESC', 'NATURAL', 'PROJECT_ID_ASC', 'PROJECT_ID_DESC', 'UPDATED_AT_ASC', 'UPDATED_AT_DESC')
 
 
 class FacilityUsersOrderBy(sgqlc.types.Enum):
     __schema__ = control_schema
-    __choices__ = ('NATURAL', 'ID_ASC', 'ID_DESC', 'FACILITY_ID_ASC', 'FACILITY_ID_DESC', 'USER_ID_ASC', 'USER_ID_DESC', 'ROLE_ASC', 'ROLE_DESC', 'CREATED_AT_ASC', 'CREATED_AT_DESC', 'UPDATED_AT_ASC', 'UPDATED_AT_DESC', 'PRIMARY_KEY_ASC', 'PRIMARY_KEY_DESC')
+    __choices__ = ('CREATED_AT_ASC', 'CREATED_AT_DESC', 'FACILITY_ID_ASC', 'FACILITY_ID_DESC', 'ID_ASC', 'ID_DESC', 'NATURAL', 'PRIMARY_KEY_ASC', 'PRIMARY_KEY_DESC', 'ROLE_ASC', 'ROLE_DESC', 'UPDATED_AT_ASC', 'UPDATED_AT_DESC', 'USER_ID_ASC', 'USER_ID_DESC')
 
 
 Float = sgqlc.types.Float
@@ -86,22 +86,27 @@ class JSON(sgqlc.types.Scalar):
 
 class OrganizationsOrderBy(sgqlc.types.Enum):
     __schema__ = control_schema
-    __choices__ = ('NATURAL', 'ID_ASC', 'ID_DESC', 'NAME_ASC', 'NAME_DESC', 'CREATED_AT_ASC', 'CREATED_AT_DESC', 'UPDATED_AT_ASC', 'UPDATED_AT_DESC', 'PRIMARY_KEY_ASC', 'PRIMARY_KEY_DESC')
+    __choices__ = ('CREATED_AT_ASC', 'CREATED_AT_DESC', 'ID_ASC', 'ID_DESC', 'NAME_ASC', 'NAME_DESC', 'NATURAL', 'PRIMARY_KEY_ASC', 'PRIMARY_KEY_DESC', 'UPDATED_AT_ASC', 'UPDATED_AT_DESC')
+
+
+class ProjectAgentsOrderBy(sgqlc.types.Enum):
+    __schema__ = control_schema
+    __choices__ = ('CREATED_AT_ASC', 'CREATED_AT_DESC', 'ID_ASC', 'ID_DESC', 'NATURAL', 'PRIMARY_KEY_ASC', 'PRIMARY_KEY_DESC', 'PROJECT_ID_ASC', 'PROJECT_ID_DESC', 'ROLE_ASC', 'ROLE_DESC', 'UPDATED_AT_ASC', 'UPDATED_AT_DESC', 'USER_ID_ASC', 'USER_ID_DESC')
 
 
 class ProjectSuccessMetricsOrderBy(sgqlc.types.Enum):
     __schema__ = control_schema
-    __choices__ = ('NATURAL', 'ID_ASC', 'ID_DESC', 'PROJECT_ID_ASC', 'PROJECT_ID_DESC', 'NAME_ASC', 'NAME_DESC', 'DESCRIPTION_ASC', 'DESCRIPTION_DESC', 'UNITS_ASC', 'UNITS_DESC', 'CREATED_AT_ASC', 'CREATED_AT_DESC', 'UPDATED_AT_ASC', 'UPDATED_AT_DESC', 'PRIMARY_KEY_ASC', 'PRIMARY_KEY_DESC')
+    __choices__ = ('CREATED_AT_ASC', 'CREATED_AT_DESC', 'DESCRIPTION_ASC', 'DESCRIPTION_DESC', 'ID_ASC', 'ID_DESC', 'NAME_ASC', 'NAME_DESC', 'NATURAL', 'PRIMARY_KEY_ASC', 'PRIMARY_KEY_DESC', 'PROJECT_ID_ASC', 'PROJECT_ID_DESC', 'UNITS_ASC', 'UNITS_DESC', 'UPDATED_AT_ASC', 'UPDATED_AT_DESC')
 
 
 class ProjectTypesOrderBy(sgqlc.types.Enum):
     __schema__ = control_schema
-    __choices__ = ('NATURAL', 'ID_ASC', 'ID_DESC', 'NAME_ASC', 'NAME_DESC', 'DESCRIPTION_ASC', 'DESCRIPTION_DESC', 'CREATED_AT_ASC', 'CREATED_AT_DESC', 'UPDATED_AT_ASC', 'UPDATED_AT_DESC', 'PRIMARY_KEY_ASC', 'PRIMARY_KEY_DESC')
+    __choices__ = ('CREATED_AT_ASC', 'CREATED_AT_DESC', 'DESCRIPTION_ASC', 'DESCRIPTION_DESC', 'ID_ASC', 'ID_DESC', 'NAME_ASC', 'NAME_DESC', 'NATURAL', 'PRIMARY_KEY_ASC', 'PRIMARY_KEY_DESC', 'UPDATED_AT_ASC', 'UPDATED_AT_DESC')
 
 
 class ProjectsOrderBy(sgqlc.types.Enum):
     __schema__ = control_schema
-    __choices__ = ('NATURAL', 'ID_ASC', 'ID_DESC', 'NAME_ASC', 'NAME_DESC', 'DESCRIPTION_ASC', 'DESCRIPTION_DESC', 'ORGANIZATION_ID_ASC', 'ORGANIZATION_ID_DESC', 'PROJECT_TYPE_ID_ASC', 'PROJECT_TYPE_ID_DESC', 'CREATED_AT_ASC', 'CREATED_AT_DESC', 'UPDATED_AT_ASC', 'UPDATED_AT_DESC', 'PRIMARY_KEY_ASC', 'PRIMARY_KEY_DESC')
+    __choices__ = ('CREATED_AT_ASC', 'CREATED_AT_DESC', 'DESCRIPTION_ASC', 'DESCRIPTION_DESC', 'ID_ASC', 'ID_DESC', 'NAME_ASC', 'NAME_DESC', 'NATURAL', 'ORGANIZATION_ID_ASC', 'ORGANIZATION_ID_DESC', 'PRIMARY_KEY_ASC', 'PRIMARY_KEY_DESC', 'PROJECT_TYPE_ID_ASC', 'PROJECT_TYPE_ID_DESC', 'UPDATED_AT_ASC', 'UPDATED_AT_DESC')
 
 
 String = sgqlc.types.String
@@ -112,7 +117,7 @@ class UUID(sgqlc.types.Scalar):
 
 class UsersOrderBy(sgqlc.types.Enum):
     __schema__ = control_schema
-    __choices__ = ('NATURAL', 'FIRST_NAME_ASC', 'FIRST_NAME_DESC', 'LAST_NAME_ASC', 'LAST_NAME_DESC', 'EMAIL_ASC', 'EMAIL_DESC', 'PHONE_NUMBER_ASC', 'PHONE_NUMBER_DESC', 'CREATED_AT_ASC', 'CREATED_AT_DESC', 'UPDATED_AT_ASC', 'UPDATED_AT_DESC', 'PRIMARY_KEY_ASC', 'PRIMARY_KEY_DESC')
+    __choices__ = ('CREATED_AT_ASC', 'CREATED_AT_DESC', 'EMAIL_ASC', 'EMAIL_DESC', 'FIRST_NAME_ASC', 'FIRST_NAME_DESC', 'LAST_NAME_ASC', 'LAST_NAME_DESC', 'NATURAL', 'PHONE_NUMBER_ASC', 'PHONE_NUMBER_DESC', 'PRIMARY_KEY_ASC', 'PRIMARY_KEY_DESC', 'UPDATED_AT_ASC', 'UPDATED_AT_DESC')
 
 
 
@@ -189,32 +194,41 @@ class ControlEventLogPatch(sgqlc.types.Input):
 
 class ControlEventMetricCondition(sgqlc.types.Input):
     __schema__ = control_schema
-    __field_names__ = ('control_event_id', 'project_success_metric_id', 'projected_impact_amount', 'created_at', 'updated_at')
+    __field_names__ = ('control_event_id', 'project_success_metric_id', 'projected_impact_amount', 'created_at', 'updated_at', 'actual_impact_amount', 'controllable_component_id', 'id')
     control_event_id = sgqlc.types.Field(UUID, graphql_name='controlEventId')
     project_success_metric_id = sgqlc.types.Field(UUID, graphql_name='projectSuccessMetricId')
     projected_impact_amount = sgqlc.types.Field(Float, graphql_name='projectedImpactAmount')
     created_at = sgqlc.types.Field(Datetime, graphql_name='createdAt')
     updated_at = sgqlc.types.Field(Datetime, graphql_name='updatedAt')
+    actual_impact_amount = sgqlc.types.Field(Float, graphql_name='actualImpactAmount')
+    controllable_component_id = sgqlc.types.Field(UUID, graphql_name='controllableComponentId')
+    id = sgqlc.types.Field(UUID, graphql_name='id')
 
 
 class ControlEventMetricInput(sgqlc.types.Input):
     __schema__ = control_schema
-    __field_names__ = ('control_event_id', 'project_success_metric_id', 'projected_impact_amount', 'created_at', 'updated_at')
+    __field_names__ = ('control_event_id', 'project_success_metric_id', 'projected_impact_amount', 'created_at', 'updated_at', 'actual_impact_amount', 'controllable_component_id', 'id')
     control_event_id = sgqlc.types.Field(sgqlc.types.non_null(UUID), graphql_name='controlEventId')
     project_success_metric_id = sgqlc.types.Field(sgqlc.types.non_null(UUID), graphql_name='projectSuccessMetricId')
     projected_impact_amount = sgqlc.types.Field(sgqlc.types.non_null(Float), graphql_name='projectedImpactAmount')
     created_at = sgqlc.types.Field(Datetime, graphql_name='createdAt')
     updated_at = sgqlc.types.Field(Datetime, graphql_name='updatedAt')
+    actual_impact_amount = sgqlc.types.Field(Float, graphql_name='actualImpactAmount')
+    controllable_component_id = sgqlc.types.Field(sgqlc.types.non_null(UUID), graphql_name='controllableComponentId')
+    id = sgqlc.types.Field(UUID, graphql_name='id')
 
 
 class ControlEventMetricPatch(sgqlc.types.Input):
     __schema__ = control_schema
-    __field_names__ = ('control_event_id', 'project_success_metric_id', 'projected_impact_amount', 'created_at', 'updated_at')
+    __field_names__ = ('control_event_id', 'project_success_metric_id', 'projected_impact_amount', 'created_at', 'updated_at', 'actual_impact_amount', 'controllable_component_id', 'id')
     control_event_id = sgqlc.types.Field(UUID, graphql_name='controlEventId')
     project_success_metric_id = sgqlc.types.Field(UUID, graphql_name='projectSuccessMetricId')
     projected_impact_amount = sgqlc.types.Field(Float, graphql_name='projectedImpactAmount')
     created_at = sgqlc.types.Field(Datetime, graphql_name='createdAt')
     updated_at = sgqlc.types.Field(Datetime, graphql_name='updatedAt')
+    actual_impact_amount = sgqlc.types.Field(Float, graphql_name='actualImpactAmount')
+    controllable_component_id = sgqlc.types.Field(UUID, graphql_name='controllableComponentId')
+    id = sgqlc.types.Field(UUID, graphql_name='id')
 
 
 class ControlEventPatch(sgqlc.types.Input):
@@ -387,6 +401,13 @@ class CreateOrganizationInput(sgqlc.types.Input):
     organization = sgqlc.types.Field(sgqlc.types.non_null('OrganizationInput'), graphql_name='organization')
 
 
+class CreateProjectAgentInput(sgqlc.types.Input):
+    __schema__ = control_schema
+    __field_names__ = ('client_mutation_id', 'project_agent')
+    client_mutation_id = sgqlc.types.Field(String, graphql_name='clientMutationId')
+    project_agent = sgqlc.types.Field(sgqlc.types.non_null('ProjectAgentInput'), graphql_name='projectAgent')
+
+
 class CreateProjectInput(sgqlc.types.Input):
     __schema__ = control_schema
     __field_names__ = ('client_mutation_id', 'project')
@@ -459,6 +480,20 @@ class DeleteControlEventMetricByControlEventIdAndProjectSuccessMetricIdInput(sgq
     client_mutation_id = sgqlc.types.Field(String, graphql_name='clientMutationId')
     control_event_id = sgqlc.types.Field(sgqlc.types.non_null(UUID), graphql_name='controlEventId')
     project_success_metric_id = sgqlc.types.Field(sgqlc.types.non_null(UUID), graphql_name='projectSuccessMetricId')
+
+
+class DeleteControlEventMetricByNodeIdInput(sgqlc.types.Input):
+    __schema__ = control_schema
+    __field_names__ = ('client_mutation_id', 'node_id')
+    client_mutation_id = sgqlc.types.Field(String, graphql_name='clientMutationId')
+    node_id = sgqlc.types.Field(sgqlc.types.non_null(ID), graphql_name='nodeId')
+
+
+class DeleteControlEventMetricInput(sgqlc.types.Input):
+    __schema__ = control_schema
+    __field_names__ = ('client_mutation_id', 'id')
+    client_mutation_id = sgqlc.types.Field(String, graphql_name='clientMutationId')
+    id = sgqlc.types.Field(sgqlc.types.non_null(UUID), graphql_name='id')
 
 
 class DeleteControlEventStateByNodeIdInput(sgqlc.types.Input):
@@ -553,6 +588,20 @@ class DeleteOrganizationInput(sgqlc.types.Input):
     id = sgqlc.types.Field(sgqlc.types.non_null(UUID), graphql_name='id')
 
 
+class DeleteProjectAgentByNodeIdInput(sgqlc.types.Input):
+    __schema__ = control_schema
+    __field_names__ = ('client_mutation_id', 'node_id')
+    client_mutation_id = sgqlc.types.Field(String, graphql_name='clientMutationId')
+    node_id = sgqlc.types.Field(sgqlc.types.non_null(ID), graphql_name='nodeId')
+
+
+class DeleteProjectAgentInput(sgqlc.types.Input):
+    __schema__ = control_schema
+    __field_names__ = ('client_mutation_id', 'id')
+    client_mutation_id = sgqlc.types.Field(String, graphql_name='clientMutationId')
+    id = sgqlc.types.Field(sgqlc.types.non_null(UUID), graphql_name='id')
+
+
 class DeleteProjectByNodeIdInput(sgqlc.types.Input):
     __schema__ = control_schema
     __field_names__ = ('client_mutation_id', 'node_id')
@@ -611,32 +660,32 @@ class DeleteUserInput(sgqlc.types.Input):
 
 class EdgeNodeCondition(sgqlc.types.Input):
     __schema__ = control_schema
-    __field_names__ = ('client_id', 'organization_id', 'project_id', 'created_at', 'updated_at')
+    __field_names__ = ('client_id', 'organization_id', 'created_at', 'updated_at', 'facility_id')
     client_id = sgqlc.types.Field(String, graphql_name='clientId')
     organization_id = sgqlc.types.Field(UUID, graphql_name='organizationId')
-    project_id = sgqlc.types.Field(String, graphql_name='projectId')
     created_at = sgqlc.types.Field(Datetime, graphql_name='createdAt')
     updated_at = sgqlc.types.Field(Datetime, graphql_name='updatedAt')
+    facility_id = sgqlc.types.Field(Int, graphql_name='facilityId')
 
 
 class EdgeNodeInput(sgqlc.types.Input):
     __schema__ = control_schema
-    __field_names__ = ('client_id', 'organization_id', 'project_id', 'created_at', 'updated_at')
+    __field_names__ = ('client_id', 'organization_id', 'created_at', 'updated_at', 'facility_id')
     client_id = sgqlc.types.Field(sgqlc.types.non_null(String), graphql_name='clientId')
     organization_id = sgqlc.types.Field(sgqlc.types.non_null(UUID), graphql_name='organizationId')
-    project_id = sgqlc.types.Field(sgqlc.types.non_null(String), graphql_name='projectId')
     created_at = sgqlc.types.Field(Datetime, graphql_name='createdAt')
     updated_at = sgqlc.types.Field(Datetime, graphql_name='updatedAt')
+    facility_id = sgqlc.types.Field(Int, graphql_name='facilityId')
 
 
 class EdgeNodePatch(sgqlc.types.Input):
     __schema__ = control_schema
-    __field_names__ = ('client_id', 'organization_id', 'project_id', 'created_at', 'updated_at')
+    __field_names__ = ('client_id', 'organization_id', 'created_at', 'updated_at', 'facility_id')
     client_id = sgqlc.types.Field(String, graphql_name='clientId')
     organization_id = sgqlc.types.Field(UUID, graphql_name='organizationId')
-    project_id = sgqlc.types.Field(String, graphql_name='projectId')
     created_at = sgqlc.types.Field(Datetime, graphql_name='createdAt')
     updated_at = sgqlc.types.Field(Datetime, graphql_name='updatedAt')
+    facility_id = sgqlc.types.Field(Int, graphql_name='facilityId')
 
 
 class FacilityCondition(sgqlc.types.Input):
@@ -749,6 +798,39 @@ class OrganizationPatch(sgqlc.types.Input):
     updated_at = sgqlc.types.Field(Datetime, graphql_name='updatedAt')
 
 
+class ProjectAgentCondition(sgqlc.types.Input):
+    __schema__ = control_schema
+    __field_names__ = ('id', 'project_id', 'user_id', 'role', 'created_at', 'updated_at')
+    id = sgqlc.types.Field(UUID, graphql_name='id')
+    project_id = sgqlc.types.Field(String, graphql_name='projectId')
+    user_id = sgqlc.types.Field(String, graphql_name='userId')
+    role = sgqlc.types.Field(String, graphql_name='role')
+    created_at = sgqlc.types.Field(Datetime, graphql_name='createdAt')
+    updated_at = sgqlc.types.Field(Datetime, graphql_name='updatedAt')
+
+
+class ProjectAgentInput(sgqlc.types.Input):
+    __schema__ = control_schema
+    __field_names__ = ('id', 'project_id', 'user_id', 'role', 'created_at', 'updated_at')
+    id = sgqlc.types.Field(UUID, graphql_name='id')
+    project_id = sgqlc.types.Field(sgqlc.types.non_null(String), graphql_name='projectId')
+    user_id = sgqlc.types.Field(sgqlc.types.non_null(String), graphql_name='userId')
+    role = sgqlc.types.Field(sgqlc.types.non_null(String), graphql_name='role')
+    created_at = sgqlc.types.Field(Datetime, graphql_name='createdAt')
+    updated_at = sgqlc.types.Field(Datetime, graphql_name='updatedAt')
+
+
+class ProjectAgentPatch(sgqlc.types.Input):
+    __schema__ = control_schema
+    __field_names__ = ('id', 'project_id', 'user_id', 'role', 'created_at', 'updated_at')
+    id = sgqlc.types.Field(UUID, graphql_name='id')
+    project_id = sgqlc.types.Field(String, graphql_name='projectId')
+    user_id = sgqlc.types.Field(String, graphql_name='userId')
+    role = sgqlc.types.Field(String, graphql_name='role')
+    created_at = sgqlc.types.Field(Datetime, graphql_name='createdAt')
+    updated_at = sgqlc.types.Field(Datetime, graphql_name='updatedAt')
+
+
 class ProjectCondition(sgqlc.types.Input):
     __schema__ = control_schema
     __field_names__ = ('id', 'name', 'description', 'organization_id', 'project_type_id', 'created_at', 'updated_at')
@@ -856,7 +938,7 @@ class ProposeControlEventInput(sgqlc.types.Input):
     __field_names__ = ('client_mutation_id', 'proposed_event', 'components_to_control')
     client_mutation_id = sgqlc.types.Field(String, graphql_name='clientMutationId')
     proposed_event = sgqlc.types.Field(sgqlc.types.non_null(ControlEventProposalInputRecordInput), graphql_name='proposedEvent')
-    components_to_control = sgqlc.types.Field(sgqlc.types.non_null(sgqlc.types.list_of(ControllableComponentInput)), graphql_name='componentsToControl')
+    components_to_control = sgqlc.types.Field(sgqlc.types.list_of(ControllableComponentInput), graphql_name='componentsToControl')
 
 
 class RawControlEventInputRecordInput(sgqlc.types.Input):
@@ -934,6 +1016,22 @@ class UpdateControlEventMetricByControlEventIdAndProjectSuccessMetricIdInput(sgq
     patch = sgqlc.types.Field(sgqlc.types.non_null(ControlEventMetricPatch), graphql_name='patch')
     control_event_id = sgqlc.types.Field(sgqlc.types.non_null(UUID), graphql_name='controlEventId')
     project_success_metric_id = sgqlc.types.Field(sgqlc.types.non_null(UUID), graphql_name='projectSuccessMetricId')
+
+
+class UpdateControlEventMetricByNodeIdInput(sgqlc.types.Input):
+    __schema__ = control_schema
+    __field_names__ = ('client_mutation_id', 'node_id', 'patch')
+    client_mutation_id = sgqlc.types.Field(String, graphql_name='clientMutationId')
+    node_id = sgqlc.types.Field(sgqlc.types.non_null(ID), graphql_name='nodeId')
+    patch = sgqlc.types.Field(sgqlc.types.non_null(ControlEventMetricPatch), graphql_name='patch')
+
+
+class UpdateControlEventMetricInput(sgqlc.types.Input):
+    __schema__ = control_schema
+    __field_names__ = ('client_mutation_id', 'patch', 'id')
+    client_mutation_id = sgqlc.types.Field(String, graphql_name='clientMutationId')
+    patch = sgqlc.types.Field(sgqlc.types.non_null(ControlEventMetricPatch), graphql_name='patch')
+    id = sgqlc.types.Field(sgqlc.types.non_null(UUID), graphql_name='id')
 
 
 class UpdateControlEventStateByNodeIdInput(sgqlc.types.Input):
@@ -1038,6 +1136,22 @@ class UpdateOrganizationInput(sgqlc.types.Input):
     __field_names__ = ('client_mutation_id', 'patch', 'id')
     client_mutation_id = sgqlc.types.Field(String, graphql_name='clientMutationId')
     patch = sgqlc.types.Field(sgqlc.types.non_null(OrganizationPatch), graphql_name='patch')
+    id = sgqlc.types.Field(sgqlc.types.non_null(UUID), graphql_name='id')
+
+
+class UpdateProjectAgentByNodeIdInput(sgqlc.types.Input):
+    __schema__ = control_schema
+    __field_names__ = ('client_mutation_id', 'node_id', 'patch')
+    client_mutation_id = sgqlc.types.Field(String, graphql_name='clientMutationId')
+    node_id = sgqlc.types.Field(sgqlc.types.non_null(ID), graphql_name='nodeId')
+    patch = sgqlc.types.Field(sgqlc.types.non_null(ProjectAgentPatch), graphql_name='patch')
+
+
+class UpdateProjectAgentInput(sgqlc.types.Input):
+    __schema__ = control_schema
+    __field_names__ = ('client_mutation_id', 'patch', 'id')
+    client_mutation_id = sgqlc.types.Field(String, graphql_name='clientMutationId')
+    patch = sgqlc.types.Field(sgqlc.types.non_null(ProjectAgentPatch), graphql_name='patch')
     id = sgqlc.types.Field(sgqlc.types.non_null(UUID), graphql_name='id')
 
 
@@ -1209,6 +1323,32 @@ class ControlEventControlEventStatesByControlEventLogControlEventIdAndPreviousSt
     )
 
 
+class ControlEventControllableComponentsByControlEventMetricControlEventIdAndControllableComponentIdManyToManyConnection(sgqlc.types.relay.Connection):
+    __schema__ = control_schema
+    __field_names__ = ('nodes', 'edges', 'page_info', 'total_count')
+    nodes = sgqlc.types.Field(sgqlc.types.non_null(sgqlc.types.list_of('ControllableComponent')), graphql_name='nodes')
+    edges = sgqlc.types.Field(sgqlc.types.non_null(sgqlc.types.list_of(sgqlc.types.non_null('ControlEventControllableComponentsByControlEventMetricControlEventIdAndControllableComponentIdManyToManyEdge'))), graphql_name='edges')
+    page_info = sgqlc.types.Field(sgqlc.types.non_null('PageInfo'), graphql_name='pageInfo')
+    total_count = sgqlc.types.Field(sgqlc.types.non_null(Int), graphql_name='totalCount')
+
+
+class ControlEventControllableComponentsByControlEventMetricControlEventIdAndControllableComponentIdManyToManyEdge(sgqlc.types.Type):
+    __schema__ = control_schema
+    __field_names__ = ('cursor', 'node', 'control_event_metrics')
+    cursor = sgqlc.types.Field(Cursor, graphql_name='cursor')
+    node = sgqlc.types.Field('ControllableComponent', graphql_name='node')
+    control_event_metrics = sgqlc.types.Field(sgqlc.types.non_null('ControlEventMetricsConnection'), graphql_name='controlEventMetrics', args=sgqlc.types.ArgDict((
+        ('first', sgqlc.types.Arg(Int, graphql_name='first', default=None)),
+        ('last', sgqlc.types.Arg(Int, graphql_name='last', default=None)),
+        ('offset', sgqlc.types.Arg(Int, graphql_name='offset', default=None)),
+        ('before', sgqlc.types.Arg(Cursor, graphql_name='before', default=None)),
+        ('after', sgqlc.types.Arg(Cursor, graphql_name='after', default=None)),
+        ('order_by', sgqlc.types.Arg(sgqlc.types.list_of(sgqlc.types.non_null(ControlEventMetricsOrderBy)), graphql_name='orderBy', default=['PRIMARY_KEY_ASC'])),
+        ('condition', sgqlc.types.Arg(ControlEventMetricCondition, graphql_name='condition', default=None)),
+))
+    )
+
+
 class ControlEventControlledComponentsManyToManyConnection(sgqlc.types.relay.Connection):
     __schema__ = control_schema
     __field_names__ = ('nodes', 'edges', 'page_info', 'total_count')
@@ -1277,22 +1417,10 @@ class ControlEventLogsEdge(sgqlc.types.Type):
     node = sgqlc.types.Field('ControlEventLog', graphql_name='node')
 
 
-class ControlEventMetric(sgqlc.types.Type):
-    __schema__ = control_schema
-    __field_names__ = ('control_event_id', 'project_success_metric_id', 'projected_impact_amount', 'created_at', 'updated_at', 'control_event', 'project_success_metric')
-    control_event_id = sgqlc.types.Field(sgqlc.types.non_null(UUID), graphql_name='controlEventId')
-    project_success_metric_id = sgqlc.types.Field(sgqlc.types.non_null(UUID), graphql_name='projectSuccessMetricId')
-    projected_impact_amount = sgqlc.types.Field(sgqlc.types.non_null(Float), graphql_name='projectedImpactAmount')
-    created_at = sgqlc.types.Field(sgqlc.types.non_null(Datetime), graphql_name='createdAt')
-    updated_at = sgqlc.types.Field(sgqlc.types.non_null(Datetime), graphql_name='updatedAt')
-    control_event = sgqlc.types.Field('ControlEvent', graphql_name='controlEvent')
-    project_success_metric = sgqlc.types.Field('ProjectSuccessMetric', graphql_name='projectSuccessMetric')
-
-
 class ControlEventMetricsConnection(sgqlc.types.relay.Connection):
     __schema__ = control_schema
     __field_names__ = ('nodes', 'edges', 'page_info', 'total_count')
-    nodes = sgqlc.types.Field(sgqlc.types.non_null(sgqlc.types.list_of(ControlEventMetric)), graphql_name='nodes')
+    nodes = sgqlc.types.Field(sgqlc.types.non_null(sgqlc.types.list_of('ControlEventMetric')), graphql_name='nodes')
     edges = sgqlc.types.Field(sgqlc.types.non_null(sgqlc.types.list_of(sgqlc.types.non_null('ControlEventMetricsEdge'))), graphql_name='edges')
     page_info = sgqlc.types.Field(sgqlc.types.non_null('PageInfo'), graphql_name='pageInfo')
     total_count = sgqlc.types.Field(sgqlc.types.non_null(Int), graphql_name='totalCount')
@@ -1302,7 +1430,7 @@ class ControlEventMetricsEdge(sgqlc.types.Type):
     __schema__ = control_schema
     __field_names__ = ('cursor', 'node')
     cursor = sgqlc.types.Field(Cursor, graphql_name='cursor')
-    node = sgqlc.types.Field(ControlEventMetric, graphql_name='node')
+    node = sgqlc.types.Field('ControlEventMetric', graphql_name='node')
 
 
 class ControlEventProjectSuccessMetricsByControlEventMetricControlEventIdAndProjectSuccessMetricIdManyToManyConnection(sgqlc.types.relay.Connection):
@@ -1316,12 +1444,15 @@ class ControlEventProjectSuccessMetricsByControlEventMetricControlEventIdAndProj
 
 class ControlEventProjectSuccessMetricsByControlEventMetricControlEventIdAndProjectSuccessMetricIdManyToManyEdge(sgqlc.types.Type):
     __schema__ = control_schema
-    __field_names__ = ('cursor', 'node', 'projected_impact_amount', 'created_at', 'updated_at')
+    __field_names__ = ('cursor', 'node', 'projected_impact_amount', 'created_at', 'updated_at', 'actual_impact_amount', 'controllable_component_id', 'id')
     cursor = sgqlc.types.Field(Cursor, graphql_name='cursor')
     node = sgqlc.types.Field('ProjectSuccessMetric', graphql_name='node')
     projected_impact_amount = sgqlc.types.Field(sgqlc.types.non_null(Float), graphql_name='projectedImpactAmount')
     created_at = sgqlc.types.Field(sgqlc.types.non_null(Datetime), graphql_name='createdAt')
     updated_at = sgqlc.types.Field(sgqlc.types.non_null(Datetime), graphql_name='updatedAt')
+    actual_impact_amount = sgqlc.types.Field(Float, graphql_name='actualImpactAmount')
+    controllable_component_id = sgqlc.types.Field(sgqlc.types.non_null(UUID), graphql_name='controllableComponentId')
+    id = sgqlc.types.Field(sgqlc.types.non_null(UUID), graphql_name='id')
 
 
 class ControlEventStateControlEventStatesByControlEventLogCurrentStateAndPreviousStateManyToManyConnection(sgqlc.types.relay.Connection):
@@ -1669,6 +1800,32 @@ class ControlEventsEdge(sgqlc.types.Type):
     node = sgqlc.types.Field('ControlEvent', graphql_name='node')
 
 
+class ControllableComponentControlEventsByControlEventMetricControllableComponentIdAndControlEventIdManyToManyConnection(sgqlc.types.relay.Connection):
+    __schema__ = control_schema
+    __field_names__ = ('nodes', 'edges', 'page_info', 'total_count')
+    nodes = sgqlc.types.Field(sgqlc.types.non_null(sgqlc.types.list_of('ControlEvent')), graphql_name='nodes')
+    edges = sgqlc.types.Field(sgqlc.types.non_null(sgqlc.types.list_of(sgqlc.types.non_null('ControllableComponentControlEventsByControlEventMetricControllableComponentIdAndControlEventIdManyToManyEdge'))), graphql_name='edges')
+    page_info = sgqlc.types.Field(sgqlc.types.non_null('PageInfo'), graphql_name='pageInfo')
+    total_count = sgqlc.types.Field(sgqlc.types.non_null(Int), graphql_name='totalCount')
+
+
+class ControllableComponentControlEventsByControlEventMetricControllableComponentIdAndControlEventIdManyToManyEdge(sgqlc.types.Type):
+    __schema__ = control_schema
+    __field_names__ = ('cursor', 'node', 'control_event_metrics')
+    cursor = sgqlc.types.Field(Cursor, graphql_name='cursor')
+    node = sgqlc.types.Field('ControlEvent', graphql_name='node')
+    control_event_metrics = sgqlc.types.Field(sgqlc.types.non_null(ControlEventMetricsConnection), graphql_name='controlEventMetrics', args=sgqlc.types.ArgDict((
+        ('first', sgqlc.types.Arg(Int, graphql_name='first', default=None)),
+        ('last', sgqlc.types.Arg(Int, graphql_name='last', default=None)),
+        ('offset', sgqlc.types.Arg(Int, graphql_name='offset', default=None)),
+        ('before', sgqlc.types.Arg(Cursor, graphql_name='before', default=None)),
+        ('after', sgqlc.types.Arg(Cursor, graphql_name='after', default=None)),
+        ('order_by', sgqlc.types.Arg(sgqlc.types.list_of(sgqlc.types.non_null(ControlEventMetricsOrderBy)), graphql_name='orderBy', default=['PRIMARY_KEY_ASC'])),
+        ('condition', sgqlc.types.Arg(ControlEventMetricCondition, graphql_name='condition', default=None)),
+))
+    )
+
+
 class ControllableComponentControlEventsManyToManyConnection(sgqlc.types.relay.Connection):
     __schema__ = control_schema
     __field_names__ = ('nodes', 'edges', 'page_info', 'total_count')
@@ -1695,6 +1852,32 @@ class ControllableComponentControlEventsManyToManyEdge(sgqlc.types.Type):
     )
 
 
+class ControllableComponentProjectSuccessMetricsByControlEventMetricControllableComponentIdAndProjectSuccessMetricIdManyToManyConnection(sgqlc.types.relay.Connection):
+    __schema__ = control_schema
+    __field_names__ = ('nodes', 'edges', 'page_info', 'total_count')
+    nodes = sgqlc.types.Field(sgqlc.types.non_null(sgqlc.types.list_of('ProjectSuccessMetric')), graphql_name='nodes')
+    edges = sgqlc.types.Field(sgqlc.types.non_null(sgqlc.types.list_of(sgqlc.types.non_null('ControllableComponentProjectSuccessMetricsByControlEventMetricControllableComponentIdAndProjectSuccessMetricIdManyToManyEdge'))), graphql_name='edges')
+    page_info = sgqlc.types.Field(sgqlc.types.non_null('PageInfo'), graphql_name='pageInfo')
+    total_count = sgqlc.types.Field(sgqlc.types.non_null(Int), graphql_name='totalCount')
+
+
+class ControllableComponentProjectSuccessMetricsByControlEventMetricControllableComponentIdAndProjectSuccessMetricIdManyToManyEdge(sgqlc.types.Type):
+    __schema__ = control_schema
+    __field_names__ = ('cursor', 'node', 'control_event_metrics')
+    cursor = sgqlc.types.Field(Cursor, graphql_name='cursor')
+    node = sgqlc.types.Field('ProjectSuccessMetric', graphql_name='node')
+    control_event_metrics = sgqlc.types.Field(sgqlc.types.non_null(ControlEventMetricsConnection), graphql_name='controlEventMetrics', args=sgqlc.types.ArgDict((
+        ('first', sgqlc.types.Arg(Int, graphql_name='first', default=None)),
+        ('last', sgqlc.types.Arg(Int, graphql_name='last', default=None)),
+        ('offset', sgqlc.types.Arg(Int, graphql_name='offset', default=None)),
+        ('before', sgqlc.types.Arg(Cursor, graphql_name='before', default=None)),
+        ('after', sgqlc.types.Arg(Cursor, graphql_name='after', default=None)),
+        ('order_by', sgqlc.types.Arg(sgqlc.types.list_of(sgqlc.types.non_null(ControlEventMetricsOrderBy)), graphql_name='orderBy', default=['PRIMARY_KEY_ASC'])),
+        ('condition', sgqlc.types.Arg(ControlEventMetricCondition, graphql_name='condition', default=None)),
+))
+    )
+
+
 class ControllableComponentsConnection(sgqlc.types.relay.Connection):
     __schema__ = control_schema
     __field_names__ = ('nodes', 'edges', 'page_info', 'total_count')
@@ -1713,14 +1896,15 @@ class ControllableComponentsEdge(sgqlc.types.Type):
 
 class CreateControlEventMetricPayload(sgqlc.types.Type):
     __schema__ = control_schema
-    __field_names__ = ('client_mutation_id', 'control_event_metric', 'query', 'control_event', 'project_success_metric', 'control_event_metric_edge')
+    __field_names__ = ('client_mutation_id', 'control_event_metric', 'query', 'control_event', 'project_success_metric', 'controllable_component', 'control_event_metric_edge')
     client_mutation_id = sgqlc.types.Field(String, graphql_name='clientMutationId')
-    control_event_metric = sgqlc.types.Field(ControlEventMetric, graphql_name='controlEventMetric')
+    control_event_metric = sgqlc.types.Field('ControlEventMetric', graphql_name='controlEventMetric')
     query = sgqlc.types.Field('Query', graphql_name='query')
     control_event = sgqlc.types.Field('ControlEvent', graphql_name='controlEvent')
     project_success_metric = sgqlc.types.Field('ProjectSuccessMetric', graphql_name='projectSuccessMetric')
+    controllable_component = sgqlc.types.Field('ControllableComponent', graphql_name='controllableComponent')
     control_event_metric_edge = sgqlc.types.Field(ControlEventMetricsEdge, graphql_name='controlEventMetricEdge', args=sgqlc.types.ArgDict((
-        ('order_by', sgqlc.types.Arg(sgqlc.types.list_of(sgqlc.types.non_null(ControlEventMetricsOrderBy)), graphql_name='orderBy', default=['NATURAL'])),
+        ('order_by', sgqlc.types.Arg(sgqlc.types.list_of(sgqlc.types.non_null(ControlEventMetricsOrderBy)), graphql_name='orderBy', default=['PRIMARY_KEY_ASC'])),
 ))
     )
 
@@ -1770,12 +1954,12 @@ class CreateControllableComponentPayload(sgqlc.types.Type):
 
 class CreateEdgeNodePayload(sgqlc.types.Type):
     __schema__ = control_schema
-    __field_names__ = ('client_mutation_id', 'edge_node', 'query', 'organization', 'project', 'edge_node_edge')
+    __field_names__ = ('client_mutation_id', 'edge_node', 'query', 'organization', 'facility', 'edge_node_edge')
     client_mutation_id = sgqlc.types.Field(String, graphql_name='clientMutationId')
     edge_node = sgqlc.types.Field('EdgeNode', graphql_name='edgeNode')
     query = sgqlc.types.Field('Query', graphql_name='query')
     organization = sgqlc.types.Field('Organization', graphql_name='organization')
-    project = sgqlc.types.Field('Project', graphql_name='project')
+    facility = sgqlc.types.Field('Facility', graphql_name='facility')
     edge_node_edge = sgqlc.types.Field('EdgeNodesEdge', graphql_name='edgeNodeEdge', args=sgqlc.types.ArgDict((
         ('order_by', sgqlc.types.Arg(sgqlc.types.list_of(sgqlc.types.non_null(EdgeNodesOrderBy)), graphql_name='orderBy', default=['PRIMARY_KEY_ASC'])),
 ))
@@ -1831,6 +2015,20 @@ class CreateOrganizationPayload(sgqlc.types.Type):
     query = sgqlc.types.Field('Query', graphql_name='query')
     organization_edge = sgqlc.types.Field('OrganizationsEdge', graphql_name='organizationEdge', args=sgqlc.types.ArgDict((
         ('order_by', sgqlc.types.Arg(sgqlc.types.list_of(sgqlc.types.non_null(OrganizationsOrderBy)), graphql_name='orderBy', default=['PRIMARY_KEY_ASC'])),
+))
+    )
+
+
+class CreateProjectAgentPayload(sgqlc.types.Type):
+    __schema__ = control_schema
+    __field_names__ = ('client_mutation_id', 'project_agent', 'query', 'project', 'user', 'project_agent_edge')
+    client_mutation_id = sgqlc.types.Field(String, graphql_name='clientMutationId')
+    project_agent = sgqlc.types.Field('ProjectAgent', graphql_name='projectAgent')
+    query = sgqlc.types.Field('Query', graphql_name='query')
+    project = sgqlc.types.Field('Project', graphql_name='project')
+    user = sgqlc.types.Field('User', graphql_name='user')
+    project_agent_edge = sgqlc.types.Field('ProjectAgentsEdge', graphql_name='projectAgentEdge', args=sgqlc.types.ArgDict((
+        ('order_by', sgqlc.types.Arg(sgqlc.types.list_of(sgqlc.types.non_null(ProjectAgentsOrderBy)), graphql_name='orderBy', default=['PRIMARY_KEY_ASC'])),
 ))
     )
 
@@ -1906,15 +2104,16 @@ class DeleteControlEventLogPayload(sgqlc.types.Type):
 
 class DeleteControlEventMetricPayload(sgqlc.types.Type):
     __schema__ = control_schema
-    __field_names__ = ('client_mutation_id', 'control_event_metric', 'deleted_control_event_metric_node_id', 'query', 'control_event', 'project_success_metric', 'control_event_metric_edge')
+    __field_names__ = ('client_mutation_id', 'control_event_metric', 'deleted_control_event_metric_node_id', 'query', 'control_event', 'project_success_metric', 'controllable_component', 'control_event_metric_edge')
     client_mutation_id = sgqlc.types.Field(String, graphql_name='clientMutationId')
-    control_event_metric = sgqlc.types.Field(ControlEventMetric, graphql_name='controlEventMetric')
+    control_event_metric = sgqlc.types.Field('ControlEventMetric', graphql_name='controlEventMetric')
     deleted_control_event_metric_node_id = sgqlc.types.Field(ID, graphql_name='deletedControlEventMetricNodeId')
     query = sgqlc.types.Field('Query', graphql_name='query')
     control_event = sgqlc.types.Field('ControlEvent', graphql_name='controlEvent')
     project_success_metric = sgqlc.types.Field('ProjectSuccessMetric', graphql_name='projectSuccessMetric')
+    controllable_component = sgqlc.types.Field('ControllableComponent', graphql_name='controllableComponent')
     control_event_metric_edge = sgqlc.types.Field(ControlEventMetricsEdge, graphql_name='controlEventMetricEdge', args=sgqlc.types.ArgDict((
-        ('order_by', sgqlc.types.Arg(sgqlc.types.list_of(sgqlc.types.non_null(ControlEventMetricsOrderBy)), graphql_name='orderBy', default=['NATURAL'])),
+        ('order_by', sgqlc.types.Arg(sgqlc.types.list_of(sgqlc.types.non_null(ControlEventMetricsOrderBy)), graphql_name='orderBy', default=['PRIMARY_KEY_ASC'])),
 ))
     )
 
@@ -1965,13 +2164,13 @@ class DeleteControllableComponentPayload(sgqlc.types.Type):
 
 class DeleteEdgeNodePayload(sgqlc.types.Type):
     __schema__ = control_schema
-    __field_names__ = ('client_mutation_id', 'edge_node', 'deleted_edge_node_node_id', 'query', 'organization', 'project', 'edge_node_edge')
+    __field_names__ = ('client_mutation_id', 'edge_node', 'deleted_edge_node_node_id', 'query', 'organization', 'facility', 'edge_node_edge')
     client_mutation_id = sgqlc.types.Field(String, graphql_name='clientMutationId')
     edge_node = sgqlc.types.Field('EdgeNode', graphql_name='edgeNode')
     deleted_edge_node_node_id = sgqlc.types.Field(ID, graphql_name='deletedEdgeNodeNodeId')
     query = sgqlc.types.Field('Query', graphql_name='query')
     organization = sgqlc.types.Field('Organization', graphql_name='organization')
-    project = sgqlc.types.Field('Project', graphql_name='project')
+    facility = sgqlc.types.Field('Facility', graphql_name='facility')
     edge_node_edge = sgqlc.types.Field('EdgeNodesEdge', graphql_name='edgeNodeEdge', args=sgqlc.types.ArgDict((
         ('order_by', sgqlc.types.Arg(sgqlc.types.list_of(sgqlc.types.non_null(EdgeNodesOrderBy)), graphql_name='orderBy', default=['PRIMARY_KEY_ASC'])),
 ))
@@ -2016,6 +2215,21 @@ class DeleteOrganizationPayload(sgqlc.types.Type):
     query = sgqlc.types.Field('Query', graphql_name='query')
     organization_edge = sgqlc.types.Field('OrganizationsEdge', graphql_name='organizationEdge', args=sgqlc.types.ArgDict((
         ('order_by', sgqlc.types.Arg(sgqlc.types.list_of(sgqlc.types.non_null(OrganizationsOrderBy)), graphql_name='orderBy', default=['PRIMARY_KEY_ASC'])),
+))
+    )
+
+
+class DeleteProjectAgentPayload(sgqlc.types.Type):
+    __schema__ = control_schema
+    __field_names__ = ('client_mutation_id', 'project_agent', 'deleted_project_agent_node_id', 'query', 'project', 'user', 'project_agent_edge')
+    client_mutation_id = sgqlc.types.Field(String, graphql_name='clientMutationId')
+    project_agent = sgqlc.types.Field('ProjectAgent', graphql_name='projectAgent')
+    deleted_project_agent_node_id = sgqlc.types.Field(ID, graphql_name='deletedProjectAgentNodeId')
+    query = sgqlc.types.Field('Query', graphql_name='query')
+    project = sgqlc.types.Field('Project', graphql_name='project')
+    user = sgqlc.types.Field('User', graphql_name='user')
+    project_agent_edge = sgqlc.types.Field('ProjectAgentsEdge', graphql_name='projectAgentEdge', args=sgqlc.types.ArgDict((
+        ('order_by', sgqlc.types.Arg(sgqlc.types.list_of(sgqlc.types.non_null(ProjectAgentsOrderBy)), graphql_name='orderBy', default=['PRIMARY_KEY_ASC'])),
 ))
     )
 
@@ -2221,6 +2435,29 @@ class EdgeNodesEdge(sgqlc.types.Type):
     node = sgqlc.types.Field('EdgeNode', graphql_name='node')
 
 
+class Edgecontrolevent(sgqlc.types.Type):
+    __schema__ = control_schema
+    __field_names__ = ('componentslug', 'controlevent')
+    componentslug = sgqlc.types.Field(String, graphql_name='componentslug')
+    controlevent = sgqlc.types.Field('ControlEvent', graphql_name='controlevent')
+
+
+class EdgecontroleventsConnection(sgqlc.types.relay.Connection):
+    __schema__ = control_schema
+    __field_names__ = ('nodes', 'edges', 'page_info', 'total_count')
+    nodes = sgqlc.types.Field(sgqlc.types.non_null(sgqlc.types.list_of(Edgecontrolevent)), graphql_name='nodes')
+    edges = sgqlc.types.Field(sgqlc.types.non_null(sgqlc.types.list_of(sgqlc.types.non_null('EdgecontroleventsEdge'))), graphql_name='edges')
+    page_info = sgqlc.types.Field(sgqlc.types.non_null('PageInfo'), graphql_name='pageInfo')
+    total_count = sgqlc.types.Field(sgqlc.types.non_null(Int), graphql_name='totalCount')
+
+
+class EdgecontroleventsEdge(sgqlc.types.Type):
+    __schema__ = control_schema
+    __field_names__ = ('cursor', 'node')
+    cursor = sgqlc.types.Field(Cursor, graphql_name='cursor')
+    node = sgqlc.types.Field(Edgecontrolevent, graphql_name='node')
+
+
 class FacilitiesConnection(sgqlc.types.relay.Connection):
     __schema__ = control_schema
     __field_names__ = ('nodes', 'edges', 'page_info', 'total_count')
@@ -2285,6 +2522,32 @@ class FacilityEdgeNodesByControllableComponentFacilityIdAndControlledByEdgeNodeC
         ('after', sgqlc.types.Arg(Cursor, graphql_name='after', default=None)),
         ('order_by', sgqlc.types.Arg(sgqlc.types.list_of(sgqlc.types.non_null(ControllableComponentsOrderBy)), graphql_name='orderBy', default=['PRIMARY_KEY_ASC'])),
         ('condition', sgqlc.types.Arg(ControllableComponentCondition, graphql_name='condition', default=None)),
+))
+    )
+
+
+class FacilityOrganizationsByEdgeNodeFacilityIdAndOrganizationIdManyToManyConnection(sgqlc.types.relay.Connection):
+    __schema__ = control_schema
+    __field_names__ = ('nodes', 'edges', 'page_info', 'total_count')
+    nodes = sgqlc.types.Field(sgqlc.types.non_null(sgqlc.types.list_of('Organization')), graphql_name='nodes')
+    edges = sgqlc.types.Field(sgqlc.types.non_null(sgqlc.types.list_of(sgqlc.types.non_null('FacilityOrganizationsByEdgeNodeFacilityIdAndOrganizationIdManyToManyEdge'))), graphql_name='edges')
+    page_info = sgqlc.types.Field(sgqlc.types.non_null('PageInfo'), graphql_name='pageInfo')
+    total_count = sgqlc.types.Field(sgqlc.types.non_null(Int), graphql_name='totalCount')
+
+
+class FacilityOrganizationsByEdgeNodeFacilityIdAndOrganizationIdManyToManyEdge(sgqlc.types.Type):
+    __schema__ = control_schema
+    __field_names__ = ('cursor', 'node', 'edge_nodes')
+    cursor = sgqlc.types.Field(Cursor, graphql_name='cursor')
+    node = sgqlc.types.Field('Organization', graphql_name='node')
+    edge_nodes = sgqlc.types.Field(sgqlc.types.non_null(EdgeNodesConnection), graphql_name='edgeNodes', args=sgqlc.types.ArgDict((
+        ('first', sgqlc.types.Arg(Int, graphql_name='first', default=None)),
+        ('last', sgqlc.types.Arg(Int, graphql_name='last', default=None)),
+        ('offset', sgqlc.types.Arg(Int, graphql_name='offset', default=None)),
+        ('before', sgqlc.types.Arg(Cursor, graphql_name='before', default=None)),
+        ('after', sgqlc.types.Arg(Cursor, graphql_name='after', default=None)),
+        ('order_by', sgqlc.types.Arg(sgqlc.types.list_of(sgqlc.types.non_null(EdgeNodesOrderBy)), graphql_name='orderBy', default=['PRIMARY_KEY_ASC'])),
+        ('condition', sgqlc.types.Arg(EdgeNodeCondition, graphql_name='condition', default=None)),
 ))
     )
 
@@ -2413,7 +2676,7 @@ class FacilityUsersManyToManyEdge(sgqlc.types.Type):
 
 class Mutation(sgqlc.types.Type):
     __schema__ = control_schema
-    __field_names__ = ('create_control_event_metric', 'create_control_event', 'create_control_events_controlled_component', 'create_controllable_component', 'create_edge_node', 'create_facility', 'create_facility_project', 'create_facility_user', 'create_organization', 'create_project_success_metric', 'create_project_type', 'create_project', 'create_user', 'update_control_event_log_by_node_id', 'update_control_event_log', 'update_control_event_metric_by_control_event_id_and_project_success_metric_id', 'update_control_event_state_by_node_id', 'update_control_event_state', 'update_control_event_by_node_id', 'update_control_event', 'update_control_event_by_start_time_and_facility_id_and_project_id_and_type', 'update_controllable_component_by_node_id', 'update_controllable_component', 'update_controllable_component_by_slug_and_facility_id', 'update_edge_node_by_node_id', 'update_edge_node', 'update_facility_by_node_id', 'update_facility', 'update_facility_user_by_node_id', 'update_facility_user', 'update_organization_by_node_id', 'update_organization', 'update_project_success_metric_by_node_id', 'update_project_success_metric', 'update_project_type_by_node_id', 'update_project_type', 'update_project_by_node_id', 'update_project', 'update_user_by_node_id', 'update_user', 'delete_control_event_log_by_node_id', 'delete_control_event_log', 'delete_control_event_metric_by_control_event_id_and_project_success_metric_id', 'delete_control_event_state_by_node_id', 'delete_control_event_state', 'delete_control_event_by_node_id', 'delete_control_event', 'delete_control_event_by_start_time_and_facility_id_and_project_id_and_type', 'delete_controllable_component_by_node_id', 'delete_controllable_component', 'delete_controllable_component_by_slug_and_facility_id', 'delete_edge_node_by_node_id', 'delete_edge_node', 'delete_facility_by_node_id', 'delete_facility', 'delete_facility_user_by_node_id', 'delete_facility_user', 'delete_organization_by_node_id', 'delete_organization', 'delete_project_success_metric_by_node_id', 'delete_project_success_metric', 'delete_project_type_by_node_id', 'delete_project_type', 'delete_project_by_node_id', 'delete_project', 'delete_user_by_node_id', 'delete_user', 'change_event_state', 'propose_control_event', 'set_control_events')
+    __field_names__ = ('create_control_event_metric', 'create_control_event', 'create_control_events_controlled_component', 'create_controllable_component', 'create_edge_node', 'create_facility', 'create_facility_project', 'create_facility_user', 'create_organization', 'create_project_agent', 'create_project_success_metric', 'create_project_type', 'create_project', 'create_user', 'update_control_event_log_by_node_id', 'update_control_event_log', 'update_control_event_metric_by_node_id', 'update_control_event_metric_by_control_event_id_and_project_success_metric_id', 'update_control_event_metric', 'update_control_event_state_by_node_id', 'update_control_event_state', 'update_control_event_by_node_id', 'update_control_event', 'update_control_event_by_start_time_and_facility_id_and_project_id_and_type', 'update_controllable_component_by_node_id', 'update_controllable_component', 'update_controllable_component_by_slug_and_facility_id', 'update_edge_node_by_node_id', 'update_edge_node', 'update_facility_by_node_id', 'update_facility', 'update_facility_user_by_node_id', 'update_facility_user', 'update_organization_by_node_id', 'update_organization', 'update_project_agent_by_node_id', 'update_project_agent', 'update_project_success_metric_by_node_id', 'update_project_success_metric', 'update_project_type_by_node_id', 'update_project_type', 'update_project_by_node_id', 'update_project', 'update_user_by_node_id', 'update_user', 'delete_control_event_log_by_node_id', 'delete_control_event_log', 'delete_control_event_metric_by_node_id', 'delete_control_event_metric_by_control_event_id_and_project_success_metric_id', 'delete_control_event_metric', 'delete_control_event_state_by_node_id', 'delete_control_event_state', 'delete_control_event_by_node_id', 'delete_control_event', 'delete_control_event_by_start_time_and_facility_id_and_project_id_and_type', 'delete_controllable_component_by_node_id', 'delete_controllable_component', 'delete_controllable_component_by_slug_and_facility_id', 'delete_edge_node_by_node_id', 'delete_edge_node', 'delete_facility_by_node_id', 'delete_facility', 'delete_facility_user_by_node_id', 'delete_facility_user', 'delete_organization_by_node_id', 'delete_organization', 'delete_project_agent_by_node_id', 'delete_project_agent', 'delete_project_success_metric_by_node_id', 'delete_project_success_metric', 'delete_project_type_by_node_id', 'delete_project_type', 'delete_project_by_node_id', 'delete_project', 'delete_user_by_node_id', 'delete_user', 'change_event_state', 'propose_control_event', 'set_control_events')
     create_control_event_metric = sgqlc.types.Field(CreateControlEventMetricPayload, graphql_name='createControlEventMetric', args=sgqlc.types.ArgDict((
         ('input', sgqlc.types.Arg(sgqlc.types.non_null(CreateControlEventMetricInput), graphql_name='input', default=None)),
 ))
@@ -2450,6 +2713,10 @@ class Mutation(sgqlc.types.Type):
         ('input', sgqlc.types.Arg(sgqlc.types.non_null(CreateOrganizationInput), graphql_name='input', default=None)),
 ))
     )
+    create_project_agent = sgqlc.types.Field(CreateProjectAgentPayload, graphql_name='createProjectAgent', args=sgqlc.types.ArgDict((
+        ('input', sgqlc.types.Arg(sgqlc.types.non_null(CreateProjectAgentInput), graphql_name='input', default=None)),
+))
+    )
     create_project_success_metric = sgqlc.types.Field(CreateProjectSuccessMetricPayload, graphql_name='createProjectSuccessMetric', args=sgqlc.types.ArgDict((
         ('input', sgqlc.types.Arg(sgqlc.types.non_null(CreateProjectSuccessMetricInput), graphql_name='input', default=None)),
 ))
@@ -2474,8 +2741,16 @@ class Mutation(sgqlc.types.Type):
         ('input', sgqlc.types.Arg(sgqlc.types.non_null(UpdateControlEventLogInput), graphql_name='input', default=None)),
 ))
     )
+    update_control_event_metric_by_node_id = sgqlc.types.Field('UpdateControlEventMetricPayload', graphql_name='updateControlEventMetricByNodeId', args=sgqlc.types.ArgDict((
+        ('input', sgqlc.types.Arg(sgqlc.types.non_null(UpdateControlEventMetricByNodeIdInput), graphql_name='input', default=None)),
+))
+    )
     update_control_event_metric_by_control_event_id_and_project_success_metric_id = sgqlc.types.Field('UpdateControlEventMetricPayload', graphql_name='updateControlEventMetricByControlEventIdAndProjectSuccessMetricId', args=sgqlc.types.ArgDict((
         ('input', sgqlc.types.Arg(sgqlc.types.non_null(UpdateControlEventMetricByControlEventIdAndProjectSuccessMetricIdInput), graphql_name='input', default=None)),
+))
+    )
+    update_control_event_metric = sgqlc.types.Field('UpdateControlEventMetricPayload', graphql_name='updateControlEventMetric', args=sgqlc.types.ArgDict((
+        ('input', sgqlc.types.Arg(sgqlc.types.non_null(UpdateControlEventMetricInput), graphql_name='input', default=None)),
 ))
     )
     update_control_event_state_by_node_id = sgqlc.types.Field('UpdateControlEventStatePayload', graphql_name='updateControlEventStateByNodeId', args=sgqlc.types.ArgDict((
@@ -2542,6 +2817,14 @@ class Mutation(sgqlc.types.Type):
         ('input', sgqlc.types.Arg(sgqlc.types.non_null(UpdateOrganizationInput), graphql_name='input', default=None)),
 ))
     )
+    update_project_agent_by_node_id = sgqlc.types.Field('UpdateProjectAgentPayload', graphql_name='updateProjectAgentByNodeId', args=sgqlc.types.ArgDict((
+        ('input', sgqlc.types.Arg(sgqlc.types.non_null(UpdateProjectAgentByNodeIdInput), graphql_name='input', default=None)),
+))
+    )
+    update_project_agent = sgqlc.types.Field('UpdateProjectAgentPayload', graphql_name='updateProjectAgent', args=sgqlc.types.ArgDict((
+        ('input', sgqlc.types.Arg(sgqlc.types.non_null(UpdateProjectAgentInput), graphql_name='input', default=None)),
+))
+    )
     update_project_success_metric_by_node_id = sgqlc.types.Field('UpdateProjectSuccessMetricPayload', graphql_name='updateProjectSuccessMetricByNodeId', args=sgqlc.types.ArgDict((
         ('input', sgqlc.types.Arg(sgqlc.types.non_null(UpdateProjectSuccessMetricByNodeIdInput), graphql_name='input', default=None)),
 ))
@@ -2582,8 +2865,16 @@ class Mutation(sgqlc.types.Type):
         ('input', sgqlc.types.Arg(sgqlc.types.non_null(DeleteControlEventLogInput), graphql_name='input', default=None)),
 ))
     )
+    delete_control_event_metric_by_node_id = sgqlc.types.Field(DeleteControlEventMetricPayload, graphql_name='deleteControlEventMetricByNodeId', args=sgqlc.types.ArgDict((
+        ('input', sgqlc.types.Arg(sgqlc.types.non_null(DeleteControlEventMetricByNodeIdInput), graphql_name='input', default=None)),
+))
+    )
     delete_control_event_metric_by_control_event_id_and_project_success_metric_id = sgqlc.types.Field(DeleteControlEventMetricPayload, graphql_name='deleteControlEventMetricByControlEventIdAndProjectSuccessMetricId', args=sgqlc.types.ArgDict((
         ('input', sgqlc.types.Arg(sgqlc.types.non_null(DeleteControlEventMetricByControlEventIdAndProjectSuccessMetricIdInput), graphql_name='input', default=None)),
+))
+    )
+    delete_control_event_metric = sgqlc.types.Field(DeleteControlEventMetricPayload, graphql_name='deleteControlEventMetric', args=sgqlc.types.ArgDict((
+        ('input', sgqlc.types.Arg(sgqlc.types.non_null(DeleteControlEventMetricInput), graphql_name='input', default=None)),
 ))
     )
     delete_control_event_state_by_node_id = sgqlc.types.Field(DeleteControlEventStatePayload, graphql_name='deleteControlEventStateByNodeId', args=sgqlc.types.ArgDict((
@@ -2650,6 +2941,14 @@ class Mutation(sgqlc.types.Type):
         ('input', sgqlc.types.Arg(sgqlc.types.non_null(DeleteOrganizationInput), graphql_name='input', default=None)),
 ))
     )
+    delete_project_agent_by_node_id = sgqlc.types.Field(DeleteProjectAgentPayload, graphql_name='deleteProjectAgentByNodeId', args=sgqlc.types.ArgDict((
+        ('input', sgqlc.types.Arg(sgqlc.types.non_null(DeleteProjectAgentByNodeIdInput), graphql_name='input', default=None)),
+))
+    )
+    delete_project_agent = sgqlc.types.Field(DeleteProjectAgentPayload, graphql_name='deleteProjectAgent', args=sgqlc.types.ArgDict((
+        ('input', sgqlc.types.Arg(sgqlc.types.non_null(DeleteProjectAgentInput), graphql_name='input', default=None)),
+))
+    )
     delete_project_success_metric_by_node_id = sgqlc.types.Field(DeleteProjectSuccessMetricPayload, graphql_name='deleteProjectSuccessMetricByNodeId', args=sgqlc.types.ArgDict((
         ('input', sgqlc.types.Arg(sgqlc.types.non_null(DeleteProjectSuccessMetricByNodeIdInput), graphql_name='input', default=None)),
 ))
@@ -2702,6 +3001,32 @@ class Node(sgqlc.types.Interface):
     node_id = sgqlc.types.Field(sgqlc.types.non_null(ID), graphql_name='nodeId')
 
 
+class OrganizationFacilitiesByEdgeNodeOrganizationIdAndFacilityIdManyToManyConnection(sgqlc.types.relay.Connection):
+    __schema__ = control_schema
+    __field_names__ = ('nodes', 'edges', 'page_info', 'total_count')
+    nodes = sgqlc.types.Field(sgqlc.types.non_null(sgqlc.types.list_of('Facility')), graphql_name='nodes')
+    edges = sgqlc.types.Field(sgqlc.types.non_null(sgqlc.types.list_of(sgqlc.types.non_null('OrganizationFacilitiesByEdgeNodeOrganizationIdAndFacilityIdManyToManyEdge'))), graphql_name='edges')
+    page_info = sgqlc.types.Field(sgqlc.types.non_null('PageInfo'), graphql_name='pageInfo')
+    total_count = sgqlc.types.Field(sgqlc.types.non_null(Int), graphql_name='totalCount')
+
+
+class OrganizationFacilitiesByEdgeNodeOrganizationIdAndFacilityIdManyToManyEdge(sgqlc.types.Type):
+    __schema__ = control_schema
+    __field_names__ = ('cursor', 'node', 'edge_nodes')
+    cursor = sgqlc.types.Field(Cursor, graphql_name='cursor')
+    node = sgqlc.types.Field('Facility', graphql_name='node')
+    edge_nodes = sgqlc.types.Field(sgqlc.types.non_null(EdgeNodesConnection), graphql_name='edgeNodes', args=sgqlc.types.ArgDict((
+        ('first', sgqlc.types.Arg(Int, graphql_name='first', default=None)),
+        ('last', sgqlc.types.Arg(Int, graphql_name='last', default=None)),
+        ('offset', sgqlc.types.Arg(Int, graphql_name='offset', default=None)),
+        ('before', sgqlc.types.Arg(Cursor, graphql_name='before', default=None)),
+        ('after', sgqlc.types.Arg(Cursor, graphql_name='after', default=None)),
+        ('order_by', sgqlc.types.Arg(sgqlc.types.list_of(sgqlc.types.non_null(EdgeNodesOrderBy)), graphql_name='orderBy', default=['PRIMARY_KEY_ASC'])),
+        ('condition', sgqlc.types.Arg(EdgeNodeCondition, graphql_name='condition', default=None)),
+))
+    )
+
+
 class OrganizationProjectTypesByProjectOrganizationIdAndProjectTypeIdManyToManyConnection(sgqlc.types.relay.Connection):
     __schema__ = control_schema
     __field_names__ = ('nodes', 'edges', 'page_info', 'total_count')
@@ -2724,32 +3049,6 @@ class OrganizationProjectTypesByProjectOrganizationIdAndProjectTypeIdManyToManyE
         ('after', sgqlc.types.Arg(Cursor, graphql_name='after', default=None)),
         ('order_by', sgqlc.types.Arg(sgqlc.types.list_of(sgqlc.types.non_null(ProjectsOrderBy)), graphql_name='orderBy', default=['PRIMARY_KEY_ASC'])),
         ('condition', sgqlc.types.Arg(ProjectCondition, graphql_name='condition', default=None)),
-))
-    )
-
-
-class OrganizationProjectsByEdgeNodeOrganizationIdAndProjectIdManyToManyConnection(sgqlc.types.relay.Connection):
-    __schema__ = control_schema
-    __field_names__ = ('nodes', 'edges', 'page_info', 'total_count')
-    nodes = sgqlc.types.Field(sgqlc.types.non_null(sgqlc.types.list_of('Project')), graphql_name='nodes')
-    edges = sgqlc.types.Field(sgqlc.types.non_null(sgqlc.types.list_of(sgqlc.types.non_null('OrganizationProjectsByEdgeNodeOrganizationIdAndProjectIdManyToManyEdge'))), graphql_name='edges')
-    page_info = sgqlc.types.Field(sgqlc.types.non_null('PageInfo'), graphql_name='pageInfo')
-    total_count = sgqlc.types.Field(sgqlc.types.non_null(Int), graphql_name='totalCount')
-
-
-class OrganizationProjectsByEdgeNodeOrganizationIdAndProjectIdManyToManyEdge(sgqlc.types.Type):
-    __schema__ = control_schema
-    __field_names__ = ('cursor', 'node', 'edge_nodes')
-    cursor = sgqlc.types.Field(Cursor, graphql_name='cursor')
-    node = sgqlc.types.Field('Project', graphql_name='node')
-    edge_nodes = sgqlc.types.Field(sgqlc.types.non_null(EdgeNodesConnection), graphql_name='edgeNodes', args=sgqlc.types.ArgDict((
-        ('first', sgqlc.types.Arg(Int, graphql_name='first', default=None)),
-        ('last', sgqlc.types.Arg(Int, graphql_name='last', default=None)),
-        ('offset', sgqlc.types.Arg(Int, graphql_name='offset', default=None)),
-        ('before', sgqlc.types.Arg(Cursor, graphql_name='before', default=None)),
-        ('after', sgqlc.types.Arg(Cursor, graphql_name='after', default=None)),
-        ('order_by', sgqlc.types.Arg(sgqlc.types.list_of(sgqlc.types.non_null(EdgeNodesOrderBy)), graphql_name='orderBy', default=['PRIMARY_KEY_ASC'])),
-        ('condition', sgqlc.types.Arg(EdgeNodeCondition, graphql_name='condition', default=None)),
 ))
     )
 
@@ -2777,6 +3076,48 @@ class PageInfo(sgqlc.types.Type):
     has_previous_page = sgqlc.types.Field(sgqlc.types.non_null(Boolean), graphql_name='hasPreviousPage')
     start_cursor = sgqlc.types.Field(Cursor, graphql_name='startCursor')
     end_cursor = sgqlc.types.Field(Cursor, graphql_name='endCursor')
+
+
+class ProjectAgentsConnection(sgqlc.types.relay.Connection):
+    __schema__ = control_schema
+    __field_names__ = ('nodes', 'edges', 'page_info', 'total_count')
+    nodes = sgqlc.types.Field(sgqlc.types.non_null(sgqlc.types.list_of('ProjectAgent')), graphql_name='nodes')
+    edges = sgqlc.types.Field(sgqlc.types.non_null(sgqlc.types.list_of(sgqlc.types.non_null('ProjectAgentsEdge'))), graphql_name='edges')
+    page_info = sgqlc.types.Field(sgqlc.types.non_null(PageInfo), graphql_name='pageInfo')
+    total_count = sgqlc.types.Field(sgqlc.types.non_null(Int), graphql_name='totalCount')
+
+
+class ProjectAgentsEdge(sgqlc.types.Type):
+    __schema__ = control_schema
+    __field_names__ = ('cursor', 'node')
+    cursor = sgqlc.types.Field(Cursor, graphql_name='cursor')
+    node = sgqlc.types.Field('ProjectAgent', graphql_name='node')
+
+
+class ProjectAgentsManyToManyConnection(sgqlc.types.relay.Connection):
+    __schema__ = control_schema
+    __field_names__ = ('nodes', 'edges', 'page_info', 'total_count')
+    nodes = sgqlc.types.Field(sgqlc.types.non_null(sgqlc.types.list_of('User')), graphql_name='nodes')
+    edges = sgqlc.types.Field(sgqlc.types.non_null(sgqlc.types.list_of(sgqlc.types.non_null('ProjectAgentsManyToManyEdge'))), graphql_name='edges')
+    page_info = sgqlc.types.Field(sgqlc.types.non_null(PageInfo), graphql_name='pageInfo')
+    total_count = sgqlc.types.Field(sgqlc.types.non_null(Int), graphql_name='totalCount')
+
+
+class ProjectAgentsManyToManyEdge(sgqlc.types.Type):
+    __schema__ = control_schema
+    __field_names__ = ('cursor', 'node', 'project_agents')
+    cursor = sgqlc.types.Field(Cursor, graphql_name='cursor')
+    node = sgqlc.types.Field('User', graphql_name='node')
+    project_agents = sgqlc.types.Field(sgqlc.types.non_null(ProjectAgentsConnection), graphql_name='projectAgents', args=sgqlc.types.ArgDict((
+        ('first', sgqlc.types.Arg(Int, graphql_name='first', default=None)),
+        ('last', sgqlc.types.Arg(Int, graphql_name='last', default=None)),
+        ('offset', sgqlc.types.Arg(Int, graphql_name='offset', default=None)),
+        ('before', sgqlc.types.Arg(Cursor, graphql_name='before', default=None)),
+        ('after', sgqlc.types.Arg(Cursor, graphql_name='after', default=None)),
+        ('order_by', sgqlc.types.Arg(sgqlc.types.list_of(sgqlc.types.non_null(ProjectAgentsOrderBy)), graphql_name='orderBy', default=['PRIMARY_KEY_ASC'])),
+        ('condition', sgqlc.types.Arg(ProjectAgentCondition, graphql_name='condition', default=None)),
+))
+    )
 
 
 class ProjectControlEventStatesByControlEventProjectIdAndCurrentStateManyToManyConnection(sgqlc.types.relay.Connection):
@@ -2857,32 +3198,6 @@ class ProjectFacilitiesByFacilityProjectProjectIdAndFacilityIdManyToManyEdge(sgq
     )
 
 
-class ProjectOrganizationsByEdgeNodeProjectIdAndOrganizationIdManyToManyConnection(sgqlc.types.relay.Connection):
-    __schema__ = control_schema
-    __field_names__ = ('nodes', 'edges', 'page_info', 'total_count')
-    nodes = sgqlc.types.Field(sgqlc.types.non_null(sgqlc.types.list_of('Organization')), graphql_name='nodes')
-    edges = sgqlc.types.Field(sgqlc.types.non_null(sgqlc.types.list_of(sgqlc.types.non_null('ProjectOrganizationsByEdgeNodeProjectIdAndOrganizationIdManyToManyEdge'))), graphql_name='edges')
-    page_info = sgqlc.types.Field(sgqlc.types.non_null(PageInfo), graphql_name='pageInfo')
-    total_count = sgqlc.types.Field(sgqlc.types.non_null(Int), graphql_name='totalCount')
-
-
-class ProjectOrganizationsByEdgeNodeProjectIdAndOrganizationIdManyToManyEdge(sgqlc.types.Type):
-    __schema__ = control_schema
-    __field_names__ = ('cursor', 'node', 'edge_nodes')
-    cursor = sgqlc.types.Field(Cursor, graphql_name='cursor')
-    node = sgqlc.types.Field('Organization', graphql_name='node')
-    edge_nodes = sgqlc.types.Field(sgqlc.types.non_null(EdgeNodesConnection), graphql_name='edgeNodes', args=sgqlc.types.ArgDict((
-        ('first', sgqlc.types.Arg(Int, graphql_name='first', default=None)),
-        ('last', sgqlc.types.Arg(Int, graphql_name='last', default=None)),
-        ('offset', sgqlc.types.Arg(Int, graphql_name='offset', default=None)),
-        ('before', sgqlc.types.Arg(Cursor, graphql_name='before', default=None)),
-        ('after', sgqlc.types.Arg(Cursor, graphql_name='after', default=None)),
-        ('order_by', sgqlc.types.Arg(sgqlc.types.list_of(sgqlc.types.non_null(EdgeNodesOrderBy)), graphql_name='orderBy', default=['PRIMARY_KEY_ASC'])),
-        ('condition', sgqlc.types.Arg(EdgeNodeCondition, graphql_name='condition', default=None)),
-))
-    )
-
-
 class ProjectSuccessMetricControlEventsByControlEventMetricProjectSuccessMetricIdAndControlEventIdManyToManyConnection(sgqlc.types.relay.Connection):
     __schema__ = control_schema
     __field_names__ = ('nodes', 'edges', 'page_info', 'total_count')
@@ -2894,12 +3209,41 @@ class ProjectSuccessMetricControlEventsByControlEventMetricProjectSuccessMetricI
 
 class ProjectSuccessMetricControlEventsByControlEventMetricProjectSuccessMetricIdAndControlEventIdManyToManyEdge(sgqlc.types.Type):
     __schema__ = control_schema
-    __field_names__ = ('cursor', 'node', 'projected_impact_amount', 'created_at', 'updated_at')
+    __field_names__ = ('cursor', 'node', 'projected_impact_amount', 'created_at', 'updated_at', 'actual_impact_amount', 'controllable_component_id', 'id')
     cursor = sgqlc.types.Field(Cursor, graphql_name='cursor')
     node = sgqlc.types.Field('ControlEvent', graphql_name='node')
     projected_impact_amount = sgqlc.types.Field(sgqlc.types.non_null(Float), graphql_name='projectedImpactAmount')
     created_at = sgqlc.types.Field(sgqlc.types.non_null(Datetime), graphql_name='createdAt')
     updated_at = sgqlc.types.Field(sgqlc.types.non_null(Datetime), graphql_name='updatedAt')
+    actual_impact_amount = sgqlc.types.Field(Float, graphql_name='actualImpactAmount')
+    controllable_component_id = sgqlc.types.Field(sgqlc.types.non_null(UUID), graphql_name='controllableComponentId')
+    id = sgqlc.types.Field(sgqlc.types.non_null(UUID), graphql_name='id')
+
+
+class ProjectSuccessMetricControllableComponentsByControlEventMetricProjectSuccessMetricIdAndControllableComponentIdManyToManyConnection(sgqlc.types.relay.Connection):
+    __schema__ = control_schema
+    __field_names__ = ('nodes', 'edges', 'page_info', 'total_count')
+    nodes = sgqlc.types.Field(sgqlc.types.non_null(sgqlc.types.list_of('ControllableComponent')), graphql_name='nodes')
+    edges = sgqlc.types.Field(sgqlc.types.non_null(sgqlc.types.list_of(sgqlc.types.non_null('ProjectSuccessMetricControllableComponentsByControlEventMetricProjectSuccessMetricIdAndControllableComponentIdManyToManyEdge'))), graphql_name='edges')
+    page_info = sgqlc.types.Field(sgqlc.types.non_null(PageInfo), graphql_name='pageInfo')
+    total_count = sgqlc.types.Field(sgqlc.types.non_null(Int), graphql_name='totalCount')
+
+
+class ProjectSuccessMetricControllableComponentsByControlEventMetricProjectSuccessMetricIdAndControllableComponentIdManyToManyEdge(sgqlc.types.Type):
+    __schema__ = control_schema
+    __field_names__ = ('cursor', 'node', 'control_event_metrics')
+    cursor = sgqlc.types.Field(Cursor, graphql_name='cursor')
+    node = sgqlc.types.Field('ControllableComponent', graphql_name='node')
+    control_event_metrics = sgqlc.types.Field(sgqlc.types.non_null(ControlEventMetricsConnection), graphql_name='controlEventMetrics', args=sgqlc.types.ArgDict((
+        ('first', sgqlc.types.Arg(Int, graphql_name='first', default=None)),
+        ('last', sgqlc.types.Arg(Int, graphql_name='last', default=None)),
+        ('offset', sgqlc.types.Arg(Int, graphql_name='offset', default=None)),
+        ('before', sgqlc.types.Arg(Cursor, graphql_name='before', default=None)),
+        ('after', sgqlc.types.Arg(Cursor, graphql_name='after', default=None)),
+        ('order_by', sgqlc.types.Arg(sgqlc.types.list_of(sgqlc.types.non_null(ControlEventMetricsOrderBy)), graphql_name='orderBy', default=['PRIMARY_KEY_ASC'])),
+        ('condition', sgqlc.types.Arg(ControlEventMetricCondition, graphql_name='condition', default=None)),
+))
+    )
 
 
 class ProjectSuccessMetricsConnection(sgqlc.types.relay.Connection):
@@ -3043,14 +3387,15 @@ class UpdateControlEventLogPayload(sgqlc.types.Type):
 
 class UpdateControlEventMetricPayload(sgqlc.types.Type):
     __schema__ = control_schema
-    __field_names__ = ('client_mutation_id', 'control_event_metric', 'query', 'control_event', 'project_success_metric', 'control_event_metric_edge')
+    __field_names__ = ('client_mutation_id', 'control_event_metric', 'query', 'control_event', 'project_success_metric', 'controllable_component', 'control_event_metric_edge')
     client_mutation_id = sgqlc.types.Field(String, graphql_name='clientMutationId')
-    control_event_metric = sgqlc.types.Field(ControlEventMetric, graphql_name='controlEventMetric')
+    control_event_metric = sgqlc.types.Field('ControlEventMetric', graphql_name='controlEventMetric')
     query = sgqlc.types.Field('Query', graphql_name='query')
     control_event = sgqlc.types.Field('ControlEvent', graphql_name='controlEvent')
     project_success_metric = sgqlc.types.Field('ProjectSuccessMetric', graphql_name='projectSuccessMetric')
+    controllable_component = sgqlc.types.Field('ControllableComponent', graphql_name='controllableComponent')
     control_event_metric_edge = sgqlc.types.Field(ControlEventMetricsEdge, graphql_name='controlEventMetricEdge', args=sgqlc.types.ArgDict((
-        ('order_by', sgqlc.types.Arg(sgqlc.types.list_of(sgqlc.types.non_null(ControlEventMetricsOrderBy)), graphql_name='orderBy', default=['NATURAL'])),
+        ('order_by', sgqlc.types.Arg(sgqlc.types.list_of(sgqlc.types.non_null(ControlEventMetricsOrderBy)), graphql_name='orderBy', default=['PRIMARY_KEY_ASC'])),
 ))
     )
 
@@ -3098,12 +3443,12 @@ class UpdateControllableComponentPayload(sgqlc.types.Type):
 
 class UpdateEdgeNodePayload(sgqlc.types.Type):
     __schema__ = control_schema
-    __field_names__ = ('client_mutation_id', 'edge_node', 'query', 'organization', 'project', 'edge_node_edge')
+    __field_names__ = ('client_mutation_id', 'edge_node', 'query', 'organization', 'facility', 'edge_node_edge')
     client_mutation_id = sgqlc.types.Field(String, graphql_name='clientMutationId')
     edge_node = sgqlc.types.Field('EdgeNode', graphql_name='edgeNode')
     query = sgqlc.types.Field('Query', graphql_name='query')
     organization = sgqlc.types.Field('Organization', graphql_name='organization')
-    project = sgqlc.types.Field('Project', graphql_name='project')
+    facility = sgqlc.types.Field('Facility', graphql_name='facility')
     edge_node_edge = sgqlc.types.Field(EdgeNodesEdge, graphql_name='edgeNodeEdge', args=sgqlc.types.ArgDict((
         ('order_by', sgqlc.types.Arg(sgqlc.types.list_of(sgqlc.types.non_null(EdgeNodesOrderBy)), graphql_name='orderBy', default=['PRIMARY_KEY_ASC'])),
 ))
@@ -3145,6 +3490,20 @@ class UpdateOrganizationPayload(sgqlc.types.Type):
     query = sgqlc.types.Field('Query', graphql_name='query')
     organization_edge = sgqlc.types.Field(OrganizationsEdge, graphql_name='organizationEdge', args=sgqlc.types.ArgDict((
         ('order_by', sgqlc.types.Arg(sgqlc.types.list_of(sgqlc.types.non_null(OrganizationsOrderBy)), graphql_name='orderBy', default=['PRIMARY_KEY_ASC'])),
+))
+    )
+
+
+class UpdateProjectAgentPayload(sgqlc.types.Type):
+    __schema__ = control_schema
+    __field_names__ = ('client_mutation_id', 'project_agent', 'query', 'project', 'user', 'project_agent_edge')
+    client_mutation_id = sgqlc.types.Field(String, graphql_name='clientMutationId')
+    project_agent = sgqlc.types.Field('ProjectAgent', graphql_name='projectAgent')
+    query = sgqlc.types.Field('Query', graphql_name='query')
+    project = sgqlc.types.Field('Project', graphql_name='project')
+    user = sgqlc.types.Field('User', graphql_name='user')
+    project_agent_edge = sgqlc.types.Field(ProjectAgentsEdge, graphql_name='projectAgentEdge', args=sgqlc.types.ArgDict((
+        ('order_by', sgqlc.types.Arg(sgqlc.types.list_of(sgqlc.types.non_null(ProjectAgentsOrderBy)), graphql_name='orderBy', default=['PRIMARY_KEY_ASC'])),
 ))
     )
 
@@ -3330,6 +3689,32 @@ class UserFacilitiesManyToManyEdge(sgqlc.types.Type):
     )
 
 
+class UserProjectsManyToManyConnection(sgqlc.types.relay.Connection):
+    __schema__ = control_schema
+    __field_names__ = ('nodes', 'edges', 'page_info', 'total_count')
+    nodes = sgqlc.types.Field(sgqlc.types.non_null(sgqlc.types.list_of('Project')), graphql_name='nodes')
+    edges = sgqlc.types.Field(sgqlc.types.non_null(sgqlc.types.list_of(sgqlc.types.non_null('UserProjectsManyToManyEdge'))), graphql_name='edges')
+    page_info = sgqlc.types.Field(sgqlc.types.non_null(PageInfo), graphql_name='pageInfo')
+    total_count = sgqlc.types.Field(sgqlc.types.non_null(Int), graphql_name='totalCount')
+
+
+class UserProjectsManyToManyEdge(sgqlc.types.Type):
+    __schema__ = control_schema
+    __field_names__ = ('cursor', 'node', 'project_agents')
+    cursor = sgqlc.types.Field(Cursor, graphql_name='cursor')
+    node = sgqlc.types.Field('Project', graphql_name='node')
+    project_agents = sgqlc.types.Field(sgqlc.types.non_null(ProjectAgentsConnection), graphql_name='projectAgents', args=sgqlc.types.ArgDict((
+        ('first', sgqlc.types.Arg(Int, graphql_name='first', default=None)),
+        ('last', sgqlc.types.Arg(Int, graphql_name='last', default=None)),
+        ('offset', sgqlc.types.Arg(Int, graphql_name='offset', default=None)),
+        ('before', sgqlc.types.Arg(Cursor, graphql_name='before', default=None)),
+        ('after', sgqlc.types.Arg(Cursor, graphql_name='after', default=None)),
+        ('order_by', sgqlc.types.Arg(sgqlc.types.list_of(sgqlc.types.non_null(ProjectAgentsOrderBy)), graphql_name='orderBy', default=['PRIMARY_KEY_ASC'])),
+        ('condition', sgqlc.types.Arg(ProjectAgentCondition, graphql_name='condition', default=None)),
+))
+    )
+
+
 class UsersConnection(sgqlc.types.relay.Connection):
     __schema__ = control_schema
     __field_names__ = ('nodes', 'edges', 'page_info', 'total_count')
@@ -3348,7 +3733,7 @@ class UsersEdge(sgqlc.types.Type):
 
 class ControlEvent(sgqlc.types.Type, Node):
     __schema__ = control_schema
-    __field_names__ = ('id', 'start_time', 'end_time', 'facility_id', 'created_at', 'updated_at', 'project_id', 'type', 'current_state', 'facility', 'project', 'control_event_state_by_current_state', 'control_events_controlled_components', 'control_event_metrics', 'control_event_logs', 'controlled_components', 'project_success_metrics_by_control_event_metric_control_event_id_and_project_success_metric_id', 'users_by_control_event_log_control_event_id_and_by_user_id', 'edge_nodes_by_control_event_log_control_event_id_and_by_edge_node_id', 'control_event_states_by_control_event_log_control_event_id_and_previous_state', 'control_event_states_by_control_event_log_control_event_id_and_current_state')
+    __field_names__ = ('id', 'start_time', 'end_time', 'facility_id', 'created_at', 'updated_at', 'project_id', 'type', 'current_state', 'facility', 'project', 'control_event_state_by_current_state', 'control_events_controlled_components', 'control_event_metrics', 'control_event_logs', 'controlled_components', 'project_success_metrics_by_control_event_metric_control_event_id_and_project_success_metric_id', 'controllable_components_by_control_event_metric_control_event_id_and_controllable_component_id', 'users_by_control_event_log_control_event_id_and_by_user_id', 'edge_nodes_by_control_event_log_control_event_id_and_by_edge_node_id', 'control_event_states_by_control_event_log_control_event_id_and_previous_state', 'control_event_states_by_control_event_log_control_event_id_and_current_state')
     id = sgqlc.types.Field(sgqlc.types.non_null(UUID), graphql_name='id')
     start_time = sgqlc.types.Field(sgqlc.types.non_null(Datetime), graphql_name='startTime')
     end_time = sgqlc.types.Field(sgqlc.types.non_null(Datetime), graphql_name='endTime')
@@ -3377,7 +3762,7 @@ class ControlEvent(sgqlc.types.Type, Node):
         ('offset', sgqlc.types.Arg(Int, graphql_name='offset', default=None)),
         ('before', sgqlc.types.Arg(Cursor, graphql_name='before', default=None)),
         ('after', sgqlc.types.Arg(Cursor, graphql_name='after', default=None)),
-        ('order_by', sgqlc.types.Arg(sgqlc.types.list_of(sgqlc.types.non_null(ControlEventMetricsOrderBy)), graphql_name='orderBy', default=['NATURAL'])),
+        ('order_by', sgqlc.types.Arg(sgqlc.types.list_of(sgqlc.types.non_null(ControlEventMetricsOrderBy)), graphql_name='orderBy', default=['PRIMARY_KEY_ASC'])),
         ('condition', sgqlc.types.Arg(ControlEventMetricCondition, graphql_name='condition', default=None)),
 ))
     )
@@ -3409,6 +3794,16 @@ class ControlEvent(sgqlc.types.Type, Node):
         ('after', sgqlc.types.Arg(Cursor, graphql_name='after', default=None)),
         ('order_by', sgqlc.types.Arg(sgqlc.types.list_of(sgqlc.types.non_null(ProjectSuccessMetricsOrderBy)), graphql_name='orderBy', default=['PRIMARY_KEY_ASC'])),
         ('condition', sgqlc.types.Arg(ProjectSuccessMetricCondition, graphql_name='condition', default=None)),
+))
+    )
+    controllable_components_by_control_event_metric_control_event_id_and_controllable_component_id = sgqlc.types.Field(sgqlc.types.non_null(ControlEventControllableComponentsByControlEventMetricControlEventIdAndControllableComponentIdManyToManyConnection), graphql_name='controllableComponentsByControlEventMetricControlEventIdAndControllableComponentId', args=sgqlc.types.ArgDict((
+        ('first', sgqlc.types.Arg(Int, graphql_name='first', default=None)),
+        ('last', sgqlc.types.Arg(Int, graphql_name='last', default=None)),
+        ('offset', sgqlc.types.Arg(Int, graphql_name='offset', default=None)),
+        ('before', sgqlc.types.Arg(Cursor, graphql_name='before', default=None)),
+        ('after', sgqlc.types.Arg(Cursor, graphql_name='after', default=None)),
+        ('order_by', sgqlc.types.Arg(sgqlc.types.list_of(sgqlc.types.non_null(ControllableComponentsOrderBy)), graphql_name='orderBy', default=['PRIMARY_KEY_ASC'])),
+        ('condition', sgqlc.types.Arg(ControllableComponentCondition, graphql_name='condition', default=None)),
 ))
     )
     users_by_control_event_log_control_event_id_and_by_user_id = sgqlc.types.Field(sgqlc.types.non_null(ControlEventUsersByControlEventLogControlEventIdAndByUserIdManyToManyConnection), graphql_name='usersByControlEventLogControlEventIdAndByUserId', args=sgqlc.types.ArgDict((
@@ -3471,6 +3866,22 @@ class ControlEventLog(sgqlc.types.Type, Node):
     control_event = sgqlc.types.Field(ControlEvent, graphql_name='controlEvent')
     control_event_state_by_previous_state = sgqlc.types.Field('ControlEventState', graphql_name='controlEventStateByPreviousState')
     control_event_state_by_current_state = sgqlc.types.Field('ControlEventState', graphql_name='controlEventStateByCurrentState')
+
+
+class ControlEventMetric(sgqlc.types.Type, Node):
+    __schema__ = control_schema
+    __field_names__ = ('control_event_id', 'project_success_metric_id', 'projected_impact_amount', 'created_at', 'updated_at', 'actual_impact_amount', 'controllable_component_id', 'id', 'control_event', 'project_success_metric', 'controllable_component')
+    control_event_id = sgqlc.types.Field(sgqlc.types.non_null(UUID), graphql_name='controlEventId')
+    project_success_metric_id = sgqlc.types.Field(sgqlc.types.non_null(UUID), graphql_name='projectSuccessMetricId')
+    projected_impact_amount = sgqlc.types.Field(sgqlc.types.non_null(Float), graphql_name='projectedImpactAmount')
+    created_at = sgqlc.types.Field(sgqlc.types.non_null(Datetime), graphql_name='createdAt')
+    updated_at = sgqlc.types.Field(sgqlc.types.non_null(Datetime), graphql_name='updatedAt')
+    actual_impact_amount = sgqlc.types.Field(Float, graphql_name='actualImpactAmount')
+    controllable_component_id = sgqlc.types.Field(sgqlc.types.non_null(UUID), graphql_name='controllableComponentId')
+    id = sgqlc.types.Field(sgqlc.types.non_null(UUID), graphql_name='id')
+    control_event = sgqlc.types.Field(ControlEvent, graphql_name='controlEvent')
+    project_success_metric = sgqlc.types.Field('ProjectSuccessMetric', graphql_name='projectSuccessMetric')
+    controllable_component = sgqlc.types.Field('ControllableComponent', graphql_name='controllableComponent')
 
 
 class ControlEventState(sgqlc.types.Type, Node):
@@ -3614,7 +4025,7 @@ class ControlEventState(sgqlc.types.Type, Node):
 
 class ControllableComponent(sgqlc.types.Type, Node):
     __schema__ = control_schema
-    __field_names__ = ('id', 'slug', 'facility_id', 'label', 'description', 'controlled_by_edge_node_client_id', 'created_at', 'updated_at', 'facility', 'controlled_by_edge_node_client', 'control_events_controlled_components', 'control_events')
+    __field_names__ = ('id', 'slug', 'facility_id', 'label', 'description', 'controlled_by_edge_node_client_id', 'created_at', 'updated_at', 'facility', 'controlled_by_edge_node_client', 'control_events_controlled_components', 'control_event_metrics', 'control_events', 'control_events_by_control_event_metric_controllable_component_id_and_control_event_id', 'project_success_metrics_by_control_event_metric_controllable_component_id_and_project_success_metric_id')
     id = sgqlc.types.Field(sgqlc.types.non_null(UUID), graphql_name='id')
     slug = sgqlc.types.Field(sgqlc.types.non_null(String), graphql_name='slug')
     facility_id = sgqlc.types.Field(Int, graphql_name='facilityId')
@@ -3635,6 +4046,16 @@ class ControllableComponent(sgqlc.types.Type, Node):
         ('condition', sgqlc.types.Arg(ControlEventsControlledComponentCondition, graphql_name='condition', default=None)),
 ))
     )
+    control_event_metrics = sgqlc.types.Field(sgqlc.types.non_null(ControlEventMetricsConnection), graphql_name='controlEventMetrics', args=sgqlc.types.ArgDict((
+        ('first', sgqlc.types.Arg(Int, graphql_name='first', default=None)),
+        ('last', sgqlc.types.Arg(Int, graphql_name='last', default=None)),
+        ('offset', sgqlc.types.Arg(Int, graphql_name='offset', default=None)),
+        ('before', sgqlc.types.Arg(Cursor, graphql_name='before', default=None)),
+        ('after', sgqlc.types.Arg(Cursor, graphql_name='after', default=None)),
+        ('order_by', sgqlc.types.Arg(sgqlc.types.list_of(sgqlc.types.non_null(ControlEventMetricsOrderBy)), graphql_name='orderBy', default=['PRIMARY_KEY_ASC'])),
+        ('condition', sgqlc.types.Arg(ControlEventMetricCondition, graphql_name='condition', default=None)),
+))
+    )
     control_events = sgqlc.types.Field(sgqlc.types.non_null(ControllableComponentControlEventsManyToManyConnection), graphql_name='controlEvents', args=sgqlc.types.ArgDict((
         ('first', sgqlc.types.Arg(Int, graphql_name='first', default=None)),
         ('last', sgqlc.types.Arg(Int, graphql_name='last', default=None)),
@@ -3645,18 +4066,38 @@ class ControllableComponent(sgqlc.types.Type, Node):
         ('condition', sgqlc.types.Arg(ControlEventCondition, graphql_name='condition', default=None)),
 ))
     )
+    control_events_by_control_event_metric_controllable_component_id_and_control_event_id = sgqlc.types.Field(sgqlc.types.non_null(ControllableComponentControlEventsByControlEventMetricControllableComponentIdAndControlEventIdManyToManyConnection), graphql_name='controlEventsByControlEventMetricControllableComponentIdAndControlEventId', args=sgqlc.types.ArgDict((
+        ('first', sgqlc.types.Arg(Int, graphql_name='first', default=None)),
+        ('last', sgqlc.types.Arg(Int, graphql_name='last', default=None)),
+        ('offset', sgqlc.types.Arg(Int, graphql_name='offset', default=None)),
+        ('before', sgqlc.types.Arg(Cursor, graphql_name='before', default=None)),
+        ('after', sgqlc.types.Arg(Cursor, graphql_name='after', default=None)),
+        ('order_by', sgqlc.types.Arg(sgqlc.types.list_of(sgqlc.types.non_null(ControlEventsOrderBy)), graphql_name='orderBy', default=['PRIMARY_KEY_ASC'])),
+        ('condition', sgqlc.types.Arg(ControlEventCondition, graphql_name='condition', default=None)),
+))
+    )
+    project_success_metrics_by_control_event_metric_controllable_component_id_and_project_success_metric_id = sgqlc.types.Field(sgqlc.types.non_null(ControllableComponentProjectSuccessMetricsByControlEventMetricControllableComponentIdAndProjectSuccessMetricIdManyToManyConnection), graphql_name='projectSuccessMetricsByControlEventMetricControllableComponentIdAndProjectSuccessMetricId', args=sgqlc.types.ArgDict((
+        ('first', sgqlc.types.Arg(Int, graphql_name='first', default=None)),
+        ('last', sgqlc.types.Arg(Int, graphql_name='last', default=None)),
+        ('offset', sgqlc.types.Arg(Int, graphql_name='offset', default=None)),
+        ('before', sgqlc.types.Arg(Cursor, graphql_name='before', default=None)),
+        ('after', sgqlc.types.Arg(Cursor, graphql_name='after', default=None)),
+        ('order_by', sgqlc.types.Arg(sgqlc.types.list_of(sgqlc.types.non_null(ProjectSuccessMetricsOrderBy)), graphql_name='orderBy', default=['PRIMARY_KEY_ASC'])),
+        ('condition', sgqlc.types.Arg(ProjectSuccessMetricCondition, graphql_name='condition', default=None)),
+))
+    )
 
 
 class EdgeNode(sgqlc.types.Type, Node):
     __schema__ = control_schema
-    __field_names__ = ('client_id', 'organization_id', 'project_id', 'created_at', 'updated_at', 'organization', 'project', 'controllable_components_by_controlled_by_edge_node_client_id', 'control_event_logs_by_by_edge_node_id', 'facilities_by_controllable_component_controlled_by_edge_node_client_id_and_facility_id', 'users_by_control_event_log_by_edge_node_id_and_by_user_id', 'control_events_by_control_event_log_by_edge_node_id_and_control_event_id', 'control_event_states_by_control_event_log_by_edge_node_id_and_previous_state', 'control_event_states_by_control_event_log_by_edge_node_id_and_current_state')
+    __field_names__ = ('client_id', 'organization_id', 'created_at', 'updated_at', 'facility_id', 'organization', 'facility', 'controllable_components_by_controlled_by_edge_node_client_id', 'control_event_logs_by_by_edge_node_id', 'facilities_by_controllable_component_controlled_by_edge_node_client_id_and_facility_id', 'users_by_control_event_log_by_edge_node_id_and_by_user_id', 'control_events_by_control_event_log_by_edge_node_id_and_control_event_id', 'control_event_states_by_control_event_log_by_edge_node_id_and_previous_state', 'control_event_states_by_control_event_log_by_edge_node_id_and_current_state')
     client_id = sgqlc.types.Field(sgqlc.types.non_null(String), graphql_name='clientId')
     organization_id = sgqlc.types.Field(sgqlc.types.non_null(UUID), graphql_name='organizationId')
-    project_id = sgqlc.types.Field(sgqlc.types.non_null(String), graphql_name='projectId')
     created_at = sgqlc.types.Field(sgqlc.types.non_null(Datetime), graphql_name='createdAt')
     updated_at = sgqlc.types.Field(sgqlc.types.non_null(Datetime), graphql_name='updatedAt')
+    facility_id = sgqlc.types.Field(Int, graphql_name='facilityId')
     organization = sgqlc.types.Field('Organization', graphql_name='organization')
-    project = sgqlc.types.Field('Project', graphql_name='project')
+    facility = sgqlc.types.Field('Facility', graphql_name='facility')
     controllable_components_by_controlled_by_edge_node_client_id = sgqlc.types.Field(sgqlc.types.non_null(ControllableComponentsConnection), graphql_name='controllableComponentsByControlledByEdgeNodeClientId', args=sgqlc.types.ArgDict((
         ('first', sgqlc.types.Arg(Int, graphql_name='first', default=None)),
         ('last', sgqlc.types.Arg(Int, graphql_name='last', default=None)),
@@ -3731,7 +4172,7 @@ class EdgeNode(sgqlc.types.Type, Node):
 
 class Facility(sgqlc.types.Type, Node):
     __schema__ = control_schema
-    __field_names__ = ('id', 'name', 'organization_id', 'created_at', 'updated_at', 'organization', 'control_events', 'controllable_components', 'facility_projects', 'facility_users', 'projects_by_control_event_facility_id_and_project_id', 'control_event_states_by_control_event_facility_id_and_current_state', 'edge_nodes_by_controllable_component_facility_id_and_controlled_by_edge_node_client_id', 'projects_by_facility_project_facility_id_and_project_id', 'users')
+    __field_names__ = ('id', 'name', 'organization_id', 'created_at', 'updated_at', 'organization', 'control_events', 'edge_nodes', 'controllable_components', 'facility_projects', 'facility_users', 'projects_by_control_event_facility_id_and_project_id', 'control_event_states_by_control_event_facility_id_and_current_state', 'organizations_by_edge_node_facility_id_and_organization_id', 'edge_nodes_by_controllable_component_facility_id_and_controlled_by_edge_node_client_id', 'projects_by_facility_project_facility_id_and_project_id', 'users')
     id = sgqlc.types.Field(sgqlc.types.non_null(Int), graphql_name='id')
     name = sgqlc.types.Field(sgqlc.types.non_null(String), graphql_name='name')
     organization_id = sgqlc.types.Field(sgqlc.types.non_null(UUID), graphql_name='organizationId')
@@ -3746,6 +4187,16 @@ class Facility(sgqlc.types.Type, Node):
         ('after', sgqlc.types.Arg(Cursor, graphql_name='after', default=None)),
         ('order_by', sgqlc.types.Arg(sgqlc.types.list_of(sgqlc.types.non_null(ControlEventsOrderBy)), graphql_name='orderBy', default=['PRIMARY_KEY_ASC'])),
         ('condition', sgqlc.types.Arg(ControlEventCondition, graphql_name='condition', default=None)),
+))
+    )
+    edge_nodes = sgqlc.types.Field(sgqlc.types.non_null(EdgeNodesConnection), graphql_name='edgeNodes', args=sgqlc.types.ArgDict((
+        ('first', sgqlc.types.Arg(Int, graphql_name='first', default=None)),
+        ('last', sgqlc.types.Arg(Int, graphql_name='last', default=None)),
+        ('offset', sgqlc.types.Arg(Int, graphql_name='offset', default=None)),
+        ('before', sgqlc.types.Arg(Cursor, graphql_name='before', default=None)),
+        ('after', sgqlc.types.Arg(Cursor, graphql_name='after', default=None)),
+        ('order_by', sgqlc.types.Arg(sgqlc.types.list_of(sgqlc.types.non_null(EdgeNodesOrderBy)), graphql_name='orderBy', default=['PRIMARY_KEY_ASC'])),
+        ('condition', sgqlc.types.Arg(EdgeNodeCondition, graphql_name='condition', default=None)),
 ))
     )
     controllable_components = sgqlc.types.Field(sgqlc.types.non_null(ControllableComponentsConnection), graphql_name='controllableComponents', args=sgqlc.types.ArgDict((
@@ -3798,6 +4249,16 @@ class Facility(sgqlc.types.Type, Node):
         ('condition', sgqlc.types.Arg(ControlEventStateCondition, graphql_name='condition', default=None)),
 ))
     )
+    organizations_by_edge_node_facility_id_and_organization_id = sgqlc.types.Field(sgqlc.types.non_null(FacilityOrganizationsByEdgeNodeFacilityIdAndOrganizationIdManyToManyConnection), graphql_name='organizationsByEdgeNodeFacilityIdAndOrganizationId', args=sgqlc.types.ArgDict((
+        ('first', sgqlc.types.Arg(Int, graphql_name='first', default=None)),
+        ('last', sgqlc.types.Arg(Int, graphql_name='last', default=None)),
+        ('offset', sgqlc.types.Arg(Int, graphql_name='offset', default=None)),
+        ('before', sgqlc.types.Arg(Cursor, graphql_name='before', default=None)),
+        ('after', sgqlc.types.Arg(Cursor, graphql_name='after', default=None)),
+        ('order_by', sgqlc.types.Arg(sgqlc.types.list_of(sgqlc.types.non_null(OrganizationsOrderBy)), graphql_name='orderBy', default=['PRIMARY_KEY_ASC'])),
+        ('condition', sgqlc.types.Arg(OrganizationCondition, graphql_name='condition', default=None)),
+))
+    )
     edge_nodes_by_controllable_component_facility_id_and_controlled_by_edge_node_client_id = sgqlc.types.Field(sgqlc.types.non_null(FacilityEdgeNodesByControllableComponentFacilityIdAndControlledByEdgeNodeClientIdManyToManyConnection), graphql_name='edgeNodesByControllableComponentFacilityIdAndControlledByEdgeNodeClientId', args=sgqlc.types.ArgDict((
         ('first', sgqlc.types.Arg(Int, graphql_name='first', default=None)),
         ('last', sgqlc.types.Arg(Int, graphql_name='last', default=None)),
@@ -3845,7 +4306,7 @@ class FacilityUser(sgqlc.types.Type, Node):
 
 class Organization(sgqlc.types.Type, Node):
     __schema__ = control_schema
-    __field_names__ = ('id', 'name', 'created_at', 'updated_at', 'edge_nodes', 'projects', 'facilities', 'projects_by_edge_node_organization_id_and_project_id', 'project_types_by_project_organization_id_and_project_type_id')
+    __field_names__ = ('id', 'name', 'created_at', 'updated_at', 'edge_nodes', 'projects', 'facilities', 'facilities_by_edge_node_organization_id_and_facility_id', 'project_types_by_project_organization_id_and_project_type_id')
     id = sgqlc.types.Field(sgqlc.types.non_null(UUID), graphql_name='id')
     name = sgqlc.types.Field(sgqlc.types.non_null(String), graphql_name='name')
     created_at = sgqlc.types.Field(sgqlc.types.non_null(Datetime), graphql_name='createdAt')
@@ -3880,14 +4341,14 @@ class Organization(sgqlc.types.Type, Node):
         ('condition', sgqlc.types.Arg(FacilityCondition, graphql_name='condition', default=None)),
 ))
     )
-    projects_by_edge_node_organization_id_and_project_id = sgqlc.types.Field(sgqlc.types.non_null(OrganizationProjectsByEdgeNodeOrganizationIdAndProjectIdManyToManyConnection), graphql_name='projectsByEdgeNodeOrganizationIdAndProjectId', args=sgqlc.types.ArgDict((
+    facilities_by_edge_node_organization_id_and_facility_id = sgqlc.types.Field(sgqlc.types.non_null(OrganizationFacilitiesByEdgeNodeOrganizationIdAndFacilityIdManyToManyConnection), graphql_name='facilitiesByEdgeNodeOrganizationIdAndFacilityId', args=sgqlc.types.ArgDict((
         ('first', sgqlc.types.Arg(Int, graphql_name='first', default=None)),
         ('last', sgqlc.types.Arg(Int, graphql_name='last', default=None)),
         ('offset', sgqlc.types.Arg(Int, graphql_name='offset', default=None)),
         ('before', sgqlc.types.Arg(Cursor, graphql_name='before', default=None)),
         ('after', sgqlc.types.Arg(Cursor, graphql_name='after', default=None)),
-        ('order_by', sgqlc.types.Arg(sgqlc.types.list_of(sgqlc.types.non_null(ProjectsOrderBy)), graphql_name='orderBy', default=['PRIMARY_KEY_ASC'])),
-        ('condition', sgqlc.types.Arg(ProjectCondition, graphql_name='condition', default=None)),
+        ('order_by', sgqlc.types.Arg(sgqlc.types.list_of(sgqlc.types.non_null(FacilitiesOrderBy)), graphql_name='orderBy', default=['PRIMARY_KEY_ASC'])),
+        ('condition', sgqlc.types.Arg(FacilityCondition, graphql_name='condition', default=None)),
 ))
     )
     project_types_by_project_organization_id_and_project_type_id = sgqlc.types.Field(sgqlc.types.non_null(OrganizationProjectTypesByProjectOrganizationIdAndProjectTypeIdManyToManyConnection), graphql_name='projectTypesByProjectOrganizationIdAndProjectTypeId', args=sgqlc.types.ArgDict((
@@ -3904,7 +4365,7 @@ class Organization(sgqlc.types.Type, Node):
 
 class Project(sgqlc.types.Type, Node):
     __schema__ = control_schema
-    __field_names__ = ('id', 'name', 'description', 'organization_id', 'project_type_id', 'created_at', 'updated_at', 'organization', 'project_type', 'control_events', 'edge_nodes', 'facility_projects', 'project_success_metrics', 'facilities_by_control_event_project_id_and_facility_id', 'control_event_states_by_control_event_project_id_and_current_state', 'organizations_by_edge_node_project_id_and_organization_id', 'facilities_by_facility_project_project_id_and_facility_id')
+    __field_names__ = ('id', 'name', 'description', 'organization_id', 'project_type_id', 'created_at', 'updated_at', 'organization', 'project_type', 'control_events', 'facility_projects', 'project_success_metrics', 'project_agents', 'facilities_by_control_event_project_id_and_facility_id', 'control_event_states_by_control_event_project_id_and_current_state', 'facilities_by_facility_project_project_id_and_facility_id', 'agents')
     id = sgqlc.types.Field(sgqlc.types.non_null(String), graphql_name='id')
     name = sgqlc.types.Field(sgqlc.types.non_null(String), graphql_name='name')
     description = sgqlc.types.Field(sgqlc.types.non_null(String), graphql_name='description')
@@ -3922,16 +4383,6 @@ class Project(sgqlc.types.Type, Node):
         ('after', sgqlc.types.Arg(Cursor, graphql_name='after', default=None)),
         ('order_by', sgqlc.types.Arg(sgqlc.types.list_of(sgqlc.types.non_null(ControlEventsOrderBy)), graphql_name='orderBy', default=['PRIMARY_KEY_ASC'])),
         ('condition', sgqlc.types.Arg(ControlEventCondition, graphql_name='condition', default=None)),
-))
-    )
-    edge_nodes = sgqlc.types.Field(sgqlc.types.non_null(EdgeNodesConnection), graphql_name='edgeNodes', args=sgqlc.types.ArgDict((
-        ('first', sgqlc.types.Arg(Int, graphql_name='first', default=None)),
-        ('last', sgqlc.types.Arg(Int, graphql_name='last', default=None)),
-        ('offset', sgqlc.types.Arg(Int, graphql_name='offset', default=None)),
-        ('before', sgqlc.types.Arg(Cursor, graphql_name='before', default=None)),
-        ('after', sgqlc.types.Arg(Cursor, graphql_name='after', default=None)),
-        ('order_by', sgqlc.types.Arg(sgqlc.types.list_of(sgqlc.types.non_null(EdgeNodesOrderBy)), graphql_name='orderBy', default=['PRIMARY_KEY_ASC'])),
-        ('condition', sgqlc.types.Arg(EdgeNodeCondition, graphql_name='condition', default=None)),
 ))
     )
     facility_projects = sgqlc.types.Field(sgqlc.types.non_null(FacilityProjectsConnection), graphql_name='facilityProjects', args=sgqlc.types.ArgDict((
@@ -3954,6 +4405,16 @@ class Project(sgqlc.types.Type, Node):
         ('condition', sgqlc.types.Arg(ProjectSuccessMetricCondition, graphql_name='condition', default=None)),
 ))
     )
+    project_agents = sgqlc.types.Field(sgqlc.types.non_null(ProjectAgentsConnection), graphql_name='projectAgents', args=sgqlc.types.ArgDict((
+        ('first', sgqlc.types.Arg(Int, graphql_name='first', default=None)),
+        ('last', sgqlc.types.Arg(Int, graphql_name='last', default=None)),
+        ('offset', sgqlc.types.Arg(Int, graphql_name='offset', default=None)),
+        ('before', sgqlc.types.Arg(Cursor, graphql_name='before', default=None)),
+        ('after', sgqlc.types.Arg(Cursor, graphql_name='after', default=None)),
+        ('order_by', sgqlc.types.Arg(sgqlc.types.list_of(sgqlc.types.non_null(ProjectAgentsOrderBy)), graphql_name='orderBy', default=['PRIMARY_KEY_ASC'])),
+        ('condition', sgqlc.types.Arg(ProjectAgentCondition, graphql_name='condition', default=None)),
+))
+    )
     facilities_by_control_event_project_id_and_facility_id = sgqlc.types.Field(sgqlc.types.non_null(ProjectFacilitiesByControlEventProjectIdAndFacilityIdManyToManyConnection), graphql_name='facilitiesByControlEventProjectIdAndFacilityId', args=sgqlc.types.ArgDict((
         ('first', sgqlc.types.Arg(Int, graphql_name='first', default=None)),
         ('last', sgqlc.types.Arg(Int, graphql_name='last', default=None)),
@@ -3974,16 +4435,6 @@ class Project(sgqlc.types.Type, Node):
         ('condition', sgqlc.types.Arg(ControlEventStateCondition, graphql_name='condition', default=None)),
 ))
     )
-    organizations_by_edge_node_project_id_and_organization_id = sgqlc.types.Field(sgqlc.types.non_null(ProjectOrganizationsByEdgeNodeProjectIdAndOrganizationIdManyToManyConnection), graphql_name='organizationsByEdgeNodeProjectIdAndOrganizationId', args=sgqlc.types.ArgDict((
-        ('first', sgqlc.types.Arg(Int, graphql_name='first', default=None)),
-        ('last', sgqlc.types.Arg(Int, graphql_name='last', default=None)),
-        ('offset', sgqlc.types.Arg(Int, graphql_name='offset', default=None)),
-        ('before', sgqlc.types.Arg(Cursor, graphql_name='before', default=None)),
-        ('after', sgqlc.types.Arg(Cursor, graphql_name='after', default=None)),
-        ('order_by', sgqlc.types.Arg(sgqlc.types.list_of(sgqlc.types.non_null(OrganizationsOrderBy)), graphql_name='orderBy', default=['PRIMARY_KEY_ASC'])),
-        ('condition', sgqlc.types.Arg(OrganizationCondition, graphql_name='condition', default=None)),
-))
-    )
     facilities_by_facility_project_project_id_and_facility_id = sgqlc.types.Field(sgqlc.types.non_null(ProjectFacilitiesByFacilityProjectProjectIdAndFacilityIdManyToManyConnection), graphql_name='facilitiesByFacilityProjectProjectIdAndFacilityId', args=sgqlc.types.ArgDict((
         ('first', sgqlc.types.Arg(Int, graphql_name='first', default=None)),
         ('last', sgqlc.types.Arg(Int, graphql_name='last', default=None)),
@@ -3994,11 +4445,34 @@ class Project(sgqlc.types.Type, Node):
         ('condition', sgqlc.types.Arg(FacilityCondition, graphql_name='condition', default=None)),
 ))
     )
+    agents = sgqlc.types.Field(sgqlc.types.non_null(ProjectAgentsManyToManyConnection), graphql_name='agents', args=sgqlc.types.ArgDict((
+        ('first', sgqlc.types.Arg(Int, graphql_name='first', default=None)),
+        ('last', sgqlc.types.Arg(Int, graphql_name='last', default=None)),
+        ('offset', sgqlc.types.Arg(Int, graphql_name='offset', default=None)),
+        ('before', sgqlc.types.Arg(Cursor, graphql_name='before', default=None)),
+        ('after', sgqlc.types.Arg(Cursor, graphql_name='after', default=None)),
+        ('order_by', sgqlc.types.Arg(sgqlc.types.list_of(sgqlc.types.non_null(UsersOrderBy)), graphql_name='orderBy', default=['PRIMARY_KEY_ASC'])),
+        ('condition', sgqlc.types.Arg(UserCondition, graphql_name='condition', default=None)),
+))
+    )
+
+
+class ProjectAgent(sgqlc.types.Type, Node):
+    __schema__ = control_schema
+    __field_names__ = ('id', 'project_id', 'user_id', 'role', 'created_at', 'updated_at', 'project', 'user')
+    id = sgqlc.types.Field(sgqlc.types.non_null(UUID), graphql_name='id')
+    project_id = sgqlc.types.Field(sgqlc.types.non_null(String), graphql_name='projectId')
+    user_id = sgqlc.types.Field(sgqlc.types.non_null(String), graphql_name='userId')
+    role = sgqlc.types.Field(sgqlc.types.non_null(String), graphql_name='role')
+    created_at = sgqlc.types.Field(sgqlc.types.non_null(Datetime), graphql_name='createdAt')
+    updated_at = sgqlc.types.Field(sgqlc.types.non_null(Datetime), graphql_name='updatedAt')
+    project = sgqlc.types.Field(Project, graphql_name='project')
+    user = sgqlc.types.Field('User', graphql_name='user')
 
 
 class ProjectSuccessMetric(sgqlc.types.Type, Node):
     __schema__ = control_schema
-    __field_names__ = ('id', 'project_id', 'name', 'description', 'units', 'created_at', 'updated_at', 'project', 'control_event_metrics', 'control_events_by_control_event_metric_project_success_metric_id_and_control_event_id')
+    __field_names__ = ('id', 'project_id', 'name', 'description', 'units', 'created_at', 'updated_at', 'project', 'control_event_metrics', 'control_events_by_control_event_metric_project_success_metric_id_and_control_event_id', 'controllable_components_by_control_event_metric_project_success_metric_id_and_controllable_component_id')
     id = sgqlc.types.Field(sgqlc.types.non_null(UUID), graphql_name='id')
     project_id = sgqlc.types.Field(sgqlc.types.non_null(String), graphql_name='projectId')
     name = sgqlc.types.Field(sgqlc.types.non_null(String), graphql_name='name')
@@ -4013,7 +4487,7 @@ class ProjectSuccessMetric(sgqlc.types.Type, Node):
         ('offset', sgqlc.types.Arg(Int, graphql_name='offset', default=None)),
         ('before', sgqlc.types.Arg(Cursor, graphql_name='before', default=None)),
         ('after', sgqlc.types.Arg(Cursor, graphql_name='after', default=None)),
-        ('order_by', sgqlc.types.Arg(sgqlc.types.list_of(sgqlc.types.non_null(ControlEventMetricsOrderBy)), graphql_name='orderBy', default=['NATURAL'])),
+        ('order_by', sgqlc.types.Arg(sgqlc.types.list_of(sgqlc.types.non_null(ControlEventMetricsOrderBy)), graphql_name='orderBy', default=['PRIMARY_KEY_ASC'])),
         ('condition', sgqlc.types.Arg(ControlEventMetricCondition, graphql_name='condition', default=None)),
 ))
     )
@@ -4025,6 +4499,16 @@ class ProjectSuccessMetric(sgqlc.types.Type, Node):
         ('after', sgqlc.types.Arg(Cursor, graphql_name='after', default=None)),
         ('order_by', sgqlc.types.Arg(sgqlc.types.list_of(sgqlc.types.non_null(ControlEventsOrderBy)), graphql_name='orderBy', default=['PRIMARY_KEY_ASC'])),
         ('condition', sgqlc.types.Arg(ControlEventCondition, graphql_name='condition', default=None)),
+))
+    )
+    controllable_components_by_control_event_metric_project_success_metric_id_and_controllable_component_id = sgqlc.types.Field(sgqlc.types.non_null(ProjectSuccessMetricControllableComponentsByControlEventMetricProjectSuccessMetricIdAndControllableComponentIdManyToManyConnection), graphql_name='controllableComponentsByControlEventMetricProjectSuccessMetricIdAndControllableComponentId', args=sgqlc.types.ArgDict((
+        ('first', sgqlc.types.Arg(Int, graphql_name='first', default=None)),
+        ('last', sgqlc.types.Arg(Int, graphql_name='last', default=None)),
+        ('offset', sgqlc.types.Arg(Int, graphql_name='offset', default=None)),
+        ('before', sgqlc.types.Arg(Cursor, graphql_name='before', default=None)),
+        ('after', sgqlc.types.Arg(Cursor, graphql_name='after', default=None)),
+        ('order_by', sgqlc.types.Arg(sgqlc.types.list_of(sgqlc.types.non_null(ControllableComponentsOrderBy)), graphql_name='orderBy', default=['PRIMARY_KEY_ASC'])),
+        ('condition', sgqlc.types.Arg(ControllableComponentCondition, graphql_name='condition', default=None)),
 ))
     )
 
@@ -4061,7 +4545,7 @@ class ProjectType(sgqlc.types.Type, Node):
 
 class Query(sgqlc.types.Type, Node):
     __schema__ = control_schema
-    __field_names__ = ('query', 'node', 'control_event_logs', 'control_event_metrics', 'control_event_states', 'control_events', 'control_events_controlled_components', 'controllable_components', 'edge_nodes', 'facilities', 'facility_projects', 'facility_users', 'organizations', 'project_success_metrics', 'project_types', 'projects', 'users', 'control_event_log', 'control_event_metric_by_control_event_id_and_project_success_metric_id', 'control_event_state', 'control_event', 'control_event_by_start_time_and_facility_id_and_project_id_and_type', 'controllable_component', 'controllable_component_by_slug_and_facility_id', 'edge_node', 'facility', 'facility_user', 'organization', 'project_success_metric', 'project_type', 'project', 'user', 'control_events_by_edge_node_client_id', 'facility_enrollment_status_for_project', 'control_event_log_by_node_id', 'control_event_state_by_node_id', 'control_event_by_node_id', 'controllable_component_by_node_id', 'edge_node_by_node_id', 'facility_by_node_id', 'facility_user_by_node_id', 'organization_by_node_id', 'project_success_metric_by_node_id', 'project_type_by_node_id', 'project_by_node_id', 'user_by_node_id')
+    __field_names__ = ('query', 'node', 'control_event_logs', 'control_event_metrics', 'control_event_states', 'control_events', 'control_events_controlled_components', 'controllable_components', 'edge_nodes', 'facilities', 'facility_projects', 'facility_users', 'organizations', 'project_agents', 'project_success_metrics', 'project_types', 'projects', 'users', 'control_event_log', 'control_event_metric_by_control_event_id_and_project_success_metric_id', 'control_event_metric', 'control_event_state', 'control_event', 'control_event_by_start_time_and_facility_id_and_project_id_and_type', 'controllable_component', 'controllable_component_by_slug_and_facility_id', 'edge_node', 'facility', 'facility_user', 'organization', 'project_agent', 'project_success_metric', 'project_type', 'project', 'user', 'control_events_by_edge_node_client_id', 'edge_control_events', 'facility_enrollment_status_for_project', 'control_event_log_by_node_id', 'control_event_metric_by_node_id', 'control_event_state_by_node_id', 'control_event_by_node_id', 'controllable_component_by_node_id', 'edge_node_by_node_id', 'facility_by_node_id', 'facility_user_by_node_id', 'organization_by_node_id', 'project_agent_by_node_id', 'project_success_metric_by_node_id', 'project_type_by_node_id', 'project_by_node_id', 'user_by_node_id')
     query = sgqlc.types.Field(sgqlc.types.non_null('Query'), graphql_name='query')
     node = sgqlc.types.Field(Node, graphql_name='node', args=sgqlc.types.ArgDict((
         ('node_id', sgqlc.types.Arg(sgqlc.types.non_null(ID), graphql_name='nodeId', default=None)),
@@ -4083,7 +4567,7 @@ class Query(sgqlc.types.Type, Node):
         ('offset', sgqlc.types.Arg(Int, graphql_name='offset', default=None)),
         ('before', sgqlc.types.Arg(Cursor, graphql_name='before', default=None)),
         ('after', sgqlc.types.Arg(Cursor, graphql_name='after', default=None)),
-        ('order_by', sgqlc.types.Arg(sgqlc.types.list_of(sgqlc.types.non_null(ControlEventMetricsOrderBy)), graphql_name='orderBy', default=['NATURAL'])),
+        ('order_by', sgqlc.types.Arg(sgqlc.types.list_of(sgqlc.types.non_null(ControlEventMetricsOrderBy)), graphql_name='orderBy', default=['PRIMARY_KEY_ASC'])),
         ('condition', sgqlc.types.Arg(ControlEventMetricCondition, graphql_name='condition', default=None)),
 ))
     )
@@ -4177,6 +4661,16 @@ class Query(sgqlc.types.Type, Node):
         ('condition', sgqlc.types.Arg(OrganizationCondition, graphql_name='condition', default=None)),
 ))
     )
+    project_agents = sgqlc.types.Field(ProjectAgentsConnection, graphql_name='projectAgents', args=sgqlc.types.ArgDict((
+        ('first', sgqlc.types.Arg(Int, graphql_name='first', default=None)),
+        ('last', sgqlc.types.Arg(Int, graphql_name='last', default=None)),
+        ('offset', sgqlc.types.Arg(Int, graphql_name='offset', default=None)),
+        ('before', sgqlc.types.Arg(Cursor, graphql_name='before', default=None)),
+        ('after', sgqlc.types.Arg(Cursor, graphql_name='after', default=None)),
+        ('order_by', sgqlc.types.Arg(sgqlc.types.list_of(sgqlc.types.non_null(ProjectAgentsOrderBy)), graphql_name='orderBy', default=['PRIMARY_KEY_ASC'])),
+        ('condition', sgqlc.types.Arg(ProjectAgentCondition, graphql_name='condition', default=None)),
+))
+    )
     project_success_metrics = sgqlc.types.Field(ProjectSuccessMetricsConnection, graphql_name='projectSuccessMetrics', args=sgqlc.types.ArgDict((
         ('first', sgqlc.types.Arg(Int, graphql_name='first', default=None)),
         ('last', sgqlc.types.Arg(Int, graphql_name='last', default=None)),
@@ -4226,6 +4720,10 @@ class Query(sgqlc.types.Type, Node):
         ('project_success_metric_id', sgqlc.types.Arg(sgqlc.types.non_null(UUID), graphql_name='projectSuccessMetricId', default=None)),
 ))
     )
+    control_event_metric = sgqlc.types.Field(ControlEventMetric, graphql_name='controlEventMetric', args=sgqlc.types.ArgDict((
+        ('id', sgqlc.types.Arg(sgqlc.types.non_null(UUID), graphql_name='id', default=None)),
+))
+    )
     control_event_state = sgqlc.types.Field(ControlEventState, graphql_name='controlEventState', args=sgqlc.types.ArgDict((
         ('state', sgqlc.types.Arg(sgqlc.types.non_null(String), graphql_name='state', default=None)),
 ))
@@ -4266,6 +4764,10 @@ class Query(sgqlc.types.Type, Node):
         ('id', sgqlc.types.Arg(sgqlc.types.non_null(UUID), graphql_name='id', default=None)),
 ))
     )
+    project_agent = sgqlc.types.Field(ProjectAgent, graphql_name='projectAgent', args=sgqlc.types.ArgDict((
+        ('id', sgqlc.types.Arg(sgqlc.types.non_null(UUID), graphql_name='id', default=None)),
+))
+    )
     project_success_metric = sgqlc.types.Field(ProjectSuccessMetric, graphql_name='projectSuccessMetric', args=sgqlc.types.ArgDict((
         ('id', sgqlc.types.Arg(sgqlc.types.non_null(UUID), graphql_name='id', default=None)),
 ))
@@ -4291,6 +4793,15 @@ class Query(sgqlc.types.Type, Node):
         ('after', sgqlc.types.Arg(Cursor, graphql_name='after', default=None)),
 ))
     )
+    edge_control_events = sgqlc.types.Field(EdgecontroleventsConnection, graphql_name='edgeControlEvents', args=sgqlc.types.ArgDict((
+        ('clientid', sgqlc.types.Arg(String, graphql_name='clientid', default=None)),
+        ('first', sgqlc.types.Arg(Int, graphql_name='first', default=None)),
+        ('last', sgqlc.types.Arg(Int, graphql_name='last', default=None)),
+        ('offset', sgqlc.types.Arg(Int, graphql_name='offset', default=None)),
+        ('before', sgqlc.types.Arg(Cursor, graphql_name='before', default=None)),
+        ('after', sgqlc.types.Arg(Cursor, graphql_name='after', default=None)),
+))
+    )
     facility_enrollment_status_for_project = sgqlc.types.Field(ProjectenrollmentstatusesConnection, graphql_name='facilityEnrollmentStatusForProject', args=sgqlc.types.ArgDict((
         ('projectid', sgqlc.types.Arg(String, graphql_name='projectid', default=None)),
         ('first', sgqlc.types.Arg(Int, graphql_name='first', default=None)),
@@ -4301,6 +4812,10 @@ class Query(sgqlc.types.Type, Node):
 ))
     )
     control_event_log_by_node_id = sgqlc.types.Field(ControlEventLog, graphql_name='controlEventLogByNodeId', args=sgqlc.types.ArgDict((
+        ('node_id', sgqlc.types.Arg(sgqlc.types.non_null(ID), graphql_name='nodeId', default=None)),
+))
+    )
+    control_event_metric_by_node_id = sgqlc.types.Field(ControlEventMetric, graphql_name='controlEventMetricByNodeId', args=sgqlc.types.ArgDict((
         ('node_id', sgqlc.types.Arg(sgqlc.types.non_null(ID), graphql_name='nodeId', default=None)),
 ))
     )
@@ -4332,6 +4847,10 @@ class Query(sgqlc.types.Type, Node):
         ('node_id', sgqlc.types.Arg(sgqlc.types.non_null(ID), graphql_name='nodeId', default=None)),
 ))
     )
+    project_agent_by_node_id = sgqlc.types.Field(ProjectAgent, graphql_name='projectAgentByNodeId', args=sgqlc.types.ArgDict((
+        ('node_id', sgqlc.types.Arg(sgqlc.types.non_null(ID), graphql_name='nodeId', default=None)),
+))
+    )
     project_success_metric_by_node_id = sgqlc.types.Field(ProjectSuccessMetric, graphql_name='projectSuccessMetricByNodeId', args=sgqlc.types.ArgDict((
         ('node_id', sgqlc.types.Arg(sgqlc.types.non_null(ID), graphql_name='nodeId', default=None)),
 ))
@@ -4352,7 +4871,7 @@ class Query(sgqlc.types.Type, Node):
 
 class User(sgqlc.types.Type, Node):
     __schema__ = control_schema
-    __field_names__ = ('first_name', 'last_name', 'email', 'phone_number', 'created_at', 'updated_at', 'control_event_logs_by_by_user_id', 'facility_users', 'edge_nodes_by_control_event_log_by_user_id_and_by_edge_node_id', 'control_events_by_control_event_log_by_user_id_and_control_event_id', 'control_event_states_by_control_event_log_by_user_id_and_previous_state', 'control_event_states_by_control_event_log_by_user_id_and_current_state', 'facilities')
+    __field_names__ = ('first_name', 'last_name', 'email', 'phone_number', 'created_at', 'updated_at', 'control_event_logs_by_by_user_id', 'facility_users', 'project_agents', 'edge_nodes_by_control_event_log_by_user_id_and_by_edge_node_id', 'control_events_by_control_event_log_by_user_id_and_control_event_id', 'control_event_states_by_control_event_log_by_user_id_and_previous_state', 'control_event_states_by_control_event_log_by_user_id_and_current_state', 'facilities', 'projects')
     first_name = sgqlc.types.Field(sgqlc.types.non_null(String), graphql_name='firstName')
     last_name = sgqlc.types.Field(sgqlc.types.non_null(String), graphql_name='lastName')
     email = sgqlc.types.Field(sgqlc.types.non_null(String), graphql_name='email')
@@ -4377,6 +4896,16 @@ class User(sgqlc.types.Type, Node):
         ('after', sgqlc.types.Arg(Cursor, graphql_name='after', default=None)),
         ('order_by', sgqlc.types.Arg(sgqlc.types.list_of(sgqlc.types.non_null(FacilityUsersOrderBy)), graphql_name='orderBy', default=['PRIMARY_KEY_ASC'])),
         ('condition', sgqlc.types.Arg(FacilityUserCondition, graphql_name='condition', default=None)),
+))
+    )
+    project_agents = sgqlc.types.Field(sgqlc.types.non_null(ProjectAgentsConnection), graphql_name='projectAgents', args=sgqlc.types.ArgDict((
+        ('first', sgqlc.types.Arg(Int, graphql_name='first', default=None)),
+        ('last', sgqlc.types.Arg(Int, graphql_name='last', default=None)),
+        ('offset', sgqlc.types.Arg(Int, graphql_name='offset', default=None)),
+        ('before', sgqlc.types.Arg(Cursor, graphql_name='before', default=None)),
+        ('after', sgqlc.types.Arg(Cursor, graphql_name='after', default=None)),
+        ('order_by', sgqlc.types.Arg(sgqlc.types.list_of(sgqlc.types.non_null(ProjectAgentsOrderBy)), graphql_name='orderBy', default=['PRIMARY_KEY_ASC'])),
+        ('condition', sgqlc.types.Arg(ProjectAgentCondition, graphql_name='condition', default=None)),
 ))
     )
     edge_nodes_by_control_event_log_by_user_id_and_by_edge_node_id = sgqlc.types.Field(sgqlc.types.non_null(UserEdgeNodesByControlEventLogByUserIdAndByEdgeNodeIdManyToManyConnection), graphql_name='edgeNodesByControlEventLogByUserIdAndByEdgeNodeId', args=sgqlc.types.ArgDict((
@@ -4427,6 +4956,16 @@ class User(sgqlc.types.Type, Node):
         ('after', sgqlc.types.Arg(Cursor, graphql_name='after', default=None)),
         ('order_by', sgqlc.types.Arg(sgqlc.types.list_of(sgqlc.types.non_null(FacilitiesOrderBy)), graphql_name='orderBy', default=['PRIMARY_KEY_ASC'])),
         ('condition', sgqlc.types.Arg(FacilityCondition, graphql_name='condition', default=None)),
+))
+    )
+    projects = sgqlc.types.Field(sgqlc.types.non_null(UserProjectsManyToManyConnection), graphql_name='projects', args=sgqlc.types.ArgDict((
+        ('first', sgqlc.types.Arg(Int, graphql_name='first', default=None)),
+        ('last', sgqlc.types.Arg(Int, graphql_name='last', default=None)),
+        ('offset', sgqlc.types.Arg(Int, graphql_name='offset', default=None)),
+        ('before', sgqlc.types.Arg(Cursor, graphql_name='before', default=None)),
+        ('after', sgqlc.types.Arg(Cursor, graphql_name='after', default=None)),
+        ('order_by', sgqlc.types.Arg(sgqlc.types.list_of(sgqlc.types.non_null(ProjectsOrderBy)), graphql_name='orderBy', default=['PRIMARY_KEY_ASC'])),
+        ('condition', sgqlc.types.Arg(ProjectCondition, graphql_name='condition', default=None)),
 ))
     )
 
