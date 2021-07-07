@@ -65,12 +65,15 @@ class ControlService:
             self.endpoint = HTTPEndpoint(self.url, {'Authorization': f'Bearer {self.get_auth_token()}'})
         return self.endpoint
 
-    def get_control_events(self, facility_id: int):
+    def get_control_events(self, facility_id: int, project_id: str = None):
         op = Operation(schema.Query)
 
         filters = {}
         if facility_id:
             filters['facility_id'] = facility_id
+
+        if project_id:
+            filters['project_id'] = project_id
 
         if len(filters) > 0:
             events = op.control_events(condition=filters)
@@ -80,6 +83,8 @@ class ControlService:
         events.nodes.id()
         events.nodes.start_time()
         events.nodes.end_time()
+        events.nodes.project.id()
+        events.nodes.project.name()
 
         print(op)
 
