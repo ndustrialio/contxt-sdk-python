@@ -17,6 +17,8 @@ pyjwt = "^1"
 pyyaml = "^5"
 requests = "^2"
 tabulate = "*"
+sgqlc = "^14.0"
+pytz = "^2021.1"
 
 [tool.poetry.dev-dependencies]
 black = "^21.6b0"
