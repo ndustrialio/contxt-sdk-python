@@ -33,7 +33,7 @@ types-jwt = "^0.1.3"
 types-pkg-resources = "^0.1.3"
 types-pyyaml = "^5.4.6"
 types-requests = "^2.25.6"
-types-tabulate = "^0.1.1"
+types-tabulate = "^0.8.2"
 
 [tool.poetry.extras]
 crypto = ["cryptography"]
