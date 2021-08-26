@@ -17,7 +17,7 @@ def project_envs() -> None:
 def get(clients: Clients, project_slug: str) -> None:
     """Get project environment(s)"""
     result = clients.contxt_deployments.get(f"{clients.org_id}/projects/{project_slug}/environments")
-    print_table(result, keys=["id", "slug", "name", "type", "description"])
+    print_table(result, keys=["id", "slug", "name", "type", "description", "deployment_strategy"])
 
 
 @project_envs.command()
