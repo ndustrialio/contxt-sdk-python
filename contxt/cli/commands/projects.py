@@ -22,7 +22,7 @@ def get(clients: Clients, slug: Optional[str], sort: str) -> None:
         if slug
         else clients.contxt_deployments.get(f"{clients.org_id}/projects")
     )
-    print_table(items=items, keys=["slug", "name", "type", "description"], sort_by=sort)
+    print_table(items=items, keys=["id", "slug", "name", "type", "description"], sort_by=sort)
 
 
 @projects.command()
