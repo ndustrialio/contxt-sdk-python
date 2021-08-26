@@ -17,7 +17,24 @@ def project_envs() -> None:
 def get(clients: Clients, project_slug: str) -> None:
     """Get project environment(s)"""
     result = clients.contxt_deployments.get(f"{clients.org_id}/projects/{project_slug}/environments")
-    print_table(result, keys=["id", "slug", "name", "type", "description", "deployment_strategy"])
+
+    # Can't get cluster by id from API
+    clusters = clients.contxt_deployments.get_clusters(clients.org_id)
+    for r in result:
+        r["cluster_slug"] = next(c.slug for c in clusters if c.id == r["cluster_id"])
+    print_table(
+        result,
+        keys=[
+            "id",
+            "slug",
+            "name",
+            "type",
+            "description",
+            "deployment_strategy",
+            "cluster_id",
+            "cluster_slug",
+        ],
+    )
 
 
 @project_envs.command()
