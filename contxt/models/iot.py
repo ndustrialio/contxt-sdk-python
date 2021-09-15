@@ -152,7 +152,6 @@ class Feed(ApiObject):
         ApiField("owner_id"),
         ApiField("owner", data_type=Owner),
         ApiField("feed_type", data_type=dict),
-        ApiField("FeedStatus", attr_key="feed_status", data_type=dict),
         ApiField("Metrics", attr_key="metrics", data_type=dict, optional=True),
     )
 
@@ -173,7 +172,6 @@ class Feed(ApiObject):
     owner_id: str
     feed_type: str
     owner: Owner
-    feed_status: str
     metrics: Optional[Dict] = None
 
 
