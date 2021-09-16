@@ -18,7 +18,7 @@ class EmsService(ConfiguredApi):
         ),
         ApiEnvironment(
             name="staging",
-            base_url="https://ems-staging.api.ndustrial.io/v1",
+            base_url="https://ems.staging.api.ndustrial.io/v1",
             client_id="vMV67yaRFgjBB1JFbT3vXBOlohFdG1I4",
         ),
     )
