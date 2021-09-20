@@ -43,4 +43,4 @@ poetry run pre-commit install
 
 ### Create Release
 
-On a commit to master, our [CI pipeline](.github/workflows/ci.yaml) will bump the version (determined by [conventional commits](https://www.conventionalcommits.org/)) and publish a new release to PyPI.
+On a commit to main, our [CI pipeline](.github/workflows/ci.yaml) will bump the version (determined by [conventional commits](https://www.conventionalcommits.org/)) and publish a new release to PyPI.
