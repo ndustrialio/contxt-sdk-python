@@ -147,6 +147,7 @@ class IotService(ConfiguredApi):
         window: Window = Window.RAW,
         end_time: Optional[datetime] = None,
         per_page: int = 1000,
+        use_legacy_api: bool = True
     ) -> Iterable[DataPoint]:
         """Get time series data for field `field`"""
         # Manually validate the window choice, since our API does not return a
@@ -155,13 +156,19 @@ class IotService(ConfiguredApi):
         assert (start_time is None) == (
             end_time is None
         ), "Either both start and end time should be provided, or both should be missing"
+        if use_legacy_api:
+            uri = f"outputs/{field.output_id}/fields/{field.field_human_name}/data"
+        else:
+            uri = f"outputs/{field.output_id}/fields/{field.field_human_name}/data_v2"
+        #print(f'{int(start_time.timestamp())} -> {int(end_time.timestamp())}')
         return PagedTimeSeries(
             api=self,
-            url=f"outputs/{field.output_id}/fields/{field.field_human_name}/data",
+            url=uri,
             params={
                 "timeStart": int(start_time.timestamp()) if start_time else None,
                 "timeEnd": int(end_time.timestamp()) if end_time else None,
                 "window": window.value,
+                "limit": 5000
             },
             per_page=per_page,
         )

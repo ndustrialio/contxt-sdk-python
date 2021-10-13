@@ -1,7 +1,7 @@
 from csv import DictWriter
 from datetime import date, datetime
 from enum import Enum
-from json import dump, dumps
+from json import dump, dumps, loads
 from pathlib import Path
 from typing import Any, Callable, Iterable, Optional
 
@@ -69,9 +69,6 @@ class Serializer:
         elif hasattr(obj, "_ast"):
             # Abstract syntax tree
             return Serializer.to_dict(obj._ast())
-        elif hasattr(obj, "__iter__") and not isinstance(obj, str):
-            # Iterables (except strings)
-            return [Serializer.to_dict(v, cls_key) for v in obj]
         elif hasattr(obj, "__dict__"):
             # General object
             d = {
@@ -82,6 +79,9 @@ class Serializer:
             if cls_key is not None and hasattr(obj, "__class__"):
                 d[cls_key] = obj.__class__.__name__
             return d
+        elif hasattr(obj, "__iter__") and not isinstance(obj, str):
+            # Iterables (except strings)
+            return [Serializer.to_dict(v, cls_key) for v in obj]
         else:
             # Fallback to self
             return obj
@@ -126,7 +126,10 @@ class Serializer:
 
         for key, value in nested_sections.items():
             printed += "\n" + key.capitalize() + "\n"
-            printed += Serializer.to_table(value)
+            if isinstance(value, dict) and value.get('nodes'):
+                printed += Serializer.to_table(value.get('nodes'))
+            else:
+                printed += Serializer.to_table(value)
             printed += "\n"
 
         return printed

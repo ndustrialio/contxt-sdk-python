@@ -2,9 +2,13 @@ import requests
 from sgqlc.types import list_of
 from sgqlc.operation import Operation
 from sgqlc.endpoint.http import HTTPEndpoint
+from sgqlc.introspection import query as introspection_query, variables
 from datetime import datetime
 import pytz
 from typing import List
+import json
+from os import path
+from sgqlc.codegen.schema import CodeGen, load_schema
 
 from contxt.services.api import ApiEnvironment
 from contxt.services.control.control_schema import control_schema as schema
@@ -19,6 +23,11 @@ ENVS = {
         name="dev",
         base_url="https://facilitycontrol.staging.opencontxt.com/graphql",
         client_id="https://ndustrial-pocs.opencontxt.com"
+    ),
+    'local': ApiEnvironment(
+        name="local",
+        base_url="http://localhost:4002/graphql",
+        client_id="local"
     )
 }
 
@@ -27,10 +36,18 @@ class EnvironmentException(Exception):
     pass
 
 
+def include_proposals_with_object(obj, include_only_active: bool = True):
+    proposals = obj.event_proposals(order_by=[schema.EventProposalsOrderBy.START_TIME_ASC]).nodes()
+    proposals.id()
+    proposals.start_time()
+    proposals.end_time()
+    proposals.current_state()
+
+
 class ControlService:
 
     def __init__(self, client_id: str, client_secret: str, env='staging'):
-        self.token = None
+        self.token = None if env != "local" else "no_auth"
         self.endpoint = None
         if not ENVS.get(env):
             raise EnvironmentException('Environment not found')
@@ -60,12 +77,30 @@ class ControlService:
 
         return self.token
 
+    def update_schema(self):
+        data = self._get_endpoint()(introspection_query, variables())
+
+        base_file_path = path.dirname(__file__)
+        json_schema_filepath = path.abspath(path.join(base_file_path, "control_schema.json"))
+        with open(json_schema_filepath, 'w') as f:
+            print(f'Writing schema to {json_schema_filepath}')
+            json.dump(data, f, sort_keys=True, indent=2, default=str)
+
+        python_schema_filepath = path.abspath(path.join(base_file_path, 'control_schema.py'))
+        print('Generating code for schema')
+        with open(json_schema_filepath, 'r') as json_file:
+            schem = load_schema(json_file)
+            with open(python_schema_filepath, 'w') as schema_file:
+                gen = CodeGen('control_schema', schem, schema_file.write, docstrings=True)
+                gen.write()
+            print('Schema and types updated!')
+
     def _get_endpoint(self):
         if not self.endpoint:
             self.endpoint = HTTPEndpoint(self.url, {'Authorization': f'Bearer {self.get_auth_token()}'})
         return self.endpoint
 
-    def get_control_events(self, facility_id: int, project_id: str = None):
+    def get_event_proposals(self, facility_id: int, project_id: str = None):
         op = Operation(schema.Query)
 
         filters = {}
@@ -76,31 +111,183 @@ class ControlService:
             filters['project_id'] = project_id
 
         if len(filters) > 0:
-            events = op.control_events(condition=filters)
+            proposals = op.event_proposals(condition=filters,
+                                           order_by=[schema.EventProposalsOrderBy.START_TIME_ASC]).nodes()
         else:
-            events = op.control_events()
+            proposals = op.event_proposals(order_by=[schema.EventProposalsOrderBy.START_TIME_ASC]).nodes()
 
-        events.nodes.id()
-        events.nodes.start_time()
-        events.nodes.end_time()
-        events.nodes.project.id()
-        events.nodes.project.name()
+        proposals.id()
+        proposals.facility().name()
+        proposals.facility().id()
+        proposals.start_time()
+        proposals.end_time()
+        proposals.current_state()
 
-        print(op)
+        # include projects
+        proposals.project.id()
+        proposals.project.name()
+
+        # include metrics
+        proposals.event_proposal_metrics().nodes().id()
+        proposals.event_proposal_metrics().nodes().actual_impact_amount()
+        proposals.event_proposal_metrics().nodes().projected_impact_amount()
+        proposals.event_proposal_metrics().nodes().calculation_metadata()
+        proposals.event_proposal_metrics().nodes().controllable_component().id()
+        proposals.event_proposal_metrics().nodes().controllable_component().slug()
 
         data = self._get_endpoint()(op)
 
-        events = (op + data).control_events
+        proposals = (op + data).event_proposals
 
-        return events.nodes
+        return proposals.nodes
 
-    def propose_control_event(self, facility_id: int, project_id: str, start_time: datetime,
-                              end_time: datetime, components: List[schema.ControllableComponent]):
+    def get_proposal_detail(self, event_proposal_id: str):
+        op = Operation(schema.Query)
+
+        event_proposal = op.event_proposal(id=event_proposal_id)
+
+        event_proposal.facility_id()
+        event_proposal.start_time()
+        event_proposal.end_time()
+        event_proposal.current_state()
+
+        # Include project info
+        event_proposal.project().id()
+
+        # Include metrics
+        event_proposal.event_proposal_metrics().nodes().id()
+        event_proposal.event_proposal_metrics().nodes().actual_impact_amount()
+        event_proposal.event_proposal_metrics().nodes().projected_impact_amount()
+        event_proposal.event_proposal_metrics().nodes().calculation_metadata()
+        event_proposal.event_proposal_metrics().nodes().controllable_component().id()
+        event_proposal.event_proposal_metrics().nodes().controllable_component().slug()
+
+        data = self._get_endpoint()(op)
+
+        event_proposal = (op + data).event_proposal
+
+        return event_proposal
+
+    def get_control_event_detail(self, control_event_id: str):
+        op = Operation(schema.Query)
+
+        control_event = op.control_event(id=control_event_id)
+
+        control_event.start_time()
+        control_event.end_time()
+        control_event.current_state()
+
+        # Audit Logs
+        logs = control_event.control_event_logs(
+            order_by=[schema.ControlEventLogsOrderBy.EVENT_TIME_ASC]).nodes()
+        logs.event_time()
+        logs.event_type()
+        logs.label()
+        logs.by_user_id()
+        logs.by_edge_node_id()
+        logs.previous_state()
+        logs.current_state()
+        logs.data()
+
+        data = self._get_endpoint()(op)
+
+        control_event = (op + data).control_event
+
+        return control_event
+
+    def get_edge_control_events(self, client_id: str):
+        op = Operation(schema.Query)
+
+        edge_control_events = op.edge_control_events(clientid=client_id)
+
+        edge_control_events.nodes.componentslug()
+        control_event = edge_control_events.nodes.controlevent()
+
+        control_event.id()
+        control_event.start_time()
+        control_event.end_time()
+        control_event.state_machine().current_state()
+
+        data = self._get_endpoint()(op)
+
+        edge_control_events = (op + data).edge_control_events
+
+        return edge_control_events
+
+    def transition_event(self, control_event_id: str, transition_event: str):
+        op = Operation(schema.Mutation)
+
+        transition_input = schema.TransitionControlEventInput()
+        transition_input.control_event_id = control_event_id
+        transition_input.transition_event = transition_event
+
+        transition = op.transition_control_event(input=transition_input)
+
+        transition.control_event.id()
+        transition.control_event.state_machine().current_state()
+
+        data = self._get_endpoint()(op)
+        if 'errors' in data:
+            raise Exception(data['errors'][0]['message'])
+
+        event = (op + data).transition_control_event
+        return event
+
+    def get_definitions(self, definition_slug: str):
+        op = Operation(schema.Query)
+
+        if definition_slug:
+            print(definition_slug)
+            query = op.state_definition(slug=definition_slug)
+        else:
+            definitions = op.state_definitions()
+            query = definitions.nodes()
+
+        query.slug()
+        query.definition()
+
+        data = self._get_endpoint()(op)
+
+        if definition_slug:
+            definitions = (op + data).state_definition
+        else:
+            definitions = (op + data).state_definitions
+
+        return definitions
+
+    def add_historic_event(self, facility_id: int, project_id: str, start_time: datetime,
+                           end_time: datetime, components: List[schema.ControllableComponent]):
 
         op = Operation(schema.Mutation)
 
-        proposal = schema.ProposeControlEventInput()
-        event_proposal = schema.ControlEventProposalInputRecordInput()
+        historic_event = schema.AddHistoricEventInput()
+        historic_input = schema.HistoricEventProposalInputRecordInput()
+        historic_input.facilityid = facility_id
+        historic_input.projectid = project_id
+        historic_input.starttime = str(start_time.astimezone(pytz.utc))
+        historic_input.endtime = str(end_time.astimezone(pytz.utc))
+        historic_event.historic_event = historic_input
+        historic_event.components = components
+
+        propose = op.add_historic_event(input=historic_event)
+
+        propose.event_proposal.id()
+
+        data = self._get_endpoint()(op)
+        if 'errors' in data:
+            print(data)
+            raise Exception(data['errors'][0]['message'])
+
+        event = (op + data).add_historic_event.event_proposal
+        return event
+
+    def propose_event(self, facility_id: int, project_id: str, start_time: datetime,
+                      end_time: datetime, components: List[schema.ControllableComponent]):
+
+        op = Operation(schema.Mutation)
+
+        proposal = schema.ProposeEventInput()
+        event_proposal = schema.EventProposalInputRecordInput()
         event_proposal.facilityid = facility_id
         event_proposal.projectid = project_id
         event_proposal.starttime = str(start_time.astimezone(pytz.utc))
@@ -109,39 +296,35 @@ class ControlService:
         proposal.components_to_control = components
 
         print(proposal)
-        propose = op.propose_control_event(input=proposal)
+        propose = op.propose_event(input=proposal)
 
-        propose.control_event.id()
-
-        print(op)
+        propose.event_proposal.id()
 
         data = self._get_endpoint()(op)
         if 'errors' in data:
             print(data)
             raise Exception(data['errors'][0]['message'])
 
-        event = (op + data).propose_control_event.control_event
+        event = (op + data).propose_event.event_proposal
         return event
 
     def add_savings_for_component_control_event(self, component: schema.ControllableComponent,
-                                                control_event: schema.ControlEvent, success_metric_id: str,
+                                                event_proposal: schema.EventProposal, success_metric_id: str,
                                                 projected_savings_amount: float):
         op = Operation(schema.Mutation)
 
-        input = schema.CreateControlEventMetricInput()
-        metric = schema.ControlEventMetricInput()
-        metric.control_event_id = control_event.id
+        input = schema.CreateEventProposalMetricInput()
+        metric = schema.EventProposalMetricInput()
+        metric.event_proposal_id = event_proposal.id
         metric.controllable_component_id = component.id
         metric.project_success_metric_id = success_metric_id
         metric.projected_impact_amount = projected_savings_amount
 
-        input.control_event_metric = metric
+        input.event_proposal_metric = metric
 
-        new_metric = op.create_control_event_metric(input=input)
+        new_metric = op.create_event_proposal_metric(input=input)
 
-        new_metric.control_event_metric.project_success_metric_id()
-
-        print(op)
+        new_metric.event_proposal_metric.project_success_metric_id()
 
         data = self._get_endpoint()(op)
 
@@ -149,26 +332,83 @@ class ControlService:
             print(data)
             raise Exception(data['errors'][0]['message'])
 
-        metric = (op + data).create_control_event_metric
+        metric = (op + data).create_event_proposal_metric
         return metric
 
-    def get_controllables_for_facility(self, facility_id: int):
+    def add_actual_savings_for_component_control_event(self, success_metric_id: str,
+                                                       actual_savings_amount: float,
+                                                       metadata: str):
+        op = Operation(schema.Mutation)
+
+        update = schema.UpdateEventProposalMetricInput()
+        patch = schema.EventProposalMetricPatch()
+
+        update.id = success_metric_id
+        patch.actual_impact_amount = actual_savings_amount
+        if metadata:
+            patch.calculation_metadata = metadata
+
+        update.patch = patch
+
+        update_metric = op.update_event_proposal_metric(input=update)
+        update_metric.event_proposal_metric.id()
+
+        data = self._get_endpoint()(op)
+
+        if 'errors' in data:
+            print(data)
+            raise Exception(data['errors'][0]['message'])
+
+        metric = (op + data).update_event_proposal_metric
+        return metric
+
+    def create_facility(self, name: str, id: int, organization_id: str):
+        op = Operation(schema.Mutation)
+
+        create = schema.CreateFacilityInput()
+        facility = schema.FacilityInput()
+        facility.id = id
+        facility.name = name
+        facility.organization_id = organization_id
+
+        create.facility = facility
+
+        print(create)
+        post_create = op.create_facility(input=create)
+
+        post_create.facility.id()
+        post_create.facility.name()
+        post_create.facility.organization_id()
+
+        data = self._get_endpoint()(op)
+        if 'errors' in data:
+            print(data)
+            raise Exception(data['errors'][0]['message'])
+        print((op + data))
+        facility = (op + data).create_facility
+        return facility
+
+    def get_controllables_for_facility(self, facility_id: int, component_slug: str = None,
+                                       include_events: bool = True):
         op = Operation(schema.Query)
 
         filters = {}
         if facility_id:
             filters['facility_id'] = facility_id
+        if component_slug:
+            filters['slug'] = component_slug
 
         if len(filters) > 0:
             components = op.controllable_components(condition=filters)
         else:
             components = op.controllable_components()
 
+        if include_events:
+            include_proposals_with_object(components.nodes)
+
         components.nodes.id()
         components.nodes.slug()
         components.nodes.label()
-
-        print(op)
 
         data = self._get_endpoint()(op)
 
@@ -176,7 +416,8 @@ class ControlService:
 
         return components.nodes
 
-    def get_project_definition(self, project_id: str, metric_name: str = None):
+    def get_project_definition(self, project_id: str, metric_name: str = None,
+                               include_events: bool = True, include_only_enrolled_facilities: bool = True):
         op = Operation(schema.Query)
 
         project = op.project(id=project_id)
@@ -195,10 +436,158 @@ class ControlService:
         metrics.units()
         metrics.description()
 
-        print(op)
+        if include_events:
+            include_proposals_with_object(project)
+
+        if include_only_enrolled_facilities:
+            facility_projects = project.facility_projects(
+                condition={'enrollmentStatus': 'ENROLLED'}).nodes()
+        else:
+            facility_projects = project.facility_projects().nodes()
+        facility_projects.enrollment_status()
+        facility = facility_projects.facility()
+        facility.name()
 
         data = self._get_endpoint()(op)
 
         project = (op + data).project
 
         return project
+
+    def get_projects(self, facility_id: int):
+        op = Operation(schema.Query)
+
+        projects = op.projects()
+
+        projects.nodes().id()
+        projects.nodes().name()
+        projects.nodes().description()
+
+        data = self._get_endpoint()(op)
+
+        projects = (op + data).projects
+
+        return projects.nodes
+
+    def get_facilities(self, include_events: bool = True,):
+        op = Operation(schema.Query)
+
+        facilities = op.facilities().nodes()
+
+        facilities.id()
+        facilities.name()
+
+        # Project Info
+        projects = facilities.facility_projects().nodes()
+        projects.enrollment_status()
+
+        project = projects.project()
+        project.name()
+
+        # Event Info
+        if include_events:
+            include_proposals_with_object(facilities)
+
+        # User Roles
+        controllers = facilities.facility_users().nodes()
+        controllers.user_id()
+        controllers.role()
+
+        data = self._get_endpoint()(op)
+
+        facilities = (op + data).facilities
+
+        return facilities.nodes
+
+    def get_edge_nodes(self, facility_id: int = None):
+        op = Operation(schema.Query)
+
+        filters = {}
+        if facility_id:
+            filters['facility_id'] = facility_id
+
+        if len(filters) > 0:
+            edge_nodes = op.edge_nodes(condition=filters).nodes()
+        else:
+            edge_nodes = op.edge_nodes().nodes()
+
+        edge_nodes.client_id()
+        edge_nodes.facility_id()
+        edge_nodes.organization_id()
+        edge_nodes.last_fetch_time()
+
+        data = self._get_endpoint()(op)
+
+        edge_nodes = (op + data).edge_nodes
+
+        return edge_nodes.nodes
+
+    def get_edge_node(self, client_id: str):
+        op = Operation(schema.Query)
+
+        edge_node = op.edge_node(client_id=client_id)
+
+        edge_node.client_id()
+        edge_node.facility_id()
+        edge_node.organization_id()
+        edge_node.last_fetch_time()
+
+        # Facility Info
+        facility = edge_node.facility()
+        facility.id()
+        facility.name()
+
+        # Organization Info
+        org = edge_node.organization()
+        org.id()
+        org.name()
+
+        # Components
+        components = edge_node.controllable_components_by_controlled_by_edge_node_client_id().nodes()
+        components.slug()
+        components.label()
+
+        data = self._get_endpoint()(op)
+
+        edge_node = (op + data).edge_node
+
+        return edge_node
+
+    def get_facility(self, id: int, include_events: bool = True):
+        op = Operation(schema.Query)
+
+        facility = op.facility(id=id)
+
+        facility.id()
+        facility.name()
+        facility.organization_id()
+
+        # Controllable Info
+        controllables = facility.controllable_components().nodes()
+        controllables.slug()
+        controllables.label()
+        controllables.description()
+
+        # Control Event Info
+        if include_events:
+            include_proposals_with_object(facility)
+
+        data = self._get_endpoint()(op)
+
+        facility = (op + data).facility
+
+        return facility
+
+    def get_organizations(self):
+        op = Operation(schema.Query)
+
+        orgs = op.organizations().nodes()
+
+        orgs.id()
+        orgs.name()
+
+        data = self._get_endpoint()(op)
+
+        orgs = (op + data).organizations
+
+        return orgs.nodes

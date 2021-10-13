@@ -170,7 +170,9 @@ class PagedTimeSeries:
             self.page_index = 0
             self.page = self._get_page(url=self.url, params=self.params)
         yield from self.page
+        return
         while self.next_page_url:
+            print(self.next_page_url, self.page.meta)
             yield from self.get_next_page()
 
     def _get_page(self, url: str, params: Optional[Dict] = None) -> TimeSeriesPage:
