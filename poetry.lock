@@ -635,7 +635,7 @@ python-versions = "*"
 
 [[package]]
 name = "types-click"
-version = "7.1.5"
+version = "7.1.7"
 description = "Typing stubs for click"
 category = "dev"
 optional = false
@@ -781,7 +781,7 @@ crypto = ["cryptography"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "8cf0b837d5cd3f1233ad6b2398535ea09d866b44942010a7737eac8babf403da"
+content-hash = "bc539721edc6afdb009f31e48a2634dfb3fc46bfaf7e048d5c3497a3f9e22273"
 
 [metadata.files]
 appdirs = [
@@ -1243,8 +1243,8 @@ typed-ast = [
     {file = "typed_ast-1.4.3.tar.gz", hash = "sha256:fb1bbeac803adea29cedd70781399c99138358c26d05fcbd23c13016b7f5ec65"},
 ]
 types-click = [
-    {file = "types-click-7.1.5.tar.gz", hash = "sha256:ced04123d857f5b05df7c6b10e9710e66cf2ec7d99d4ee48d04a07f4c1a83ad4"},
-    {file = "types_click-7.1.5-py3-none-any.whl", hash = "sha256:3547c4346884551d8c5a6320aa26a26f16a3257aebd975843fdeb2cbaf156911"},
+    {file = "types-click-7.1.7.tar.gz", hash = "sha256:fff7ea52619581401a90cb9247e1a7e95c29084cfdbc26b7a49ed94c40fcd3d8"},
+    {file = "types_click-7.1.7-py3-none-any.whl", hash = "sha256:64dd3dc1fe5ed7e105b7a0479a6aebdd3c132c474c54f42a744af1bfba1989fd"},
 ]
 types-cryptography = [
     {file = "types_cryptography-3.3.2-py2.py3-none-any.whl", hash = "sha256:9c0e7018ba376c5161b0f5c4757718045fe536d1f33aed801890613620d03b39"},
