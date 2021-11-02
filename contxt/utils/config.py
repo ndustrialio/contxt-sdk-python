@@ -146,3 +146,18 @@ def load_config_from_file(file='./../config.yml') -> Config:
 
     result = config_schema().load(config_yaml)
     return result
+
+
+def load_config_class_from_file(file: str, config_class):
+    print(f'Loading config from file: {file}')
+    with open(file, 'r') as stream:
+        try:
+            config_yaml = load(stream, Loader=SafeLoader)
+        except YAMLError as e:
+            print(e)
+            raise
+
+    config_schema = class_schema(config_class)
+
+    result = config_schema().load(config_yaml)
+    return result

@@ -176,6 +176,7 @@ class PagedTimeSeries:
             yield from self.get_next_page()
 
     def _get_page(self, url: str, params: Optional[Dict] = None) -> TimeSeriesPage:
+        print(url, params)
         resp = self.api.get(url, params=params)
         page = ObjectMapper.tree_to_object(resp, TimeSeriesPage)
         # NOTE: this post processing is not ideal, but works for now

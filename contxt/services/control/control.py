@@ -1,4 +1,5 @@
 import requests
+from auth0.v3.authentication import GetToken
 from sgqlc.types import list_of
 from sgqlc.operation import Operation
 from sgqlc.endpoint.http import HTTPEndpoint
@@ -60,21 +61,10 @@ class ControlService:
     def get_auth_token(self):
 
         if self.token is None:
-            resp = requests.post('https://contxt.auth0.com/oauth/token', json={
-                "client_id": self.client_id,
-                "client_secret": self.client_secret,
-                "audience": self.audience,
-                "grant_type": "client_credentials",
-            })
-
-            if resp.status_code != 200:
-                print('ERROR!')
-                print(resp.text)
-                return
-
-            resp = resp.json()
-            self.token = resp["access_token"]
-
+            req = GetToken('contxt.auth0.com')
+            token = req.client_credentials(client_id=self.client_id, client_secret=self.client_secret,
+                                     audience=self.audience)
+            self.token = token['access_token']
         return self.token
 
     def update_schema(self):
@@ -206,6 +196,7 @@ class ControlService:
         control_event.id()
         control_event.start_time()
         control_event.end_time()
+        control_event.state_machine().state_definition()
         control_event.state_machine().current_state()
 
         data = self._get_endpoint()(op)
@@ -550,7 +541,6 @@ class ControlService:
         data = self._get_endpoint()(op)
 
         edge_node = (op + data).edge_node
-
         return edge_node
 
     def get_facility(self, id: int, include_events: bool = True):

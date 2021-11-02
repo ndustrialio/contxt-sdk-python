@@ -608,7 +608,7 @@ class AddHistoricEventInput(sgqlc.types.Input):
 
     historic_event = sgqlc.types.Field(sgqlc.types.non_null('HistoricEventProposalInputRecordInput'), graphql_name='historicEvent')
 
-    components = sgqlc.types.Field(sgqlc.types.non_null(sgqlc.types.list_of('ControllableComponentInput')), graphql_name='components')
+    components = sgqlc.types.Field(sgqlc.types.list_of('ControllableComponentInput'), graphql_name='components')
 
 
 
@@ -1015,7 +1015,7 @@ class CreateControllableComponentInput(sgqlc.types.Input):
     by the client.
     '''
 
-    controllable_component = sgqlc.types.Field(sgqlc.types.non_null(ControllableComponentInput), graphql_name='controllableComponent')
+    controllable_component = sgqlc.types.Field(ControllableComponentInput, graphql_name='controllableComponent')
     '''The `ControllableComponent` to be created by this mutation.'''
 
 

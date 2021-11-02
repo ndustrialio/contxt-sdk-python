@@ -1,8 +1,42 @@
 from ..services.auth import AuthService
 from ..utils import make_logger
 from . import Auth, Token, TokenProvider
+import requests
+from auth0.v3.authentication import GetToken
 
 logger = make_logger(__name__)
+
+
+class PlainMachineTokenProvider(TokenProvider):
+    """Plain-ole `TokenProvider` for a machine client, where `client_id` and
+        `client_secret` serve as the identity provider WITHOUT  using Contxt Auth Service
+    """
+    def __init__(self, client_id: str, client_secret: str, audience: str) -> None:
+        super().__init__(audience)
+        self.client_id = client_id
+        self.client_secret = client_secret
+        self.audience = audience
+
+    @TokenProvider.access_token.getter  # type: ignore
+    def access_token(self) -> Token:
+        """Gets a valid access token for audience `audience`"""
+        if self._access_token is None or self._token_expiring():
+            # Token either not yet set or expiring soon, fetch one
+            logger.debug(f"Fetching new access_token for {self.audience}")
+            resp = requests.post('https://contxt.auth0.com/oauth/token', json={
+                "client_id": self.client_id,
+                "client_secret": self.client_secret,
+                "audience": self.audience,
+                "grant_type": "client_credentials",
+            })
+            token = GetToken('ndustrial.auth0.com')
+            token.client_credentials(client_id=self.client_id, client_secret=self.client_secret,
+                                     audience=self.audience)
+
+            self.access_token = self.auth_service.get_oauth_token(
+                self.client_id, self.client_secret, self.audience
+            )["access_token"]
+        return self._access_token  # type: ignore
 
 
 class MachineTokenProvider(TokenProvider):
