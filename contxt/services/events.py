@@ -17,7 +17,7 @@ class EventsService(ConfiguredApi):
         ),
         ApiEnvironment(
             name="staging",
-            base_url="https://events-staging.api.ndustrial.io/v1",
+            base_url="https://events.api.staging.ndustrial.io/v1",
             client_id="dn4MaocJFdKtsBy9sFFaTeuJWL1nt5xu",
         ),
     )
