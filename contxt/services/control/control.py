@@ -1,24 +1,18 @@
-import requests
-from auth0.v3.authentication import GetToken
-from sgqlc.types import list_of
 from sgqlc.operation import Operation
-from sgqlc.endpoint.http import HTTPEndpoint
-from sgqlc.introspection import query as introspection_query, variables
 from datetime import datetime
 import pytz
 from typing import List
-import json
-from os import path
-from sgqlc.codegen.schema import CodeGen, load_schema
 
-from contxt.services.api import ApiEnvironment
+from contxt.services.api import ApiEnvironment, EnvironmentException
 from contxt.services.control.control_schema import control_schema as schema
+from contxt.services.base_graph_service import BaseGraphService
 
 ENVS = {
     'staging': ApiEnvironment(
         name="staging",
         base_url="https://poc.staging.ndustrial.io/control/graphql",
-        client_id="https://wms-poc.staging.ndustrial.io"
+        client_id="https://wms-poc.staging.ndustrial.io",
+        auth_provider='contxt.auth0.com'
     ),
     'dev': ApiEnvironment(
         name="dev",
@@ -28,13 +22,10 @@ ENVS = {
     'local': ApiEnvironment(
         name="local",
         base_url="http://localhost:4002/graphql",
-        client_id="local"
+        client_id="local",
+        auth_required=False
     )
 }
-
-
-class EnvironmentException(Exception):
-    pass
 
 
 def include_proposals_with_object(obj, include_only_active: bool = True):
@@ -45,50 +36,13 @@ def include_proposals_with_object(obj, include_only_active: bool = True):
     proposals.current_state()
 
 
-class ControlService:
+class ControlService(BaseGraphService):
 
     def __init__(self, client_id: str, client_secret: str, env='staging'):
-        self.token = None if env != "local" else "no_auth"
-        self.endpoint = None
         if not ENVS.get(env):
             raise EnvironmentException('Environment not found')
-        self.env = ENVS.get(env)
-        self.url = self.env.base_url
-        self.client_id = client_id
-        self.client_secret = client_secret
-        self.audience = self.env.client_id
-
-    def get_auth_token(self):
-
-        if self.token is None:
-            req = GetToken('contxt.auth0.com')
-            token = req.client_credentials(client_id=self.client_id, client_secret=self.client_secret,
-                                     audience=self.audience)
-            self.token = token['access_token']
-        return self.token
-
-    def update_schema(self):
-        data = self._get_endpoint()(introspection_query, variables())
-
-        base_file_path = path.dirname(__file__)
-        json_schema_filepath = path.abspath(path.join(base_file_path, "control_schema.json"))
-        with open(json_schema_filepath, 'w') as f:
-            print(f'Writing schema to {json_schema_filepath}')
-            json.dump(data, f, sort_keys=True, indent=2, default=str)
-
-        python_schema_filepath = path.abspath(path.join(base_file_path, 'control_schema.py'))
-        print('Generating code for schema')
-        with open(json_schema_filepath, 'r') as json_file:
-            schem = load_schema(json_file)
-            with open(python_schema_filepath, 'w') as schema_file:
-                gen = CodeGen('control_schema', schem, schema_file.write, docstrings=True)
-                gen.write()
-            print('Schema and types updated!')
-
-    def _get_endpoint(self):
-        if not self.endpoint:
-            self.endpoint = HTTPEndpoint(self.url, {'Authorization': f'Bearer {self.get_auth_token()}'})
-        return self.endpoint
+        super().__init__(client_id=client_id, client_secret=client_secret,
+                         api_environment=ENVS.get(env), service_name='control')
 
     def get_event_proposals(self, facility_id: int, project_id: str = None):
         op = Operation(schema.Query)
@@ -126,6 +80,9 @@ class ControlService:
         proposals.event_proposal_metrics().nodes().controllable_component().slug()
 
         data = self._get_endpoint()(op)
+        if 'errors' in data:
+            print(data)
+            raise Exception(data['errors'][0]['message'])
 
         proposals = (op + data).event_proposals
 

@@ -132,6 +132,10 @@ class Api:
         return self._process_response(response)
 
 
+class EnvironmentException(Exception):
+    pass
+
+
 @dataclass
 class ApiEnvironment:
     """An environment for an API.
@@ -142,6 +146,8 @@ class ApiEnvironment:
     name: str
     base_url: str
     client_id: str
+    auth_provider: str = 'contxt.auth0.com'
+    auth_required: bool = True
 
 
 class ConfiguredApi(Api, ABC):

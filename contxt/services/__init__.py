@@ -14,3 +14,4 @@ from .iot import IotDataService, IotService
 from .ngest import NgestService
 from .sis import SisService
 from .control.control import ControlService
+from .base.base import BaseService
