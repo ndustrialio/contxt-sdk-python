@@ -26,7 +26,7 @@ def get(clients: Clients, service_id: Optional[str]) -> None:
 
 @service_instances.command()
 @click.option("--service-id", prompt=True)
-@click.option("--project-environment-id", prompt=True)  # optional?
+@click.option("--project-environment-id", prompt=True, required=False)  # optional?
 @click.option("--name", prompt=True)
 @click.option("--slug", prompt=True)
 @click.option("--descriptor", prompt=True)
@@ -35,7 +35,7 @@ def get(clients: Clients, service_id: Optional[str]) -> None:
 def create(
     clients: Clients,
     service_id: str,
-    project_environment_id: str,
+    project_environment_id: Optional[str],
     name: str,
     slug: str,
     descriptor: str,
