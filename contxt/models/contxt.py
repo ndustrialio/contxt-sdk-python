@@ -263,8 +263,34 @@ class Service(ApiObject):
     _api_fields: ClassVar = (
         ApiField("id", data_type=int),
         ApiField("name"),
+        ApiField("slug"),
+        ApiField("type"),
+        ApiField("project_id", data_type=int),
+        ApiField("description"),
+        ApiField("deployment_strategy"),
+        ApiField("created_at", data_type=Parsers.datetime),
+    )
+
+    id: int
+    name: str
+    slug: str
+    type: str
+    project_id: int
+    description: str
+    deployment_strategy: str
+    created_at: Optional[datetime] = None
+
+
+@dataclass
+class ServiceInstance(ApiObject):
+    _api_fields: ClassVar = (
+        ApiField("id", data_type=int),
+        ApiField("name"),
+        ApiField("slug"),
         ApiField("description"),
         ApiField("descriptor"),
+        ApiField("service_id", data_type=int),
+        ApiField("project_environment_id"),
         ApiField("client_id"),
         ApiField("command"),
         ApiField("arguments"),
@@ -279,8 +305,11 @@ class Service(ApiObject):
 
     id: int
     name: str
+    slug: str
     description: str
     descriptor: str
+    service_id: int
+    project_environment_id: str
     client_id: str
     command: str
     arguments: str
@@ -298,6 +327,7 @@ class Project(ApiObject):
     _api_fields: ClassVar = (
         ApiField("id", data_type=int),
         ApiField("name"),
+        ApiField("slug"),
         ApiField("description"),
         ApiField("type"),
         ApiField("created_at", data_type=Parsers.datetime),
@@ -307,10 +337,37 @@ class Project(ApiObject):
 
     id: int
     name: str
+    slug: str
     description: str
     type: str
     roles: Optional[List[Role]] = None
     services: Optional[List[Service]] = None
+    created_at: Optional[datetime] = None
+
+
+@dataclass
+class ProjectEnvironment(ApiObject):
+    _api_fields: ClassVar = (
+        ApiField("id", data_type=int),
+        ApiField("slug"),
+        ApiField("project_id", data_type=int),
+        ApiField("cluster_id"),
+        ApiField("cluster_slug"),
+        ApiField("name"),
+        ApiField("description"),
+        ApiField("type"),
+        ApiField("archived"),
+        ApiField("created_at", data_type=Parsers.datetime),
+    )
+
+    id: int
+    slug: str
+    project_id: int
+    cluster_id: str
+    cluster_slug: str
+    name: str
+    description: str
+    type: str
     created_at: Optional[datetime] = None
 
 

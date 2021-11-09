@@ -1,7 +1,10 @@
+from typing import List
+
 import click
 
 from contxt.cli.clients import Clients
-from contxt.cli.utils import print_item, print_table
+from contxt.cli.utils import fields_option, print_item, print_table, sort_option
+from contxt.models.contxt import Service
 
 
 @click.group()
@@ -12,14 +15,16 @@ def services() -> None:
 @services.command()
 @click.argument("id", default="")  # HACK: make an optional argument
 @click.pass_obj
-def get(clients: Clients, id: str) -> None:
+@fields_option(default=["id", "slug", "project_id", "description"], obj=Service)
+@sort_option(default="slug")
+def get(clients: Clients, id: str, fields: List[str], sort: str) -> None:
     """Get service(s)"""
     items = (
         [clients.contxt_deployments.get(f"{clients.org_id}/services/{id}")]
         if id
         else clients.contxt_deployments.get(f"{clients.org_id}/services")
     )
-    print_table(items, keys=["id", "slug", "project_id", "description"])
+    print_table(items=items, keys=fields, sort_by=sort)
 
 
 @services.command()

@@ -1,9 +1,10 @@
-from typing import Optional
+from typing import List, Optional
 
 import click
 
 from contxt.cli.clients import Clients
-from contxt.cli.utils import OPTIONAL_PROMPT_KWARGS, print_item, print_table
+from contxt.cli.utils import OPTIONAL_PROMPT_KWARGS, fields_option, print_item, print_table, sort_option
+from contxt.models.contxt import ProjectEnvironment
 
 
 @click.group()
@@ -14,27 +15,18 @@ def project_envs() -> None:
 @project_envs.command()
 @click.argument("project_slug")
 @click.pass_obj
-def get(clients: Clients, project_slug: str) -> None:
+@fields_option(default=["id", "slug", "name", "type", "description"], obj=ProjectEnvironment)
+@sort_option(default="id")
+def get(clients: Clients, project_slug: str, fields: List[str], sort: str) -> None:
     """Get project environment(s)"""
     result = clients.contxt_deployments.get(f"{clients.org_id}/projects/{project_slug}/environments")
 
-    # Can't get cluster by id from API
-    clusters = clients.contxt_deployments.get_clusters(clients.org_id)
-    for r in result:
-        r["cluster_slug"] = next(c.slug for c in clusters if c.id == r["cluster_id"])
-    print_table(
-        result,
-        keys=[
-            "id",
-            "slug",
-            "name",
-            "type",
-            "description",
-            "deployment_strategy",
-            "cluster_id",
-            "cluster_slug",
-        ],
-    )
+    if "cluster_slug" in fields:
+        clusters = clients.contxt_deployments.get_clusters(clients.org_id)
+        for r in result:
+            r["cluster_slug"] = next(c.slug for c in clusters if c.id == r["cluster_id"])
+
+    print_table(result, keys=fields, sort_by=sort)
 
 
 @project_envs.command()
