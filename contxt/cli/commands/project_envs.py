@@ -1,9 +1,10 @@
-from typing import Optional
+from typing import Optional, List
 
 import click
 
 from contxt.cli.clients import Clients
-from contxt.cli.utils import OPTIONAL_PROMPT_KWARGS, print_item, print_table
+from contxt.models.contxt import ProjectEnvironment
+from contxt.cli.utils import OPTIONAL_PROMPT_KWARGS, fields_option, sort_option, print_item, print_table
 
 
 @click.group()
@@ -14,10 +15,12 @@ def project_envs() -> None:
 @project_envs.command()
 @click.argument("project_slug")
 @click.pass_obj
-def get(clients: Clients, project_slug: str) -> None:
+@fields_option(default=["id", "slug", "name", "type", "description"], obj=ProjectEnvironment)
+@sort_option(default="id")
+def get(clients: Clients, project_slug: str, fields: List[str], sort: str) -> None:
     """Get project environment(s)"""
     result = clients.contxt_deployments.get(f"{clients.org_id}/projects/{project_slug}/environments")
-    print_table(result, keys=["id", "slug", "name", "type", "description"])
+    print_table(result, keys=fields, sort_by=sort)
 
 
 @project_envs.command()

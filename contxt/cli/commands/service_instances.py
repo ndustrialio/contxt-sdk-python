@@ -1,9 +1,11 @@
-from typing import Optional
+from typing import Optional, List
 
 import click
 
+
+from contxt.models.contxt import ServiceInstance
 from contxt.cli.clients import Clients
-from contxt.cli.utils import print_item, print_table
+from contxt.cli.utils import OPTIONAL_PROMPT_KWARGS, fields_option, sort_option, print_item, print_table
 
 
 @click.group()
@@ -14,19 +16,21 @@ def service_instances() -> None:
 @service_instances.command()
 @click.option("--service-id")
 @click.pass_obj
-def get(clients: Clients, service_id: Optional[str]) -> None:
+@fields_option(default=["id", "slug", "service_id", "description"], obj=ServiceInstance)
+@sort_option(default="slug")
+def get(clients: Clients, service_id: Optional[str], fields: List[str], sort: str) -> None:
     """Get service instance(s)"""
     items = (
         clients.contxt_deployments.get(f"{clients.org_id}/services/{service_id}/service_instances")
         if service_id
         else clients.contxt_deployments.get(f"{clients.org_id}/service_instances")
     )
-    print_table(items, keys=["id", "slug", "service_id", "description"])
+    print_table(items, keys=fields, sort_by=sort)
 
 
 @service_instances.command()
 @click.option("--service-id", prompt=True)
-@click.option("--project-environment-id", prompt=True, required=False)  # optional?
+@click.option("--project-environment-id", **OPTIONAL_PROMPT_KWARGS)
 @click.option("--name", prompt=True)
 @click.option("--slug", prompt=True)
 @click.option("--descriptor", prompt=True)

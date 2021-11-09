@@ -1,9 +1,10 @@
-from typing import Optional
+from typing import Optional, List
 
 import click
 
 from contxt.cli.clients import Clients
-from contxt.cli.utils import OPTIONAL_PROMPT_KWARGS, print_item, print_table, sort_option
+from contxt.models.contxt import Project
+from contxt.cli.utils import OPTIONAL_PROMPT_KWARGS, fields_option, sort_option, print_item, print_table
 
 
 @click.group()
@@ -13,16 +14,17 @@ def projects() -> None:
 
 @projects.command()
 @click.argument("slug", default="")
-@sort_option(default="slug")
 @click.pass_obj
-def get(clients: Clients, slug: Optional[str], sort: str) -> None:
+@fields_option(default=["id", "slug", "name", "type", "description"], obj=Project)
+@sort_option(default="slug")
+def get(clients: Clients, slug: Optional[str], fields: List[str], sort: str) -> None:
     """Get project(s)"""
     items = (
         [clients.contxt_deployments.get(f"{clients.org_id}/projects/{slug}")]
         if slug
         else clients.contxt_deployments.get(f"{clients.org_id}/projects")
     )
-    print_table(items=items, keys=["slug", "name", "type", "description"], sort_by=sort)
+    print_table(items=items, keys=fields, sort_by=sort)
 
 
 @projects.command()
