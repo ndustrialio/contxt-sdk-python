@@ -353,6 +353,7 @@ class ProjectEnvironment(ApiObject):
         ApiField("slug"),
         ApiField("project_id", data_type=int),
         ApiField("cluster_id"),
+        ApiField("cluster_slug"),
         ApiField("name"),
         ApiField("description"),
         ApiField("type"),
@@ -364,6 +365,7 @@ class ProjectEnvironment(ApiObject):
     slug: str
     project_id: int
     cluster_id: str
+    cluster_slug: str
     name: str
     description: str
     type: str

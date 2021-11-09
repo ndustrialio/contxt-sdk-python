@@ -46,15 +46,16 @@ def create(
     service_type: str,
 ) -> None:
     """Create service instances"""
+    json = {
+        "name": name,
+        "project_environment_id": project_environment_id,
+        "slug": slug,
+        "descriptor": descriptor,
+        "service_type": service_type,
+    }
+    json = {k: v for k, v in json.items() if v is not None}
     result = clients.contxt_deployments.post(
-        f"{clients.org_id}/services/{service_id}/service_instances",
-        json={
-            "project_environment_id": project_environment_id,
-            "name": name,
-            "slug": slug,
-            "descriptor": descriptor,
-            "service_type": service_type,
-        },
+        f"{clients.org_id}/services/{service_id}/service_instances", json
     )
     print_item(result)
 
