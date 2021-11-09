@@ -1,10 +1,10 @@
-from typing import Optional, List
+from typing import List, Optional
 
 import click
 
 from contxt.cli.clients import Clients
+from contxt.cli.utils import OPTIONAL_PROMPT_KWARGS, fields_option, print_item, print_table, sort_option
 from contxt.models.contxt import ProjectEnvironment
-from contxt.cli.utils import OPTIONAL_PROMPT_KWARGS, fields_option, sort_option, print_item, print_table
 
 
 @click.group()
@@ -26,11 +26,7 @@ def get(clients: Clients, project_slug: str, fields: List[str], sort: str) -> No
         for r in result:
             r["cluster_slug"] = next(c.slug for c in clusters if c.id == r["cluster_id"])
 
-    print_table(
-        result,
-        keys=fields,
-        sort_by=sort
-    )
+    print_table(result, keys=fields, sort_by=sort)
 
 
 @project_envs.command()

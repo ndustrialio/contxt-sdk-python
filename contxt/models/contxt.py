@@ -258,7 +258,6 @@ class Image(ApiObject):
     updated_at: Optional[datetime] = None
 
 
-
 @dataclass
 class Service(ApiObject):
     _api_fields: ClassVar = (

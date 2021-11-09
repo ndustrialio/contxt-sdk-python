@@ -1,10 +1,10 @@
-from typing import Optional, List
+from typing import List, Optional
 
 import click
 
 from contxt.cli.clients import Clients
+from contxt.cli.utils import OPTIONAL_PROMPT_KWARGS, fields_option, print_item, print_table, sort_option
 from contxt.models.contxt import Project
-from contxt.cli.utils import OPTIONAL_PROMPT_KWARGS, fields_option, sort_option, print_item, print_table
 
 
 @click.group()

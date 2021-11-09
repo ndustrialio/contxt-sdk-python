@@ -1,10 +1,10 @@
-from typing import Optional, List
+from typing import List
 
 import click
 
 from contxt.cli.clients import Clients
+from contxt.cli.utils import fields_option, print_item, print_table, sort_option
 from contxt.models.contxt import Service
-from contxt.cli.utils import fields_option, sort_option, print_item, print_table
 
 
 @click.group()
