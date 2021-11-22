@@ -322,7 +322,7 @@ i18n = ["babel (>=2.9.0)"]
 
 [[package]]
 name = "mkdocs-click"
-version = "0.4.0"
+version = "0.5.0"
 description = "An MkDocs extension to generate documentation for Click command line applications"
 category = "dev"
 optional = false
@@ -773,7 +773,7 @@ crypto = ["cryptography"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "578e147504b0cb853b7e67745c29d38244e000fe85530c6f215cdd9da38f3943"
+content-hash = "17f8e7502e137744008c01d72e43222c034f055bbadc0f3da8aa1a6a0161eb75"
 
 [metadata.files]
 appdirs = [
@@ -1000,8 +1000,8 @@ mkdocs = [
     {file = "mkdocs-1.2.3.tar.gz", hash = "sha256:89f5a094764381cda656af4298727c9f53dc3e602983087e1fe96ea1df24f4c1"},
 ]
 mkdocs-click = [
-    {file = "mkdocs_click-0.4.0-py3-none-any.whl", hash = "sha256:3b54c65bd1e6e2b600da71d77705e911d15d86bc2c2b341ff5d7f76b9fe1505b"},
-    {file = "mkdocs_click-0.4.0.tar.gz", hash = "sha256:b34be84cde57850733fb1b32db37b472620ac2c3e97db4abbe11dbd6b98124f2"},
+    {file = "mkdocs_click-0.5.0-py3-none-any.whl", hash = "sha256:ded9c09e3a7966fba8b147bbe2a3ef0b31a21072340b8c08cd8c885da57d0746"},
+    {file = "mkdocs_click-0.5.0.tar.gz", hash = "sha256:a506983881da5e9405fdecc03351806661f433e1c2f81092fb05c9b93998c11a"},
 ]
 mypy = [
     {file = "mypy-0.910-cp35-cp35m-macosx_10_9_x86_64.whl", hash = "sha256:a155d80ea6cee511a3694b108c4494a39f42de11ee4e61e72bc424c490e46457"},
