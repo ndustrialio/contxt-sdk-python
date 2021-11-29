@@ -14,8 +14,8 @@ class NgestService(ConfiguredApi):
     _envs = (
         ApiEnvironment(
             name="production",
-            base_url="https://data.ndustrial.io/v1",
-            client_id="AhVAWkq2FEoQtWAP7EidZ9uzrc4ED1Dx",
+            baseUrl="https://data.ndustrial.io/v1",
+            clientId="AhVAWkq2FEoQtWAP7EidZ9uzrc4ED1Dx",
         ),
     )
 

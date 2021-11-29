@@ -11,13 +11,13 @@ class MessageBusService(ConfiguredApi):
     _envs = (
         ApiEnvironment(
             name="production",
-            base_url="https://bus.ndustrial.io",
-            client_id="T62CR77ouw4I6VPlSSlLT9VpVA1ebByx",
+            baseUrl="https://bus.ndustrial.io",
+            clientId="T62CR77ouw4I6VPlSSlLT9VpVA1ebByx",
         ),
         ApiEnvironment(
             name="staging",
-            base_url="https://bus-staging.ndustrial.io",
-            client_id="YHCtC2dZAvvt2SdxUVwWpVdm4fSOkUdL",
+            baseUrl="https://bus-staging.ndustrial.io",
+            clientId="YHCtC2dZAvvt2SdxUVwWpVdm4fSOkUdL",
         ),
     )
 

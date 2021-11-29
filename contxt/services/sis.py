@@ -16,8 +16,8 @@ class SisService(ConfiguredApi):
     _envs = (
         ApiEnvironment(
             name="production",
-            base_url="https://sis.api.ndustrial.io/v1",
-            client_id="rPDKeB6b9n7tBo5il9eY3XrJ8yKeF3ho",
+            baseUrl="https://sis.api.ndustrial.io/v1",
+            clientId="rPDKeB6b9n7tBo5il9eY3XrJ8yKeF3ho",
         ),
     )
 

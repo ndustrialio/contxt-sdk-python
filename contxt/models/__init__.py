@@ -27,6 +27,10 @@ class Parsers:
         return _date.fromisoformat(datestamp)
 
     @staticmethod
+    def year_month_date(datestamp: str) -> _date:
+        return _datetime.strptime(datestamp, "%Y-%m").date()
+
+    @staticmethod
     def datetime(timestamp: str) -> _datetime:
         return _datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%S.%fZ").replace(tzinfo=timezone.utc)
 

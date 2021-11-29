@@ -10,20 +10,20 @@ from contxt.services.base_graph_service import BaseGraphService
 ENVS = {
     'staging': ApiEnvironment(
         name="staging",
-        base_url="https://poc.staging.ndustrial.io/control/graphql",
-        client_id="https://wms-poc.staging.ndustrial.io",
-        auth_provider='contxt.auth0.com'
+        baseUrl="https://poc.staging.ndustrial.io/control/graphql",
+        clientId="https://wms-poc.staging.ndustrial.io",
+        authProvider='contxt.auth0.com'
     ),
     'dev': ApiEnvironment(
         name="dev",
-        base_url="https://facilitycontrol.staging.opencontxt.com/graphql",
-        client_id="https://ndustrial-pocs.opencontxt.com"
+        baseUrl="https://facilitycontrol.staging.opencontxt.com/graphql",
+        clientId="https://ndustrial-pocs.opencontxt.com"
     ),
     'local': ApiEnvironment(
         name="local",
-        base_url="http://localhost:4002/graphql",
-        client_id="local",
-        auth_required=False
+        baseUrl="http://localhost:4002/graphql",
+        clientId="local",
+        authRequired=False
     )
 }
 
@@ -38,11 +38,9 @@ def include_proposals_with_object(obj, include_only_active: bool = True):
 
 class ControlService(BaseGraphService):
 
-    def __init__(self, client_id: str, client_secret: str, env='staging'):
-        if not ENVS.get(env):
-            raise EnvironmentException('Environment not found')
+    def __init__(self, client_id: str, client_secret: str, env: ApiEnvironment):
         super().__init__(client_id=client_id, client_secret=client_secret,
-                         api_environment=ENVS.get(env), service_name='control')
+                         api_environment=env, service_name='control')
 
     def get_event_proposals(self, facility_id: int, project_id: str = None):
         op = Operation(schema.Query)

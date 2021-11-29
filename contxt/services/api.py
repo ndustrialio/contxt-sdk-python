@@ -10,6 +10,7 @@ from urllib3.util.retry import Retry
 
 from ..auth import Auth, TokenProvider
 from ..utils import make_logger
+from ..utils.config import ApiEnvironment
 
 logger = make_logger(__name__)
 
@@ -54,7 +55,7 @@ class ApiRetry(Retry):
 
 
 class Api:
-    """An API with url `base_url`.
+    """An API with url `baseUrl`.
 
     If `token_provider` is specified, all requests will be authenticated with
     the access token it provides.
@@ -136,20 +137,6 @@ class EnvironmentException(Exception):
     pass
 
 
-@dataclass
-class ApiEnvironment:
-    """An environment for an API.
-
-    Note `client_id` is only needed if authentication is required.
-    """
-
-    name: str
-    base_url: str
-    client_id: str
-    auth_provider: str = 'contxt.auth0.com'
-    auth_required: bool = True
-
-
 class ConfiguredApi(Api, ABC):
     """An `Api` configured for multiple environments, such as staging and production.
     Available environments are expressed by `_envs` and the desired environment is
@@ -162,9 +149,9 @@ class ConfiguredApi(Api, ABC):
         # TODO: figure out a cleaner approach to environment selection
         api_env = self._get_env(env)
         self.env = env
-        self.client_id = api_env.client_id
+        self.client_id = api_env.clientId
         token_provider = auth.get_token_provider(self.client_id) if auth else None
-        super().__init__(base_url=api_env.base_url, token_provider=token_provider, **kwargs)
+        super().__init__(base_url=api_env.baseUrl, token_provider=token_provider, **kwargs)
 
     @classmethod
     def _get_env(cls, name: str) -> ApiEnvironment:

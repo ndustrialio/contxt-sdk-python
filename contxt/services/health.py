@@ -9,8 +9,8 @@ class HealthService(ConfiguredApi):
     _envs = (
         ApiEnvironment(
             name="production",
-            base_url="https://health.api.ndustrial.io/v1",
-            client_id="6uaQIV1KnnWhXiTm09iGDvy2aQaz2xVI",
+            baseUrl="https://health.api.ndustrial.io/v1",
+            clientId="6uaQIV1KnnWhXiTm09iGDvy2aQaz2xVI",
         ),
     )
 

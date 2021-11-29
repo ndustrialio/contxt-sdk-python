@@ -38,13 +38,13 @@ class IotService(ConfiguredApi):
     _envs = (
         ApiEnvironment(
             name="production",
-            base_url="https://feeds.api.ndustrial.io/v1",
-            client_id="iznTb30Sfp2Jpaf398I5DN6MyPuDCftA",
+            baseUrl="https://feeds.api.ndustrial.io/v1",
+            clientId="iznTb30Sfp2Jpaf398I5DN6MyPuDCftA",
         ),
         ApiEnvironment(
             name="staging",
-            base_url="https://feeds-staging.api.ndustrial.io/v1",
-            client_id="m35AEcxD8hf65sq04ZU7yFxqpqVkKzES",
+            baseUrl="https://feeds-staging.api.ndustrial.io/v1",
+            clientId="m35AEcxD8hf65sq04ZU7yFxqpqVkKzES",
         ),
     )
 
@@ -323,13 +323,13 @@ class IotDataService(ConfiguredApi):
     _envs = (
         ApiEnvironment(
             name="production",
-            base_url="https://iot.api.ndustrial.io/v2/",
-            client_id="ZPrYMWVCcsyYaKKK2uiFLS71X1MB7zJP",
+            baseUrl="https://iot.api.ndustrial.io/v2/",
+            clientId="ZPrYMWVCcsyYaKKK2uiFLS71X1MB7zJP",
         ),
         ApiEnvironment(
             name="development",
-            base_url="http://localhost:8080/v2/",
-            client_id="ZPrYMWVCcsyYaKKK2uiFLS71X1MB7zJP",
+            baseUrl="http://localhost:8080/v2/",
+            clientId="ZPrYMWVCcsyYaKKK2uiFLS71X1MB7zJP",
         ),
     )
 

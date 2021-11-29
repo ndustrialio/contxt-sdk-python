@@ -68,11 +68,11 @@ class Facility(ApiObject):
 @dataclass
 class UtilityPeriod(ApiObject):
     _api_fields: ClassVar = (
-        ApiField("event_time", data_type=Parsers.datetime),
+        ApiField("date", data_type=Parsers.year_month_date),
         ApiField("value", data_type=int),
     )
 
-    event_time: datetime
+    date: datetime
     value: int
 
 
@@ -95,6 +95,9 @@ class UtilitySpend(ApiObject):
     @property
     def periods(self):
         return self.values
+
+    def __len__(self):
+        return len(self.values)
 
 
 @dataclass

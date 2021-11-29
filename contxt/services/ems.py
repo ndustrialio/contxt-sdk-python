@@ -13,13 +13,13 @@ class EmsService(ConfiguredApi):
     _envs = (
         ApiEnvironment(
             name="production",
-            base_url="https://ems.api.ndustrial.io/v1",
-            client_id="e2IT0Zm9RgGlDBkLa2ruEcN9Iop6dJAS",
+            baseUrl="https://ems.api.ndustrial.io/v1",
+            clientId="e2IT0Zm9RgGlDBkLa2ruEcN9Iop6dJAS",
         ),
         ApiEnvironment(
             name="staging",
-            base_url="https://ems.api.staging.ndustrial.io/v1",
-            client_id="vMV67yaRFgjBB1JFbT3vXBOlohFdG1I4",
+            baseUrl="https://ems.api.staging.ndustrial.io/v1",
+            clientId="vMV67yaRFgjBB1JFbT3vXBOlohFdG1I4",
         ),
     )
 
@@ -63,6 +63,7 @@ class EmsService(ConfiguredApi):
                 "exclude_account_charges": exclude_account_charges,
             },
         )
+        print(resp)
         return UtilitySpend.from_api(resp)
 
     def get_monthly_utility_usage(

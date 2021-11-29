@@ -1,10 +1,16 @@
-from yaml import load, SafeLoader, YAMLError
+import yaml
+from yaml import load, SafeLoader, YAMLError, safe_dump
 from marshmallow_dataclass import class_schema
 from typing import Dict
+import logging
 
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import Optional, ForwardRef, List, Dict, Any
+
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(format='[%(module)s %(levelname)s:%(asctime)s] %(message)s', level=logging.INFO)
 
 
 class ProjectConfigException(Exception):
@@ -133,13 +139,34 @@ class Config:
                 return report_load_config
 
 
+@dataclass
+class ApiEnvironment:
+    """An environment for an API.
+
+    Note `client_id` is only needed if authentication is required.
+    """
+
+    name: str
+    baseUrl: str
+    clientId: str
+    authProvider: str = 'contxt.auth0.com'
+    authRequired: bool = True
+
+
+@dataclass
+class ContxtEnvironmentConfig:
+    clientId: str
+    clientSecret: str
+    apiEnvironment: ApiEnvironment
+
+
 def load_config_from_file(file='./../config.yml') -> Config:
-    print(f'Loading config from file: {file}')
+    logger.info(f'Loading config from file: {file}')
     with open(file, 'r') as stream:
         try:
-            config_yaml = load(stream, Loader=SafeLoader)
+            config_yaml = load(stream, Loader=yaml.Loader)
         except YAMLError as e:
-            print(e)
+            logger.error(e)
             raise
 
     config_schema = class_schema(Config)
@@ -148,13 +175,25 @@ def load_config_from_file(file='./../config.yml') -> Config:
     return result
 
 
+def write_config_class_to_file(file: str, obj, config_class):
+    logger.info(f'Writing config to file: {file}')
+    with open(file, 'w') as stream:
+        try:
+            config_schema = class_schema(config_class)()
+            result = config_schema.dump(obj)
+            safe_dump(result, stream)
+        except YAMLError as e:
+            logger.error(e)
+            raise
+
+
 def load_config_class_from_file(file: str, config_class):
-    print(f'Loading config from file: {file}')
+    logger.info(f'Loading config from file: {file}')
     with open(file, 'r') as stream:
         try:
-            config_yaml = load(stream, Loader=SafeLoader)
+            config_yaml = load(stream, Loader=yaml.SafeLoader)
         except YAMLError as e:
-            print(e)
+            logger.error(e)
             raise
 
     config_schema = class_schema(config_class)

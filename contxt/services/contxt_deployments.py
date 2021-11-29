@@ -13,13 +13,13 @@ class ContxtDeploymentService(ConfiguredApi):
     _envs = (
         ApiEnvironment(
             name="production",
-            base_url="https://contxt.api.ndustrial.io/deploy/v1",
-            client_id="8qY2xJob1JAxhmVhIDLCNnGriTM9bct8",
+            baseUrl="https://contxt.api.ndustrial.io/deploy/v1",
+            clientId="8qY2xJob1JAxhmVhIDLCNnGriTM9bct8",
         ),
         ApiEnvironment(
             name="staging",
-            base_url="https://contxt-api.staging.ndustrial.io/deploy/v1",
-            client_id="qGzdTXcmB57zlTp86rYsivG9qEss1lbF",
+            baseUrl="https://contxt-api.staging.ndustrial.io/deploy/v1",
+            clientId="qGzdTXcmB57zlTp86rYsivG9qEss1lbF",
         ),
     )
 

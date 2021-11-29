@@ -10,7 +10,8 @@ from ..models.assets import (
     Metric,
     MetricValue,
 )
-from .api import ApiEnvironment, ConfiguredApi
+from contxt.utils.config import ApiEnvironment
+from .api import ConfiguredApi
 from .pagination import PagedRecords, PageOptions
 
 
@@ -20,13 +21,13 @@ class AssetsService(ConfiguredApi):
     _envs = (
         ApiEnvironment(
             name="production",
-            base_url="https://facilities.api.ndustrial.io/v1",
-            client_id="SgbCopArnGMa9PsRlCVUCVRwxocntlg0",
+            baseUrl="https://facilities.api.ndustrial.io/v1",
+            clientId="SgbCopArnGMa9PsRlCVUCVRwxocntlg0",
         ),
         ApiEnvironment(
             name="staging",
-            base_url="https://facilities-staging.api.ndustrial.io/v1",
-            client_id="xG775XHIOZVUn84seNeHXi0Qe55YuR5w",
+            baseUrl="https://facilities-staging.api.ndustrial.io/v1",
+            clientId="xG775XHIOZVUn84seNeHXi0Qe55YuR5w",
         ),
     )
 

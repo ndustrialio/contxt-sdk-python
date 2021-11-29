@@ -12,13 +12,13 @@ class EventsService(ConfiguredApi):
     _envs = (
         ApiEnvironment(
             name="production",
-            base_url="https://events.api.ndustrial.io/v1",
-            client_id="7jzwfE20O2XZ4aq3cO1wmk63G9GzNc8j",
+            baseUrl="https://events.api.ndustrial.io/v1",
+            clientId="7jzwfE20O2XZ4aq3cO1wmk63G9GzNc8j",
         ),
         ApiEnvironment(
             name="staging",
-            base_url="https://events.api.staging.ndustrial.io/v1",
-            client_id="dn4MaocJFdKtsBy9sFFaTeuJWL1nt5xu",
+            baseUrl="https://events.api.staging.ndustrial.io/v1",
+            clientId="dn4MaocJFdKtsBy9sFFaTeuJWL1nt5xu",
         ),
     )
 
