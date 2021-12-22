@@ -4,10 +4,10 @@ from requests.exceptions import HTTPError
 
 from ..auth import Auth
 from ..models.contxt import Cluster
-from .api import ApiEnvironment, ConfiguredApi
+from .api import ApiEnvironment, ConfiguredLegacyApi
 
 
-class ContxtDeploymentService(ConfiguredApi):
+class ContxtDeploymentService(ConfiguredLegacyApi):
     """Contxt API client"""
 
     _envs = (

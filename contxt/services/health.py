@@ -1,9 +1,9 @@
 from ..auth import Auth
 from ..models.health import Health
-from .api import ApiEnvironment, ConfiguredApi
+from .api import ApiEnvironment, ConfiguredLegacyApi
 
 
-class HealthService(ConfiguredApi):
+class HealthService(ConfiguredLegacyApi):
     """Health API client"""
 
     _envs = (

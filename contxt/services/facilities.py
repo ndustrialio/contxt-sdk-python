@@ -2,11 +2,11 @@ from typing import List, Optional
 
 from ..auth import Auth
 from ..models.facilities import Facility
-from .api import ConfiguredApi
+from .api import ConfiguredLegacyApi
 from .assets import AssetsService
 
 
-class FacilitiesService(ConfiguredApi):
+class FacilitiesService(ConfiguredLegacyApi):
     """Facilities API client"""
 
     _envs = AssetsService._envs

@@ -3,11 +3,11 @@ from typing import Iterable, List, Optional
 
 from ..auth import Auth
 from ..models.ems import Facility, MainService, ResourceType, UtilityContract, UtilitySpend, UtilityUsage
-from .api import ApiEnvironment, ConfiguredApi
+from .api import ApiEnvironment, ConfiguredLegacyApi
 from .pagination import PagedRecords
 
 
-class EmsService(ConfiguredApi):
+class EmsService(ConfiguredLegacyApi):
     """EMS API client"""
 
     _envs = (

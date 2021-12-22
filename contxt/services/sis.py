@@ -4,13 +4,13 @@ from typing import List, Optional
 from contxt.auth import Auth
 from contxt.models.ems import UtilityAccount, UtilityMeter, UtilityStatement
 from contxt.models.sis import FileRead
-from contxt.services.api import ApiEnvironment, ConfiguredApi
+from contxt.services.api import ApiEnvironment, ConfiguredLegacyApi
 from contxt.utils import make_logger
 
 logger = make_logger(__name__)
 
 
-class SisService(ConfiguredApi):
+class SisService(ConfiguredLegacyApi):
     """Legacy SIS API client"""
 
     _envs = (

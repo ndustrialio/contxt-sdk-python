@@ -4,28 +4,13 @@ from contxt.services.api import ApiEnvironment, EnvironmentException
 from contxt.services.base_graph_service import BaseGraphService
 from contxt.services.base.base_schema import base as schema
 
-'''
-ENVS = {
-    'staging': ApiEnvironment(
-        name="staging",
-        baseUrl="https://contxt-dev.staging.lineageapi.com/graphql",
-        clientId="https://contxt-dev.staging.lineageapi.com/",
-        authProvider='contxt.auth0.com'
-    ),
-    'local': ApiEnvironment(
-        name="local",
-        baseUrl="http://localhost:3000/graphql",
-        clientId="local",
-        authRequired=False
-    )
-}
-'''
+from contxt.utils.config import ContxtEnvironmentConfig
+
 
 class BaseService(BaseGraphService):
 
-    def __init__(self, client_id: str, client_secret: str, env: ApiEnvironment):
-        super().__init__(client_id=client_id, client_secret=client_secret,
-                         api_environment=env, service_name='base')
+    def __init__(self, contxt_env: ContxtEnvironmentConfig):
+        super().__init__(contxt_env)
 
     def get_sources(self, slug: str = None):
         op = Operation(schema.Query)

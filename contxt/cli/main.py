@@ -27,6 +27,7 @@ class Cli(click.MultiCommand):
         ns = {}
         code = compile(f.read_text(), f, "exec")
         eval(code, ns, ns)
+        print(name)
         return ns[name]
 
     def __call__(self, *args, **kwargs):

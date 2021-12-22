@@ -71,22 +71,34 @@ class RateConfig:
 
 
 @dataclass
+class EvaporatorConfig:
+    slug: str
+    label: str
+    stateAttributes: Optional[Dict[str, str]] = field(default_factory=dict)
+
+
+@dataclass
 class BlastCellConfig:
     slug: str
-    timerField: str
-    stateField: str
+    evaporatorId: Optional[str] = None
+    stateAttributes: Optional[Dict[str, str]] = field(default_factory=dict)
 
 
 @dataclass
 class RefrigerationConfig:
     feedKey: str
     blastCells: Optional[List[BlastCellConfig]]
+    evaporators: Optional[List[EvaporatorConfig]]
 
     def get_blast_cell_with_slug(self, slug: str) -> BlastCellConfig:
         for cell in self.blastCells:
             if cell.slug == slug:
                 return cell
 
+    def get_evaporator_with_slug(self, slug: str) -> EvaporatorConfig:
+        for evap in self.evaporators:
+            if evap.slug == slug:
+                return evap
 
 @dataclass
 class FacilityConfig:
@@ -155,6 +167,7 @@ class ApiEnvironment:
 
 @dataclass
 class ContxtEnvironmentConfig:
+    service: str
     clientId: str
     clientSecret: str
     apiEnvironment: ApiEnvironment

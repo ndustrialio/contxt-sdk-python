@@ -2,11 +2,11 @@ from typing import Iterable, List, Optional
 
 from ..auth import Auth
 from ..models.events import Event, EventDefinition, EventType, TriggeredEvent
-from .api import ApiEnvironment, ConfiguredApi
+from .api import ApiEnvironment, ConfiguredLegacyApi
 from .pagination import PagedRecords, PageOptions
 
 
-class EventsService(ConfiguredApi):
+class EventsService(ConfiguredLegacyApi):
     """Events API client"""
 
     _envs = (

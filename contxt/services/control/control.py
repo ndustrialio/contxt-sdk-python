@@ -3,8 +3,9 @@ from datetime import datetime
 import pytz
 from typing import List
 
+from contxt.utils.config import ContxtEnvironmentConfig
 from contxt.services.api import ApiEnvironment, EnvironmentException
-from contxt.services.control.control_schema import control_schema as schema
+from contxt.services.control.control_schema import control as schema
 from contxt.services.base_graph_service import BaseGraphService
 
 ENVS = {
@@ -38,9 +39,8 @@ def include_proposals_with_object(obj, include_only_active: bool = True):
 
 class ControlService(BaseGraphService):
 
-    def __init__(self, client_id: str, client_secret: str, env: ApiEnvironment):
-        super().__init__(client_id=client_id, client_secret=client_secret,
-                         api_environment=env, service_name='control')
+    def __init__(self, contxt_env: ContxtEnvironmentConfig):
+        super().__init__(contxt_env)
 
     def get_event_proposals(self, facility_id: int, project_id: str = None):
         op = Operation(schema.Query)
@@ -219,6 +219,8 @@ class ControlService(BaseGraphService):
 
         propose.event_proposal.id()
 
+        print(op)
+
         data = self._get_endpoint()(op)
         if 'errors' in data:
             print(data)
@@ -245,7 +247,7 @@ class ControlService(BaseGraphService):
         propose = op.propose_event(input=proposal)
 
         propose.event_proposal.id()
-
+        print(op)
         data = self._get_endpoint()(op)
         if 'errors' in data:
             print(data)

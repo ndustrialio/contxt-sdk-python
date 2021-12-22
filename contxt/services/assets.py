@@ -11,11 +11,11 @@ from ..models.assets import (
     MetricValue,
 )
 from contxt.utils.config import ApiEnvironment
-from .api import ConfiguredApi
+from .api import ConfiguredLegacyApi
 from .pagination import PagedRecords, PageOptions
 
 
-class AssetsService(ConfiguredApi):
+class AssetsService(ConfiguredLegacyApi):
     """Assets API client"""
 
     _envs = (

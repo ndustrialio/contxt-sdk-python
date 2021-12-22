@@ -1,8 +1,12 @@
+from abc import ABC
 from typing import Dict, List, Union, Optional
 from pathlib import Path
 import os
-from .api import ApiEnvironment, ConfiguredApi
+from auth0.v3.authentication import GetToken
+from .api import ApiEnvironment, ConfiguredLegacyApi, ConfiguredGraphApi
 from ..auth import Auth
+from ..utils.config import ContxtEnvironmentConfig
+from ..utils.stored_file import PersistentContxtConfig
 import jwt
 import logging
 
@@ -53,29 +57,17 @@ class TokenConfig:
             client_config.audiences[audience] = token
 
 
-class StoredTokenCache:
+class StoredTokenCache(PersistentContxtConfig):
 
     def __init__(self):
-        self.token_config = self._load_token_file()
-
-    def _write_token_file(self):
-        base_contxt_dir = os.path.join(str(Path.home()), '.contxt')
-        if not os.path.exists(base_contxt_dir):
-            os.mkdir(base_contxt_dir)
-        contxt_file_name = os.path.join(base_contxt_dir, 'auth_tokens')
-        write_config_class_to_file(contxt_file_name, self.token_config, TokenConfig)
-
-    def _load_token_file(self) -> TokenConfig:
-        contxt_file_name = os.path.join(str(Path.home()), '.contxt', 'auth_tokens')
-        if os.path.exists(contxt_file_name):
-            config = load_config_class_from_file(contxt_file_name, TokenConfig)
-            return config
+        super().__init__('auth_tokens', TokenConfig)
+        self.token_config = self.load_contxt_file()
 
     def set_token(self, client_id: str, audience: str, token: str):
         if self.token_config is None:
             self.token_config = TokenConfig(tokens=[])
         self.token_config.set_token_for_client(client_id, audience, token)
-        self._write_token_file()
+        self.write_contxt_file()
 
     def get_token(self, client_id: str, audience: str) -> str:
         if self.token_config is not None:
@@ -84,25 +76,13 @@ class StoredTokenCache:
                 return tokens_for_client.get_token_for_audience(audience)
 
 
-class AuthService(ConfiguredApi):
+class AuthService(ConfiguredGraphApi, ABC):
     """Auth API client"""
 
-    def __init__(self, env: str = "production", **kwargs) -> None:
-        super().__init__(env=env, **kwargs)
+    def __init__(self, contxt_env: ContxtEnvironmentConfig, **kwargs) -> None:
+        super().__init__(contxt_env=contxt_env, **kwargs)
+        self.service_env = contxt_env
         self.token_cache = StoredTokenCache()
-
-    _envs = (
-        ApiEnvironment(
-            name="production",
-            baseUrl="https://contxtauth.com/v1",
-            clientId="75wT048QcpE7ujwBJPPjr263eTHl4gEX",
-        ),
-        ApiEnvironment(
-            name="staging",
-            baseUrl="https://contxt-auth-service.staging.ndustrial.io/v1",
-            clientId="7TceUsM1eC4nKmdoC717383DWyfc9QoY",
-        ),
-    )
 
     def get_jwks(self) -> Dict:
         return self.get(".well-known/jwks.json")
@@ -119,24 +99,21 @@ class AuthService(ConfiguredApi):
         )
 
     def get_oauth_token(self, client_id: str, client_secret: str, audience: str) -> str:
-        cached_token = self.token_cache.get_token(client_id=client_id,
-                                                  audience=audience)
-
+        cached_token = self.token_cache.get_token(client_id=self.service_env.clientId,
+                                                  audience=self.service_env.apiEnvironment.clientId)
         if cached_token is None:
             logger.info('Token not found for client...fetching new one')
-            resp = self.post(
-                "oauth/token",
-                json={
-                    "client_id": client_id,
-                    "client_secret": client_secret,
-                    "audience": audience,
-                    "grant_type": "client_credentials",
-                },
-            )
-            self.token_cache.set_token(client_id=client_id,
-                                       audience=audience,
-                                       token=resp['access_token'])
-            return resp['access_token']
+            req = GetToken(self.service_env.apiEnvironment.authProvider)
+            print(self.service_env.apiEnvironment.authProvider, self.service_env.clientId, self.service_env.clientSecret, self.service_env.apiEnvironment.clientId)
+            token = req.client_credentials(client_id=self.service_env.clientId,
+                                           client_secret=self.service_env.clientSecret,
+                                           audience=self.service_env.apiEnvironment.clientId)
+            self.token_cache.set_token(client_id=self.service_env.clientId,
+                                       audience=self.service_env.apiEnvironment.clientId,
+                                       token=token['access_token'])
+
+            print(token)
+            return token['access_token']
         else:
             logger.info('Using cached token')
             return cached_token

@@ -3,12 +3,13 @@ from datetime import datetime, timezone
 from typing import Dict, List
 
 from ..utils import is_datetime_aware, make_logger
-from .api import ApiEnvironment, ConfiguredApi
+from ..utils.config import ContxtEnvironmentConfig
+from .api import ApiEnvironment, ConfiguredLegacyApi
 
 logger = make_logger(__name__)
 
 
-class NgestService(ConfiguredApi):
+class NgestService(ConfiguredLegacyApi):
     """Ngest API client"""
 
     _envs = (
@@ -19,9 +20,8 @@ class NgestService(ConfiguredApi):
         ),
     )
 
-    def __init__(self, env: str = "production", **kwargs) -> None:
-        self.env = env
-        super().__init__(env=env, **kwargs)
+    def __init__(self, env_config: ContxtEnvironmentConfig, **kwargs) -> None:
+        super().__init__(env_config=env_config, **kwargs)
 
     @staticmethod
     def specialize(feed_key: str, feed_token: str, env: str = "production") -> "SpecializedNgestService":

@@ -1,5 +1,6 @@
 from ..services.auth import AuthService
 from ..utils import make_logger
+from ..utils.config import ContxtEnvironmentConfig
 from . import Auth, Token, TokenProvider
 import requests
 from auth0.v3.authentication import GetToken
@@ -44,11 +45,10 @@ class MachineTokenProvider(TokenProvider):
     `client_secret` serve as the identity provider.
     """
 
-    def __init__(self, client_id: str, client_secret: str, audience: str) -> None:
+    def __init__(self, env_config: ContxtEnvironmentConfig, audience: str) -> None:
         super().__init__(audience)
-        self.client_id = client_id
-        self.client_secret = client_secret
-        self.auth_service = AuthService()
+        self.env_config = env_config
+        self.auth_service = AuthService(env_config)
 
     @TokenProvider.access_token.getter  # type: ignore
     def access_token(self) -> Token:
@@ -57,7 +57,7 @@ class MachineTokenProvider(TokenProvider):
             # Token either not yet set or expiring soon, fetch one
             logger.debug(f"Fetching new access_token for {self.audience}")
             self.access_token = self.auth_service.get_oauth_token(
-                self.client_id, self.client_secret, self.audience
+                self.env_config.clientId, self.env_config.clientSecret, self.audience
             )
         return self._access_token  # type: ignore
 
@@ -67,4 +67,4 @@ class MachineAuth(Auth):
 
     def get_token_provider(self, audience: str) -> MachineTokenProvider:
         """Get `MachineTokenProvider` for audience `audience`"""
-        return MachineTokenProvider(self.client_id, self.client_secret, audience)
+        return MachineTokenProvider(self.env_config, audience)

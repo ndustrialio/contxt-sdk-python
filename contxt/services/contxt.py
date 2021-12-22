@@ -12,10 +12,10 @@ from ..models.contxt import (
     Service,
     User,
 )
-from .api import ApiEnvironment, ConfiguredApi
+from .api import ApiEnvironment, ConfiguredLegacyApi
 
 
-class ContxtService(ConfiguredApi):
+class ContxtService(ConfiguredLegacyApi):
     """Contxt API client"""
 
     _envs = (

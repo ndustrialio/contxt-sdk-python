@@ -6,20 +6,20 @@ from sgqlc.endpoint.http import HTTPEndpoint
 from sgqlc.introspection import query as introspection_query, variables
 from sgqlc.codegen.schema import CodeGen, load_schema
 
+from contxt.utils.config import ContxtEnvironmentConfig
 from contxt.services.api import ApiEnvironment
 from contxt.services.auth import StoredTokenCache
 
 
 class BaseGraphService:
 
-    def __init__(self, client_id: str, client_secret: str, api_environment: ApiEnvironment,
-                 service_name: str):
-        self.service_name = service_name
+    def __init__(self, contxt_env: ContxtEnvironmentConfig):
+        self.service_name = contxt_env.service
         self.endpoint = None
-        self.env = api_environment
+        self.env = contxt_env.apiEnvironment
         self.url = self.env.baseUrl
-        self.client_id = client_id
-        self.client_secret = client_secret
+        self.client_id = contxt_env.clientId
+        self.client_secret = contxt_env.clientSecret
         self.audience = self.env.clientId
         self.token_cache = StoredTokenCache()
 

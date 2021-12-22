@@ -20,13 +20,14 @@ from ..models.iot import (
 )
 from ..utils import is_datetime_aware, make_logger
 from ..utils.object_mapper import ObjectMapper
-from .api import ApiEnvironment, ConfiguredApi
+from ..utils.config import ContxtEnvironmentConfig
+from .api import ApiEnvironment, ConfiguredLegacyApi
 from .pagination import DataPoint, PagedRecords, PagedTimeSeries, PageOptions
 
 logger = make_logger(__name__)
 
 
-class IotService(ConfiguredApi):
+class IotService(ConfiguredLegacyApi):
     """IOT API client
 
     Terminology
@@ -48,8 +49,8 @@ class IotService(ConfiguredApi):
         ),
     )
 
-    def __init__(self, auth: Auth, env: str = "production", **kwargs) -> None:
-        super().__init__(env=env, auth=auth, **kwargs)
+    def __init__(self, auth: Auth, env_config: ContxtEnvironmentConfig, **kwargs) -> None:
+        super().__init__(env_config=env_config, auth=auth, **kwargs)
 
     def provision_field_for_feed(self, feed_id: int, field: Field) -> Field:
         resp = self.post(f"feeds/{feed_id}/fields", data=field.post())
@@ -311,7 +312,7 @@ NgestField = str
 NgestRecord = Tuple[datetime, Dict[NgestField, Any]]
 
 
-class IotDataService(ConfiguredApi):
+class IotDataService(ConfiguredLegacyApi):
     """IOT API client v2.0
 
     Terminology

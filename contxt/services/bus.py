@@ -2,10 +2,10 @@ from typing import Dict, List, Optional
 
 from ..auth import Auth
 from ..models.bus import Channel, ChannelStats
-from .api import ApiEnvironment, ConfiguredApi
+from .api import ApiEnvironment, ConfiguredLegacyApi
 
 
-class MessageBusService(ConfiguredApi):
+class MessageBusService(ConfiguredLegacyApi):
     """Message Bus API client"""
 
     _envs = (

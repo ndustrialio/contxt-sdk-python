@@ -10,7 +10,7 @@ from urllib3.util.retry import Retry
 
 from ..auth import Auth, TokenProvider
 from ..utils import make_logger
-from ..utils.config import ApiEnvironment
+from ..utils.config import ApiEnvironment, ContxtEnvironmentConfig
 
 logger = make_logger(__name__)
 
@@ -137,7 +137,7 @@ class EnvironmentException(Exception):
     pass
 
 
-class ConfiguredApi(Api, ABC):
+class ConfiguredLegacyApi(Api, ABC):
     """An `Api` configured for multiple environments, such as staging and production.
     Available environments are expressed by `_envs` and the desired environment is
     specified by its name `env`.
@@ -145,13 +145,11 @@ class ConfiguredApi(Api, ABC):
     Overload this class to implement `_envs`.
     """
 
-    def __init__(self, env: str, auth: Optional[Auth] = None, **kwargs) -> None:
+    def __init__(self, env_config: ContxtEnvironmentConfig, auth: Optional[Auth] = None, **kwargs) -> None:
         # TODO: figure out a cleaner approach to environment selection
-        api_env = self._get_env(env)
-        self.env = env
-        self.client_id = api_env.clientId
-        token_provider = auth.get_token_provider(self.client_id) if auth else None
-        super().__init__(base_url=api_env.baseUrl, token_provider=token_provider, **kwargs)
+
+        token_provider = auth.get_token_provider(env_config.clientId) if auth else None
+        super().__init__(base_url=env_config.apiEnvironment.baseUrl, token_provider=token_provider, **kwargs)
 
     @classmethod
     def _get_env(cls, name: str) -> ApiEnvironment:
@@ -167,3 +165,18 @@ class ConfiguredApi(Api, ABC):
     def _envs(cls) -> Tuple[ApiEnvironment, ...]:
         """Lists available environments."""
         pass
+
+
+class ConfiguredGraphApi(Api, ABC):
+    """An `Api` configured for multiple environments, such as staging and production.
+    Available environments are expressed by `_envs` and the desired environment is
+    specified by its name `env`.
+
+    Overload this class to implement `_envs`.
+    """
+
+    def __init__(self, contxt_env: ContxtEnvironmentConfig, auth: Optional[Auth] = None, **kwargs) -> None:
+        # TODO: figure out a cleaner approach to environment selection
+        self.client_id = contxt_env.clientId
+        token_provider = auth.get_token_provider(self.client_id) if auth else None
+        super().__init__(base_url=contxt_env.apiEnvironment.baseUrl, token_provider=token_provider, **kwargs)

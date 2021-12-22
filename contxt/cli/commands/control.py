@@ -1,28 +1,46 @@
 from contxt.services.control.control import ControlService
 from contxt.utils.serializer import Serializer
 import click
+from contxt.services.api import ApiEnvironment
 
-ENV = "dev"
-envs = {
-    "staging": {
-        "client_id": "XZnouDOjhmb65Fp954myAedX6wxVNbXc",
-        "client_secret": "DbDJOdTQA_1dO-hkQyeUyDGfuJcJy4WL1s6j_sytNt9BSeKqtXh_p0lwsHEQ5X-4"
-    },
-    "dev": {
-        "client_id": "Dh1VFink5dzLZLNlcbKAg0ejnylfOCyP",
-        "client_secret": "rIabxdxuCQ-6JBipQT2FQ-1fT2BMtzJZA21yE2HcSfFLQlNWmPk2Cqw02KMpQZI9"
-    },
-    "local": {
-        "client_id": None,
-        "client_secret": None
-    }
-}
+CLIENT_ID = "FA4hZozRfcx0I4jmIH85tC8L5MekNK09"
+CLIENT_SECRET = "ZMbiSyheEJ0ODiTMFwRTiKHE5DMn7rd7onPbS2U4Eepbb_NP_2hJz6He3QqJ8v8I"
+
+INTERNAL_CONTROL_STAGING = ApiEnvironment(
+        name="staging",
+        baseUrl="https://poc.staging.ndustrial.io/control/graphql",
+        clientId="https://wms-poc.staging.ndustrial.io",
+        authProvider='contxt.auth0.com'
+)
+
+LINEAGE_CONTROL_STAGING = ApiEnvironment(
+    name="staging",
+    baseUrl="https://contxt-dev.staging.lineageapi.com/graphql",
+    clientId="https://contxt-dev.staging.lineageapi.com/",
+    authProvider="ndustrial.auth0.com"
+)
+
+INTERNAL_SANDBOX_DEV = ApiEnvironment(
+    name="dev",
+    baseUrl="https://facilitycontrol.staging.opencontxt.com/graphql",
+    clientId="https://ndustrial-pocs.opencontxt.com"
+)
+
+LOCAL_DEV = ApiEnvironment(
+    name="local",
+    baseUrl="http://localhost:4002/graphql",
+    clientId="local",
+    authRequired=False
+)
+
+SELECTED_ENV = LINEAGE_CONTROL_STAGING
 
 
 def get_control_service():
-    return ControlService(client_id=envs[ENV]["client_id"],
-                          client_secret=envs[ENV]["client_secret"],
-                          env=ENV)
+    # load configuration file
+    return ControlService(client_id=CLIENT_ID,
+                          client_secret=CLIENT_SECRET,
+                          env=SELECTED_ENV)
 
 
 @click.group()
