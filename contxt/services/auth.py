@@ -6,7 +6,7 @@ from auth0.v3.authentication import GetToken
 from .api import ApiEnvironment, ConfiguredLegacyApi, ConfiguredGraphApi
 from ..auth import Auth
 from ..utils.config import ContxtEnvironmentConfig
-from ..utils.stored_file import PersistentContxtConfig
+from ..utils.persistent_contxt_config import PersistentContxtConfig
 import jwt
 import logging
 
@@ -61,17 +61,17 @@ class StoredTokenCache(PersistentContxtConfig):
 
     def __init__(self):
         super().__init__('auth_tokens', TokenConfig)
-        self.token_config = self.load_contxt_file()
+        self.config = self.load_contxt_file()
 
     def set_token(self, client_id: str, audience: str, token: str):
-        if self.token_config is None:
-            self.token_config = TokenConfig(tokens=[])
-        self.token_config.set_token_for_client(client_id, audience, token)
+        if self.config is None:
+            self.config = TokenConfig(tokens=[])
+        self.config.set_token_for_client(client_id, audience, token)
         self.write_contxt_file()
 
     def get_token(self, client_id: str, audience: str) -> str:
-        if self.token_config is not None:
-            tokens_for_client = self.token_config.tokens_for_client(client_id)
+        if self.config is not None:
+            tokens_for_client = self.config.tokens_for_client(client_id)
             if tokens_for_client:
                 return tokens_for_client.get_token_for_audience(audience)
 

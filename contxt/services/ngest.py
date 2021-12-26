@@ -12,14 +12,6 @@ logger = make_logger(__name__)
 class NgestService(ConfiguredLegacyApi):
     """Ngest API client"""
 
-    _envs = (
-        ApiEnvironment(
-            name="production",
-            baseUrl="https://data.ndustrial.io/v1",
-            clientId="AhVAWkq2FEoQtWAP7EidZ9uzrc4ED1Dx",
-        ),
-    )
-
     def __init__(self, env_config: ContxtEnvironmentConfig, **kwargs) -> None:
         super().__init__(env_config=env_config, **kwargs)
 

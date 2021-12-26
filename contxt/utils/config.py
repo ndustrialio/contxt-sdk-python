@@ -8,12 +8,14 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Optional, ForwardRef, List, Dict, Any
 
-
 logger = logging.getLogger(__name__)
 logging.basicConfig(format='[%(module)s %(levelname)s:%(asctime)s] %(message)s', level=logging.INFO)
 
 
 class ProjectConfigException(Exception):
+    pass
+
+class ContextException(Exception):
     pass
 
 
@@ -158,7 +160,6 @@ class ApiEnvironment:
     Note `client_id` is only needed if authentication is required.
     """
 
-    name: str
     baseUrl: str
     clientId: str
     authProvider: str = 'contxt.auth0.com'
@@ -168,9 +169,39 @@ class ApiEnvironment:
 @dataclass
 class ContxtEnvironmentConfig:
     service: str
+    environment: str
     clientId: str
     clientSecret: str
     apiEnvironment: ApiEnvironment
+
+
+@dataclass
+class Context:
+    environment: str
+
+
+@dataclass
+class CurrentContext:
+    environment: str
+
+
+@dataclass
+class CustomEnvironmentConfig:
+    defaults: Dict[str, Optional[str]]
+    currentContext: Dict[str, CurrentContext]
+    serviceConfigs: List[ContxtEnvironmentConfig]
+
+    def get_service_for_current_context(self, service_name: str):
+        current_env = self.currentContext.get(service_name)
+
+        if not current_env:
+            raise ContextException(f'Current context not specified for {service_name}')
+
+        for service_config in self.serviceConfigs:
+            if service_config.service == service_name and service_config.environment == current_env.environment:
+                return service_config
+
+        raise ContextException(f'Environment not found for {service_name} with environment {current_env}')
 
 
 def load_config_from_file(file='./../config.yml') -> Config:

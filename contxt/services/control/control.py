@@ -8,26 +8,6 @@ from contxt.services.api import ApiEnvironment, EnvironmentException
 from contxt.services.control.control_schema import control as schema
 from contxt.services.base_graph_service import BaseGraphService
 
-ENVS = {
-    'staging': ApiEnvironment(
-        name="staging",
-        baseUrl="https://poc.staging.ndustrial.io/control/graphql",
-        clientId="https://wms-poc.staging.ndustrial.io",
-        authProvider='contxt.auth0.com'
-    ),
-    'dev': ApiEnvironment(
-        name="dev",
-        baseUrl="https://facilitycontrol.staging.opencontxt.com/graphql",
-        clientId="https://ndustrial-pocs.opencontxt.com"
-    ),
-    'local': ApiEnvironment(
-        name="local",
-        baseUrl="http://localhost:4002/graphql",
-        clientId="local",
-        authRequired=False
-    )
-}
-
 
 def include_proposals_with_object(obj, include_only_active: bool = True):
     proposals = obj.event_proposals(order_by=[schema.EventProposalsOrderBy.START_TIME_ASC]).nodes()

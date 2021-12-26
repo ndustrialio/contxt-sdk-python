@@ -3,26 +3,14 @@ from typing import Dict, List, Optional
 from ..auth import Auth
 from ..models.bus import Channel, ChannelStats
 from .api import ApiEnvironment, ConfiguredLegacyApi
+from ..utils.config import ContxtEnvironmentConfig
 
 
 class MessageBusService(ConfiguredLegacyApi):
     """Message Bus API client"""
 
-    _envs = (
-        ApiEnvironment(
-            name="production",
-            baseUrl="https://bus.ndustrial.io",
-            clientId="T62CR77ouw4I6VPlSSlLT9VpVA1ebByx",
-        ),
-        ApiEnvironment(
-            name="staging",
-            baseUrl="https://bus-staging.ndustrial.io",
-            clientId="YHCtC2dZAvvt2SdxUVwWpVdm4fSOkUdL",
-        ),
-    )
-
-    def __init__(self, auth: Auth, organization_id: str, env: str = "production", **kwargs) -> None:
-        super().__init__(env=env, auth=auth, **kwargs)
+    def __init__(self, auth: Auth, organization_id: str, env_config: ContxtEnvironmentConfig, **kwargs) -> None:
+        super().__init__(env_config=env_config, auth=auth, **kwargs)
         self.organization_id = organization_id
 
     def _channels_url(self, service_id: str) -> str:

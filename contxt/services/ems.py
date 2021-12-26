@@ -5,26 +5,14 @@ from ..auth import Auth
 from ..models.ems import Facility, MainService, ResourceType, UtilityContract, UtilitySpend, UtilityUsage
 from .api import ApiEnvironment, ConfiguredLegacyApi
 from .pagination import PagedRecords
+from ..utils.config import ContxtEnvironmentConfig
 
 
 class EmsService(ConfiguredLegacyApi):
     """EMS API client"""
 
-    _envs = (
-        ApiEnvironment(
-            name="production",
-            baseUrl="https://ems.api.ndustrial.io/v1",
-            clientId="e2IT0Zm9RgGlDBkLa2ruEcN9Iop6dJAS",
-        ),
-        ApiEnvironment(
-            name="staging",
-            baseUrl="https://ems.api.staging.ndustrial.io/v1",
-            clientId="vMV67yaRFgjBB1JFbT3vXBOlohFdG1I4",
-        ),
-    )
-
-    def __init__(self, auth: Auth, env: str = "production", **kwargs) -> None:
-        super().__init__(env=env, auth=auth, **kwargs)
+    def __init__(self, auth: Auth, env_config: ContxtEnvironmentConfig, **kwargs) -> None:
+        super().__init__(env_config=env_config, auth=auth, **kwargs)
 
     def get_facility(self, id: int) -> Facility:
         return Facility.from_api(self.get(f"facilities/{id}"))

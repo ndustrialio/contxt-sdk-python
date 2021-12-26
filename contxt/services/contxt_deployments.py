@@ -4,27 +4,15 @@ from requests.exceptions import HTTPError
 
 from ..auth import Auth
 from ..models.contxt import Cluster
+from ..utils.config import ContxtEnvironmentConfig
 from .api import ApiEnvironment, ConfiguredLegacyApi
 
 
 class ContxtDeploymentService(ConfiguredLegacyApi):
     """Contxt API client"""
 
-    _envs = (
-        ApiEnvironment(
-            name="production",
-            baseUrl="https://contxt.api.ndustrial.io/deploy/v1",
-            clientId="8qY2xJob1JAxhmVhIDLCNnGriTM9bct8",
-        ),
-        ApiEnvironment(
-            name="staging",
-            baseUrl="https://contxt-api.staging.ndustrial.io/deploy/v1",
-            clientId="qGzdTXcmB57zlTp86rYsivG9qEss1lbF",
-        ),
-    )
-
-    def __init__(self, auth: Auth, env: str = "production", **kwargs) -> None:
-        super().__init__(env=env, auth=auth, **kwargs)
+    def __init__(self, auth: Auth, env_config: ContxtEnvironmentConfig, **kwargs) -> None:
+        super().__init__(env_config=env_config, auth=auth, **kwargs)
 
     def get_clusters(self, organization_id: str) -> List[Cluster]:
         return [Cluster.from_api(rec) for rec in self.get(f"{organization_id}/clusters")]

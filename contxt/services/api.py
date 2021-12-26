@@ -151,21 +151,6 @@ class ConfiguredLegacyApi(Api, ABC):
         token_provider = auth.get_token_provider(env_config.clientId) if auth else None
         super().__init__(base_url=env_config.apiEnvironment.baseUrl, token_provider=token_provider, **kwargs)
 
-    @classmethod
-    def _get_env(cls, name: str) -> ApiEnvironment:
-        """Get environment with name `name`"""
-        envs = {e.name: e for e in cls._envs}  # type: ignore
-        if name not in envs:
-            raise KeyError(f"Invalid environment '{name}'. Choose from {list(envs.keys())}.")
-        return envs[name]
-
-    @property
-    @classmethod
-    @abstractmethod
-    def _envs(cls) -> Tuple[ApiEnvironment, ...]:
-        """Lists available environments."""
-        pass
-
 
 class ConfiguredGraphApi(Api, ABC):
     """An `Api` configured for multiple environments, such as staging and production.

@@ -36,19 +36,6 @@ class IotService(ConfiguredLegacyApi):
         - Grouping: Group of fields
     """
 
-    _envs = (
-        ApiEnvironment(
-            name="production",
-            baseUrl="https://feeds.api.ndustrial.io/v1",
-            clientId="iznTb30Sfp2Jpaf398I5DN6MyPuDCftA",
-        ),
-        ApiEnvironment(
-            name="staging",
-            baseUrl="https://feeds-staging.api.ndustrial.io/v1",
-            clientId="m35AEcxD8hf65sq04ZU7yFxqpqVkKzES",
-        ),
-    )
-
     def __init__(self, auth: Auth, env_config: ContxtEnvironmentConfig, **kwargs) -> None:
         super().__init__(env_config=env_config, auth=auth, **kwargs)
 
@@ -321,21 +308,8 @@ class IotDataService(ConfiguredLegacyApi):
         - Grouping: Group of fields
     """
 
-    _envs = (
-        ApiEnvironment(
-            name="production",
-            baseUrl="https://iot.api.ndustrial.io/v2/",
-            clientId="ZPrYMWVCcsyYaKKK2uiFLS71X1MB7zJP",
-        ),
-        ApiEnvironment(
-            name="development",
-            baseUrl="http://localhost:8080/v2/",
-            clientId="ZPrYMWVCcsyYaKKK2uiFLS71X1MB7zJP",
-        ),
-    )
-
-    def __init__(self, org_id: str, auth: Auth, env: str = "production", **kwargs) -> None:
-        super().__init__(env=env, auth=auth, **kwargs)
+    def __init__(self, org_id: str, auth: Auth, env_config: ContxtEnvironmentConfig, **kwargs) -> None:
+        super().__init__(env_config=env_config, auth=auth, **kwargs)
         self.org_id = org_id
 
     def get_source_data(
