@@ -140,8 +140,8 @@ class MetricValue(ApiObject):
         ApiField("effective_end_date", data_type=Parsers.datetime, creatable=True, updatable=True),
         ApiField("notes", creatable=True, updatable=True),
         ApiField("value", data_type=float, creatable=True, updatable=True),
-        ApiField("created_at", data_type=Parsers.datetime),
-        ApiField("updated_at", data_type=Parsers.datetime),
+        ApiField("created_at", data_type=Parsers.datetime, optional=True),
+        ApiField("updated_at", data_type=Parsers.datetime, optional=True)
     )
 
     asset_id: str
