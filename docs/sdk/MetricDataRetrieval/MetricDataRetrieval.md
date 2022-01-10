@@ -13,13 +13,9 @@ Note: this example is functional but not optimized. At a minimum, multiprocessin
 
 ```python
 from contxt.cli.clients import Clients
-from contxt.utils.serializer import Serializer
 
-import argparse
-import os, sys
 from random import randint
-from pathlib import Path
-from datetime import datetime, timedelta
+from datetime import datetime
 import pytz
 ```
 
@@ -64,7 +60,7 @@ We'll use a randomly selected facility for the rest of the notebook
 
 
 ```python
-facilities = [facilities[randint(0, len(facilities))]]
+facilities = [facilities[randint(0, len(facilities) - 1)]]
 ```
 
 # Retrieve Customer Metrics
@@ -184,22 +180,25 @@ df.describe()
   <thead>
     <tr style="text-align: right;">
       <th></th>
+      <th>facility_daily_active_meters</th>
       <th>facility_daily_co2_factor</th>
+      <th>facility_daily_co2_per_unit</th>
       <th>facility_daily_co2_tons</th>
       <th>facility_daily_cubic_footage</th>
       <th>facility_daily_electricity_spend</th>
       <th>facility_daily_electricity_usage</th>
-      <th>facility_daily_iot_electricity_usage</th>
-      <th>facility_daily_kwh_per_cuft</th>
-      <th>facility_daily_rolling_average_blended_rate</th>
-      <th>facility_monthly_co2_factor</th>
-      <th>facility_monthly_co2_tons</th>
-      <th>facility_monthly_cubic_footage</th>
-      <th>facility_monthly_cubic_foot_eui</th>
-      <th>facility_monthly_electricity_spend</th>
-      <th>facility_monthly_electricity_usage</th>
+      <th>facility_daily_energy_spend_per_lbs</th>
+      <th>facility_daily_energy_spend_per_unit</th>
+      <th>facility_daily_inbound_volume</th>
+      <th>...</th>
+      <th>facility_monthly_energy_spend_per_unit</th>
+      <th>facility_monthly_inbound_volume</th>
       <th>facility_monthly_kwh_per_cuft</th>
+      <th>facility_monthly_kwh_per_lbs</th>
+      <th>facility_monthly_kwh_per_unit</th>
       <th>facility_monthly_max_cuft</th>
+      <th>facility_monthly_outbound_volume</th>
+      <th>facility_monthly_production_units</th>
       <th>facility_monthly_rolling_year_cubic_footage</th>
       <th>facility_monthly_rolling_year_elec_kbtu</th>
     </tr>
@@ -207,56 +206,65 @@ df.describe()
   <tbody>
     <tr>
       <th>count</th>
+      <td>10.0</td>
       <td>10.000000</td>
+      <td>5.000000</td>
       <td>10.000000</td>
       <td>10.0</td>
       <td>10.000000</td>
       <td>10.000000</td>
-      <td>10.000000</td>
-      <td>10.000000</td>
-      <td>10.000000</td>
-      <td>1.000000</td>
+      <td>5.000000</td>
+      <td>5.000000</td>
+      <td>5.000000</td>
+      <td>...</td>
       <td>1.000000</td>
       <td>1.0</td>
       <td>1.000000</td>
+      <td>1.000000</td>
+      <td>1.000000</td>
+      <td>1.0</td>
+      <td>1.00</td>
       <td>1.00000</td>
-      <td>1.0</td>
-      <td>1.000000</td>
-      <td>1.0</td>
       <td>1.0</td>
       <td>1.000000e+00</td>
     </tr>
     <tr>
       <th>mean</th>
-      <td>0.823639</td>
-      <td>17.210435</td>
-      <td>4050000.0</td>
-      <td>3708.307724</td>
-      <td>41791.210000</td>
-      <td>41791.210000</td>
-      <td>0.010319</td>
-      <td>0.088734</td>
-      <td>0.823639</td>
-      <td>172.104352</td>
-      <td>4050000.0</td>
-      <td>32.884494</td>
-      <td>37083.07724</td>
-      <td>417912.1</td>
-      <td>0.103188</td>
-      <td>4050000.0</td>
-      <td>4050000.0</td>
-      <td>1.331822e+08</td>
+      <td>3619.0</td>
+      <td>1.255483</td>
+      <td>9.543199</td>
+      <td>4.219586</td>
+      <td>6398483.0</td>
+      <td>460.039586</td>
+      <td>6721.852316</td>
+      <td>0.520232</td>
+      <td>0.520232</td>
+      <td>660649.000000</td>
+      <td>...</td>
+      <td>0.853233</td>
+      <td>3303245.0</td>
+      <td>0.010505</td>
+      <td>12.466984</td>
+      <td>12.466984</td>
+      <td>6398483.0</td>
+      <td>2088477.84</td>
+      <td>5391.72284</td>
+      <td>6398483.0</td>
+      <td>1.997479e+07</td>
     </tr>
     <tr>
       <th>std</th>
-      <td>0.000000</td>
-      <td>5.976534</td>
       <td>0.0</td>
-      <td>1287.689112</td>
-      <td>14512.509633</td>
-      <td>14512.509633</td>
-      <td>0.003583</td>
-      <td>0.000007</td>
+      <td>0.000000</td>
+      <td>2.853221</td>
+      <td>1.373131</td>
+      <td>0.0</td>
+      <td>149.705105</td>
+      <td>2187.414873</td>
+      <td>0.155564</td>
+      <td>0.155564</td>
+      <td>203818.602634</td>
+      <td>...</td>
       <td>NaN</td>
       <td>NaN</td>
       <td>NaN</td>
@@ -270,111 +278,127 @@ df.describe()
     </tr>
     <tr>
       <th>min</th>
-      <td>0.823639</td>
-      <td>2.085577</td>
-      <td>4050000.0</td>
-      <td>449.323113</td>
-      <td>5064.300000</td>
-      <td>5064.300000</td>
-      <td>0.001250</td>
-      <td>0.088724</td>
-      <td>0.823639</td>
-      <td>172.104352</td>
-      <td>4050000.0</td>
-      <td>32.884494</td>
-      <td>37083.07724</td>
-      <td>417912.1</td>
-      <td>0.103188</td>
-      <td>4050000.0</td>
-      <td>4050000.0</td>
-      <td>1.331822e+08</td>
+      <td>3619.0</td>
+      <td>1.255483</td>
+      <td>7.140593</td>
+      <td>0.413424</td>
+      <td>6398483.0</td>
+      <td>45.061345</td>
+      <td>658.590323</td>
+      <td>0.389232</td>
+      <td>0.389232</td>
+      <td>390799.000000</td>
+      <td>...</td>
+      <td>0.853233</td>
+      <td>3303245.0</td>
+      <td>0.010505</td>
+      <td>12.466984</td>
+      <td>12.466984</td>
+      <td>6398483.0</td>
+      <td>2088477.84</td>
+      <td>5391.72284</td>
+      <td>6398483.0</td>
+      <td>1.997479e+07</td>
     </tr>
     <tr>
       <th>25%</th>
-      <td>0.823639</td>
-      <td>16.681511</td>
-      <td>4050000.0</td>
-      <td>3594.506823</td>
-      <td>40506.850000</td>
-      <td>40506.850000</td>
-      <td>0.010002</td>
-      <td>0.088729</td>
-      <td>0.823639</td>
-      <td>172.104352</td>
-      <td>4050000.0</td>
-      <td>32.884494</td>
-      <td>37083.07724</td>
-      <td>417912.1</td>
-      <td>0.103188</td>
-      <td>4050000.0</td>
-      <td>4050000.0</td>
-      <td>1.331822e+08</td>
+      <td>3619.0</td>
+      <td>1.255483</td>
+      <td>7.204442</td>
+      <td>4.403425</td>
+      <td>6398483.0</td>
+      <td>480.176541</td>
+      <td>7014.710533</td>
+      <td>0.392691</td>
+      <td>0.392691</td>
+      <td>540796.000000</td>
+      <td>...</td>
+      <td>0.853233</td>
+      <td>3303245.0</td>
+      <td>0.010505</td>
+      <td>12.466984</td>
+      <td>12.466984</td>
+      <td>6398483.0</td>
+      <td>2088477.84</td>
+      <td>5391.72284</td>
+      <td>6398483.0</td>
+      <td>1.997479e+07</td>
     </tr>
     <tr>
       <th>50%</th>
-      <td>0.823639</td>
-      <td>18.511245</td>
-      <td>4050000.0</td>
-      <td>3988.573420</td>
-      <td>44949.900000</td>
-      <td>44949.900000</td>
-      <td>0.011099</td>
-      <td>0.088734</td>
-      <td>0.823639</td>
-      <td>172.104352</td>
-      <td>4050000.0</td>
-      <td>32.884494</td>
-      <td>37083.07724</td>
-      <td>417912.1</td>
-      <td>0.103188</td>
-      <td>4050000.0</td>
-      <td>4050000.0</td>
-      <td>1.331822e+08</td>
+      <td>3619.0</td>
+      <td>1.255483</td>
+      <td>8.912080</td>
+      <td>4.526398</td>
+      <td>6398483.0</td>
+      <td>493.397874</td>
+      <td>7210.607752</td>
+      <td>0.485875</td>
+      <td>0.485875</td>
+      <td>654527.000000</td>
+      <td>...</td>
+      <td>0.853233</td>
+      <td>3303245.0</td>
+      <td>0.010505</td>
+      <td>12.466984</td>
+      <td>12.466984</td>
+      <td>6398483.0</td>
+      <td>2088477.84</td>
+      <td>5391.72284</td>
+      <td>6398483.0</td>
+      <td>1.997479e+07</td>
     </tr>
     <tr>
       <th>75%</th>
-      <td>0.823639</td>
-      <td>19.830880</td>
-      <td>4050000.0</td>
-      <td>4273.229547</td>
-      <td>48154.300000</td>
-      <td>48154.300000</td>
-      <td>0.011890</td>
-      <td>0.088739</td>
-      <td>0.823639</td>
-      <td>172.104352</td>
-      <td>4050000.0</td>
-      <td>32.884494</td>
-      <td>37083.07724</td>
-      <td>417912.1</td>
-      <td>0.103188</td>
-      <td>4050000.0</td>
-      <td>4050000.0</td>
-      <td>1.331822e+08</td>
+      <td>3619.0</td>
+      <td>1.255483</td>
+      <td>10.427902</td>
+      <td>4.875402</td>
+      <td>6398483.0</td>
+      <td>531.529215</td>
+      <td>7766.576172</td>
+      <td>0.568454</td>
+      <td>0.568454</td>
+      <td>841124.000000</td>
+      <td>...</td>
+      <td>0.853233</td>
+      <td>3303245.0</td>
+      <td>0.010505</td>
+      <td>12.466984</td>
+      <td>12.466984</td>
+      <td>6398483.0</td>
+      <td>2088477.84</td>
+      <td>5391.72284</td>
+      <td>6398483.0</td>
+      <td>1.997479e+07</td>
     </tr>
     <tr>
       <th>max</th>
-      <td>0.823639</td>
-      <td>23.099903</td>
-      <td>4050000.0</td>
-      <td>4976.840397</td>
-      <td>56092.300000</td>
-      <td>56092.300000</td>
-      <td>0.013850</td>
-      <td>0.088744</td>
-      <td>0.823639</td>
-      <td>172.104352</td>
-      <td>4050000.0</td>
-      <td>32.884494</td>
-      <td>37083.07724</td>
-      <td>417912.1</td>
-      <td>0.103188</td>
-      <td>4050000.0</td>
-      <td>4050000.0</td>
-      <td>1.331822e+08</td>
+      <td>3619.0</td>
+      <td>1.255483</td>
+      <td>14.030978</td>
+      <td>5.094992</td>
+      <td>6398483.0</td>
+      <td>555.514539</td>
+      <td>8116.385280</td>
+      <td>0.764909</td>
+      <td>0.764909</td>
+      <td>875999.000000</td>
+      <td>...</td>
+      <td>0.853233</td>
+      <td>3303245.0</td>
+      <td>0.010505</td>
+      <td>12.466984</td>
+      <td>12.466984</td>
+      <td>6398483.0</td>
+      <td>2088477.84</td>
+      <td>5391.72284</td>
+      <td>6398483.0</td>
+      <td>1.997479e+07</td>
     </tr>
   </tbody>
 </table>
+<p>8 rows × 36 columns</p>
 </div>
 
 

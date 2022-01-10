@@ -3,7 +3,7 @@ from datetime import date, datetime
 from enum import Enum
 from typing import ClassVar, List, Optional
 
-from . import ApiField, ApiObject, Parsers
+from . import ApiField, ApiObject, Formatters, Parsers
 from .events import Event
 from .iot import Field
 
@@ -76,6 +76,7 @@ class Metric(ApiObject):
     def normalized_label(self) -> str:
         return Formatters.normalize_label(self.label)
 
+
 @dataclass
 class MetricValue(ApiObject):
     _api_fields: ClassVar = (
@@ -85,17 +86,16 @@ class MetricValue(ApiObject):
         ApiField("value", data_type=float, creatable=True, updatable=True),
         ApiField("created_at", data_type=Parsers.datetime, optional=True),
         ApiField("updated_at", data_type=Parsers.datetime, optional=True),
-        ApiField("is_estimated", data_type=bool, optional=True)
+        ApiField("is_estimated", data_type=bool, optional=True),
     )
 
     effective_start_date: datetime
     effective_end_date: datetime
     value: str
     id: Optional[str] = None
-    asset: Optional["Asset"] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
-    is_estimated: bool = None
+    is_estimated: Optional[bool] = None
 
 
 @dataclass

@@ -2,7 +2,15 @@ from datetime import date, datetime, timedelta, timezone
 from typing import Iterable, List, Optional
 
 from ..auth import Auth
-from ..models.ems import Facility, MainService, Metric, MetricValue, ResourceType, UtilityContract, UtilitySpend, UtilityUsage
+from ..models.ems import (
+    Facility,
+    MainService,
+    MetricValue,
+    ResourceType,
+    UtilityContract,
+    UtilitySpend,
+    UtilityUsage,
+)
 from .api import ApiEnvironment, ConfiguredApi
 from .pagination import PagedRecords, PageOptions
 
@@ -34,18 +42,20 @@ class EmsService(ConfiguredApi):
         asset_id: str,
         metric_label: Optional[str] = None,
         params: Optional[dict] = None,
-        page_options: Optional[PageOptions] = None
+        page_options: Optional[PageOptions] = None,
     ) -> Iterable[MetricValue]:
-        assert params is None or \
-            sum([key not in ["effective_end_date", "effective_start_date"]
-                 for key in params]) == 0, \
-            f"Unrecognized query parameters: {params}"
-        params = "&".join([f"{key}={value}"
-                           for key, value in params.items()]) \
-                 if params is not None else ""
+        assert (
+            params is None
+            or sum([key not in ["effective_end_date", "effective_start_date"] for key in params]) == 0
+        ), f"Unrecognized query parameters: {params}"
+        params_string = (
+            "&".join([f"{key}={value}" for key, value in params.items()]) if params is not None else ""
+        )
 
-        url = f"assets/metrics/values?asset_ids={asset_id}" +\
-            f"&metric_labels={metric_label}&{params}"
+        url = (
+            f"assets/metrics/values?asset_ids={asset_id}"
+            + f"&metric_labels={metric_label}&{params_string}"
+        )
         resp = self.get(url)
         metric_values = resp[asset_id][metric_label]
         return [MetricValue.from_api(value) for value in metric_values]
