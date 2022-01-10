@@ -15,3 +15,4 @@ from .ngest import NgestService
 from .sis import SisService
 from .control.control import ControlService
 from .base.base import BaseService
+from .rates import UtilityRatesService

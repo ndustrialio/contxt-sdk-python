@@ -31,6 +31,7 @@ class BaseGraphService:
     def get_auth_token(self):
         cached_token = self.token_cache.get_token(client_id=self.client_id,
                                                   audience=self.audience)
+
         if cached_token:
             return cached_token
 
@@ -45,20 +46,32 @@ class BaseGraphService:
                                        token=token['access_token'])
             return token['access_token']
 
-    def update_schema(self):
+    def update_schema(self, service_name=None):
         data = self._get_endpoint()(introspection_query, variables())
 
+        schema_name = service_name if service_name else self.service_name
+
         base_file_path = path.dirname(__file__)
-        json_schema_filepath = path.abspath(path.join(base_file_path, self.service_name, f"{self.service_name}_schema.json"))
+        json_schema_filepath = path.abspath(path.join(base_file_path, schema_name, f"{schema_name}_schema.json"))
         with open(json_schema_filepath, 'w') as f:
             print(f'Writing schema to {json_schema_filepath}')
             json.dump(data, f, sort_keys=True, indent=2, default=str)
 
-        python_schema_filepath = path.abspath(path.join(base_file_path, self.service_name, f'{self.service_name}_schema.py'))
+        python_schema_filepath = path.abspath(path.join(base_file_path, schema_name, f'{schema_name}_schema.py'))
         print('Generating code for schema')
         with open(json_schema_filepath, 'r') as json_file:
             schema = load_schema(json_file)
             with open(python_schema_filepath, 'w') as schema_file:
-                gen = CodeGen(self.service_name, schema, schema_file.write, docstrings=True)
+                gen = CodeGen(schema_name, schema, schema_file.write, docstrings=True)
                 gen.write()
             print('Schema and types updated!')
+
+    def run(self, op: Operation):
+
+        data = self._get_endpoint()(op)
+
+        if 'errors' in data:
+            print(data)
+            raise Exception(data['errors'][0]['message'])
+
+        return data

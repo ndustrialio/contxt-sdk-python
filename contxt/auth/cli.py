@@ -12,6 +12,7 @@ from contxt.services.api import Api
 
 from ..services.auth import AuthService
 from ..utils import make_logger
+from ..utils.config import ContxtEnvironmentConfig, ContxtCliEnvironmentConfig
 from . import Auth, Token, TokenProvider
 
 logger = make_logger(__name__)
@@ -47,17 +48,16 @@ class DeviceAuthDenied(Exception):
 
 
 class Auth0DeviceProvider(Api):
-    def __init__(self, env: str = "production"):
-        self.env = env
-        self.base_url = environments[env].auth0_tenant_base_url
-        self.auth_service = AuthService(env=env)
-        super().__init__(base_url=f"https://{self.base_url}")
+    def __init__(self, cli_auth_env: ContxtCliEnvironmentConfig):
+        self.cli_auth_env = cli_auth_env
+        self.auth_service = AuthService(contxt_env=self.cli_auth_env.to_contxt_environment_config())
+        super().__init__(base_url=f"https://{self.cli_auth_env.apiEnvironment.authProvider}")
 
     def get_device_code_url(self):
         data = {
-            "client_id": environments[self.env].cli_client_id,
+            "client_id": self.cli_auth_env.clientId,
             "scope": "offline_access",
-            "audience": self.auth_service.client_id,
+            "audience": self.cli_auth_env.apiEnvironment.clientId,
         }
 
         return self.post("oauth/device/code", data)
@@ -67,7 +67,7 @@ class Auth0DeviceProvider(Api):
         data = {
             "grant_type": "urn:ietf:params:oauth:grant-type:device_code",
             "device_code": code_info["device_code"],
-            "client_id": environments[self.env].cli_client_id,
+            "client_id": self.cli_auth_env.clientId,
         }
 
         while True:
@@ -108,19 +108,14 @@ class UserIdentityProvider(TokenProvider):
 
     def __init__(
         self,
-        client_id: str,
-        client_secret: str,
-        audience: str,
-        env: str = "production",
+        cli_auth_env: ContxtCliEnvironmentConfig,
         cache_file: Optional[Path] = None,
     ) -> None:
-        super().__init__(audience)
-        self.env = env
-        self.client_id = client_id
-        self.client_secret = client_secret
-        self.auth_service = GetToken(environments[env].auth0_tenant_base_url)
+        super().__init__(cli_auth_env.apiEnvironment.clientId)
+        self.cli_auth_env = cli_auth_env
+        self.auth_service = GetToken(cli_auth_env.apiEnvironment.authProvider)
         self._refresh_token: Optional[Token] = None
-        self.device_provider = Auth0DeviceProvider(env)
+        self.device_provider = Auth0DeviceProvider(cli_auth_env=cli_auth_env)
 
         # Initialize cache
         self._cache_file = cache_file
@@ -133,12 +128,12 @@ class UserIdentityProvider(TokenProvider):
 
             if cache:
                 # Token exists in cache, set it
-                logger.debug("Setting token from cache")
+                logger.info("Setting token from cache")
                 self.access_token = cache["access_token"]
                 self.refresh_token = cache["refresh_token"]
             else:
                 # Token not in cache
-                logger.debug("Token not found in cache")
+                logger.info("Token not found in cache")
 
     @TokenProvider.access_token.getter  # type: ignore
     def access_token(self) -> Token:
@@ -155,7 +150,7 @@ class UserIdentityProvider(TokenProvider):
             # Token expiring soon, refresh it
             logger.debug(f"Refreshing access_token for {self.audience}")
             token_info = self.auth_service.refresh_token(
-                self.client_id, self.client_secret, self.refresh_token
+                self.cli_auth_env.clientId, "", self.refresh_token
             )
             self.access_token = token_info["access_token"]
             # Update cache
@@ -231,18 +226,19 @@ class UserTokenProvider(TokenProvider):
     """
 
     def __init__(
-        self, identity_provider: UserIdentityProvider, audience: str, env: str = "production"
+        self, identity_provider: UserIdentityProvider, audience: str, contxt_env: ContxtEnvironmentConfig
     ) -> None:
         super().__init__(audience)
         self.identity_provider = identity_provider
-        self.auth_service = AuthService(env)
+        self.auth_service = AuthService(contxt_env)
 
     @TokenProvider.access_token.getter  # type: ignore
     def access_token(self) -> Token:
         """Gets a valid access token for audience `audience`"""
         if self._access_token is None or self._token_expiring():
             # Token either not yet set or expiring soon, fetch one
-            logger.debug(f"Fetching new access_token for {self.audience}")
+            logger.info(f"Fetching new access_token for {self.audience}")
+            print('New access token')
             self.access_token = self.auth_service.get_token(
                 self.identity_provider.access_token, self.audience
             )["access_token"]
@@ -265,22 +261,20 @@ class CliAuth(Auth):
        for the target service, authenticating with the above Auth0 access token
     """
 
-    def __init__(self, env: str = "production") -> None:
-        super().__init__(client_id=environments[env].cli_client_id, client_secret="")
-        self.env = env
-        self.auth_service = AuthService(env)
+    def __init__(self, service_config: ContxtEnvironmentConfig, cli_env: ContxtCliEnvironmentConfig) -> None:
+        super().__init__(service_config)
+        self.auth_service = AuthService(contxt_env=service_config)
+        self.cli_auth_config = cli_env
         self.identity_provider = UserIdentityProvider(
-            env=env,
-            client_id=self.client_id,
-            client_secret=self.client_secret,
-            audience=self.auth_service.client_id,
+            cli_auth_env=cli_env,
             cache_file=Path.home() / ".contxt" / "cli_token",
         )
 
     def get_token_provider(self, audience: str) -> UserTokenProvider:
         """Get `TokenProvider` for audience `audience`"""
         return UserTokenProvider(
-            identity_provider=self.identity_provider, audience=audience, env=self.env
+            identity_provider=self.identity_provider, audience=audience,
+            contxt_env=self.cli_auth_config.to_contxt_environment_config()
         )
 
     @property
@@ -299,6 +293,7 @@ class CliAuth(Auth):
         """Force a prompt for the user to login. Note this will happen automatically."""
         if self.logged_in() and not self.query_user("Already logged in. Continue?"):
             return None
+        print('Logging in again')
         # NOTE: this works by unsetting the current access token, and then
         # calling the getter, which triggers a login prompt
         self.identity_provider.reset()

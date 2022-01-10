@@ -1,3 +1,6 @@
+import json
+
+import sgqlc.types
 from sgqlc.operation import Operation
 from datetime import datetime
 import pytz
@@ -6,6 +9,7 @@ from typing import List
 from contxt.utils.config import ContxtEnvironmentConfig
 from contxt.services.api import ApiEnvironment, EnvironmentException
 from contxt.services.control.control_schema import control as schema
+from contxt.services.control.control_schema import ComponentToControlInputRecordInput
 from contxt.services.base_graph_service import BaseGraphService
 
 
@@ -210,28 +214,31 @@ class ControlService(BaseGraphService):
         return event
 
     def propose_event(self, facility_id: int, project_id: str, start_time: datetime,
-                      end_time: datetime, components: List[schema.ControllableComponent]):
+                      end_time: datetime, components: List[ComponentToControlInputRecordInput],
+                      summary: str):
 
         op = Operation(schema.Mutation)
 
-        proposal = schema.ProposeEventInput()
+        #proposal = schema.ProposeEventInput()
         event_proposal = schema.EventProposalInputRecordInput()
         event_proposal.facilityid = facility_id
         event_proposal.projectid = project_id
         event_proposal.starttime = str(start_time.astimezone(pytz.utc))
         event_proposal.endtime = str(end_time.astimezone(pytz.utc))
-        proposal.proposed_event = event_proposal
-        proposal.components_to_control = components
+        event_proposal.summary = summary
+        #proposal.proposed_event = event_proposal
+        #proposal.components_to_control = components
+
+        proposal = schema.ProposeEventInput(proposed_event=event_proposal,
+                                            components_to_control=components)
 
         print(proposal)
         propose = op.propose_event(input=proposal)
 
         propose.event_proposal.id()
         print(op)
-        data = self._get_endpoint()(op)
-        if 'errors' in data:
-            print(data)
-            raise Exception(data['errors'][0]['message'])
+        print(self._get_endpoint())
+        data = self.run(op)
 
         event = (op + data).propose_event.event_proposal
         return event
@@ -444,7 +451,7 @@ class ControlService(BaseGraphService):
         edge_nodes.organization_id()
         edge_nodes.last_fetch_time()
 
-        data = self._get_endpoint()(op)
+        data = self.run(op)
 
         edge_nodes = (op + data).edge_nodes
 
@@ -475,8 +482,9 @@ class ControlService(BaseGraphService):
         components.slug()
         components.label()
 
-        data = self._get_endpoint()(op)
+        data = self.run(op)
 
+        print(data)
         edge_node = (op + data).edge_node
         return edge_node
 

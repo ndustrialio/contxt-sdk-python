@@ -25,7 +25,7 @@ def schema() -> None:
 @schema.command()
 def update():
     print('Updating schema')
-    get_control_service().update_schema()
+    get_control_service().update_schema('control')
 
 
 # Getter functions

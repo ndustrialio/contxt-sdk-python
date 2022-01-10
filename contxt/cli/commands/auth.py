@@ -9,10 +9,11 @@ def auth() -> None:
 
 
 @auth.command()
+@click.argument('SERVICE_NAME')
 @click.pass_obj
-def login(client: Clients) -> None:
+def login(client: Clients, service_name: str) -> None:
     """Login to Contxt."""
-    client.auth.login()
+    client.auth(service_name).login()
 
 
 @auth.command()

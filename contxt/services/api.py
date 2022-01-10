@@ -71,6 +71,7 @@ class Api:
 
         # Initialize session
         self.session = Session()
+        print(token_provider)
         self.session.auth = BearerTokenAuth(token_provider) if token_provider else None
         self.session.headers.update({"Cache-Control": "no-cache"})
         self.session.hooks = {"response": self._log_response}  # type: ignore
@@ -94,6 +95,7 @@ class Api:
     def _process_response(self, response: Response) -> Dict:
         try:
             # Raise any error
+            print(response)
             response.raise_for_status()
         except HTTPError:
             # Catch the error, to log the response's message, and reraise
@@ -119,6 +121,7 @@ class Api:
 
     def post(self, uri: str, data: Optional[Dict] = None, json: Optional[Dict] = None, **kwargs) -> Dict:
         """Sends a POST request"""
+        print('Posting')
         response = self.session.post(url=self._url(uri), data=data, json=json, **kwargs)
         return self._process_response(response)
 
@@ -148,7 +151,7 @@ class ConfiguredLegacyApi(Api, ABC):
     def __init__(self, env_config: ContxtEnvironmentConfig, auth: Optional[Auth] = None, **kwargs) -> None:
         # TODO: figure out a cleaner approach to environment selection
 
-        token_provider = auth.get_token_provider(env_config.clientId) if auth else None
+        token_provider = auth.get_token_provider(env_config.apiEnvironment.clientId) if auth else None
         super().__init__(base_url=env_config.apiEnvironment.baseUrl, token_provider=token_provider, **kwargs)
 
 

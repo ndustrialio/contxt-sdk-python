@@ -37,9 +37,30 @@ class PageMetadata:
 
 
 @dataclass
+class PageMetadataV2:
+    count: int
+    offset: int = 0
+
+
+@dataclass
 class Page:
     records: List[Record]
     _metadata: PageMetadata
+
+    def __len__(self) -> int:
+        return len(self.records)
+
+    def __iter__(self) -> Iterator[Record]:
+        yield from self.records
+
+    def __getitem__(self, index: Union[int, slice]) -> Union[Record, List[Record]]:
+        return self.records[index]
+
+
+@dataclass
+class PageV2:
+    records: List[Record]
+    _meta: PageMetadataV2
 
     def __len__(self) -> int:
         return len(self.records)
@@ -59,12 +80,16 @@ class PagedRecords(Generic[T]):
         params: Optional[Dict] = None,
         options: Optional[PageOptions] = None,
         record_parser: Optional[Callable[[Record], T]] = None,
+        is_v2: bool = False
     ):
         self.api = api
         self.url = url
         self.params = params or {}
         self.options = options or PageOptions()
         self.record_parser = record_parser or (lambda x: x)  # type: ignore
+
+        # Workaround for inconsistent pagination attributes
+        self.is_v2 = is_v2
 
         # Fetch first page
         self.page_index = 0
@@ -99,7 +124,10 @@ class PagedRecords(Generic[T]):
 
     def _get_page(self, index: int) -> Page:
         resp = self.api.get(uri=self.url, params={**self.params, **self.options.to_api(index)})
-        page = ObjectMapper.tree_to_object(resp, Page)
+        if self.is_v2:
+            page = ObjectMapper.tree_to_object(resp, PageV2)
+        else:
+            page = ObjectMapper.tree_to_object(resp, Page)
         # NOTE: this post processing is not ideal, but works for now
         page.records = [self.record_parser(rec) for rec in page.records]  # type: ignore
         return page
@@ -123,7 +151,10 @@ class PagedRecords(Generic[T]):
 
     @property
     def total_records(self) -> int:
-        return self.page._metadata.totalRecords
+        if self.is_v2:
+            return self.page._meta.count
+        else:
+            return self.page._metadata.totalRecords
 
     @property
     def per_page(self) -> int:

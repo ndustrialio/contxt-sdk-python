@@ -1,4 +1,6 @@
+import pytz
 import yaml
+from datetime import datetime
 from yaml import load, SafeLoader, YAMLError, safe_dump
 from marshmallow_dataclass import class_schema
 from typing import Dict
@@ -124,6 +126,10 @@ class FacilityConfig:
             if report.type == type:
                 return report
 
+    @property
+    def current_facility_time(self) -> datetime:
+        return datetime.now(pytz.timezone(self.timezone))
+
 
 @dataclass
 class ReportLoadConfig:
@@ -171,9 +177,22 @@ class ContxtEnvironmentConfig:
     service: str
     environment: str
     clientId: str
-    clientSecret: str
+    apiEnvironment: ApiEnvironment
+    clientSecret: str = ""
+
+
+@dataclass
+class ContxtCliEnvironmentConfig:
+    environment: str
+    clientId: str
+    forAuthProvider: str
     apiEnvironment: ApiEnvironment
 
+    def to_contxt_environment_config(self) -> ContxtEnvironmentConfig:
+        return ContxtEnvironmentConfig(environment=self.environment,
+                                       service=self.forAuthProvider,
+                                       clientId=self.clientId,
+                                       apiEnvironment=self.apiEnvironment)
 
 @dataclass
 class Context:
@@ -190,8 +209,9 @@ class CustomEnvironmentConfig:
     defaults: Dict[str, Optional[str]]
     currentContext: Dict[str, CurrentContext]
     serviceConfigs: List[ContxtEnvironmentConfig]
+    cliConfigs: Optional[List[ContxtCliEnvironmentConfig]]
 
-    def get_service_for_current_context(self, service_name: str):
+    def get_service_for_current_context(self, service_name: str) -> ContxtEnvironmentConfig:
         current_env = self.currentContext.get(service_name)
 
         if not current_env:
@@ -202,6 +222,13 @@ class CustomEnvironmentConfig:
                 return service_config
 
         raise ContextException(f'Environment not found for {service_name} with environment {current_env}')
+
+    def get_cli_environment_for_auth_provider(self, auth_provider: str) -> ContxtCliEnvironmentConfig:
+        for cli_config in self.cliConfigs:
+            if cli_config.forAuthProvider == auth_provider:
+                return cli_config
+
+        raise ContextException(f'CLI environment for auth provider {auth_provider} is not specified in config')
 
 
 def load_config_from_file(file='./../config.yml') -> Config:
