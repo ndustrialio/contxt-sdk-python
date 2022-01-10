@@ -48,15 +48,10 @@ class EmsService(ConfiguredApi):
             params is None
             or sum([key not in ["effective_end_date", "effective_start_date"] for key in params]) == 0
         ), f"Unrecognized query parameters: {params}"
-        params_string = (
-            "&".join([f"{key}={value}" for key, value in params.items()]) if params is not None else ""
+        resp = self.get(
+            "assets/metrics/values",
+            params={"asset_ids": asset_id, "metric_labels": metric_label, **(params or {})},
         )
-
-        url = (
-            f"assets/metrics/values?asset_ids={asset_id}"
-            + f"&metric_labels={metric_label}&{params_string}"
-        )
-        resp = self.get(url)
         metric_values = resp[asset_id][metric_label]
         return [MetricValue.from_api(value) for value in metric_values]
 
