@@ -1,9 +1,9 @@
 from dataclasses import dataclass
 from datetime import date, datetime
 from enum import Enum
-from typing import ClassVar, List
+from typing import ClassVar, List, Optional
 
-from . import ApiField, ApiObject, Parsers
+from . import ApiField, ApiObject, Formatters, Parsers
 from .events import Event
 from .iot import Field
 
@@ -40,6 +40,62 @@ class MainService(ApiObject):
     usage_field: Field
     created_at: datetime
     updated_at: datetime
+
+
+@dataclass
+class Metric(ApiObject):
+    _api_fields: ClassVar = (
+        ApiField("id"),
+        ApiField("asset_type_id"),
+        ApiField("label", creatable=True, updatable=True),
+        ApiField("description", creatable=True, updatable=True),
+        ApiField("organization_id", creatable=True),
+        ApiField("time_interval", creatable=True, updatable=True),
+        ApiField("units", creatable=True, updatable=True),
+        ApiField("global_asset_metric_parent_id"),
+        ApiField("is_global", data_type=bool, creatable=True),
+        ApiField("is_calculated", data_type=bool),
+        ApiField("created_at", data_type=Parsers.datetime),
+        ApiField("updated_at", data_type=Parsers.datetime),
+    )
+
+    asset_type_id: str
+    label: str
+    description: str
+    organization_id: str
+    time_interval: str
+    units: str
+    id: Optional[str] = None
+    global_asset_metric_parent_id: Optional[str] = None
+    is_global: Optional[bool] = None
+    is_calculated: Optional[bool] = None
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+
+    @property
+    def normalized_label(self) -> str:
+        return Formatters.normalize_label(self.label)
+
+
+@dataclass
+class MetricValue(ApiObject):
+    _api_fields: ClassVar = (
+        ApiField("id"),
+        ApiField("effective_start_date", data_type=Parsers.datetime, creatable=True, updatable=True),
+        ApiField("effective_end_date", data_type=Parsers.datetime, creatable=True, updatable=True),
+        ApiField("value", data_type=float, creatable=True, updatable=True),
+        ApiField("created_at", data_type=Parsers.datetime, optional=True),
+        ApiField("updated_at", data_type=Parsers.datetime, optional=True),
+        ApiField("is_estimated", data_type=bool, optional=True),
+    )
+
+    effective_start_date: datetime
+    effective_end_date: datetime
+    value: str
+    id: Optional[str] = None
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+    is_estimated: Optional[bool] = None
 
 
 @dataclass

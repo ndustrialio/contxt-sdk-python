@@ -526,14 +526,25 @@ class AssetsService(ConfiguredApi):
         return [self.create_metric_value(metric_value) for metric_value in metric_values]
 
     def get_metric_values(
-        self, asset_id: str, metric_id: Optional[str] = None, page_options: Optional[PageOptions] = None
+        self,
+        asset_id: str,
+        metric_id: Optional[str] = None,
+        params: Optional[Dict] = None,
+        page_options: Optional[PageOptions] = None,
     ) -> Iterable[MetricValue]:
+        assert (
+            params is None
+            or sum([key not in ["effective_end_date", "effective_start_date"] for key in params]) == 0
+        ), f"Unrecognized query parameters: {params}"
+
         url = (
             f"assets/{asset_id}/metrics/{metric_id}/values"
             if metric_id
             else f"assets/{asset_id}/metrics/values"
         )
-        return PagedRecords(api=self, url=url, options=page_options, record_parser=MetricValue.from_api)
+        return PagedRecords(
+            api=self, url=url, params=params, options=page_options, record_parser=MetricValue.from_api
+        )
 
     def update_metric_values(self, metric_values: List[MetricValue]) -> None:
         # TODO: batch update
