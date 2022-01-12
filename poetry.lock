@@ -545,7 +545,7 @@ testing = ["argcomplete", "hypothesis (>=3.56)", "mock", "nose", "requests", "xm
 name = "python-dateutil"
 version = "2.8.2"
 description = "Extensions to the standard Python datetime module"
-category = "dev"
+category = "main"
 optional = false
 python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,>=2.7"
 
@@ -617,7 +617,7 @@ websocket = ["websocket-client"]
 name = "six"
 version = "1.16.0"
 description = "Python 2 and 3 compatibility utilities"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*"
 
@@ -815,7 +815,7 @@ crypto = ["cryptography"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "788397ef044a7e787eb5637db648296323bde1289a5e60dbecc68767ce05b977"
+content-hash = "ec2305b812dae86b02c3f4a36712af4c5a0a10b662c8d74b2a09b28e947b8261"
 
 [metadata.files]
 atomicwrites = [

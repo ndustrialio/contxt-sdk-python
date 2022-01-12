@@ -11,7 +11,6 @@ logging.basicConfig(format='[%(module)s %(levelname)s:%(asctime)s] %(message)s',
 class PersistentContxtConfig:
 
     def __init__(self, filename, clazz, relative_path=os.path.join(str(Path.home()), '.contxt')):
-        print(filename, relative_path)
         self.base_path = relative_path
         self.filename = os.path.join(self.base_path, filename)
         self.clazz = clazz
@@ -25,6 +24,6 @@ class PersistentContxtConfig:
 
     def load_contxt_file(self):
         if os.path.exists(self.filename):
-            logger.debug(f'Loading config from file {self.filename}')
+            logger.info(f'Loading config from file {self.filename}')
             config = load_config_class_from_file(self.filename, self.clazz)
             return config

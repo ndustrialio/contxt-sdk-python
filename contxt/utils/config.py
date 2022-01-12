@@ -17,6 +17,7 @@ logging.basicConfig(format='[%(module)s %(levelname)s:%(asctime)s] %(message)s',
 class ProjectConfigException(Exception):
     pass
 
+
 class ContextException(Exception):
     pass
 
@@ -37,14 +38,14 @@ class ReportConfig:
 class SuggestionConfig:
     project: str
     config: Optional[Dict[str, Any]]
-    project_id: Optional[str]
+    projectId: Optional[str]
 
 
 @dataclass
 class ComponentConfig:
     name: str
     slug: str
-    iotInfo: IOTFetchConfig
+    iotInfo: Optional[IOTFetchConfig]
     id: Optional[str]
 
 
@@ -104,6 +105,7 @@ class RefrigerationConfig:
             if evap.slug == slug:
                 return evap
 
+
 @dataclass
 class FacilityConfig:
     name: str
@@ -115,6 +117,11 @@ class FacilityConfig:
     components: Optional[List[ComponentConfig]]
     rates: Optional[RateConfig] = None
     refrigeration: Optional[RefrigerationConfig] = None
+
+    def get_suggestions_project_by_id(self, project_id: str):
+        for suggestion in self.suggestions:
+            if suggestion.projectId == project_id:
+                return suggestion
 
     def get_facility_component_with_slug(self, slug: str):
         for component in self.components:
@@ -232,7 +239,7 @@ class CustomEnvironmentConfig:
 
 
 def load_config_from_file(file='./../config.yml') -> Config:
-    logger.info(f'Loading config from file: {file}')
+    logger.debug(f'Loading config from file: {file}')
     with open(file, 'r') as stream:
         try:
             config_yaml = load(stream, Loader=yaml.Loader)
@@ -259,7 +266,7 @@ def write_config_class_to_file(file: str, obj, config_class):
 
 
 def load_config_class_from_file(file: str, config_class):
-    logger.info(f'Loading config from file: {file}')
+    logger.debug(f'Loading config from file: {file}')
     with open(file, 'r') as stream:
         try:
             config_yaml = load(stream, Loader=yaml.SafeLoader)
@@ -271,3 +278,8 @@ def load_config_class_from_file(file: str, config_class):
 
     result = config_schema().load(config_yaml)
     return result
+
+
+def load_config_class_from_object(object: Dict[Any, Any], config_class):
+    config_schema = class_schema(config_class)
+    return config_schema().load(object)
