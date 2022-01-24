@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 
 from ..auth import Auth
 from ..models.bus import Channel, ChannelStats
@@ -21,7 +21,8 @@ class MessageBusService(ConfiguredApi):
         ),
     )
 
-    def __init__(self, auth: Auth, organization_id: str, env: str = "production", **kwargs) -> None:
+    def __init__(self, auth: Auth, organization_id: str, custom_envs: List[ApiEnvironment], env: str = "production", **kwargs) -> None:
+        MessageBusService._envs = custom_envs
         super().__init__(env=env, auth=auth, **kwargs)
         self.organization_id = organization_id
 
