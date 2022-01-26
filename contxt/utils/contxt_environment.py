@@ -1,3 +1,5 @@
+from typing import List
+
 from .persistent_contxt_config import PersistentContxtConfig
 from .config import CustomEnvironmentConfig, ContxtEnvironmentConfig, ContxtCliEnvironmentConfig
 
@@ -30,3 +32,19 @@ class ContxtEnvironment(PersistentContxtConfig):
         service_config = self.get_config_for_service_name(service)
 
         return self.config.get_cli_environment_for_auth_provider(service_config.apiEnvironment.authProvider)
+
+    def get_possible_configs_for_service_name(self, service_name: str) -> List[ContxtEnvironmentConfig]:
+        return self.config.get_configs_for_service(service_name=service_name)
+
+    def set_context_for_service_name(self, service: str, environment_name: str):
+        service_config = self.config.get_config_for_service_environment(service_name=service,
+                                                                        environment_name=environment_name)
+
+        if not service_config:
+            raise EnvironmentConfigurationException(f'Service / Environment is not registered ({service}:{environment_name})')
+
+        self.config.set_context_for_service(service_name=service,
+                                            environment=environment_name)
+
+        self.write_contxt_file()
+

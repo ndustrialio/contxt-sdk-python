@@ -218,6 +218,21 @@ class CustomEnvironmentConfig:
     serviceConfigs: List[ContxtEnvironmentConfig]
     cliConfigs: Optional[List[ContxtCliEnvironmentConfig]]
 
+    def set_context_for_service(self, service_name: str, environment: str):
+        self.currentContext[service_name] = CurrentContext(environment)
+
+    def get_configs_for_service(self, service_name: str) -> List[ContxtEnvironmentConfig]:
+        configs = []
+        for service_config in self.serviceConfigs:
+            if service_config.service == service_name:
+                configs.append(service_config)
+        return configs
+
+    def get_config_for_service_environment(self, service_name: str, environment_name: str):
+        for service_config in self.serviceConfigs:
+            if service_config.service == service_name and service_config.environment == environment_name:
+                return service_config
+
     def get_service_for_current_context(self, service_name: str) -> ContxtEnvironmentConfig:
         current_env = self.currentContext.get(service_name)
 

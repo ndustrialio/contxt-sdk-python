@@ -24,6 +24,6 @@ class PersistentContxtConfig:
 
     def load_contxt_file(self):
         if os.path.exists(self.filename):
-            logger.info(f'Loading config from file {self.filename}')
+            logger.debug(f'Loading config from file {self.filename}')
             config = load_config_class_from_file(self.filename, self.clazz)
             return config

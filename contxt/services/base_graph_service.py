@@ -11,6 +11,10 @@ from contxt.services.api import ApiEnvironment
 from contxt.services.auth import StoredTokenCache
 
 
+class SchemaMissingException(Exception):
+    pass
+
+
 class BaseGraphService:
 
     def __init__(self, contxt_env: ContxtEnvironmentConfig):
@@ -46,12 +50,15 @@ class BaseGraphService:
                                        token=token['access_token'])
             return token['access_token']
 
-    def update_schema(self, service_name=None):
+    def update_schema(self, service_name=None, base_file_path=None):
         data = self._get_endpoint()(introspection_query, variables())
 
         schema_name = service_name if service_name else self.service_name
 
-        base_file_path = path.dirname(__file__)
+        # if base file path is not specified, write the schema in the same directory
+        if not base_file_path:
+            base_file_path = path.dirname(__file__)
+
         json_schema_filepath = path.abspath(path.join(base_file_path, schema_name, f"{schema_name}_schema.json"))
         with open(json_schema_filepath, 'w') as f:
             print(f'Writing schema to {json_schema_filepath}')
