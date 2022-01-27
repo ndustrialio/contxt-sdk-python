@@ -1,3 +1,4 @@
+import os
 from typing import List, Optional
 
 from .persistent_contxt_config import PersistentContxtConfig
@@ -12,8 +13,11 @@ class ContxtEnvironment(PersistentContxtConfig):
 
     # default location is ~/.contxt/defaults.yml unless otherwise specified in arguments
     def __init__(self, filename: Optional[str]):
+        env_filename = os.environ.get('CONTXT_ENV_CONFIG')
         if filename:
             super().__init__(filename, CustomEnvironmentConfig, use_default_path=False)
+        elif env_filename:
+            super().__init__(env_filename, CustomEnvironmentConfig, use_default_path=False)
         else:
             super().__init__('defaults.yml', CustomEnvironmentConfig)
         self.config: CustomEnvironmentConfig = self.load_contxt_file()
