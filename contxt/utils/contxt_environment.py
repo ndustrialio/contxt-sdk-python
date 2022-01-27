@@ -12,7 +12,7 @@ class EnvironmentConfigurationException(Exception):
 class ContxtEnvironment(PersistentContxtConfig):
 
     # default location is ~/.contxt/defaults.yml unless otherwise specified in arguments
-    def __init__(self, filename: Optional[str]):
+    def __init__(self, filename: Optional[str] = None):
         env_filename = os.environ.get('CONTXT_ENV_CONFIG')
         if filename:
             super().__init__(filename, CustomEnvironmentConfig, use_default_path=False)
