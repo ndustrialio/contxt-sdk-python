@@ -1,17 +1,16 @@
 import time
 import webbrowser
 from dataclasses import dataclass
-from json import dump, load
-from pathlib import Path
+import requests
 from typing import Any, Dict, Optional
 
 from auth0.v3.authentication import GetToken
 from requests.exceptions import HTTPError
 
-from contxt.services.api import Api
-
-from ..services.auth import AuthService
+from ..services.auth import StoredTokenCache
+from ..services.api import AuthService
 from ..utils import make_logger
+from ..utils.contxt_environment import ContxtEnvironment
 from ..utils.config import ContxtEnvironmentConfig, ContxtCliEnvironmentConfig
 from . import Auth, Token, TokenProvider
 
@@ -47,11 +46,11 @@ class DeviceAuthDenied(Exception):
     pass
 
 
-class Auth0DeviceProvider(Api):
+class Auth0DeviceProvider:
     def __init__(self, cli_auth_env: ContxtCliEnvironmentConfig):
         self.cli_auth_env = cli_auth_env
         self.auth_service = AuthService(contxt_env=self.cli_auth_env.to_contxt_environment_config())
-        super().__init__(base_url=f"https://{self.cli_auth_env.apiEnvironment.authProvider}")
+        self.url = f"https://{self.cli_auth_env.apiEnvironment.authProvider}"
 
     def get_device_code_url(self):
         data = {
@@ -60,7 +59,10 @@ class Auth0DeviceProvider(Api):
             "audience": self.cli_auth_env.apiEnvironment.clientId,
         }
 
-        return self.post("oauth/device/code", data)
+        resp = requests.post(url=f"{self.url}/oauth/device/code",
+                             data=data)
+
+        return resp.json()
 
     def get_access_token(self, code_info):
 
@@ -76,8 +78,9 @@ class Auth0DeviceProvider(Api):
             time.sleep(code_info["interval"])
 
             try:
-                resp = self.post("oauth/token", data)
-                return resp
+                resp = requests.post(url=f"{self.url}/oauth/token",
+                                     data=data)
+                return resp.json()
             except HTTPError as e:
                 resp = e.response.json()
                 if resp["error"] == "authorization_pending":
@@ -101,15 +104,11 @@ class UserIdentityProvider(TokenProvider):
     """Concrete `TokenProvider` for a user's identity. The access token is provided
     directly from Auth0 via username and password and granted for offline access, so
     expired tokens are refreshed with a refresh token.
-
-    If `cache_file` is specified, both the `access_token` and `refresh_token`
-    are cached there as a JSON blob.
     """
 
     def __init__(
         self,
-        cli_auth_env: ContxtCliEnvironmentConfig,
-        cache_file: Optional[Path] = None,
+        cli_auth_env: ContxtCliEnvironmentConfig
     ) -> None:
         super().__init__(cli_auth_env.apiEnvironment.clientId)
         self.cli_auth_env = cli_auth_env
@@ -118,44 +117,28 @@ class UserIdentityProvider(TokenProvider):
         self.device_provider = Auth0DeviceProvider(cli_auth_env=cli_auth_env)
 
         # Initialize cache
-        self._cache_file = cache_file
-        self._init_from_cache()
-
-    def _init_from_cache(self) -> None:
-        if self._cache_file:
-            # Load the cache
-            cache = self.read_cache()
-
-            if cache:
-                # Token exists in cache, set it
-                logger.info("Setting token from cache")
-                self.access_token = cache["access_token"]
-                self.refresh_token = cache["refresh_token"]
-            else:
-                # Token not in cache
-                logger.info("Token not found in cache")
+        self.token_cache = StoredTokenCache()
 
     @TokenProvider.access_token.getter  # type: ignore
     def access_token(self) -> Token:
         """Gets a valid access token for audience `audience`"""
-        if self._access_token is None:
-            # Token not yet set, fetch one
-            logger.debug(f"Fetching new access_token for {self.audience}")
-            token_info = self.login()
-            self.access_token = token_info["access_token"]
-            self.refresh_token = token_info["refresh_token"]
-            # Update cache
-            self.update_cache()
-        elif self._token_expiring():
-            # Token expiring soon, refresh it
-            logger.debug(f"Refreshing access_token for {self.audience}")
-            token_info = self.auth_service.refresh_token(
-                self.cli_auth_env.clientId, "", self.refresh_token
-            )
-            self.access_token = token_info["access_token"]
-            # Update cache
-            self.update_cache()
-        return self._access_token  # type: ignore
+        cached_token = self.token_cache.get_token(client_id=self.cli_auth_env.clientId,
+                                                  audience=self.cli_auth_env.apiEnvironment.clientId)
+
+        if cached_token:
+            return cached_token
+
+        # get a new token
+        logger.info(f"Fetching new access_token for {self.audience}")
+        token_info = self.login()
+
+        _access_token = token_info.get('access_token')
+        # TODO make use of the refresh token in the cache
+        self._refresh_token = token_info.get('refresh_token')
+
+        self.token_cache.set_token(client_id=self.cli_auth_env.clientId,
+                                   audience=self.cli_auth_env.apiEnvironment.clientId,
+                                   token=_access_token)
 
     @property
     def refresh_token(self) -> Token:
@@ -197,28 +180,6 @@ class UserIdentityProvider(TokenProvider):
         super().reset()
         self._refresh_token = None
 
-    def read_cache(self) -> Dict[str, Any]:
-        if self._cache_file:
-            logger.debug(f"Reading cache {self._cache_file}")
-            if self._cache_file.is_file():
-                with self._cache_file.open("r") as f:
-                    return load(f)
-        return {}
-
-    def update_cache(self) -> None:
-        if self._cache_file:
-            logger.debug(f"Updating cache {self._cache_file}")
-            cache = {"access_token": self.access_token, "refresh_token": self.refresh_token}
-            self._cache_file.parent.mkdir(parents=True, exist_ok=True)
-            with self._cache_file.open("w") as f:
-                dump(cache, f, indent=4)
-
-    def clear_cache(self) -> None:
-        if self._cache_file:
-            logger.debug(f"Clearing cache {self._cache_file}")
-            if self._cache_file.is_file():
-                self._cache_file.unlink()
-
 
 class UserTokenProvider(TokenProvider):
     """Concrete `TokenProvider` for a user, where `identity_provider` serves as the
@@ -256,25 +217,26 @@ class CliAuth(Auth):
     Auth Flow:
     1. User provides Contxt username/password credentials
     2. Retrieve access token directly from Auth0 for our `AuthService`, authenticating
-       with above credientials
+       with above credentials
     3. When authenticating to a service, retrieve access token from our `AuthService`
        for the target service, authenticating with the above Auth0 access token
     """
 
-    def __init__(self, service_config: ContxtEnvironmentConfig, cli_env: ContxtCliEnvironmentConfig) -> None:
+    def __init__(self, service_config: ContxtEnvironmentConfig) -> None:
         super().__init__(service_config)
         self.auth_service = AuthService(contxt_env=service_config)
-        self.cli_auth_config = cli_env
+        contxt_env = ContxtEnvironment()
+        self.cli_auth_config = contxt_env.get_cli_config_for_service(service_config.service)
+        self.service_config = service_config
         self.identity_provider = UserIdentityProvider(
-            cli_auth_env=cli_env,
-            cache_file=Path.home() / ".contxt" / "cli_token",
+            cli_auth_env=self.cli_auth_config
         )
 
     def get_token_provider(self, audience: str) -> UserTokenProvider:
         """Get `TokenProvider` for audience `audience`"""
         return UserTokenProvider(
             identity_provider=self.identity_provider, audience=audience,
-            contxt_env=self.cli_auth_config.to_contxt_environment_config()
+            contxt_env=self.service_config
         )
 
     @property

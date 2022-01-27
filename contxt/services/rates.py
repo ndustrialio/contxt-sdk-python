@@ -1,8 +1,7 @@
 from typing import Dict, List, Optional, Iterable
 
-from ..auth import Auth
 from ..models.rates import UtilityProvider, RateSchedule
-from .api import ApiEnvironment, ConfiguredLegacyApi
+from .api import ConfiguredLegacyApi
 from ..utils.config import ContxtEnvironmentConfig
 from .pagination import PagedRecords, PageOptions
 
@@ -10,8 +9,8 @@ from .pagination import PagedRecords, PageOptions
 class UtilityRatesService(ConfiguredLegacyApi):
     """Utility Rates API client"""
 
-    def __init__(self, auth: Auth, env_config: ContxtEnvironmentConfig, **kwargs) -> None:
-        super().__init__(env_config=env_config, auth=auth, **kwargs)
+    def __init__(self, env_config: ContxtEnvironmentConfig, **kwargs) -> None:
+        super().__init__(env_config=env_config, **kwargs)
 
     def get_providers(
             self,

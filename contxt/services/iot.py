@@ -21,7 +21,7 @@ from ..models.iot import (
 from ..utils import is_datetime_aware, make_logger
 from ..utils.object_mapper import ObjectMapper
 from ..utils.config import ContxtEnvironmentConfig
-from .api import ApiEnvironment, ConfiguredLegacyApi
+from .api import ConfiguredLegacyApi
 from .pagination import DataPoint, PagedRecords, PagedTimeSeries, PageOptions
 
 logger = make_logger(__name__)
@@ -36,8 +36,8 @@ class IotService(ConfiguredLegacyApi):
         - Grouping: Group of fields
     """
 
-    def __init__(self, auth: Auth, env_config: ContxtEnvironmentConfig, **kwargs) -> None:
-        super().__init__(env_config=env_config, auth=auth, **kwargs)
+    def __init__(self, env_config: ContxtEnvironmentConfig, **kwargs) -> None:
+        super().__init__(env_config=env_config, **kwargs)
 
     def provision_field_for_feed(self, feed_id: int, field: Field) -> Field:
         resp = self.post(f"feeds/{feed_id}/fields", data=field.post())

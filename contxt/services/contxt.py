@@ -12,15 +12,15 @@ from ..models.contxt import (
     Service,
     User,
 )
-from .api import ApiEnvironment, ConfiguredLegacyApi
+from .api import ConfiguredLegacyApi
 from ..utils.config import ContxtEnvironmentConfig
 
 
 class ContxtService(ConfiguredLegacyApi):
     """Contxt API client"""
 
-    def __init__(self, auth: Auth, env_config: ContxtEnvironmentConfig, **kwargs) -> None:
-        super().__init__(env_config=env_config, auth=auth, **kwargs)
+    def __init__(self, env_config: ContxtEnvironmentConfig, **kwargs) -> None:
+        super().__init__(env_config=env_config, **kwargs)
 
     def get_organizations(self) -> List[Organization]:
         resp = self.get("organizations")

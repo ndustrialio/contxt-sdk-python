@@ -2,7 +2,7 @@ from typing import Dict, List, Optional
 
 from ..auth import Auth
 from ..models.bus import Channel, ChannelStats
-from .api import ApiEnvironment, ConfiguredLegacyApi
+from .api import ConfiguredLegacyApi
 from ..utils.config import ContxtEnvironmentConfig
 
 

@@ -21,14 +21,13 @@ class AssetsService(ConfiguredLegacyApi):
 
     def __init__(
         self,
-        auth: Auth,
         env_config: ContxtEnvironmentConfig,
         organization_id: Optional[str] = None,
         load_types: bool = True,
         types_to_fully_load: Optional[List[str]] = None,
         **kwargs,
     ) -> None:
-        super().__init__(env_config=env_config, auth=auth, **kwargs)
+        super().__init__(env_config=env_config, **kwargs)
         # TODO: handle multiple orgs
         self.organization_id = organization_id
         self.types: Dict[str, AssetType] = {}

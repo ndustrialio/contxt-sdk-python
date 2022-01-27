@@ -3,7 +3,6 @@ from typing import Optional
 
 import click
 
-from contxt.auth.cli import CliAuth
 from contxt.services import (
     AssetsService,
     ContxtDeploymentService,
@@ -42,57 +41,42 @@ class Clients:
                 return org["id"]
         raise click.ClickException(f"Organization {self.org_slug!r} does not exist.")
 
-    def auth(self, service_name: str) -> CliAuth:
-        config = self.contxt_env.get_config_for_service_name(service_name)
-        cli_config = self.contxt_env.get_cli_config_for_service(service_name)
-        return CliAuth(cli_env=cli_config, service_config=config)
-
     @cachedproperty
     def assets(self) -> AssetsService:
-        return AssetsService(auth=self.auth('assets'),
-                             env_config=self.contxt_env.get_config_for_service_name('assets'))
+        return AssetsService(env_config=self.contxt_env.get_config_for_service_name('assets'))
 
     @cachedproperty
     def contxt(self) -> ContxtService:
-        return ContxtService(auth=self.auth('contxt'),
-                             env_config=self.contxt_env.get_config_for_service_name('contxt'))
+        return ContxtService(env_config=self.contxt_env.get_config_for_service_name('contxt'))
 
     @cachedproperty
     def contxt_deployments(self) -> ContxtDeploymentService:
-        return ContxtDeploymentService(auth=self.auth('contxt'),
-                                       env_config=self.contxt_env.get_config_for_service_name('contxt'))
+        return ContxtDeploymentService(env_config=self.contxt_env.get_config_for_service_name('contxt'))
 
     @cachedproperty
     def ems(self) -> EmsService:
-        return EmsService(auth=self.auth('ems'),
-                          env_config=self.contxt_env.get_config_for_service_name('ems'))
+        return EmsService(env_config=self.contxt_env.get_config_for_service_name('ems'))
 
     @cachedproperty
     def events(self) -> EventsService:
-        return EventsService(auth=self.auth('events'),
-                             env_config=self.contxt_env.get_config_for_service_name('events'))
+        return EventsService(env_config=self.contxt_env.get_config_for_service_name('events'))
 
     @cachedproperty
     def facilities(self) -> FacilitiesService:
-        return FacilitiesService(auth=self.auth('assets'),
-                                 env_config=self.contxt_env.get_config_for_service_name('assets'))
+        return FacilitiesService(env_config=self.contxt_env.get_config_for_service_name('assets'))
 
     @cachedproperty
     def health(self) -> HealthService:
-        return HealthService(auth=self.auth('health'),
-                             env_config=self.contxt_env.get_config_for_service_name('health'))
+        return HealthService(env_config=self.contxt_env.get_config_for_service_name('health'))
 
     @cachedproperty
     def iot(self) -> IotService:
-        return IotService(auth=self.auth('iot'),
-                          env_config=self.contxt_env.get_config_for_service_name('iot'))
+        return IotService(env_config=self.contxt_env.get_config_for_service_name('iot'))
 
     @cachedproperty
     def sis(self) -> SisService:
-        return SisService(auth=self.auth('sis'),
-                          env_config=self.contxt_env.get_config_for_service_name('sis'))
+        return SisService(env_config=self.contxt_env.get_config_for_service_name('sis'))
 
     @cachedproperty
     def rates(self) -> UtilityRatesService:
-        return UtilityRatesService(auth=self.auth('rates'),
-                                   env_config=self.contxt_env.get_config_for_service_name('rates'))
+        return UtilityRatesService(env_config=self.contxt_env.get_config_for_service_name('rates'))

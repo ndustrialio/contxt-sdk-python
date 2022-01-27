@@ -1,10 +1,9 @@
 from datetime import date
 from typing import List, Optional
 
-from contxt.auth import Auth
 from contxt.models.ems import UtilityAccount, UtilityMeter, UtilityStatement
 from contxt.models.sis import FileRead
-from contxt.services.api import ApiEnvironment, ConfiguredLegacyApi
+from contxt.services.api import ConfiguredLegacyApi
 from contxt.utils import make_logger
 from contxt.utils.config import ContxtEnvironmentConfig
 
@@ -15,8 +14,8 @@ logger = make_logger(__name__)
 class SisService(ConfiguredLegacyApi):
     """Legacy SIS API client"""
 
-    def __init__(self, auth: Auth, env_config: ContxtEnvironmentConfig, **kwargs) -> None:
-        super().__init__(env_config=env_config, auth=auth, **kwargs)
+    def __init__(self,env_config: ContxtEnvironmentConfig, **kwargs) -> None:
+        super().__init__(env_config=env_config, **kwargs)
 
     def request_read_file(self, file_id) -> FileRead:
         resp = self.get(f"files/{file_id}/read")

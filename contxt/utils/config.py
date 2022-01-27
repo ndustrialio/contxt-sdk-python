@@ -183,9 +183,10 @@ class ApiEnvironment:
 class ContxtEnvironmentConfig:
     service: str
     environment: str
-    clientId: str
+    isGraph: bool
     apiEnvironment: ApiEnvironment
-    clientSecret: str = ""
+    clientId: Optional[str] = None
+    clientSecret: Optional[str] = None
 
 
 @dataclass
@@ -199,7 +200,9 @@ class ContxtCliEnvironmentConfig:
         return ContxtEnvironmentConfig(environment=self.environment,
                                        service=self.forAuthProvider,
                                        clientId=self.clientId,
-                                       apiEnvironment=self.apiEnvironment)
+                                       apiEnvironment=self.apiEnvironment,
+                                       isGraph=False)
+
 
 @dataclass
 class Context:
@@ -220,6 +223,13 @@ class CustomEnvironmentConfig:
 
     def set_context_for_service(self, service_name: str, environment: str):
         self.currentContext[service_name] = CurrentContext(environment)
+
+    def get_graph_environments(self) -> List[ContxtEnvironmentConfig]:
+        graph_configs = []
+        for conf in self.serviceConfigs:
+            if conf.isGraph:
+                graph_configs.append(conf)
+        return graph_configs
 
     def get_configs_for_service(self, service_name: str) -> List[ContxtEnvironmentConfig]:
         configs = []

@@ -2,7 +2,7 @@ from typing import Iterable, List, Optional
 
 from ..auth import Auth
 from ..models.events import Event, EventDefinition, EventType, TriggeredEvent
-from .api import ApiEnvironment, ConfiguredLegacyApi
+from .api import ConfiguredLegacyApi
 from .pagination import PagedRecords, PageOptions
 from ..utils.config import ContxtEnvironmentConfig
 
@@ -10,8 +10,8 @@ from ..utils.config import ContxtEnvironmentConfig
 class EventsService(ConfiguredLegacyApi):
     """Events API client"""
 
-    def __init__(self, auth: Auth, env_config: ContxtEnvironmentConfig, **kwargs) -> None:
-        super().__init__(env_config=env_config, auth=auth, **kwargs)
+    def __init__(self, env_config: ContxtEnvironmentConfig, **kwargs) -> None:
+        super().__init__(env_config=env_config, **kwargs)
 
     def set_human_readable_parameters(self, event_definition: EventDefinition) -> None:
         statement = ""

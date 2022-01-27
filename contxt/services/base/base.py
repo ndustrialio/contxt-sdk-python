@@ -1,8 +1,12 @@
 from sgqlc.operation import Operation
 
-from contxt.services.api import ApiEnvironment, EnvironmentException
-from contxt.services.base_graph_service import BaseGraphService
-from contxt.services.base.base_schema import base as schema
+from contxt.services.base_graph_service import BaseGraphService, SchemaMissingException
+
+try:
+    from contxt.schemas.foundry_graph.foundry_graph_schema import foundry_graph as schema
+except ImportError:
+    raise SchemaMissingException('[ERROR] Schema is not generated for GraphQL -- run `contxt init` to '
+                                 'initialize then re-run the command')
 
 from contxt.utils.config import ContxtEnvironmentConfig
 
@@ -26,7 +30,7 @@ class BaseService(BaseGraphService):
         query.name()
         query.source_type().slug()
 
-        data = self._get_endpoint()(op)
+        data = self.run(op)
 
         if slug:
             sources = (op + data).source
@@ -54,7 +58,7 @@ class BaseService(BaseGraphService):
         if with_cursors:
             source_channels.cursor().channel_cursor()
 
-        data = self._get_endpoint()(op)
+        data = self.run(op)
 
         channels = (op + data).sources.nodes
 
@@ -75,7 +79,7 @@ class BaseService(BaseGraphService):
 
         if with_cursors:
             query.cursor().channel_cursor()
-        data = self._get_endpoint()(op)
+        data = self.run(op)
 
         channels = (op + data).source_channels.nodes
 
@@ -97,7 +101,7 @@ class BaseService(BaseGraphService):
         cursor_upsert.source_channel_cursor().id()
         cursor_upsert.source_channel_cursor().channel_cursor()
 
-        data = self._get_endpoint()(op)
+        data = self.run(op)
         if 'errors' in data:
             print(data)
             raise Exception(data['errors'][0]['message'])

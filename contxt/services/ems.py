@@ -1,9 +1,8 @@
 from datetime import date, datetime, timedelta, timezone
 from typing import Iterable, List, Optional
 
-from ..auth import Auth
 from ..models.ems import Facility, MainService, ResourceType, UtilityContract, UtilitySpend, UtilityUsage
-from .api import ApiEnvironment, ConfiguredLegacyApi
+from .api import ConfiguredLegacyApi
 from .pagination import PagedRecords
 from ..utils.config import ContxtEnvironmentConfig
 
@@ -11,8 +10,8 @@ from ..utils.config import ContxtEnvironmentConfig
 class EmsService(ConfiguredLegacyApi):
     """EMS API client"""
 
-    def __init__(self, auth: Auth, env_config: ContxtEnvironmentConfig, **kwargs) -> None:
-        super().__init__(env_config=env_config, auth=auth, **kwargs)
+    def __init__(self, env_config: ContxtEnvironmentConfig, **kwargs) -> None:
+        super().__init__(env_config=env_config, **kwargs)
 
     def get_facility(self, id: int) -> Facility:
         return Facility.from_api(self.get(f"facilities/{id}"))

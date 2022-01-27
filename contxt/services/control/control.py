@@ -1,16 +1,17 @@
-import json
-
-import sgqlc.types
 from sgqlc.operation import Operation
 from datetime import datetime
 import pytz
 from typing import List
 
 from contxt.utils.config import ContxtEnvironmentConfig
-from contxt.services.api import ApiEnvironment, EnvironmentException
-import contxt.services.control.control_schema as schema
-from contxt.services.control.control_schema import ComponentToControlInputRecordInput
-from contxt.services.base_graph_service import BaseGraphService
+from contxt.services.base_graph_service import BaseGraphService, SchemaMissingException
+
+try:
+    import contxt.schemas.foundry_graph.foundry_graph_schema as schema
+    from contxt.schemas.foundry_graph.foundry_graph_schema import ComponentToControlInputRecordInput
+except ImportError:
+    raise SchemaMissingException('[ERROR] Schema is not generated for GraphQL -- run `contxt init` to '
+                                 'initialize then re-run the command')
 
 from contxt.models.control import Suggestion
 

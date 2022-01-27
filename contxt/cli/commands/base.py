@@ -1,37 +1,19 @@
-from contxt.services.base.base import BaseService
-from contxt.utils.serializer import Serializer
 import click
 
-ENV = "local"
-envs = {
-    "local": {
-        "client_id": None,
-        "client_secret": None
-    }
-}
+from contxt.services.base.base import BaseService
+from contxt.utils.contxt_environment import ContxtEnvironment
+from contxt.utils.serializer import Serializer
 
 
 def get_base_service():
-    return BaseService(client_id=envs[ENV]["client_id"],
-                       client_secret=envs[ENV]["client_secret"],
-                       env=ENV)
+    # load configuration file
+    contxt_env = ContxtEnvironment()
+    return BaseService(contxt_env=contxt_env.get_config_for_service_name('foundry-graph'))
 
 
 @click.group()
 def base() -> None:
     """Base Contxt Functions"""
-
-
-# Schema functions
-@click.group()
-def schema() -> None:
-    """Schema Functions"""
-
-
-@schema.command()
-def update():
-    print('Updating schema')
-    get_base_service().update_schema()
 
 
 # Getter functions
@@ -69,5 +51,4 @@ def cli() -> None:
     pass
 
 
-base.add_command(schema)
 base.add_command(get)

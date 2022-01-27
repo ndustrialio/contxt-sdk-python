@@ -4,7 +4,7 @@ from typing import Dict, List
 
 from ..utils import is_datetime_aware, make_logger
 from ..utils.config import ContxtEnvironmentConfig
-from .api import ApiEnvironment, ConfiguredLegacyApi
+from .api import ConfiguredLegacyApi
 
 logger = make_logger(__name__)
 

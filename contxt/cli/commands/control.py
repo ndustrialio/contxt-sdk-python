@@ -1,7 +1,7 @@
+import click
+
 from contxt.services.control.control import ControlService
 from contxt.utils.serializer import Serializer
-import click
-from contxt.services.api import ApiEnvironment
 from contxt.utils.contxt_environment import ContxtEnvironment
 
 
@@ -20,12 +20,6 @@ def control() -> None:
 @click.group()
 def schema() -> None:
     """Schema Functions"""
-
-
-@schema.command()
-def update():
-    print('Updating schema')
-    get_control_service().update_schema('control')
 
 
 # Getter functions
