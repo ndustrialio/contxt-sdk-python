@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from .persistent_contxt_config import PersistentContxtConfig
 from .config import CustomEnvironmentConfig, ContxtEnvironmentConfig, ContxtCliEnvironmentConfig
@@ -11,11 +11,11 @@ class EnvironmentConfigurationException(Exception):
 class ContxtEnvironment(PersistentContxtConfig):
 
     # default location is ~/.contxt/defaults.yml unless otherwise specified in arguments
-    def __init__(self, filename='defaults.yml', relative_path=None):
-        if relative_path:
-            super().__init__(filename, CustomEnvironmentConfig, relative_path=relative_path)
+    def __init__(self, filename: Optional[str]):
+        if filename:
+            super().__init__(filename, CustomEnvironmentConfig, use_default_path=False)
         else:
-            super().__init__(filename, CustomEnvironmentConfig)
+            super().__init__('defaults.yml', CustomEnvironmentConfig)
         self.config: CustomEnvironmentConfig = self.load_contxt_file()
 
     def __str__(self):
