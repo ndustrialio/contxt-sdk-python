@@ -1,0 +1,3 @@
+*.json
+*_schema.py
+!.gitignore

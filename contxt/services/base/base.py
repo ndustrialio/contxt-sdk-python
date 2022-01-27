@@ -1,32 +1,20 @@
 from sgqlc.operation import Operation
 
-from contxt.services.api import ApiEnvironment, EnvironmentException
-from contxt.services.base_graph_service import BaseGraphService
-from contxt.services.base.base_schema import base as schema
+from contxt.services.base_graph_service import BaseGraphService, SchemaMissingException
 
-ENVS = {
-    'staging': ApiEnvironment(
-        name="staging",
-        base_url="https://contxt-dev.staging.lineageapi.com/graphql",
-        client_id="https://contxt-dev.staging.lineageapi.com/",
-        auth_provider='contxt.auth0.com'
-    ),
-    'local': ApiEnvironment(
-        name="local",
-        base_url="http://localhost:3000/graphql",
-        client_id="local",
-        auth_required=False
-    )
-}
+try:
+    from contxt.schemas.foundry_graph.foundry_graph_schema import foundry_graph as schema
+except ImportError:
+    raise SchemaMissingException('[ERROR] Schema is not generated for GraphQL -- run `contxt init` to '
+                                 'initialize then re-run the command')
+
+from contxt.utils.config import ContxtEnvironmentConfig
 
 
 class BaseService(BaseGraphService):
 
-    def __init__(self, client_id: str, client_secret: str, env='local'):
-        if not ENVS.get(env):
-            raise EnvironmentException('Environment not found')
-        super().__init__(client_id=client_id, client_secret=client_secret,
-                         api_environment=ENVS.get(env), service_name='base')
+    def __init__(self, contxt_env: ContxtEnvironmentConfig):
+        super().__init__(contxt_env)
 
     def get_sources(self, slug: str = None):
         op = Operation(schema.Query)
@@ -42,7 +30,7 @@ class BaseService(BaseGraphService):
         query.name()
         query.source_type().slug()
 
-        data = self._get_endpoint()(op)
+        data = self.run(op)
 
         if slug:
             sources = (op + data).source
@@ -51,6 +39,31 @@ class BaseService(BaseGraphService):
 
         return sources
 
+    def get_channels_by_source_type(self, source_type_id: str, with_cursors: bool = True):
+        op = Operation(schema.Query)
+
+        filters = {
+            'sourceTypeId': source_type_id
+        }
+
+        print(source_type_id)
+        source_nodes = op.sources(condition=filters).nodes()
+
+        source_nodes.slug()
+        source_channels = source_nodes.source_channels_by_source_slug().nodes()
+        source_channels.name()
+        source_channels.description()
+        source_channels.source_slug()
+
+        if with_cursors:
+            source_channels.cursor().channel_cursor()
+
+        data = self.run(op)
+
+        channels = (op + data).sources.nodes
+
+        return channels
+
     def get_channels(self, source_slug: str, with_cursors: bool = True):
         op = Operation(schema.Query)
 
@@ -58,7 +71,6 @@ class BaseService(BaseGraphService):
             'sourceSlug': source_slug
         }
 
-        print(source_slug)
         query = op.source_channels(condition=filters).nodes()
 
         query.name()
@@ -67,8 +79,7 @@ class BaseService(BaseGraphService):
 
         if with_cursors:
             query.cursor().channel_cursor()
-
-        data = self._get_endpoint()(op)
+        data = self.run(op)
 
         channels = (op + data).source_channels.nodes
 
@@ -90,7 +101,7 @@ class BaseService(BaseGraphService):
         cursor_upsert.source_channel_cursor().id()
         cursor_upsert.source_channel_cursor().channel_cursor()
 
-        data = self._get_endpoint()(op)
+        data = self.run(op)
         if 'errors' in data:
             print(data)
             raise Exception(data['errors'][0]['message'])

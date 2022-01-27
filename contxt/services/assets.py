@@ -10,36 +10,24 @@ from ..models.assets import (
     Metric,
     MetricValue,
 )
-from .api import ApiEnvironment, ConfiguredApi
+from contxt.utils.config import ApiEnvironment
+from .api import ConfiguredLegacyApi
 from .pagination import PagedRecords, PageOptions
+from ..utils.config import ContxtEnvironmentConfig
 
 
-class AssetsService(ConfiguredApi):
+class AssetsService(ConfiguredLegacyApi):
     """Assets API client"""
-
-    _envs = (
-        ApiEnvironment(
-            name="production",
-            base_url="https://facilities.api.ndustrial.io/v1",
-            client_id="SgbCopArnGMa9PsRlCVUCVRwxocntlg0",
-        ),
-        ApiEnvironment(
-            name="staging",
-            base_url="https://facilities-staging.api.ndustrial.io/v1",
-            client_id="xG775XHIOZVUn84seNeHXi0Qe55YuR5w",
-        ),
-    )
 
     def __init__(
         self,
-        auth: Auth,
+        env_config: ContxtEnvironmentConfig,
         organization_id: Optional[str] = None,
-        env: str = "production",
         load_types: bool = True,
         types_to_fully_load: Optional[List[str]] = None,
         **kwargs,
     ) -> None:
-        super().__init__(env=env, auth=auth, **kwargs)
+        super().__init__(env_config=env_config, **kwargs)
         # TODO: handle multiple orgs
         self.organization_id = organization_id
         self.types: Dict[str, AssetType] = {}

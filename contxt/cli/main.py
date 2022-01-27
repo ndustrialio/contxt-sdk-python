@@ -1,6 +1,7 @@
 """Main CLI"""
 
 import logging
+
 from pathlib import Path
 from typing import Optional
 
@@ -10,6 +11,8 @@ from requests import RequestException
 from contxt import __version__
 from contxt.cli.clients import Clients
 from contxt.cli.log import init as init_logger
+from contxt.services.base_graph_service import SchemaMissingException
+from contxt.utils.contxt_environment import ContxtEnvironment
 
 logger = logging.getLogger()
 COMMAND_DIR = Path(__file__).parent / "commands"
@@ -26,7 +29,11 @@ class Cli(click.MultiCommand):
             return None
         ns = {}
         code = compile(f.read_text(), f, "exec")
-        eval(code, ns, ns)
+        try:
+            eval(code, ns, ns)
+        except SchemaMissingException:
+            print(f'Missing schema for {name}')
+            return None
         return ns[name]
 
     def __call__(self, *args, **kwargs):
@@ -54,7 +61,8 @@ class Cli(click.MultiCommand):
 def cli(ctx: click.Context, env: str, org: Optional[str], verbose: int) -> None:
     """Contxt CLI"""
     init_logger(verbose)
-    ctx.obj = Clients(env=env, org_slug=org)
+    env = ContxtEnvironment()
+    ctx.obj = Clients(contxt_env=env, org_slug=org)
 
 
 if __name__ == "__main__":

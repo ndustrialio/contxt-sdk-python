@@ -12,27 +12,15 @@ from ..models.contxt import (
     Service,
     User,
 )
-from .api import ApiEnvironment, ConfiguredApi
+from .api import ConfiguredLegacyApi
+from ..utils.config import ContxtEnvironmentConfig
 
 
-class ContxtService(ConfiguredApi):
+class ContxtService(ConfiguredLegacyApi):
     """Contxt API client"""
 
-    _envs = (
-        ApiEnvironment(
-            name="production",
-            base_url="https://contxt.api.ndustrial.io/v1",
-            client_id="8qY2xJob1JAxhmVhIDLCNnGriTM9bct8",
-        ),
-        ApiEnvironment(
-            name="staging",
-            base_url="https://contxt-api.staging.ndustrial.io/v1",
-            client_id="qGzdTXcmB57zlTp86rYsivG9qEss1lbF",
-        ),
-    )
-
-    def __init__(self, auth: Auth, env: str = "production", **kwargs) -> None:
-        super().__init__(env=env, auth=auth, **kwargs)
+    def __init__(self, env_config: ContxtEnvironmentConfig, **kwargs) -> None:
+        super().__init__(env_config=env_config, **kwargs)
 
     def get_organizations(self) -> List[Organization]:
         resp = self.get("organizations")

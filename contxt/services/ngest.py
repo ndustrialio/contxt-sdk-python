@@ -3,25 +3,17 @@ from datetime import datetime, timezone
 from typing import Dict, List
 
 from ..utils import is_datetime_aware, make_logger
-from .api import ApiEnvironment, ConfiguredApi
+from ..utils.config import ContxtEnvironmentConfig
+from .api import ConfiguredLegacyApi
 
 logger = make_logger(__name__)
 
 
-class NgestService(ConfiguredApi):
+class NgestService(ConfiguredLegacyApi):
     """Ngest API client"""
 
-    _envs = (
-        ApiEnvironment(
-            name="production",
-            base_url="https://data.ndustrial.io/v1",
-            client_id="AhVAWkq2FEoQtWAP7EidZ9uzrc4ED1Dx",
-        ),
-    )
-
-    def __init__(self, env: str = "production", **kwargs) -> None:
-        self.env = env
-        super().__init__(env=env, **kwargs)
+    def __init__(self, env_config: ContxtEnvironmentConfig, **kwargs) -> None:
+        super().__init__(env_config=env_config, **kwargs)
 
     @staticmethod
     def specialize(feed_key: str, feed_token: str, env: str = "production") -> "SpecializedNgestService":

@@ -1,18 +1,15 @@
 from typing import List, Optional
 
-from ..auth import Auth
 from ..models.facilities import Facility
-from .api import ConfiguredApi
-from .assets import AssetsService
+from ..utils.config import ContxtEnvironmentConfig
+from .api import ConfiguredLegacyApi
 
 
-class FacilitiesService(ConfiguredApi):
+class FacilitiesService(ConfiguredLegacyApi):
     """Facilities API client"""
 
-    _envs = AssetsService._envs
-
-    def __init__(self, auth: Auth, env: str = "production", **kwargs) -> None:
-        super().__init__(env=env, auth=auth, **kwargs)
+    def __init__(self, env_config: ContxtEnvironmentConfig, **kwargs) -> None:
+        super().__init__(env_config=env_config, **kwargs)
 
     def get_facilities(self, organization_id: Optional[str] = None) -> List[Facility]:
         uri = (

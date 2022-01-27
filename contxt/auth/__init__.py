@@ -6,6 +6,8 @@ from typing import Any, Dict, Optional
 
 from jwt import decode
 
+from ..utils.config import ContxtEnvironmentConfig
+
 Token = str
 DecodedToken = Dict[str, Any]
 
@@ -62,9 +64,8 @@ class Auth(ABC):
     Overload this class to implement `get_token_provider()`.
     """
 
-    def __init__(self, client_id: str, client_secret: str) -> None:
-        self.client_id = client_id
-        self.client_secret = client_secret
+    def __init__(self, env_config: ContxtEnvironmentConfig) -> None:
+        self.env_config = env_config
 
     @abstractmethod
     def get_token_provider(self, audience: str) -> TokenProvider:

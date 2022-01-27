@@ -1,30 +1,17 @@
 from datetime import date, datetime, timedelta, timezone
 from typing import Iterable, List, Optional
 
-from ..auth import Auth
 from ..models.ems import Facility, MainService, ResourceType, UtilityContract, UtilitySpend, UtilityUsage
-from .api import ApiEnvironment, ConfiguredApi
+from .api import ConfiguredLegacyApi
 from .pagination import PagedRecords
+from ..utils.config import ContxtEnvironmentConfig
 
 
-class EmsService(ConfiguredApi):
+class EmsService(ConfiguredLegacyApi):
     """EMS API client"""
 
-    _envs = (
-        ApiEnvironment(
-            name="production",
-            base_url="https://ems.api.ndustrial.io/v1",
-            client_id="e2IT0Zm9RgGlDBkLa2ruEcN9Iop6dJAS",
-        ),
-        ApiEnvironment(
-            name="staging",
-            base_url="https://ems.api.staging.ndustrial.io/v1",
-            client_id="vMV67yaRFgjBB1JFbT3vXBOlohFdG1I4",
-        ),
-    )
-
-    def __init__(self, auth: Auth, env: str = "production", **kwargs) -> None:
-        super().__init__(env=env, auth=auth, **kwargs)
+    def __init__(self, env_config: ContxtEnvironmentConfig, **kwargs) -> None:
+        super().__init__(env_config=env_config, **kwargs)
 
     def get_facility(self, id: int) -> Facility:
         return Facility.from_api(self.get(f"facilities/{id}"))
@@ -63,6 +50,7 @@ class EmsService(ConfiguredApi):
                 "exclude_account_charges": exclude_account_charges,
             },
         )
+        print(resp)
         return UtilitySpend.from_api(resp)
 
     def get_monthly_utility_usage(

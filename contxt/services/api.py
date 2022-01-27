@@ -1,15 +1,17 @@
-from abc import ABC, abstractmethod
-from dataclasses import dataclass
-from typing import Dict, FrozenSet, Optional, Tuple
+from abc import ABC
+from typing import Dict, FrozenSet, Optional, Tuple, Union, List
 
+from auth0.v3.authentication import GetToken
 from requests import PreparedRequest, Response, Session
 from requests.adapters import HTTPAdapter
 from requests.auth import AuthBase
 from requests.exceptions import HTTPError
 from urllib3.util.retry import Retry
 
-from ..auth import Auth, TokenProvider
+from ..auth import TokenProvider
+from ..services.auth import StoredTokenCache
 from ..utils import make_logger
+from ..utils.config import ContxtEnvironmentConfig
 
 logger = make_logger(__name__)
 
@@ -54,7 +56,7 @@ class ApiRetry(Retry):
 
 
 class Api:
-    """An API with url `base_url`.
+    """An API with url `baseUrl`.
 
     If `token_provider` is specified, all requests will be authenticated with
     the access token it provides.
@@ -70,6 +72,7 @@ class Api:
 
         # Initialize session
         self.session = Session()
+        self.token_provider = token_provider
         self.session.auth = BearerTokenAuth(token_provider) if token_provider else None
         self.session.headers.update({"Cache-Control": "no-cache"})
         self.session.hooks = {"response": self._log_response}  # type: ignore
@@ -93,6 +96,7 @@ class Api:
     def _process_response(self, response: Response) -> Dict:
         try:
             # Raise any error
+            print(response)
             response.raise_for_status()
         except HTTPError:
             # Catch the error, to log the response's message, and reraise
@@ -118,6 +122,7 @@ class Api:
 
     def post(self, uri: str, data: Optional[Dict] = None, json: Optional[Dict] = None, **kwargs) -> Dict:
         """Sends a POST request"""
+        print('Posting')
         response = self.session.post(url=self._url(uri), data=data, json=json, **kwargs)
         return self._process_response(response)
 
@@ -136,21 +141,7 @@ class EnvironmentException(Exception):
     pass
 
 
-@dataclass
-class ApiEnvironment:
-    """An environment for an API.
-
-    Note `client_id` is only needed if authentication is required.
-    """
-
-    name: str
-    base_url: str
-    client_id: str
-    auth_provider: str = 'contxt.auth0.com'
-    auth_required: bool = True
-
-
-class ConfiguredApi(Api, ABC):
+class ConfiguredLegacyApi(Api, ABC):
     """An `Api` configured for multiple environments, such as staging and production.
     Available environments are expressed by `_envs` and the desired environment is
     specified by its name `env`.
@@ -158,25 +149,80 @@ class ConfiguredApi(Api, ABC):
     Overload this class to implement `_envs`.
     """
 
-    def __init__(self, env: str, auth: Optional[Auth] = None, **kwargs) -> None:
-        # TODO: figure out a cleaner approach to environment selection
-        api_env = self._get_env(env)
-        self.env = env
-        self.client_id = api_env.client_id
-        token_provider = auth.get_token_provider(self.client_id) if auth else None
-        super().__init__(base_url=api_env.base_url, token_provider=token_provider, **kwargs)
+    def __init__(self, env_config: ContxtEnvironmentConfig, **kwargs) -> None:
+        if env_config.clientId is None:
+            from ..auth.cli import CliAuth
+            print('CLI auth')
+            print(env_config)
+            cli_auth = CliAuth(service_config=env_config)
+            token_provider = cli_auth.get_token_provider(audience=env_config.apiEnvironment.clientId)
+        else:
+            from ..auth.machine import PlainMachineTokenProvider
+            token_provider = PlainMachineTokenProvider(env_config)
+        super().__init__(base_url=env_config.apiEnvironment.baseUrl, token_provider=token_provider, **kwargs)
 
-    @classmethod
-    def _get_env(cls, name: str) -> ApiEnvironment:
-        """Get environment with name `name`"""
-        envs = {e.name: e for e in cls._envs}  # type: ignore
-        if name not in envs:
-            raise KeyError(f"Invalid environment '{name}'. Choose from {list(envs.keys())}.")
-        return envs[name]
 
-    @property
-    @classmethod
-    @abstractmethod
-    def _envs(cls) -> Tuple[ApiEnvironment, ...]:
-        """Lists available environments."""
-        pass
+class ConfiguredGraphApi(Api, ABC):
+    """An `Api` configured for multiple environments, such as staging and production.
+    Available environments are expressed by `_envs` and the desired environment is
+    specified by its name `env`.
+
+    Overload this class to implement `_envs`.
+    """
+
+    def __init__(self, contxt_env: ContxtEnvironmentConfig, **kwargs) -> None:
+        if contxt_env.clientId is None:
+            from ..auth.cli import CliAuth
+
+            cli_auth = CliAuth(service_config=contxt_env)
+            token_provider = cli_auth.identity_provider
+        else:
+            from ..auth.machine import PlainMachineTokenProvider
+
+            token_provider = PlainMachineTokenProvider(contxt_env)
+
+        super().__init__(base_url=contxt_env.apiEnvironment.baseUrl, token_provider=token_provider, **kwargs)
+
+
+class AuthService(Api):
+    """Auth API client"""
+
+    def __init__(self, contxt_env: ContxtEnvironmentConfig) -> None:
+        super().__init__(f'https://{contxt_env.apiEnvironment.authProvider}')
+        self.service_env = contxt_env
+        self.token_cache = StoredTokenCache()
+
+    def get_jwks(self) -> Dict:
+        return self.get(".well-known/jwks.json")
+
+    def get_token(self, access_token: str, audiences: Union[str, List[str]]) -> Dict:
+        audiences = [audiences] if isinstance(audiences, str) else audiences
+        print(access_token, audiences)
+        return self.post(
+            "token", json={"audiences": audiences}, headers={"Authorization": f"Bearer {access_token}"}
+        )
+
+    def get_cluster_config(self, access_token: str, host: str) -> Dict:
+        return self.post(
+            "clusterconfig", headers={"Authorization": f"Bearer {access_token}"}, json={"host": host}
+        )
+
+    def get_oauth_token(self, client_id: str, client_secret: str, audience: str) -> str:
+        cached_token = self.token_cache.get_token(client_id=self.service_env.clientId,
+                                                  audience=self.service_env.apiEnvironment.clientId)
+        if cached_token is None:
+            logger.info('Token not found for client...fetching new one')
+            req = GetToken(self.service_env.apiEnvironment.authProvider)
+            print(self.service_env.apiEnvironment.authProvider, self.service_env.clientId, self.service_env.clientSecret, self.service_env.apiEnvironment.clientId)
+            token = req.client_credentials(client_id=self.service_env.clientId,
+                                           client_secret=self.service_env.clientSecret,
+                                           audience=self.service_env.apiEnvironment.clientId)
+            self.token_cache.set_token(client_id=self.service_env.clientId,
+                                       audience=self.service_env.apiEnvironment.clientId,
+                                       token=token['access_token'])
+
+            print(token)
+            return token['access_token']
+        else:
+            logger.info('Using cached token')
+            return cached_token

@@ -1,28 +1,14 @@
-from contxt.services.control.control import ControlService
-from contxt.utils.serializer import Serializer
 import click
 
-ENV = "dev"
-envs = {
-    "staging": {
-        "client_id": "XZnouDOjhmb65Fp954myAedX6wxVNbXc",
-        "client_secret": "DbDJOdTQA_1dO-hkQyeUyDGfuJcJy4WL1s6j_sytNt9BSeKqtXh_p0lwsHEQ5X-4"
-    },
-    "dev": {
-        "client_id": "Dh1VFink5dzLZLNlcbKAg0ejnylfOCyP",
-        "client_secret": "rIabxdxuCQ-6JBipQT2FQ-1fT2BMtzJZA21yE2HcSfFLQlNWmPk2Cqw02KMpQZI9"
-    },
-    "local": {
-        "client_id": None,
-        "client_secret": None
-    }
-}
+from contxt.services.control.control import ControlService
+from contxt.utils.serializer import Serializer
+from contxt.utils.contxt_environment import ContxtEnvironment
 
 
 def get_control_service():
-    return ControlService(client_id=envs[ENV]["client_id"],
-                          client_secret=envs[ENV]["client_secret"],
-                          env=ENV)
+    # load configuration file
+    contxt_env = ContxtEnvironment()
+    return ControlService(contxt_env=contxt_env.get_config_for_service_name('foundry-graph'))
 
 
 @click.group()
@@ -34,12 +20,6 @@ def control() -> None:
 @click.group()
 def schema() -> None:
     """Schema Functions"""
-
-
-@schema.command()
-def update():
-    print('Updating schema')
-    get_control_service().update_schema()
 
 
 # Getter functions

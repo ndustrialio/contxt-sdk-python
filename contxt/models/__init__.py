@@ -5,6 +5,9 @@ from ast import literal_eval
 from copy import deepcopy
 from datetime import date as _date
 from datetime import datetime as _datetime
+from time import time_ns
+from dateutil.parser import isoparse
+from pytz import timezone as _timezone
 from datetime import timedelta, timezone
 from importlib import import_module
 from typing import Any, Callable, Dict, Optional, Tuple, Union
@@ -27,8 +30,20 @@ class Parsers:
         return _date.fromisoformat(datestamp)
 
     @staticmethod
+    def year_month_date(datestamp: str) -> _date:
+        return _datetime.strptime(datestamp, "%Y-%m").date()
+
+    @staticmethod
     def datetime(timestamp: str) -> _datetime:
         return _datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%S.%fZ").replace(tzinfo=timezone.utc)
+
+    @staticmethod
+    def nano_datetime(timestamp: str) -> _datetime:
+        return isoparse(timestamp)
+
+    @staticmethod
+    def timezone(timezone_str: str) -> _timezone:
+        return _timezone(timezone_str)
 
     @staticmethod
     def unknown(value: Any) -> Any:

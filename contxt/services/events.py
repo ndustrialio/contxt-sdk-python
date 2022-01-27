@@ -2,28 +2,16 @@ from typing import Iterable, List, Optional
 
 from ..auth import Auth
 from ..models.events import Event, EventDefinition, EventType, TriggeredEvent
-from .api import ApiEnvironment, ConfiguredApi
+from .api import ConfiguredLegacyApi
 from .pagination import PagedRecords, PageOptions
+from ..utils.config import ContxtEnvironmentConfig
 
 
-class EventsService(ConfiguredApi):
+class EventsService(ConfiguredLegacyApi):
     """Events API client"""
 
-    _envs = (
-        ApiEnvironment(
-            name="production",
-            base_url="https://events.api.ndustrial.io/v1",
-            client_id="7jzwfE20O2XZ4aq3cO1wmk63G9GzNc8j",
-        ),
-        ApiEnvironment(
-            name="staging",
-            base_url="https://events.api.staging.ndustrial.io/v1",
-            client_id="dn4MaocJFdKtsBy9sFFaTeuJWL1nt5xu",
-        ),
-    )
-
-    def __init__(self, auth: Auth, env: str = "production", **kwargs) -> None:
-        super().__init__(env=env, auth=auth, **kwargs)
+    def __init__(self, env_config: ContxtEnvironmentConfig, **kwargs) -> None:
+        super().__init__(env_config=env_config, **kwargs)
 
     def set_human_readable_parameters(self, event_definition: EventDefinition) -> None:
         statement = ""

@@ -31,6 +31,7 @@ def print_table(
     if items:
         print(Serializer.to_table(items, sort_by=sort_by))
     if count:
+        print(items)
         print(f"Count: {len(items)}")
 
 

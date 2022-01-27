@@ -1,48 +1,69 @@
 from typing import Dict, List, Union
 
-from .api import ApiEnvironment, ConfiguredApi
+from ..utils.persistent_contxt_config import PersistentContxtConfig
+import jwt
+import logging
+
+from dataclasses import dataclass
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(format='[%(module)s %(levelname)s:%(asctime)s] %(message)s', level=logging.INFO)
 
 
-class AuthService(ConfiguredApi):
-    """Auth API client"""
+@dataclass
+class MachineTokenConfig:
+    audience: str
+    token: str
 
-    _envs = (
-        ApiEnvironment(
-            name="production",
-            base_url="https://contxtauth.com/v1",
-            client_id="75wT048QcpE7ujwBJPPjr263eTHl4gEX",
-        ),
-        ApiEnvironment(
-            name="staging",
-            base_url="https://contxt-auth-service.staging.ndustrial.io/v1",
-            client_id="7TceUsM1eC4nKmdoC717383DWyfc9QoY",
-        ),
-    )
 
-    def __init__(self, env: str = "production", **kwargs) -> None:
-        super().__init__(env=env, **kwargs)
+@dataclass
+class MachineClientConfig:
+    clientId: str
+    audiences: Dict[str, str]
 
-    def get_jwks(self) -> Dict:
-        return self.get(".well-known/jwks.json")
+    def get_token_for_audience(self, audience) -> str:
+        token = self.audiences.get(audience)
+        if token:
+            # decode the token to get some extra info
+            try:
+                jwt.decode(token, audience=audience, options={"verify_signature": False})
+                return token
+            except jwt.ExpiredSignatureError:
+                logger.info('Expired token detected')
 
-    def get_token(self, access_token: str, audiences: Union[str, List[str]]) -> Dict:
-        audiences = [audiences] if isinstance(audiences, str) else audiences
-        return self.post(
-            "token", json={"audiences": audiences}, headers={"Authorization": f"Bearer {access_token}"}
-        )
 
-    def get_cluster_config(self, access_token: str, host: str) -> Dict:
-        return self.post(
-            "clusterconfig", headers={"Authorization": f"Bearer {access_token}"}, json={"host": host}
-        )
+@dataclass
+class TokenConfig:
+    tokens: List[MachineClientConfig]
 
-    def get_oauth_token(self, client_id: str, client_secret: str, audience: str) -> Dict:
-        return self.post(
-            "oauth/token",
-            json={
-                "client_id": client_id,
-                "client_secret": client_secret,
-                "audience": audience,
-                "grant_type": "client_credentials",
-            },
-        )
+    def tokens_for_client(self, client_id: str):
+        for client in self.tokens:
+            if client.clientId == client_id:
+                return client
+
+    def set_token_for_client(self, client_id: str, audience: str, token: str):
+        client_config = self.tokens_for_client(client_id)
+        if client_config is None:
+            self.tokens.append(MachineClientConfig(clientId=client_id, audiences={audience: token}))
+        else:
+            client_config.audiences[audience] = token
+
+
+class StoredTokenCache(PersistentContxtConfig):
+
+    def __init__(self):
+        super().__init__('auth_tokens', TokenConfig)
+        self.config = self.load_contxt_file()
+
+    def set_token(self, client_id: str, audience: str, token: str):
+        if self.config is None:
+            self.config = TokenConfig(tokens=[])
+        self.config.set_token_for_client(client_id, audience, token)
+        self.write_contxt_file()
+
+    def get_token(self, client_id: str, audience: str) -> str:
+        if self.config is not None:
+            tokens_for_client = self.config.tokens_for_client(client_id)
+            if tokens_for_client:
+                return tokens_for_client.get_token_for_audience(audience)
+

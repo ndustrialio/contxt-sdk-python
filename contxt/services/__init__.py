@@ -1,8 +1,9 @@
 """API clients"""
 
+from contxt.services.base_graph_service import SchemaMissingException
+
 # flake8: noqa
 from .assets import AssetsService
-from .auth import AuthService
 from .bus import MessageBusService
 from .contxt import ContxtService
 from .contxt_deployments import ContxtDeploymentService
@@ -13,5 +14,9 @@ from .health import HealthService
 from .iot import IotDataService, IotService
 from .ngest import NgestService
 from .sis import SisService
-from .control.control import ControlService
-from .base.base import BaseService
+from .rates import UtilityRatesService
+try:
+    from .control.control import ControlService
+    from .base.base import BaseService
+except SchemaMissingException:
+    pass
