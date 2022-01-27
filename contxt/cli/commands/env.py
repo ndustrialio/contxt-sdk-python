@@ -96,8 +96,6 @@ def add(clients: Clients, service_name: str) -> None:
         pass
 
 
-
-
 @env.command()
 @click.pass_obj
 @click.argument('SERVICE_NAME')
