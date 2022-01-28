@@ -80,7 +80,7 @@ class Metric(ApiObject):
 @dataclass
 class MetricValue(ApiObject):
     _api_fields: ClassVar = (
-        ApiField("id"),
+        ApiField("id", optional=True),
         ApiField("effective_start_date", data_type=Parsers.datetime, creatable=True, updatable=True),
         ApiField("effective_end_date", data_type=Parsers.datetime, creatable=True, updatable=True),
         ApiField("value", data_type=float, creatable=True, updatable=True),
