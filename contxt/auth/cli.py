@@ -1,7 +1,7 @@
 import time
 import webbrowser
 from dataclasses import dataclass
-import requests
+from requests import Session
 from typing import Any, Dict, Optional
 
 from auth0.v3.authentication import GetToken
@@ -49,6 +49,7 @@ class DeviceAuthDenied(Exception):
 class Auth0DeviceProvider:
     def __init__(self, cli_auth_env: ContxtCliEnvironmentConfig):
         self.cli_auth_env = cli_auth_env
+        self.session = Session()
         self.auth_service = AuthService(contxt_env=self.cli_auth_env.to_contxt_environment_config())
         self.url = f"https://{self.cli_auth_env.apiEnvironment.authProvider}"
 
@@ -59,7 +60,7 @@ class Auth0DeviceProvider:
             "audience": self.cli_auth_env.apiEnvironment.clientId,
         }
 
-        resp = requests.post(url=f"{self.url}/oauth/device/code",
+        resp = self.session.post(url=f"{self.url}/oauth/device/code",
                              data=data)
 
         return resp.json()
@@ -78,8 +79,9 @@ class Auth0DeviceProvider:
             time.sleep(code_info["interval"])
 
             try:
-                resp = requests.post(url=f"{self.url}/oauth/token",
-                                     data=data)
+                resp = self.session.post(url=f"{self.url}/oauth/token",
+                                         data=data)
+                resp.raise_for_status()
                 return resp.json()
             except HTTPError as e:
                 resp = e.response.json()
@@ -112,6 +114,7 @@ class UserIdentityProvider(TokenProvider):
     ) -> None:
         super().__init__(cli_auth_env.apiEnvironment.clientId)
         self.cli_auth_env = cli_auth_env
+        self.is_legacy_provider = True if cli_auth_env.forAuthProvider == 'contxtauth.com/v1' else False
         self.auth_service = GetToken(cli_auth_env.apiEnvironment.authProvider)
         self._refresh_token: Optional[Token] = None
         self.device_provider = Auth0DeviceProvider(cli_auth_env=cli_auth_env)
@@ -192,18 +195,33 @@ class UserTokenProvider(TokenProvider):
         super().__init__(audience)
         self.identity_provider = identity_provider
         self.auth_service = AuthService(contxt_env)
+        self.token_cache = StoredTokenCache()
 
     @TokenProvider.access_token.getter  # type: ignore
     def access_token(self) -> Token:
         """Gets a valid access token for audience `audience`"""
-        if self._access_token is None or self._token_expiring():
-            # Token either not yet set or expiring soon, fetch one
-            logger.info(f"Fetching new access_token for {self.audience}")
-            print('New access token')
-            self.access_token = self.auth_service.get_token(
-                self.identity_provider.access_token, self.audience
-            )["access_token"]
-        return self._access_token  # type: ignore
+
+        if not self.identity_provider.is_legacy_provider:
+            # need to go through an extra authentication if using contxtauth.com
+            return self.identity_provider.access_token
+
+        cached_token = self.token_cache.get_token(client_id=self.identity_provider.cli_auth_env.apiEnvironment.clientId,
+                                                  audience=self.audience)
+
+        if cached_token:
+            return cached_token
+
+        # Token either not yet set or expiring soon, fetch one
+        logger.info(f"Fetching new access_token for {self.audience}")
+        print('New access token')
+        access_token = self.auth_service.get_token(
+            self.identity_provider.access_token, self.audience
+        )["access_token"]
+
+        self.token_cache.set_token(client_id=self.identity_provider.cli_auth_env.apiEnvironment.clientId,
+                                   audience=self.audience,
+                                   token=access_token)
+        return access_token  # type: ignore
 
 
 class CliAuth(Auth):
@@ -218,8 +236,9 @@ class CliAuth(Auth):
     1. User provides Contxt username/password credentials
     2. Retrieve access token directly from Auth0 for our `AuthService`, authenticating
        with above credentials
-    3. When authenticating to a service, retrieve access token from our `AuthService`
-       for the target service, authenticating with the above Auth0 access token
+    3. (IF contxtauth.com is the Auth Provider) When authenticating to a service,
+        retrieve access token from our `AuthService` for the target service, authenticating
+        with the above Auth0 access token
     """
 
     def __init__(self, service_config: ContxtEnvironmentConfig) -> None:

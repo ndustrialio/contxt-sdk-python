@@ -1,4 +1,5 @@
 from sgqlc.operation import Operation
+from sgqlc.types import non_null
 from datetime import datetime
 import pytz
 import json
@@ -266,11 +267,12 @@ class ControlService(BaseGraphService):
                                   start_time=suggestion.start_time,
                                   end_time=suggestion.end_time,
                                   components=inputs,
-                                  project_id=suggestion.project_id)
+                                  project_id=suggestion.project_id,
+                                  metadata=suggestion.metadata)
 
     def propose_event(self, facility_id: int, project_id: str, start_time: datetime,
                       end_time: datetime, components: List[ComponentToControlInputRecordInput],
-                      summary: str, metadata: Dict[AnyStr, Any]) -> schema.EventProposal:
+                      summary: str, metadata: Dict[AnyStr, Any] = None) -> schema.EventProposal:
 
         op = Operation(schema.Mutation)
 
@@ -372,6 +374,27 @@ class ControlService(BaseGraphService):
         facility = (op + data).create_facility
         return facility
 
+    def set_controllable_as_schedulable(self, controllable_id: str) -> schema.ControllableComponent:
+        op = Operation(schema.Mutation)
+
+        update = schema.UpdateControllableComponentInput()
+        update.id = controllable_id
+        patch = schema.ControllableComponentPatch()
+        patch.is_schedulable = True
+        update.patch = patch
+
+        update_controllable = op.update_controllable_component(input=update)
+
+        update_controllable.controllable_component.is_schedulable()
+
+        data = self._get_endpoint()(op)
+        if 'errors' in data:
+            print(data)
+            raise Exception(data['errors'][0]['message'])
+
+        component = (op + data).update_contorllable_component
+        return component
+
     def get_controllables_for_facility(self, facility_id: int, component_slug: str = None,
                                        include_events: bool = True):
         op = Operation(schema.Query)
@@ -393,6 +416,7 @@ class ControlService(BaseGraphService):
         components.nodes.id()
         components.nodes.slug()
         components.nodes.label()
+        components.nodes.is_schedulable()
 
         data = self._get_endpoint()(op)
 

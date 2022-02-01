@@ -158,7 +158,20 @@ def facility(name: str, id: int, organization_id: str):
     print(Serializer.to_pretty_cli(facility))
 
 
-#def controllable()
+@click.command()
+@click.argument('CONTROLLABLE_SLUG')
+@click.option('--facility-id', type=int, required=True)
+def set_schedulable(controllable_slug: str, facility_id: int):
+    controllables = get_control_service().get_controllables_for_facility(facility_id, component_slug=controllable_slug)
+    if len(controllables):
+        controllable = controllables[0]
+        if controllable.is_schedulable:
+            print('Controllable is already schedulable')
+            return
+        print(f'Setting controllable (ID {controllable.id}, Label: {controllable.label}) as schedulable')
+        get_control_service().set_controllable_as_schedulable(controllable.id)
+    else:
+        print('Controllable not found')
 
 
 @click.group(context_settings=dict(help_option_names=["-h", "--help"], show_default=True))
@@ -170,3 +183,4 @@ control.add_command(create)
 control.add_command(get)
 control.add_command(generate)
 control.add_command(schema)
+control.add_command(set_schedulable)

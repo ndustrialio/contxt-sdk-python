@@ -177,7 +177,7 @@ class ConfiguredGraphApi(Api, ABC):
             from ..auth.cli import CliAuth
 
             cli_auth = CliAuth(service_config=contxt_env)
-            token_provider = cli_auth.identity_provider
+            token_provider = cli_auth.get_token_provider(audience=contxt_env.apiEnvironment.clientId)
         else:
             from ..auth.machine import PlainMachineTokenProvider
 
@@ -199,7 +199,6 @@ class AuthService(Api):
 
     def get_token(self, access_token: str, audiences: Union[str, List[str]]) -> Dict:
         audiences = [audiences] if isinstance(audiences, str) else audiences
-        print(access_token, audiences)
         return self.post(
             "token", json={"audiences": audiences}, headers={"Authorization": f"Bearer {access_token}"}
         )

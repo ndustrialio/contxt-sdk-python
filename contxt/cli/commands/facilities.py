@@ -6,6 +6,15 @@ import click
 from contxt.cli.clients import Clients
 from contxt.cli.utils import fields_option, print_table, sort_option
 from contxt.models.facilities import Facility
+from contxt.utils.contxt_environment import ContxtEnvironment
+from contxt.services.nionic import NionicService
+from contxt.utils.serializer import Serializer
+
+
+def get_nionic_service():
+    # load configuration file
+    contxt_env = ContxtEnvironment()
+    return NionicService(contxt_env=contxt_env.get_config_for_service_name('nionic'))
 
 
 @click.group()
@@ -14,13 +23,10 @@ def facilities() -> None:
 
 
 @facilities.command()
-@fields_option(default=["id", "name", "organization_id"], obj=Facility)
-@sort_option(default="id")
-@click.pass_obj
-def get(clients: Clients, fields: List[str], sort: str) -> None:
+def get() -> None:
     """Get facilities"""
-    items = clients.facilities.get_facilities()
-    print_table(items=items, keys=fields, sort_by=sort)
+    facilities = get_nionic_service().get_facilities().nodes
+    print(Serializer.to_table(facilities))
 
 
 @facilities.command()

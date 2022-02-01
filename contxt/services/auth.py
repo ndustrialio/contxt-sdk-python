@@ -1,4 +1,4 @@
-from typing import Dict, List, Union
+from typing import Dict, List
 
 from ..utils.persistent_contxt_config import PersistentContxtConfig
 import jwt
@@ -9,6 +9,9 @@ from dataclasses import dataclass
 logger = logging.getLogger(__name__)
 logging.basicConfig(format='[%(module)s %(levelname)s:%(asctime)s] %(message)s', level=logging.INFO)
 
+
+class SetTokenException(Exception):
+    pass
 
 @dataclass
 class MachineTokenConfig:
@@ -43,6 +46,8 @@ class TokenConfig:
 
     def set_token_for_client(self, client_id: str, audience: str, token: str):
         client_config = self.tokens_for_client(client_id)
+        if token is None:
+            raise SetTokenException('Token cannot be null')
         if client_config is None:
             self.tokens.append(MachineClientConfig(clientId=client_id, audiences={audience: token}))
         else:
