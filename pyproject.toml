@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "contxt-sdk"
-version = "3.0.0-beta.4"
+version = "3.0.0-beta.5"
 description = "Contxt SDK from ndustrial"
 authors = ["ndustrial <dev@ndustrial.io>"]
 license = "ISC"
@@ -17,7 +17,7 @@ pyjwt = "^1"
 pyyaml = "^5"
 requests = "^2"
 tabulate = "*"
-sgqlc = "^14.0"
+sgqlc = "^15.0"
 pytz = "^2021.1"
 python-dateutil = "^2.8.2"
 pyinquirer = {git = "https://github.com/CITGuru/PyInquirer.git", rev = "master"}

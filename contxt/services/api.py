@@ -149,8 +149,10 @@ class ConfiguredLegacyApi(Api, ABC):
     Overload this class to implement `_envs`.
     """
 
-    def __init__(self, env_config: ContxtEnvironmentConfig, **kwargs) -> None:
-        if env_config.clientId is None:
+    def __init__(self, env_config: ContxtEnvironmentConfig, override_token_provider: TokenProvider = None, **kwargs) -> None:
+        if override_token_provider:
+            token_provider = override_token_provider
+        elif env_config.clientId is None:
             from ..auth.cli import CliAuth
             print('CLI auth')
             print(env_config)
