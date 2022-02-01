@@ -1,7 +1,8 @@
 from sgqlc.operation import Operation
 from datetime import datetime
 import pytz
-from typing import List
+import json
+from typing import List, Dict, AnyStr, Any
 
 from contxt.utils.config import ContxtEnvironmentConfig
 from contxt.services.base_graph_service import BaseGraphService, SchemaMissingException
@@ -51,6 +52,8 @@ class ControlService(BaseGraphService):
         proposals.start_time()
         proposals.end_time()
         proposals.current_state()
+        proposals.metadata()
+        proposals.bitly_link()
 
         # include projects
         proposals.project.id()
@@ -82,6 +85,8 @@ class ControlService(BaseGraphService):
         event_proposal.start_time()
         event_proposal.end_time()
         event_proposal.current_state()
+        event_proposal.metadata()
+        event_proposal.bitly_link()
 
         # Include project info
         event_proposal.project().id()
@@ -112,6 +117,27 @@ class ControlService(BaseGraphService):
         event_proposal = (op + data).event_proposal
 
         return event_proposal
+
+    def get_proposals_for_component(self, controllable_component_id: str):
+        op = Operation(schema.Query)
+
+        controllable_component = op.controllable_component(id=controllable_component_id)
+        controllable_component.id()
+        controllable_component.slug()
+
+        proposals = controllable_component.event_proposals(
+            order_by=[schema.EventProposalsOrderBy.START_TIME_DESC]).nodes()
+        proposals.id()
+        proposals.project_id()
+        proposals.current_state()
+        proposals.metadata()
+        proposals.start_time()
+        proposals.end_time()
+        proposals.summary()
+
+        data = self.run(op)
+
+        return (op + data).controllable_component
 
     def get_control_event_detail(self, control_event_id: str):
         op = Operation(schema.Query)
@@ -244,19 +270,17 @@ class ControlService(BaseGraphService):
 
     def propose_event(self, facility_id: int, project_id: str, start_time: datetime,
                       end_time: datetime, components: List[ComponentToControlInputRecordInput],
-                      summary: str) -> schema.EventProposal:
+                      summary: str, metadata: Dict[AnyStr, Any]) -> schema.EventProposal:
 
         op = Operation(schema.Mutation)
 
-        #proposal = schema.ProposeEventInput()
         event_proposal = schema.EventProposalInputRecordInput()
         event_proposal.facilityid = facility_id
         event_proposal.projectid = project_id
         event_proposal.starttime = str(start_time.astimezone(pytz.utc))
         event_proposal.endtime = str(end_time.astimezone(pytz.utc))
         event_proposal.summary = summary
-        #proposal.proposed_event = event_proposal
-        #proposal.components_to_control = components
+        event_proposal.metadata = json.dumps(metadata)
 
         proposal = schema.ProposeEventInput(proposed_event=event_proposal,
                                             components_to_control=components)

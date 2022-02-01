@@ -224,6 +224,17 @@ class CustomEnvironmentConfig:
     def set_context_for_service(self, service_name: str, environment: str):
         self.currentContext[service_name] = CurrentContext(environment)
 
+    def get_graph_environments_for_current_context(self) -> List[ContxtEnvironmentConfig]:
+        graph_services = list(set(env.service for env in self.get_graph_environments()))
+
+        current_context_services = []
+        for service in graph_services:
+            try:
+                current_context_services.append(self.get_service_for_current_context(service))
+            except ContextException:
+                print(f'No context found for {service}.')
+        return current_context_services
+
     def get_graph_environments(self) -> List[ContxtEnvironmentConfig]:
         graph_configs = []
         for conf in self.serviceConfigs:

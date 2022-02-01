@@ -1,8 +1,9 @@
 from dataclasses import dataclass
 from datetime import datetime
 
-from enum import Enum
-from typing import Optional, List, Dict
+from typing import Optional, List, Dict, AnyStr, Any
+
+from contxt.utils.serializer import Serializer
 
 
 @dataclass
@@ -27,4 +28,7 @@ class Suggestion:
     end_time: datetime
     summary: str
     components: List[ControllableComponent]
+    metadata: Optional[Dict[AnyStr, Any]] = None
 
+    def __str__(self):
+        return Serializer.to_pretty_cli(self)

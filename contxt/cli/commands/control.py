@@ -60,18 +60,17 @@ def controllables(facility_id: int, slug: str = None):
 @get.command()
 @click.option('--facility-id', type=int)
 @click.option('--project-id', type=str)
-def events(facility_id: int, project_id: str):
+def proposals(facility_id: int, project_id: str):
     control = get_control_service()
-    events = control.get_control_events(facility_id=facility_id, project_id=project_id)
-    for event in events:
-        print(event)
+    proposals = control.get_event_proposals(facility_id=facility_id, project_id=project_id)
+    print(Serializer.to_table(proposals))
 
 
 @get.command()
-@click.argument('control-event-id', type=str)
-def event(control_event_id: str):
-    event = get_control_service().get_control_event_detail(control_event_id=control_event_id)
-    print(Serializer.to_pretty_cli(event))
+@click.argument('proposal-id')
+def proposal(proposal_id: str):
+    proposal = get_control_service().get_proposal_detail(event_proposal_id=proposal_id)
+    print(Serializer.to_pretty_cli(proposal))
 
 
 @get.command()
@@ -83,7 +82,7 @@ def projects(facility_id: int):
 
 
 @get.command()
-@click.argument('project-id', type=str, required=True)
+@click.argument('project-id', required=True)
 def project(project_id: str):
     control = get_control_service()
     project = control.get_project_definition(project_id=project_id)

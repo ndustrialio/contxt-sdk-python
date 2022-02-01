@@ -39,6 +39,7 @@ class BaseGraphService(ConfiguredGraphApi):
         return self.endpoint
 
     def update_schema(self, service_name=None, base_file_path=None):
+        print(f'Loading schema for {service_name} at {self.url}')
         data = self._get_endpoint()(introspection_query, variables())
 
         service_name = service_name.replace('-','_')
