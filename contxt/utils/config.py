@@ -310,6 +310,10 @@ def load_config_class_from_file(file: str, config_class):
             logger.error(e)
             raise
 
+    # file is blank -- carry on
+    if not config_yaml:
+        return None
+
     config_schema = class_schema(config_class)
 
     result = config_schema().load(config_yaml)

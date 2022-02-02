@@ -1,6 +1,7 @@
 """Main CLI"""
 
 import logging
+import sys
 
 from pathlib import Path
 from typing import Optional
@@ -12,7 +13,7 @@ from contxt import __version__
 from contxt.cli.clients import Clients
 from contxt.cli.log import init as init_logger
 from contxt.services.base_graph_service import SchemaMissingException
-from contxt.utils.contxt_environment import ContxtEnvironment
+from contxt.utils.contxt_environment import ContxtEnvironment, ContxtConfigurationError
 
 logger = logging.getLogger()
 COMMAND_DIR = Path(__file__).parent / "commands"
@@ -47,22 +48,20 @@ class Cli(click.MultiCommand):
 
 
 @click.group(cls=Cli, name="contxt", context_settings=dict(help_option_names=["-h", "--help"]))
-@click.option(
-    "--env",
-    type=click.Choice(["production", "staging"]),
-    default="production",
-    envvar="CONTXT_ENV",
-    help="Environment for all API's",
-)
 @click.option("--org", envvar="CONTXT_ORG", help="Organization slug")
 @click.option("-v", "--verbose", count=True, help="Increase verbosity")
 @click.version_option(__version__, "-V", "--version")
 @click.pass_context
-def cli(ctx: click.Context, env: str, org: Optional[str], verbose: int) -> None:
+def cli(ctx: click.Context, org: Optional[str], verbose: int) -> None:
     """Contxt CLI"""
     init_logger(verbose)
-    env = ContxtEnvironment()
-    ctx.obj = Clients(contxt_env=env, org_slug=org)
+    try:
+        env = ContxtEnvironment()
+        ctx.obj = Clients(contxt_env=env, org_slug=org)
+    except ContxtConfigurationError:
+        print('Configuration error has occurred. Make sure you have ran `contxt init`')
+        print('If this is the first time running the SDK, run `contxt init '
+              '--fresh-from-file ./docs/configs/basic_config.yml')
 
 
 if __name__ == "__main__":

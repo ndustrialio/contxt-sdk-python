@@ -1,11 +1,16 @@
 import os
+import sys
 from typing import List, Optional
 
-from .persistent_contxt_config import PersistentContxtConfig
+from .persistent_contxt_config import PersistentContxtConfig, ContxtConfigurationError
 from .config import CustomEnvironmentConfig, ContxtEnvironmentConfig, ContxtCliEnvironmentConfig
 
 
 class EnvironmentConfigurationException(Exception):
+    pass
+
+
+class ContxtEnvironmentInitializationError(Exception):
     pass
 
 
@@ -15,15 +20,28 @@ class ContxtEnvironment(PersistentContxtConfig):
     def __init__(self, filename: Optional[str] = None):
         env_filename = os.environ.get('CONTXT_ENV_CONFIG')
         if filename:
-            super().__init__(filename, CustomEnvironmentConfig, use_default_path=False)
+            super().__init__(filename, CustomEnvironmentConfig, use_default_path=False, initialize_if_not_exists=False)
         elif env_filename:
-            super().__init__(env_filename, CustomEnvironmentConfig, use_default_path=False)
+            super().__init__(env_filename, CustomEnvironmentConfig, use_default_path=False, initialize_if_not_exists=False)
         else:
-            super().__init__('defaults.yml', CustomEnvironmentConfig)
-        self.config: CustomEnvironmentConfig = self.load_contxt_file()
+            super().__init__('defaults.yml', CustomEnvironmentConfig, initialize_if_not_exists=False)
+        self.config: CustomEnvironmentConfig = self.load_contxt_file(initialize_if_not_exists=True)
 
     def __str__(self):
         return str(self.config)
+
+    def rewrite_to_default_file(self):
+        try:
+            super().__init__('defaults.yml', CustomEnvironmentConfig, initialize_if_not_exists=False)
+            # TODO prompt to make sure they want to overwrite their existing file (since an exception wasn't raised)
+            resp = input('Overwriting defaults.yml file -- are you sure? (y/n): ')
+            if resp != 'y':
+                raise ContxtEnvironmentInitializationError('User aborted overwriting existing file')
+            self.write_contxt_file()
+        except ContxtConfigurationError:
+            print('Config does not exist already')
+            print(self.filename)
+            self.write_contxt_file()
 
     def get_config_for_service_name(self, service: str) -> ContxtEnvironmentConfig:
         if self.config:

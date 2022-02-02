@@ -1,0 +1,71 @@
+cliConfigs:
+- apiEnvironment:
+    authProvider: ndustrial.auth0.com
+    authRequired: true
+    baseUrl: https://contxtauth.com/v1
+    clientId: 75wT048QcpE7ujwBJPPjr263eTHl4gEX
+  clientId: bleED0RUwb7CJ9j7D48tqSiSZRZn29AV
+  environment: ndustrial-auth
+  forAuthProvider: contxtauth.com/v1
+- apiEnvironment:
+    authProvider: contxt.auth0.com
+    authRequired: true
+    baseUrl: https://contxt.auth0.com
+    clientId: https://foundry.staging.ndustrial.io
+  clientId: DkgRpm7YwlSPUSdpC5gfwMQYXUs75Pd0
+  environment: contxt-auth0
+  forAuthProvider: contxt.auth0.com
+currentContext:
+  iot:
+    environment: production-cli
+  foundry-graph:
+    environment: foundry-staging-cli
+  ems:
+    environment: production-cli
+  rates:
+    environment: production-cli
+defaults:
+  organization: null
+serviceConfigs:
+- apiEnvironment:
+    authProvider: contxt.auth0.com
+    authRequired: true
+    baseUrl: https://foundry.staging.ndustrial.io/graphql
+    clientId: https://foundry.staging.ndustrial.io
+  clientId: null
+  clientSecret: null
+  environment: foundry-staging-cli
+  isGraph: true
+  service: foundry-graph
+- apiEnvironment:
+    authProvider: contxtauth.com/v1
+    authRequired: true
+    baseUrl: https://feeds.api.ndustrial.io/v1
+    clientId: iznTb30Sfp2Jpaf398I5DN6MyPuDCftA
+  clientId: null
+  clientSecret: null
+  environment: production-cli
+  isGraph: false
+  service: iot
+- apiEnvironment:
+    authProvider: contxtauth.com/v1
+    authRequired: true
+    baseUrl: https://ems.api.ndustrial.io/v1
+    clientId: e2IT0Zm9RgGlDBkLa2ruEcN9Iop6dJAS
+  clientId: null
+  clientSecret: null
+  environment: production-cli
+  isGraph: false
+  service: ems
+- apiEnvironment:
+    authProvider: contxtauth.com/v1
+    authRequired: true
+    baseUrl: https://rates-v2.api.ndustrial.io/v2
+    clientId: Z74s6YwxjVPGkMCZmRBhedIgMrckM0Sd
+  clientId: null
+  clientSecret: null
+  environment: production-cli
+  isGraph: false
+  service: rates
+
+

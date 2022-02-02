@@ -96,7 +96,6 @@ class Api:
     def _process_response(self, response: Response) -> Dict:
         try:
             # Raise any error
-            print(response)
             response.raise_for_status()
         except HTTPError:
             # Catch the error, to log the response's message, and reraise
@@ -122,7 +121,6 @@ class Api:
 
     def post(self, uri: str, data: Optional[Dict] = None, json: Optional[Dict] = None, **kwargs) -> Dict:
         """Sends a POST request"""
-        print('Posting')
         response = self.session.post(url=self._url(uri), data=data, json=json, **kwargs)
         return self._process_response(response)
 
@@ -154,8 +152,6 @@ class ConfiguredLegacyApi(Api, ABC):
             token_provider = override_token_provider
         elif env_config.clientId is None:
             from ..auth.cli import CliAuth
-            print('CLI auth')
-            print(env_config)
             cli_auth = CliAuth(service_config=env_config)
             token_provider = cli_auth.get_token_provider(audience=env_config.apiEnvironment.clientId)
         else:
@@ -214,7 +210,6 @@ class AuthService(Api):
         if cached_token is None:
             logger.info('Token not found for client...fetching new one')
             req = GetToken(self.service_env.apiEnvironment.authProvider)
-            print(self.service_env.apiEnvironment.authProvider, self.service_env.clientId, self.service_env.clientSecret, self.service_env.apiEnvironment.clientId)
             token = req.client_credentials(client_id=self.service_env.clientId,
                                            client_secret=self.service_env.clientSecret,
                                            audience=self.service_env.apiEnvironment.clientId)
@@ -222,7 +217,6 @@ class AuthService(Api):
                                        audience=self.service_env.apiEnvironment.clientId,
                                        token=token['access_token'])
 
-            print(token)
             return token['access_token']
         else:
             logger.info('Using cached token')

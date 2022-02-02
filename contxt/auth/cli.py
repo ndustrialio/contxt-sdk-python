@@ -17,23 +17,6 @@ from . import Auth, Token, TokenProvider
 logger = make_logger(__name__)
 
 
-@dataclass
-class Env:
-    cli_client_id: str
-    auth0_tenant_base_url: str
-
-
-environments = {
-    "staging": Env(
-        cli_client_id="yJw7FCGBKg7nTT4CJ4n05QaVzhTIgtAf",
-        auth0_tenant_base_url="contxt-staging.us.auth0.com",
-    ),
-    "production": Env(
-        cli_client_id="bleED0RUwb7CJ9j7D48tqSiSZRZn29AV", auth0_tenant_base_url="ndustrial.auth0.com"
-    ),
-}
-
-
 class DeviceAuthPendingException(Exception):
     pass
 
@@ -142,6 +125,7 @@ class UserIdentityProvider(TokenProvider):
         self.token_cache.set_token(client_id=self.cli_auth_env.clientId,
                                    audience=self.cli_auth_env.apiEnvironment.clientId,
                                    token=_access_token)
+        return _access_token
 
     @property
     def refresh_token(self) -> Token:
@@ -212,7 +196,7 @@ class UserTokenProvider(TokenProvider):
             return cached_token
 
         # Token either not yet set or expiring soon, fetch one
-        logger.info(f"Fetching new access_token for {self.audience}")
+        print(f"Fetching new access_token for {self.audience}")
         print('New access token')
         access_token = self.auth_service.get_token(
             self.identity_provider.access_token, self.audience

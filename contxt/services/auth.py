@@ -57,8 +57,7 @@ class TokenConfig:
 class StoredTokenCache(PersistentContxtConfig):
 
     def __init__(self):
-        super().__init__('auth_tokens', TokenConfig)
-        self.config = self.load_contxt_file()
+        super().__init__('auth_tokens.yml', TokenConfig)
 
     def set_token(self, client_id: str, audience: str, token: str):
         if self.config is None:
