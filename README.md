@@ -6,8 +6,16 @@
 
 ## Installation
 
+Clone this repo (this version is not yet published to PyPi)
 ```sh
-pip install contxt-sdk
+git clone https://github.com/ndustrialio/contxt-sdk-python-control.git
+cd contxt-sdk-python-control
+```
+
+Initialize the CLI to create an environment configuration file, as well as download
+any GraphQL schemas needed for the configuration.
+```shell
+contxt init --fresh-from-file ./docs/configs/basic_config.yml
 ```
 
 ## CLI Usage
@@ -18,7 +26,6 @@ contxt --help
 
 ## Documentation
 
-Please refer to <https://ndustrialio.github.io/contxt-sdk-python>.
 
 ## Contributing
 
