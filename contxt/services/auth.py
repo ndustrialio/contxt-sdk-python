@@ -13,6 +13,7 @@ logging.basicConfig(format='[%(module)s %(levelname)s:%(asctime)s] %(message)s',
 class SetTokenException(Exception):
     pass
 
+
 @dataclass
 class MachineTokenConfig:
     audience: str

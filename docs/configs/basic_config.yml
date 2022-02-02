@@ -24,6 +24,8 @@ currentContext:
     environment: production-cli
   rates:
     environment: production-cli
+  facilities:
+    environment: production-cli
 defaults:
   organization: null
 serviceConfigs:
@@ -67,5 +69,15 @@ serviceConfigs:
   environment: production-cli
   isGraph: false
   service: rates
+- apiEnvironment:
+    authProvider: contxtauth.com/v1
+    authRequired: true
+    baseUrl: https://facilities.api.ndustrial.io/v1
+    clientId: SgbCopArnGMa9PsRlCVUCVRwxocntlg0
+  clientId: null
+  clientSecret: null
+  environment: production-cli
+  isGraph: false
+  service: facilities
 
 

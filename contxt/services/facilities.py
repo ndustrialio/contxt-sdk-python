@@ -8,7 +8,7 @@ from .api import ConfiguredLegacyApi
 class FacilitiesService(ConfiguredLegacyApi):
     """Facilities API client"""
 
-    def __init__(self, env_config: ContxtEnvironmentConfig, **kwargs) -> None:
+    def __init__(self, env_config: ContxtEnvironmentConfig = None, **kwargs) -> None:
         super().__init__(env_config=env_config, **kwargs)
 
     def get_facilities(self, organization_id: Optional[str] = None) -> List[Facility]:

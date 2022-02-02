@@ -21,7 +21,7 @@ class PersistentContxtConfig:
             self.filename = os.path.join(self.base_path, filename)
         else:
             self.filename = filename
-        logger.info(f'Using config file {self.filename}')
+        logger.debug(f'Using config file {self.filename}')
         self.clazz = clazz
         self.config = self.load_contxt_file(initialize_if_not_exists)
 
