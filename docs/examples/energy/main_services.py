@@ -1,9 +1,8 @@
-from contxt.services.facilities import FacilitiesService
-from contxt.services.ems import EmsService
-from contxt.workers import BaseWorker
-
 import argparse
-import os, sys
+
+from contxt.services.ems import EmsService
+from contxt.services.facilities import FacilitiesService
+from contxt.workers import BaseWorker
 
 
 class MainServiceFetcher(BaseWorker):
