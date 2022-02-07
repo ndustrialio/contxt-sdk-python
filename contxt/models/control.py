@@ -28,6 +28,8 @@ class Suggestion:
     end_time: datetime
     summary: str
     components: List[ControllableComponent]
+    approval_deadline_time: Optional[datetime] = None
+    control_start_deadline_time: Optional[datetime] = None
     metadata: Optional[Dict[AnyStr, Any]] = None
 
     def __str__(self):

@@ -1,9 +1,8 @@
 from sgqlc.operation import Operation
-from sgqlc.types import non_null
 from datetime import datetime
 import pytz
 import json
-from typing import List, Dict, AnyStr, Any
+from typing import List, Dict, AnyStr, Any, Optional
 
 from contxt.utils.config import ContxtEnvironmentConfig
 from contxt.services.base_graph_service import BaseGraphService, SchemaMissingException
@@ -272,7 +271,9 @@ class ControlService(BaseGraphService):
 
     def propose_event(self, facility_id: int, project_id: str, start_time: datetime,
                       end_time: datetime, components: List[ComponentToControlInputRecordInput],
-                      summary: str, metadata: Dict[AnyStr, Any] = None) -> schema.EventProposal:
+                      summary: str, control_start_deadline_time: Optional[datetime] = None,
+                      approval_deadline_time: Optional[datetime] = None, metadata: Dict[AnyStr, Any] = None
+                      ) -> schema.EventProposal:
 
         op = Operation(schema.Mutation)
 
@@ -281,6 +282,10 @@ class ControlService(BaseGraphService):
         event_proposal.projectid = project_id
         event_proposal.starttime = str(start_time.astimezone(pytz.utc))
         event_proposal.endtime = str(end_time.astimezone(pytz.utc))
+        if control_start_deadline_time:
+            event_proposal.controlstartdeadlinetime = str(control_start_deadline_time)
+        if approval_deadline_time:
+            event_proposal.approvaldeadlinetime = str(approval_deadline_time)
         event_proposal.summary = summary
         event_proposal.metadata = json.dumps(metadata)
 
