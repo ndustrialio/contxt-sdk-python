@@ -98,14 +98,13 @@ class Channel(ApiObject):
 @dataclass
 class ChannelStats(ApiObject):
     _api_fields: ClassVar = (
+        ApiField("bytesInCounter", attr_key="bytes_in_counter", data_type=int),
+        ApiField("msgInCounter", attr_key="msg_in_counter", data_type=int),
+        ApiField("bytesOutCounter", attr_key="bytes_out_counter", data_type=int),
+        ApiField("msgOutCounter", attr_key="msg_out_counter", data_type=int),
+        ApiField("backlogSize", attr_key="backlog_size", data_type=int),
         ApiField("msgRateIn", attr_key="msg_rate_in", data_type=float),
         ApiField("msgRateOut", attr_key="msg_rate_out", data_type=float),
-        ApiField("msgThroughputIn", attr_key="msg_throughput_in", data_type=float),
-        ApiField("msgThroughputOut", attr_key="msg_throughput_out", data_type=float),
-        ApiField("averageMsgSize", attr_key="avg_msg_size", data_type=float),
-        ApiField("storageSize", attr_key="storage_size", data_type=float),
-        ApiField("replication", data_type=dict),
-        ApiField("deduplicationStatus", attr_key="deduplication_status"),
         ApiField("publishers", data_type=PublisherStats),
         ApiField(
             "subscriptions",
@@ -113,14 +112,13 @@ class ChannelStats(ApiObject):
         ),
     )
 
+    bytes_in_counter: int
+    msg_in_counter: int
+    bytes_out_counter: int
+    msg_out_counter: int
+    backlog_size: int
     msg_rate_in: float
     msg_rate_out: float
-    msg_throughput_in: float
-    msg_throughput_out: float
-    avg_msg_size: float
-    storage_size: float
-    replication: dict
-    deduplication_status: str
     publishers: List[PublisherStats]
     subscriptions: List[SubscriberStats]
 

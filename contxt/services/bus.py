@@ -2,24 +2,13 @@ from typing import Dict, List, Optional
 
 from ..auth import Auth
 from ..models.bus import Channel, ChannelStats
-from .api import ApiEnvironment, ConfiguredApi
+from .api import ConfiguredApi
 
 
 class MessageBusService(ConfiguredApi):
     """Message Bus API client"""
 
-    _envs = (
-        ApiEnvironment(
-            name="production",
-            base_url="https://bus.ndustrial.io",
-            client_id="T62CR77ouw4I6VPlSSlLT9VpVA1ebByx",
-        ),
-        ApiEnvironment(
-            name="staging",
-            base_url="https://bus-staging.ndustrial.io",
-            client_id="YHCtC2dZAvvt2SdxUVwWpVdm4fSOkUdL",
-        ),
-    )
+    _envs = ()
 
     def __init__(self, auth: Auth, organization_id: str, env: str = "production", **kwargs) -> None:
         super().__init__(env=env, auth=auth, **kwargs)
