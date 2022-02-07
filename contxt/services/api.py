@@ -14,9 +14,7 @@ from ..utils import make_logger
 logger = make_logger(__name__)
 
 # NOTE: support breaking change in urllib3: https://github.com/urllib3/urllib3/issues/2092
-RETRY_METHODS_PARM = (
-    "allowed_methods" if hasattr(Retry.DEFAULT, "allowed_methods") else "method_whitelist"
-)
+RETRY_METHODS_PARM = "allowed_methods" if hasattr(Retry(), "allowed_methods") else "method_whitelist"
 
 
 class BearerTokenAuth(AuthBase):
