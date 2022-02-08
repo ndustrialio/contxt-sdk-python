@@ -290,6 +290,24 @@ class ControlService(BaseGraphService):
         proposal = (op + data).adjust_proposal_end_time.event_proposal
         return proposal
 
+    def update_metadata(self, proposal_id: str, metadata: Dict[AnyStr, Any]) -> schema.EventProposal:
+        op = Operation(schema.Mutation)
+
+        update_input = schema.UpdateProposalMetadataInput()
+        update_input.proposalid = proposal_id
+        update_input.proposalmetadata = json.dumps(metadata)
+
+        operation = op.update_proposal_metadata(input=update_input)
+
+        operation.event_proposal.id()
+        operation.event_proposal.current_state()
+        operation.event_proposal.end_time()
+
+        data = self.run(op)
+
+        proposal = (op + data).update_proposal_metadata.event_proposal
+        return proposal
+
     def propose_event(self, facility_id: int, project_id: str, start_time: datetime,
                       end_time: datetime, components: List[ComponentToControlInputRecordInput],
                       summary: str, control_start_deadline_time: Optional[datetime] = None,
