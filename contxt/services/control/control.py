@@ -269,6 +269,27 @@ class ControlService(BaseGraphService):
                                   project_id=suggestion.project_id,
                                   metadata=suggestion.metadata)
 
+    def adjust_proposal_end(self, proposal_id: str, new_end_time: datetime) -> schema.EventProposal:
+        op = Operation(schema.Mutation)
+
+        adjustment_input = schema.AdjustProposalEndTimeInputRecordInput()
+        adjustment_input.proposalid = proposal_id
+        adjustment_input.newendtime = str(new_end_time)
+
+        adjust = schema.AdjustProposalEndTimeInput()
+        adjust.proposal_adjustment = adjustment_input
+
+        operation = op.adjust_proposal_end_time(input=adjust)
+
+        operation.event_proposal.id()
+        operation.event_proposal.current_state()
+        operation.event_proposal.end_time()
+
+        data = self.run(op)
+
+        proposal = (op + data).adjust_proposal_end_time.event_proposal
+        return proposal
+
     def propose_event(self, facility_id: int, project_id: str, start_time: datetime,
                       end_time: datetime, components: List[ComponentToControlInputRecordInput],
                       summary: str, control_start_deadline_time: Optional[datetime] = None,

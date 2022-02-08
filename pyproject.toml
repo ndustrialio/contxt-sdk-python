@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "contxt-sdk"
-version = "3.0.0-beta.7"
+version = "3.0.0-beta.8"
 description = "Contxt SDK from ndustrial"
 authors = ["ndustrial <dev@ndustrial.io>"]
 license = "ISC"
