@@ -21,6 +21,13 @@ class MessageBusService(ConfiguredApi):
         resp = self.get(f"{self._channels_url(service_id)}/{channel_id}")
         return Channel.from_api(resp)
 
+    def create_channel_for_service(self, channel: Channel) -> Channel:
+        data = {
+            'name': channel.name
+        }
+        resp = self.post(f"{self._channels_url(channel.service_id)}", json=data)
+        return Channel.from_api(resp)
+
     def get_channel_with_name_for_service(self, channel_name: str, service_id: str) -> Optional[Channel]:
         for channel in self.get_channels_for_service(service_id):
             if channel.name.lower() == channel_name.lower():
