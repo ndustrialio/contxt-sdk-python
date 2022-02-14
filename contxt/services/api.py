@@ -115,7 +115,9 @@ class Api:
         response = self.session.get(url=self._url(uri), params=params, **kwargs)
         return self._process_response(response)
 
-    def raw_post(self, uri: str, data: Optional[Dict] = None, json: Optional[Dict] = None, **kwargs) -> requests.Response:
+    def raw_post(
+        self, uri: str, data: Optional[Dict] = None, json: Optional[Dict] = None, **kwargs
+    ) -> requests.Response:
         """Sends a POST request without processing response"""
         return self.session.post(url=self._url(uri), data=data, json=json, **kwargs)
 

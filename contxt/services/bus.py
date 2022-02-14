@@ -22,9 +22,7 @@ class MessageBusService(ConfiguredApi):
         return Channel.from_api(resp)
 
     def create_channel_for_service(self, channel: Channel) -> Channel:
-        data = {
-            'name': channel.name
-        }
+        data = {"name": channel.name}
         resp = self.post(f"{self._channels_url(channel.service_id)}", json=data)
         return Channel.from_api(resp)
 
