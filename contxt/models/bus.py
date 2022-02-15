@@ -80,16 +80,16 @@ class SubscriberStats(ApiObject):
 @dataclass
 class Channel(ApiObject):
     _api_fields: ClassVar = (
-        ApiField("id"),
-        ApiField("name"),
-        ApiField("organization_id"),
-        ApiField("service_id"),
+        ApiField("id", data_type=str, optional=True),
+        ApiField("name", data_type=str),
+        ApiField("organization_id", data_type=str),
+        ApiField("service_id", data_type=str),
     )
 
-    id: str
     name: str
-    organization_id: str
     service_id: str
+    organization_id: str
+    id: Optional[str] = None
 
     def __str__(self) -> str:
         return pretty_print(self)

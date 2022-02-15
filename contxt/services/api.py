@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Dict, FrozenSet, Optional, Tuple
 
+import requests
 from requests import PreparedRequest, Response, Session
 from requests.adapters import HTTPAdapter
 from requests.auth import AuthBase
@@ -113,6 +114,12 @@ class Api:
         """Sends a GET request"""
         response = self.session.get(url=self._url(uri), params=params, **kwargs)
         return self._process_response(response)
+
+    def raw_post(
+        self, uri: str, data: Optional[Dict] = None, json: Optional[Dict] = None, **kwargs
+    ) -> requests.Response:
+        """Sends a POST request without processing response"""
+        return self.session.post(url=self._url(uri), data=data, json=json, **kwargs)
 
     def post(self, uri: str, data: Optional[Dict] = None, json: Optional[Dict] = None, **kwargs) -> Dict:
         """Sends a POST request"""
