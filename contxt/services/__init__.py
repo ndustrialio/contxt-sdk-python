@@ -18,5 +18,6 @@ from .rates import UtilityRatesService
 try:
     from .control.control import ControlService
     from .base.base import BaseService
+    from .nionic_iot import IotNionicHelper
 except SchemaMissingException:
     pass
