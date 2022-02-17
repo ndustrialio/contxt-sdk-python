@@ -24,6 +24,21 @@ class FieldValueType(Enum):
 
 
 @dataclass
+class MetricWindow(Enum):
+    MINUTELY = '1min'
+    FIVE_MINUTELY = '5min'
+    QUARTER_HOURLY = '15min'
+    HALF_HOURLY = '30min'
+    HOURLY = '1hr'
+
+
+@dataclass
+class MetricField:
+    label: str
+    sourceId: str
+
+
+@dataclass
 class Field(ApiObject):
     _api_fields: ClassVar = (
         ApiField("id", data_type=int),

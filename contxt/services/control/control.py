@@ -17,8 +17,11 @@ except ImportError:
 from contxt.models.control import Suggestion
 
 
-def include_proposals_with_object(obj, include_only_active: bool = True):
-    proposals = obj.event_proposals(order_by=[schema.EventProposalsOrderBy.START_TIME_ASC]).nodes()
+def include_proposals_with_object(obj, include_only_active: bool = True, project_id: str = None):
+    filters = {}
+    if project_id:
+        filters['project_id'] = project_id
+    proposals = obj.event_proposals(condition=filters, order_by=[schema.EventProposalsOrderBy.START_TIME_ASC]).nodes()
     proposals.id()
     proposals.start_time()
     proposals.end_time()
@@ -91,6 +94,18 @@ class ControlService(BaseGraphService):
         # Include project info
         event_proposal.project().id()
 
+        # Include component info
+        event_proposal.event_proposals_controlled_components().nodes().state_definition()
+        event_proposal.event_proposals_controlled_components().nodes().controllable_component().id()
+        event_proposal.event_proposals_controlled_components().nodes().controllable_component().slug()
+        event_proposal.event_proposals_controlled_components().nodes().controllable_component().label()
+
+        # Include control events
+        event_proposal.control_events().nodes().id()
+        event_proposal.control_events().nodes().current_state()
+        event_proposal.control_events().nodes().start_time()
+        event_proposal.control_events().nodes().end_time()
+
         # Include metrics
         if include_metrics:
             event_proposal.event_proposal_metrics().nodes().id()
@@ -118,15 +133,28 @@ class ControlService(BaseGraphService):
 
         return event_proposal
 
-    def get_proposals_for_component(self, controllable_component_id: str):
+    def get_latest_proposal_for_component(self, controllable_component_id: str, project_id: str = None
+                                          ) -> Optional[schema.EventProposal]:
+        component_with_proposals = self.get_proposals_for_component(controllable_component_id, limit=1,
+                                                                    project_id=project_id)
+
+        if len(component_with_proposals.event_proposals.nodes):
+            return component_with_proposals.event_proposals.nodes[0]
+
+    def get_proposals_for_component(self, controllable_component_id: str, limit=None, project_id: str = None
+                                    ) -> schema.ControllableComponent:
         op = Operation(schema.Query)
 
         controllable_component = op.controllable_component(id=controllable_component_id)
         controllable_component.id()
         controllable_component.slug()
 
+        filters = {}
+        if project_id:
+            filters['project_id'] = project_id
+
         proposals = controllable_component.event_proposals(
-            order_by=[schema.EventProposalsOrderBy.START_TIME_DESC]).nodes()
+            condition=filters, order_by=[schema.EventProposalsOrderBy.START_TIME_DESC], first=limit).nodes()
         proposals.id()
         proposals.project_id()
         proposals.current_state()
@@ -166,10 +194,10 @@ class ControlService(BaseGraphService):
 
         return control_event
 
-    def get_edge_control_events(self, client_id: str):
+    def get_edge_control_events(self):
         op = Operation(schema.Query)
 
-        edge_control_events = op.edge_control_events(clientid=client_id)
+        edge_control_events = op.edge_control_events()
 
         edge_control_events.nodes.componentslug()
         control_event = edge_control_events.nodes.controlevent()
@@ -339,6 +367,27 @@ class ControlService(BaseGraphService):
         event = (op + data).propose_event.event_proposal
         return event
 
+    def approve_proposal(self, proposal_id: str, components: List[ComponentToControlInputRecordInput]
+                         ) -> schema.EventProposal:
+
+        op = Operation(schema.Mutation)
+
+        approved_proposal = schema.EventApprovalInputRecordInput()
+        approved_proposal.id = proposal_id
+
+        approval = schema.ApproveProposalInput(approved_proposal=approved_proposal,
+                                               approved_components=components)
+
+        approve = op.approve_proposal(input=approval)
+
+        approve.event_proposal.id()
+        approve.event_proposal.start_time()
+        approve.event_proposal.end_time()
+        data = self.run(op)
+
+        event = (op + data).approve_proposal.event_proposal
+        return event
+
     def add_savings_for_component_control_event(self, component: schema.ControllableComponent,
                                                 event_proposal: schema.EventProposal, success_metric_id: str,
                                                 projected_savings_amount: float):
@@ -436,11 +485,18 @@ class ControlService(BaseGraphService):
             print(data)
             raise Exception(data['errors'][0]['message'])
 
-        component = (op + data).update_contorllable_component
+        component = (op + data).update_controllable_component
         return component
 
+    def get_controllable_by_slug(self, facility_id: int, component_slug: str) -> Optional[schema.ControllableComponent]:
+        components = self.get_controllables_for_facility(facility_id=facility_id, component_slug=component_slug,
+                                                         include_events=False)
+
+        if len(components):
+            return components[0]
+
     def get_controllables_for_facility(self, facility_id: int, component_slug: str = None,
-                                       include_events: bool = True):
+                                       include_events: bool = True, project_id: str = None):
         op = Operation(schema.Query)
 
         filters = {}
@@ -455,7 +511,7 @@ class ControlService(BaseGraphService):
             components = op.controllable_components()
 
         if include_events:
-            include_proposals_with_object(components.nodes)
+            include_proposals_with_object(components.nodes, project_id=project_id)
 
         components.nodes.id()
         components.nodes.slug()

@@ -1,5 +1,7 @@
 import click
+import sys
 
+from contxt.schemas.foundry_graph.foundry_graph_schema import ComponentToControlInputRecordInput
 from contxt.services.control.control import ControlService
 from contxt.utils.serializer import Serializer
 from contxt.utils.contxt_environment import ContxtEnvironment
@@ -104,9 +106,8 @@ def edge_node(edge_node_client_id: str = None):
 
 
 @get.command()
-@click.argument('edge-node-client-id', type=str)
-def edge_node_events(edge_node_client_id: str):
-    events = get_control_service().get_edge_control_events(edge_node_client_id)
+def edge_node_events():
+    events = get_control_service().get_edge_control_events()
     print(Serializer.to_pretty_cli(events))
 
 
@@ -172,6 +173,28 @@ def set_schedulable(controllable_slug: str, facility_id: int):
         get_control_service().set_controllable_as_schedulable(controllable.id)
     else:
         print('Controllable not found')
+
+
+@control.command()
+@click.argument('PROPOSAL_ID')
+def approve(proposal_id: str):
+
+    proposal = get_control_service().get_proposal_detail(event_proposal_id=proposal_id, include_event_log=False,
+                                                         include_metrics=False)
+
+    if not proposal:
+        print('Proposal not found!')
+        sys.exit(0)
+
+    component_inputs = []
+    for component in proposal.event_proposals_controlled_components.nodes:
+        component_inputs.append(
+            ComponentToControlInputRecordInput(controllable_component_id=component.controllable_component.id,
+                                               state_definition_slug=component.state_definition)
+        )
+
+    approval = get_control_service().approve_proposal(proposal_id=proposal_id, components=component_inputs)
+    print(Serializer.to_pretty_cli(approval))
 
 
 @click.group(context_settings=dict(help_option_names=["-h", "--help"], show_default=True))
