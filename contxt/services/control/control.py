@@ -84,6 +84,7 @@ class ControlService(BaseGraphService):
 
         event_proposal = op.event_proposal(id=event_proposal_id)
 
+        event_proposal.id()
         event_proposal.facility_id()
         event_proposal.start_time()
         event_proposal.end_time()

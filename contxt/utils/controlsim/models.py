@@ -1,6 +1,11 @@
 from dataclasses import dataclass
-
+from enum import Enum
 from typing import Optional, List, Dict
+
+
+class SimulatedStateRunMode(Enum):
+    runUntilEndTime = 'run-until-end-time'
+    timeDelay = 'time-delay'
 
 
 @dataclass
@@ -10,6 +15,7 @@ class SimulatedStateConfig:
     workMessage: Optional[str]
     onSuccess: Optional[str]
     onFail: Optional[str]
+    mode: Optional[SimulatedStateRunMode] = SimulatedStateRunMode.timeDelay
 
 
 @dataclass

@@ -59,7 +59,7 @@ class GeneralControlEventSimulator:
                 print(f'Config not found for state {self.current_state}')
                 return
 
-            # if we're in a state of waiting for extrernal input, we'll grab the state from the framework
+            # if we're in a state of waiting for external input, we'll grab the state from the framework
             if not state_config.controllable:
                 # can't do this since the framework state may be out of date
                 framework_reported_state = framework_reported_current_states.get(
@@ -96,8 +96,8 @@ class GeneralControlEventSimulator:
 
 class Simulator:
 
-    def __init__(self, definitions: List[str], blast_config_filename: str):
-        self.simulation_config: SimulationConfigs = load_config_class_from_file(blast_config_filename, SimulationConfigs)
+    def __init__(self, definitions: List[str], simulator_config_filename: str):
+        self.simulation_config: SimulationConfigs = load_config_class_from_file(simulator_config_filename, SimulationConfigs)
         self.control_service = get_control_service()
         self.definitions = definitions
 
