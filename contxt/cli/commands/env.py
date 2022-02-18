@@ -7,9 +7,6 @@ from contxt.cli.clients import Clients
 from contxt.utils.serializer import Serializer
 from contxt.utils.config import ContextException
 
-VALID_AUTH_PROVIDERS = ['contxtauth.com/v1', 'contxt.auth0.com', 'lineagelogistics.auth0.com']
-
-
 @click.group()
 def env() -> None:
     """Contxt Environment Functions"""
