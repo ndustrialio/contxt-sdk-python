@@ -8,12 +8,30 @@
 
 Clone this repo (this version is not yet published to PyPi)
 ```sh
-git clone https://github.com/ndustrialio/contxt-sdk-python-control.git
-cd contxt-sdk-python-control
+git clone https://github.com/ndustrialio/contxt-sdk-python.git
+cd contxt-sdk-python
 ```
 
-Initialize the CLI to create an environment configuration file, as well as download
-any GraphQL schemas needed for the configuration.
+### Create a virtual env
+
+Create a virtual environment for this repo:
+```shell
+virtualenv venv --python=python3
+```
+
+Activate your environment:
+```shell
+source ./venv/bin/activate
+```
+
+### Install dependencies
+```shell
+poetry install
+```
+
+
+Initialize the CLI/SDK. This command will download any dependent GraphQL schemas, create a token cache file, and create
+a fresh defaults file. During this process you will likely be asked to login to your Contxt account.
 ```shell
 contxt init --fresh-from-file ./docs/configs/basic_config.yml
 ```
