@@ -9,7 +9,7 @@ repository = "https://github.com/ndustrialio/contxt-sdk-python"
 packages = [ { include = "contxt" } ]
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.8"
 auth0-python = "^3"
 click = "^8"
 cryptography = { version = ">=1.4", optional = true } # enable pyjwt to en/decode jwt via RSA
@@ -22,6 +22,8 @@ pytz = "^2021.1"
 python-dateutil = "^2.8.2"
 pyinquirer = {git = "https://github.com/CITGuru/PyInquirer.git", rev = "master"}
 marshmallow-enum = "^1.5.1"
+marshmallow-dataclass = "^8.5.3"
+pandas = "^1.4.1"
 
 [tool.poetry.dev-dependencies]
 flake8 = "^3"
