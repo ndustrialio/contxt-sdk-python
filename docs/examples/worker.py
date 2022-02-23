@@ -1,4 +1,5 @@
 from contxt.services.facilities import FacilitiesService
+from contxt.utils.serializer import Serializer
 from contxt.workers import BaseWorker
 
 
@@ -10,8 +11,7 @@ class ExampleWorker(BaseWorker):
 
     def do_work(self):
         facilities = self.facilities_service.get_facilities()
-        for facility in facilities:
-            print(facility.name)
+        print(Serializer.to_table(facilities, exclude_keys=['organization','tags','info'], sort_by='id'))
 
 
 if __name__ == "__main__":

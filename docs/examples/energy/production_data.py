@@ -23,7 +23,8 @@ class ProductionDataFetcher(BaseWorker):
 
         print(f"Fetching Asset type information for Organization")
 
-        types = self.assets.get_asset_types(facility.organization_id)
+        # this returns a paged record, so we need to iterate over them to pull all records (then print)
+        types = [t for t in self.assets.get_asset_types(facility.organization_id)]
         print(Serializer.to_table(types))
 
         facility_type = None
@@ -32,16 +33,14 @@ class ProductionDataFetcher(BaseWorker):
                 facility_type = t
 
         # Get the metrics available for the facility type in this organization
-        metrics = self.assets.get_metrics(facility_type.id)
+        metrics = [m for m in self.assets.get_metrics(facility_type.id)]
 
         print(f"Metrics available for the Facility type")
         print(Serializer.to_table(metrics))
 
-        metric = None
-        for m in metrics:
-            # can look for outbound volume at `facility_daily_outbound_volume`
-            if m.label == 'facility_daily_inbound_volume':
-                metric = m
+        # can look for outbound volume at `facility_daily_outbound_volume`
+        print('\nPulling data for daily inbound volume')
+        metric = next(m for m in metrics if m.label == 'facility_daily_inbound_volume')
 
         values = self.assets.get_metric_values(asset_id=facility.asset_id, metric_id=metric.id)
         print(f"Data for {metric.label} in units: {metric.units if not None else 'N/A'}")
