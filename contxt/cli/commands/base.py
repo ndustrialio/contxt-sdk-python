@@ -35,6 +35,18 @@ def channels(source_slug: str):
     print(Serializer.to_table(channels))
 
 
+@get.command()
+def users():
+    users = get_base_service().get_users()
+    print(Serializer.to_table(users))
+
+
+@get.command()
+def my_roles():
+    my_roles = get_base_service().my_roles()
+    print(Serializer.to_table(my_roles))
+
+
 @base.command()
 @click.option('--source', required=True)
 @click.option('--channel', required=True)
@@ -46,9 +58,32 @@ def set_cursor(source: str, channel: str, cursor: int):
     print(Serializer.to_table(cursor))
 
 
+@base.command()
+@click.option('--user-id', required=True, type=str, prompt=True, help='ID of the user to grant the role to')
+@click.option('--role', required=True, type=str, prompt=True, help='Role name')
+def grant_role(user_id: str, role: str):
+    get_base_service().grant_role(user_id, role)
+
+
+# Getter functions
+@click.group()
+def create() -> None:
+    """Create Functions"""
+
+
+@create.command()
+@click.option('--slug', help='Slugified version of the source type. This will be the primary ID', prompt=True)
+@click.option('--name', help='The pretty name of the source type (this will ultimately be shown in a UI', prompt=True)
+def source_type(slug: str, name: str) -> None:
+    """Create a new Source Type"""
+    source_type = get_base_service().create_source_type(slug=slug, name=name)
+    print(Serializer.to_pretty_cli(source_type))
+
+
 @click.group(context_settings=dict(help_option_names=["-h", "--help"], show_default=True))
 def cli() -> None:
     pass
 
 
 base.add_command(get)
+base.add_command(create)
