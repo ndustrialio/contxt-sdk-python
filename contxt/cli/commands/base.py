@@ -80,6 +80,14 @@ def source_type(slug: str, name: str) -> None:
     print(Serializer.to_pretty_cli(source_type))
 
 
+@create.command()
+@click.option('--description', help='Brief description of what the robot user will be user for', prompt=True, required=True)
+def robot_user(description: str) -> None:
+    """Create a new Robot User"""
+    robot_user = get_base_service().create_robot_user(description)
+    print(Serializer.to_pretty_cli(robot_user))
+
+
 @click.group(context_settings=dict(help_option_names=["-h", "--help"], show_default=True))
 def cli() -> None:
     pass

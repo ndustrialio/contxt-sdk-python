@@ -110,6 +110,8 @@ class Serializer:
 
     @staticmethod
     def to_pretty_cli(obj: Any, **kwargs):
+        if not obj:
+            return
 
         d = Serializer.to_dict(obj)
 

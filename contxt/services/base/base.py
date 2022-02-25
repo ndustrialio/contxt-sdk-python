@@ -57,6 +57,23 @@ class BaseService(BaseGraphService):
 
         return True
 
+    def create_robot_user(self, description: str):
+        op = Operation(schema.Mutation)
+
+        robot_input = schema.CreateRobotUserInput()
+        robot_input.description = description
+
+        create_robot_user = op.create_robot_user(input=robot_input)
+
+        create_robot_user.user().id()
+        create_robot_user.user().first_name()
+        create_robot_user.user().last_name()
+        create_robot_user.user().description()
+
+        data = self.run(op)
+
+        return (op + data).create_robot_user.user
+
     def get_sources(self, slug: str = None, source_type_id: str = None):
         op = Operation(schema.Query)
 
