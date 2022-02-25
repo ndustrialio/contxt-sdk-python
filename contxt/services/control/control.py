@@ -33,6 +33,15 @@ class ControlService(BaseGraphService):
     def __init__(self, contxt_env: ContxtEnvironmentConfig):
         super().__init__(contxt_env)
 
+    def create_definition_from_json_file(self, json_file: str, slug: str, project_id: str, label: str,
+                                         description: str) -> schema.StateDefinition:
+        print(f'Opening json file at {json_file}')
+        with open(json_file, 'r') as f:
+            definition_data = json.load(f)
+
+            return self.create_definition(json_obj=definition_data, slug=slug, project_id=project_id, label=label,
+                                          description=description)
+
     def get_event_proposals(self, facility_id: int, project_id: str = None):
         op = Operation(schema.Query)
 
@@ -215,12 +224,13 @@ class ControlService(BaseGraphService):
 
         return edge_control_events
 
-    def transition_event(self, control_event_id: str, transition_event: str):
+    def transition_event(self, control_event_id: str, transition_event: str, message: str = None):
         op = Operation(schema.Mutation)
 
         transition_input = schema.TransitionControlEventInput()
         transition_input.control_event_id = control_event_id
         transition_input.transition_event = transition_event
+        transition_input.message = message
 
         transition = op.transition_control_event(input=transition_input)
 
@@ -254,6 +264,30 @@ class ControlService(BaseGraphService):
             definitions = (op + data).state_definitions
 
         return definitions
+
+    def create_definition(self, json_obj, slug: str, project_id: str, description: str, label: str
+                          ) -> schema.StateDefinition:
+        op = Operation(schema.Mutation)
+
+        def_input = schema.StateDefinitionInput()
+        def_input.definition = json.dumps(json_obj)
+        def_input.project_id = project_id
+        def_input.slug = slug
+        def_input.description = description
+        def_input.label = label
+
+        create_def_input = schema.CreateStateDefinitionInput(state_definition=def_input)
+
+        create = op.create_state_definition(input=create_def_input)
+
+        create.state_definition.slug()
+        create.state_definition.project_id()
+        create.state_definition.label()
+        create.state_definition.description()
+
+        data = self.run(op)
+
+        return (op + data).create_state_definition.state_definition
 
     def add_historic_event(self, facility_id: int, project_id: str, start_time: datetime,
                            end_time: datetime, components: List[schema.ControllableComponent]):

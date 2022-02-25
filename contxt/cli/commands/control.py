@@ -1,5 +1,6 @@
 import click
 import sys
+import json
 
 from contxt.schemas.foundry_graph.foundry_graph_schema import ComponentToControlInputRecordInput
 from contxt.services.control.control import ControlService
@@ -47,6 +48,13 @@ def facilities():
 def facility(facility_id: int):
     facility = get_control_service().get_facility(facility_id)
     print(Serializer.to_pretty_cli(facility))
+
+
+@get.command()
+@click.argument('CONTROL_EVENT_ID', type=str)
+def control_event(control_event_id: str):
+    event = get_control_service().get_control_event_detail(control_event_id)
+    print(Serializer.to_pretty_cli(event))
 
 
 @get.command()
@@ -125,10 +133,12 @@ def definitions(event_definition_id: str = None):
 # Transition function
 @control.command()
 @click.option('--event', type=str, required=True)
+@click.option('--message', type=str)
 @click.argument('control-event-id', type=str)
-def transition(control_event_id: str, event: str):
+def transition(control_event_id: str, event: str, message: str):
     control_event = get_control_service().transition_event(control_event_id=control_event_id,
-                                                           transition_event=event)
+                                                           transition_event=event,
+                                                           message=message)
     print(Serializer.to_pretty_cli(control_event))
 
 
@@ -157,6 +167,18 @@ def create() -> None:
 def facility(name: str, id: int, organization_id: str):
     facility = get_control_service().create_facility(name=name, id=id, organization_id=organization_id)
     print(Serializer.to_pretty_cli(facility))
+
+
+@create.command()
+@click.option('--json-file', type=str, required=True)
+@click.option('--slug', type=str, required=True, prompt=True)
+@click.option('--project-id', type=str, required=True, prompt=True)
+@click.option('--label', type=str, required=True, prompt=True)
+@click.option('--description', type=str, required=True, prompt=True)
+def definition(json_file: str, slug: str, project_id: str, label: str, description: str):
+    definition = get_control_service().create_definition_from_json_file(json_file, slug=slug, project_id=project_id,
+                                                                        label=label, description=description)
+    print(Serializer.to_pretty_cli(definition))
 
 
 @click.command()
