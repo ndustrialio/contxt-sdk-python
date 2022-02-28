@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from dateutil import parser
 from typing import Any, Dict, Iterable, List
 
 import pandas as pd
@@ -52,22 +53,44 @@ class IotNionicHelper(BaseGraphService):
 
     def get_metric_data(self, field: MetricField, start_time: datetime, end_time: datetime,
                         window: MetricWindow = MetricWindow.MINUTELY, order_by=[schema.MetricDataOrderBy.TIME_ASC]
-                        ) -> List[schema.MetricData]:
+                        ) -> schema.MetricData:
         op = Operation(schema.Query)
         metric_data = op.metric_data(label=field.label, source_id=field.sourceId, window=window,
                                      order_by=order_by, from_=str(start_time), to=str(end_time))
         metric_data.nodes().time()
         metric_data.nodes().data()
 
+        # page info
+        metric_data.page_info().has_next_page()
+
+        #print(op)
         data = self.run(op)
 
-        return (op + data).metric_data.nodes
+        return (op + data).metric_data
 
-    def get_metric_data_df(self, field: MetricField, start_time: datetime, end_time: datetime,
+    def get_metric_data_series(self, field: MetricField, start_time: datetime, end_time: datetime,
                            window: MetricWindow = MetricWindow.MINUTELY, order_by=[schema.MetricDataOrderBy.TIME_ASC]
-                           ) -> pd.DataFrame:
+                           ) -> pd.Series:
 
-        data = self.get_metric_data(field, start_time, end_time, window, order_by)
+        parsed_data = []
+        time_index = []
 
-        return pd.DataFrame([{'time': d.time, 'value': d.data} for d in data])
+        while True:
+            data = self.get_metric_data(field, start_time, end_time, window, order_by)
+
+            has_another_page = data.page_info.has_next_page
+            for d in data.nodes:
+                time_index.append(parser.parse(d.time))
+                try:
+                    parsed_data.append(float(d.data))
+                except TypeError as e:
+                    parsed_data.append(d.data)
+
+            if not has_another_page:
+                break
+
+            start_time = time_index[-1]
+
+        df = pd.Series(parsed_data, time_index)
+        return df
 
