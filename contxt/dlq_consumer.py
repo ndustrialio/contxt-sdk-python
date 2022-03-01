@@ -44,7 +44,7 @@ class DlqConsumer:
 
         channelAuthApi = Api(self.etl_mgmt_api_base_url)
         channel_token_resp = channelAuthApi.raw_post(
-            "v1/channels/authorizations",
+            "channels/authorizations",
             headers={"Authorization": "Bearer " + bearer_token},
             json={"resources": [{"resource": self.channel, "actions": ["subscribe"]}]},
         )
