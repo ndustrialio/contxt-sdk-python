@@ -109,15 +109,13 @@ class DlqConsumer:
             count = 0
 
             if queue_message is not None and "result" in queue_message:
-                # logger.debug
-                print(f"writing DLQ message {queue_message['result']['id']}")
+                logger.debug(f"writing DLQ message {queue_message['result']['id']}")
                 writer.writerow(queue_message["result"]["body"])
                 count += 1
 
                 if self.acknowledge:
-                    # logger.debug
-                    print(f"acknowledging DLQ message {queue_message['id']}")
-                    mb.acknowledge(queue_message["id"])
+                    logger.debug(f"acknowledging DLQ message {queue_message['result']['id']}")
+                    mb.acknowledge(queue_message["result"]["id"])
 
             while limit == 0 or count < limit:
                 queue_message = None
@@ -138,4 +136,4 @@ class DlqConsumer:
 
                     if self.acknowledge:
                         logger.debug(f"acknowledging DLQ message {queue_message['id']}")
-                        mb.acknowledge(queue_message["id"])
+                        mb.acknowledge(queue_message["result"]["id"])

@@ -73,7 +73,7 @@ class MessageBus:
                 {
                     "jsonrpc": "2.0",
                     "method": "MessageBus.Acknowledge",
-                    "message_id": msg_id,
+                    "params": {"message_id": msg_id},
                     "id": str(ackId),
                 }
             )
