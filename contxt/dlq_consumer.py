@@ -1,5 +1,4 @@
 import csv
-import json
 import logging
 from contextlib import closing
 from typing import TextIO
@@ -74,7 +73,10 @@ class DlqConsumer:
             mb = MessageBus(ws)
             if not mb.authorize(channel_token_resp.text):
                 return
-            if not mb.subscribe(self.etl_mgmt_api_client_id, self.channel, self.subscription_name):
+            subscription_id = mb.subscribe(
+                self.etl_mgmt_api_client_id, self.channel, self.subscription_name
+            )
+            if not subscription_id:
                 return
 
             # set timeout for receiving in order to detect end of stream
@@ -87,7 +89,7 @@ class DlqConsumer:
                 # infer the fields from the first message
                 logger.debug("waiting for DLQ row from message bus")
                 try:
-                    queue_message = json.loads(ws.recv())
+                    queue_message = mb.recv(subscription_id)
                 except websocket.WebSocketTimeoutException:
                     logger.info("timeout waiting for first DLQ row from message bus. Closing connection")
                     # end of queue if timeout received?
@@ -121,7 +123,7 @@ class DlqConsumer:
                 queue_message = None
                 logger.debug("waiting for DLQ message from message bus")
                 try:
-                    queue_message = json.loads(ws.recv())
+                    queue_message = mb.recv(subscription_id)
                 except websocket.WebSocketTimeoutException:
                     logger.info(
                         "timeout waiting for next DLQ message from message bus. Closing connection"

@@ -1,6 +1,7 @@
 import json
 import logging
 import uuid
+from typing import Dict
 
 import websocket
 
@@ -10,6 +11,7 @@ logger = logging.getLogger()
 class MessageBus:
     def __init__(self, ws: websocket.WebSocket) -> None:
         self.ws = ws
+        self.acks: Dict[uuid.UUID, str] = {}
 
     def authorize(self, token: str):
         logger.debug("sending authorization to message bus")
@@ -38,6 +40,7 @@ class MessageBus:
         return True
 
     def subscribe(self, service_client_id: str, channel: str, group: str):
+        subscription_id = str(uuid.uuid4())
         logger.debug(f"sending channel {channel} subscription to message bus")
         self.ws.send(
             json.dumps(
@@ -49,7 +52,7 @@ class MessageBus:
                         "channel": channel,
                         "group": group,
                     },
-                    "id": str(uuid.uuid4()),
+                    "id": subscription_id,
                 }
             )
         )
@@ -59,15 +62,16 @@ class MessageBus:
             response = json.loads(self.ws.recv())
         except websocket.WebSocketTimeoutException:
             logger.warn(f"Timeout waiting for channel {channel} subscription response")
-            return False
+            return None
         except Exception as e:
             logger.error(f"Error waiting for channel {channel} subscription response", e)
-            return False
+            return None
         logger.debug(f"channel {channel} subscription response: {response}")
-        return True
+        return response["result"]["subscription"]
 
     def acknowledge(self, msg_id: str):
         ackId = uuid.uuid4()
+        self.acks[ackId] = msg_id
         self.ws.send(
             json.dumps(
                 {
@@ -78,3 +82,18 @@ class MessageBus:
                 }
             )
         )
+
+    def recv(self, subscription_id):
+        receipt = json.loads(self.ws.recv())
+        while "id" in receipt and receipt["id"] != subscription_id:
+            if uuid.UUID(receipt["id"]) in self.acks:
+                logger.debug(f"removing ack {receipt['id']}")
+                if "error" in receipt:
+                    logger.warn(
+                        f"Error received from acknowledgement of message {self.acks[receipt['id']]}",
+                        receipt["error"],
+                    )
+                self.acks.remove(receipt["id"])
+            receipt = json.loads(self.ws.recv())
+
+        return receipt
