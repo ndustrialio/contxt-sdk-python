@@ -93,35 +93,49 @@ class DlqConsumer:
                     # end of queue if timeout received?
                     return
 
-                fields = queue_message.keys()
+                if (
+                    queue_message is not None
+                    and "result" in queue_message
+                    and "body" in queue_message["result"]
+                ):
+                    fields = queue_message["result"]["body"].keys()
+                else:
+                    logger.error("unable to determine columns from first message")
+                    return
 
             writer = csv.DictWriter(dst, fieldnames=fields)
-            writer.writeheader()
+            if headers:
+                writer.writeheader()
             count = 0
 
-            if queue_message is not None:
-                logger.debug(f"writing DLQ row {queue_message}")
-                writer.writerow(queue_message)
+            if queue_message is not None and "result" in queue_message:
+                # logger.debug
+                print(f"writing DLQ message {queue_message['result']['id']}")
+                writer.writerow(queue_message["result"]["body"])
                 count += 1
 
                 if self.acknowledge:
-                    logger.debug(f"acknowledging DLQ row {queue_message.message_id}")
-                    mb.acknowledge(queue_message.message_id)
+                    # logger.debug
+                    print(f"acknowledging DLQ message {queue_message['id']}")
+                    mb.acknowledge(queue_message["id"])
 
             while limit == 0 or count < limit:
                 queue_message = None
-                logger.debug("waiting for DLQ row from message bus")
+                logger.debug("waiting for DLQ message from message bus")
                 try:
                     queue_message = json.loads(ws.recv())
                 except websocket.WebSocketTimeoutException:
-                    logger.info("timeout waiting for next DLQ row from message bus. Closing connection")
+                    logger.info(
+                        "timeout waiting for next DLQ message from message bus. Closing connection"
+                    )
                     # end of queue if timeout received?
                     break
 
-                logger.debug(f"writing DLQ row {queue_message}")
-                writer.writerow(queue_message)
-                count += 1
+                if queue_message is not None and "result" in queue_message:
+                    logger.debug(f"writing DLQ message {queue_message['id']}")
+                    writer.writerow(queue_message["result"]["body"])
+                    count += 1
 
-                if self.acknowledge:
-                    logger.debug(f"acknowledging DLQ row {queue_message.message_id}")
-                    mb.acknowledge(queue_message.message_id)
+                    if self.acknowledge:
+                        logger.debug(f"acknowledging DLQ message {queue_message['id']}")
+                        mb.acknowledge(queue_message["id"])
