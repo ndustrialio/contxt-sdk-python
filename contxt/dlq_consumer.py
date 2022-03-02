@@ -105,7 +105,7 @@ class DlqConsumer:
                     logger.error("unable to determine columns from first message")
                     return
 
-            writer = csv.DictWriter(dst, fieldnames=fields)
+            writer = csv.DictWriter(dst, fieldnames=fields, extrasaction="ignore")
             if headers:
                 writer.writeheader()
             count = 0
