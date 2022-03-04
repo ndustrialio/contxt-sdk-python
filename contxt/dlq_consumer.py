@@ -53,8 +53,11 @@ class DlqConsumer:
         except HTTPError:
             # Catch the error, to log the response's message, and reraise
             # Try to decode the response as json, else fall back to raw text
-            response_json = channel_token_resp.json()
-            msg = response_json.get("message") or response_json or channel_token_resp.text
+            try:
+                response_json = channel_token_resp.json()
+                msg = response_json.get("message") or response_json
+            except Exception:
+                msg = channel_token_resp.text
             logger.debug(f"HTTP Error: {channel_token_resp.reason} - {msg}")
             raise
 

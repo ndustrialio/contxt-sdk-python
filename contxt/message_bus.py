@@ -66,6 +66,9 @@ class MessageBus:
         except Exception as e:
             logger.error(f"Error waiting for channel {channel} subscription response", e)
             return None
+        if "error" in response:
+            logger.warn(f"channel {channel} subscription error: {response['error']['message']}")
+            return None
         logger.debug(f"channel {channel} subscription response: {response}")
         return response["result"]["subscription"]
 
