@@ -45,8 +45,8 @@ class BaseGraphService(ConfiguredApi):
         if org_slug is None:
             org_id = self.token_provider.decoded_access_token.get('organizations')[0]
             org_slug = self.org_id_slugs.get(org_id)
-        split = self.url.split('ndustrial')
-        self.url = (self.url if org_slug == 'ndustrial' else (split[0] + org_slug + split[1])).rstrip("/")
+        split = self.url.split('ndustrial.api')
+        self.url = (self.url if org_slug == 'ndustrial' else (split[0] + org_slug + '.api' + split[1])).rstrip("/")
         return HTTPEndpoint(self.url, {'Authorization': f'Bearer {self.token_provider.access_token}'})
 
     def run(self, op: Operation, org_id: Optional[str] = None):
