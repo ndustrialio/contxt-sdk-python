@@ -46,27 +46,23 @@ class MainService(ApiObject):
 class Metric(ApiObject):
     _api_fields: ClassVar = (
         ApiField("id"),
-        ApiField("asset_type_id"),
         ApiField("label", creatable=True, updatable=True),
         ApiField("description", creatable=True, updatable=True),
         ApiField("organization_id", creatable=True),
         ApiField("time_interval", creatable=True, updatable=True),
         ApiField("units", creatable=True, updatable=True),
-        ApiField("global_asset_metric_parent_id"),
         ApiField("is_global", data_type=bool, creatable=True),
         ApiField("is_calculated", data_type=bool),
         ApiField("created_at", data_type=Parsers.datetime),
         ApiField("updated_at", data_type=Parsers.datetime),
     )
 
-    asset_type_id: str
     label: str
     description: str
     organization_id: str
     time_interval: str
     units: str
     id: Optional[str] = None
-    global_asset_metric_parent_id: Optional[str] = None
     is_global: Optional[bool] = None
     is_calculated: Optional[bool] = None
     created_at: Optional[datetime] = None
@@ -103,7 +99,6 @@ class Facility(ApiObject):
     _api_fields: ClassVar = (
         ApiField("id", data_type=int),
         ApiField("name"),
-        ApiField("asset_id"),
         ApiField("organization_id"),
         ApiField("baseline", data_type=dict),
         ApiField("main_services", data_type=MainService),
@@ -113,7 +108,6 @@ class Facility(ApiObject):
 
     id: int
     name: str
-    asset_id: str
     organization_id: str
     baseline: dict
     main_services: List[MainService]
