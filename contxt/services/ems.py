@@ -2,17 +2,9 @@ from datetime import date, datetime, timedelta, timezone
 from typing import Iterable, List, Optional
 
 from ..auth import Auth
-from ..models.ems import (
-    Facility,
-    MainService,
-    MetricValue,
-    ResourceType,
-    UtilityContract,
-    UtilitySpend,
-    UtilityUsage,
-)
+from ..models.ems import Facility, MainService, ResourceType, UtilityContract, UtilitySpend, UtilityUsage
 from .api import ApiEnvironment, ConfiguredApi
-from .pagination import PagedRecords, PageOptions
+from .pagination import PagedRecords
 
 
 class EmsService(ConfiguredApi):

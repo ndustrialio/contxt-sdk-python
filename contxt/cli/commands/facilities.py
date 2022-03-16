@@ -1,10 +1,10 @@
 from csv import DictReader
-from typing import IO, List, Optional
+from typing import IO, Optional
 
 import click
 
 from contxt.cli.clients import Clients
-from contxt.cli.utils import fields_option, print_table, sort_option, Serializer
+from contxt.cli.utils import Serializer
 
 
 @click.group()
@@ -35,8 +35,7 @@ def create(clients: Clients, org_id: str, input: IO[str]) -> None:
     # Parse file
     try:
         facilities = [
-            dict(name=r["name"], slug=r["slug"], timezone=r["timezone"])
-            for r in DictReader(input)
+            dict(name=r["name"], slug=r["slug"], timezone=r["timezone"]) for r in DictReader(input)
         ]
     except KeyError:
         raise click.ClickException("The following columns are required: name, slug, timezone")

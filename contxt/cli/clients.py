@@ -5,7 +5,6 @@ import click
 
 from contxt.auth.cli import CliAuth
 from contxt.services import (
-    BaseGraphService,
     ContxtDeploymentService,
     ContxtService,
     EmsService,

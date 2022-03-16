@@ -1,15 +1,15 @@
-from csv import DictReader
-from typing import IO, List, Optional
+from typing import Optional
 
 import click
 
 from contxt.cli.clients import Clients
-from contxt.cli.utils import fields_option, print_table, sort_option, Serializer
+from contxt.cli.utils import Serializer
 
 
 @click.group()
 def metrics() -> None:
     """Metrics."""
+
 
 @metrics.command()
 @click.option("--org-id", help="Organization ID, defaults to first value in token if not specified")
@@ -19,10 +19,17 @@ def labels(clients: Clients, org_id: Optional[str] = None) -> None:
     labels = clients.nionic.get_metric_labels(org_id)
     print(Serializer.to_table(labels))
 
+
 @metrics.command()
 @click.option("--org-id", help="Organization ID, defaults to first value in token if not specified")
-@click.option("--source-id", required=True, help="Organization ID, defaults to first value in token if not specified")
-@click.option("--label", required=True, help="Organization ID, defaults to first value in token if not specified")
+@click.option(
+    "--source-id",
+    required=True,
+    help="Organization ID, defaults to first value in token if not specified",
+)
+@click.option(
+    "--label", required=True, help="Organization ID, defaults to first value in token if not specified"
+)
 @click.pass_obj
 def data(clients: Clients, source_id: str, label: str, org_id: Optional[str] = None) -> None:
     """Get facilities"""
