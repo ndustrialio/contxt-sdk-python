@@ -18,7 +18,6 @@ pyyaml = ">=5,<7"
 requests = "^2"
 tabulate = "*"
 sgqlc = "^15.0"
-frozendict = "^2.3.0"
 
 [tool.poetry.dev-dependencies]
 black = "^21.12b0"
