@@ -13,14 +13,15 @@ class NionicService(BaseGraphService):
 
     _envs = BaseGraphService._envs
 
-    def __init__(self, auth: Auth, env: str = "production", **kwargs) -> None:
+    def __init__(self, auth: Auth, env: str = "production", org_id: str = None, **kwargs) -> None:
+        self.default_org_id = org_id
         super().__init__(env=env, auth=auth)
 
     def get_facilities(self, organization_id: Optional[str] = None):
         op = Operation(Query)
         op.facilities().nodes().__fields__(*list(Facility._ContainerTypeMeta__fields.keys()))
 
-        data = self.run(op, organization_id)
+        data = self.run(op, organization_id or self.default_org_id)
 
         facilities = (op + data).facilities
         return facilities
@@ -29,7 +30,7 @@ class NionicService(BaseGraphService):
         op = Operation(Mutation)
         op.create_facility(input={"facility": data}).__fields__("facility")
 
-        data = self.run(op, organization_id)
+        data = self.run(op, organization_id or self.default_org_id)
 
         facility = data["data"]["createFacility"]["facility"]
         return facility
@@ -38,7 +39,7 @@ class NionicService(BaseGraphService):
         op = Operation(Query)
         op.metric_labels().__fields__(*list(MetricLabel._ContainerTypeMeta__fields.keys()))
 
-        data = self.run(op, organization_id)
+        data = self.run(op, organization_id or self.default_org_id)
 
         metric_labels = data.get("data").get("metricLabels")
         return metric_labels
@@ -49,7 +50,7 @@ class NionicService(BaseGraphService):
         fields.remove("id")
         op.metric_data(source_id=source_id, label=label).nodes().__fields__(*fields)
 
-        data = self.run(op, organization_id)
+        data = self.run(op, organization_id or self.default_org_id)
 
         metric_data = (op + data).metric_data
         return metric_data
