@@ -96,6 +96,8 @@ class ControlService(BaseGraphService):
         event_proposal.id()
         event_proposal.facility_id()
         event_proposal.start_time()
+        event_proposal.approval_deadline_time()
+        event_proposal.control_start_deadline_time()
         event_proposal.end_time()
         event_proposal.current_state()
         event_proposal.metadata()
@@ -218,7 +220,7 @@ class ControlService(BaseGraphService):
         control_event.state_machine().state_definition()
         control_event.state_machine().current_state()
 
-        data = self._get_endpoint()(op)
+        data = self.run(op)
 
         edge_control_events = (op + data).edge_control_events
 
@@ -330,7 +332,9 @@ class ControlService(BaseGraphService):
                                   end_time=suggestion.end_time,
                                   components=inputs,
                                   project_id=suggestion.project_id,
-                                  metadata=suggestion.metadata)
+                                  metadata=suggestion.metadata,
+                                  control_start_deadline_time=suggestion.control_start_deadline_time,
+                                  approval_deadline_time=suggestion.approval_deadline_time)
 
     def adjust_proposal_end(self, proposal_id: str, new_end_time: datetime) -> schema.EventProposal:
         op = Operation(schema.Mutation)

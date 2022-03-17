@@ -31,6 +31,7 @@ def get(clients: Clients, slug: Optional[str], sort: str) -> None:
 @click.option("--type", type=click.Choice(["Core", "Custom"]), default="Custom", prompt=True)
 @click.option("--description", **OPTIONAL_PROMPT_KWARGS)
 @click.option("--owner-role-id", **OPTIONAL_PROMPT_KWARGS)
+@click.option("--org-id", required=True)
 @click.pass_obj
 def create(
     clients: Clients,
@@ -39,10 +40,11 @@ def create(
     type: str,
     slug: Optional[str],
     owner_role_id: Optional[str],
+    org_id: str
 ) -> None:
     """Create a project"""
     result = clients.contxt_deployments.post(
-        f"{clients.org_id}/projects",
+        f"{org_id}/projects",
         {
             "name": name,
             "slug": slug,

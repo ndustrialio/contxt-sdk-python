@@ -23,6 +23,10 @@ except ImportError:
 logger = make_logger(__name__)
 
 
+class IOTRequestException(Exception):
+    pass
+
+
 class IotNionicHelper(BaseGraphService):
 
     def __init__(self, contxt_env: ContxtEnvironmentConfig):
@@ -31,59 +35,77 @@ class IotNionicHelper(BaseGraphService):
     def get_latest_states(self, fields: List[MetricField]) -> Dict[str, schema.MetricData]:
         op = Operation(schema.Query)
 
+        field_aliases = []
+
         for field in fields:
+            field_alias = field.label if field.alias is None else field.alias.replace('-', '_')
+            field_aliases.append(field_alias)
             metric_data = op.metric_data(label=field.label, source_id=field.sourceId, window='1min',
                                          order_by=[schema.MetricDataOrderBy.TIME_DESC], first=1,
                                          to=str(datetime.utcnow()), from_=str(datetime.utcnow() - timedelta(days=1)),
-                                         __alias__=field.label)
+                                         __alias__=field_alias)
             metric_data.nodes().time()
             metric_data.nodes().data()
-
+        print(op)
         data = self.run(op)
 
         metric_data = (op + data)
 
         result_data = {}
-        for field in fields:
-            res = metric_data[field.label]
+        for field in field_aliases:
+            res = metric_data[field]
             if len(res.nodes):
-                result_data[field.label] = res.nodes[0]
+                result_data[field] = res.nodes[0]
+            else:
+                result_data[field] = None
 
         return result_data
 
     def get_metric_data(self, field: MetricField, start_time: datetime, end_time: datetime,
-                        window: MetricWindow = MetricWindow.MINUTELY, order_by=[schema.MetricDataOrderBy.TIME_ASC]
+                        window: MetricWindow = MetricWindow.MINUTELY, order_by=[schema.MetricDataOrderBy.TIME_ASC],
+                        aggregation: schema.MetricDataAggregationMethod = 'AVG'
                         ) -> schema.MetricData:
         op = Operation(schema.Query)
-        metric_data = op.metric_data(label=field.label, source_id=field.sourceId, window=window,
-                                     order_by=order_by, from_=str(start_time), to=str(end_time))
+
+        if window is not MetricWindow.MINUTELY:
+            metric_data = op.metric_data(label=field.label, source_id=field.sourceId, window=window.value,
+                                         order_by=order_by, from_=str(start_time), to=str(end_time),
+                                         aggregation=aggregation)
+        else:
+            metric_data = op.metric_data(label=field.label, source_id=field.sourceId, window=window.value,
+                                         order_by=order_by, from_=str(start_time), to=str(end_time))
         metric_data.nodes().time()
         metric_data.nodes().data()
 
         # page info
         metric_data.page_info().has_next_page()
-
-        #print(op)
+        print(op)
         data = self.run(op)
 
         return (op + data).metric_data
 
     def get_metric_data_series(self, field: MetricField, start_time: datetime, end_time: datetime,
-                           window: MetricWindow = MetricWindow.MINUTELY, order_by=[schema.MetricDataOrderBy.TIME_ASC]
-                           ) -> pd.Series:
+                               window: MetricWindow = MetricWindow.MINUTELY, order_by=[schema.MetricDataOrderBy.TIME_ASC],
+                               aggregation: str = 'AVG'
+                               ) -> pd.Series:
+
+        if aggregation not in schema.MetricDataAggregationMethod.__choices__:
+            raise IOTRequestException(f'Aggregation method {aggregation} not a valid aggregation method')
+
+        agg_method = schema.MetricDataAggregationMethod(aggregation)
 
         parsed_data = []
         time_index = []
 
         while True:
-            data = self.get_metric_data(field, start_time, end_time, window, order_by)
+            data = self.get_metric_data(field, start_time, end_time, window, order_by, aggregation=agg_method)
 
             has_another_page = data.page_info.has_next_page
             for d in data.nodes:
                 time_index.append(parser.parse(d.time))
                 try:
                     parsed_data.append(float(d.data))
-                except TypeError as e:
+                except ValueError as e:
                     parsed_data.append(d.data)
 
             if not has_another_page:

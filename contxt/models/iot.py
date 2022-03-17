@@ -36,6 +36,7 @@ class MetricWindow(Enum):
 class MetricField:
     label: str
     sourceId: str
+    alias: Optional[str] = None
 
 
 @dataclass

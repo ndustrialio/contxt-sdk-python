@@ -64,7 +64,10 @@ def get(clients: Clients, feed_key: str, fields: List[str], sort: str) -> None:
         raise click.ClickException(f"Feed with key {feed_key} does not exist.")
 
     items = clients.iot.get_fields_for_feed(feed.id)
-    print_table(items=items, keys=fields, sort_by=sort)
+    all_fields = []
+    for f in items:
+        all_fields.append(f)
+    print(Serializer.to_table(all_fields))
 
 
 @groupings.command("get")

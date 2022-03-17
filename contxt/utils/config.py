@@ -80,6 +80,15 @@ class EvaporatorConfig:
     slug: str
     label: str
     stateAttributes: Optional[Dict[str, str]] = field(default_factory=dict)
+    facilityAttributes: Optional[Dict[str, str]] = field(default_factory=dict)
+    constants: Optional[Dict[str, Any]] = field(default_factory=dict)
+
+
+@dataclass
+class CompressorConfig:
+    slug: str
+    label: str
+    stateAttributes: Optional[Dict[str, str]] = field(default_factory=dict)
 
 
 @dataclass
@@ -90,10 +99,17 @@ class BlastCellConfig:
 
 
 @dataclass
+class CurtailmentConfig:
+    stateAttributes: Optional[Dict[str, str]] = field(default_factory=dict)
+
+
+@dataclass
 class RefrigerationConfig:
     feedKey: str
     blastCells: Optional[List[BlastCellConfig]]
     evaporators: Optional[List[EvaporatorConfig]]
+    compressors: Optional[List[CompressorConfig]]
+    curtailment: Optional[CurtailmentConfig]
 
     def get_blast_cell_with_slug(self, slug: str) -> BlastCellConfig:
         for cell in self.blastCells:
@@ -104,6 +120,11 @@ class RefrigerationConfig:
         for evap in self.evaporators:
             if evap.slug == slug:
                 return evap
+
+    def get_compressor_with_slug(self, slug: str) -> CompressorConfig:
+        for comp in self.compressors:
+            if comp.slug == slug:
+                return comp
 
 
 @dataclass
@@ -117,6 +138,7 @@ class FacilityConfig:
     components: Optional[List[ComponentConfig]]
     rates: Optional[RateConfig] = None
     refrigeration: Optional[RefrigerationConfig] = None
+    mainServices: Optional[List[ComponentConfig]] = None
 
     def get_suggestions_project_by_id(self, project_id: str):
         for suggestion in self.suggestions:
