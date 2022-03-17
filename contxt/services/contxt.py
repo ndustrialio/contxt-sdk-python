@@ -26,7 +26,7 @@ class ContxtService(ConfiguredApi):
         ),
         ApiEnvironment(
             name="staging",
-            base_url="https://contxt-api.staging.ndustrial.io/v1",
+            base_url="https://contxt.api.staging.ndustrial.io/v1",
             client_id="qGzdTXcmB57zlTp86rYsivG9qEss1lbF",
         ),
     )
