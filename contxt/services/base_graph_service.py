@@ -39,9 +39,7 @@ class BaseGraphService(ConfiguredApi):
         if org_slug is None:
             raise Exception("No valid mapping of Organization ID to Nionic tenant")
         split = self.url.split("ndustrial.api")
-        self.url = (
-            self.url if org_slug == "ndustrial" else (split[0] + org_slug + ".api" + split[1])
-        ).rstrip("/")
+        self.url = (split[0] + org_slug + ".api" + split[1]).rstrip("/")
         return HTTPEndpoint(self.url, {"Authorization": f"Bearer {self.token_provider.access_token}"})
 
     def run(self, op: Operation, org_id: Optional[str] = None):
