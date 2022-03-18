@@ -26,7 +26,9 @@ class NionicService(BaseGraphService):
         facilities = (op + data).facilities
         return facilities
 
-    def create_facility(self, data: dict, organization_id: Optional[str] = None, slug: Optional[str] = None):
+    def create_facility(
+        self, data: dict, organization_id: Optional[str] = None, slug: Optional[str] = None
+    ):
         op = Operation(Mutation)
         op.create_facility(input={"facility": data}).__fields__("facility")
 
@@ -44,7 +46,13 @@ class NionicService(BaseGraphService):
         metric_labels = data.get("data").get("metricLabels")
         return metric_labels
 
-    def get_metric_data(self, label: str, source_id: str, organization_id: Optional[str] = None, slug: Optional[str] = None):
+    def get_metric_data(
+        self,
+        label: str,
+        source_id: str,
+        organization_id: Optional[str] = None,
+        slug: Optional[str] = None,
+    ):
         op = Operation(Query)
         fields = list(MetricData._ContainerTypeMeta__fields.keys())
         fields.remove("id")

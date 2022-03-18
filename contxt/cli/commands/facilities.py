@@ -27,7 +27,9 @@ def get(clients: Clients, org_id: Optional[str] = None, slug: Optional[str] = No
 @click.option("--slug", help="Organization slug, overrides org-id if set")
 @click.option("--input", required=True, type=click.File(), help="CSV of facilities to create")
 @click.pass_obj
-def create(clients: Clients, input: IO[str], org_id: Optional[str] = None, slug: Optional[str] = None) -> None:
+def create(
+    clients: Clients, input: IO[str], org_id: Optional[str] = None, slug: Optional[str] = None
+) -> None:
     """Create facilities from a CSV file, containing the columns:
 
     \b
@@ -49,4 +51,4 @@ def create(clients: Clients, input: IO[str], org_id: Optional[str] = None, slug:
         item_show_func=lambda f: f"Facility {f['name']}" if f else "",
     ) as facilities_:
         for f in facilities_:
-            clients.nionic.create_facility(data=f, organization_id=org_id, slug = slug)
+            clients.nionic.create_facility(data=f, organization_id=org_id, slug=slug)

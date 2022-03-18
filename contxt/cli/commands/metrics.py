@@ -33,7 +33,13 @@ def labels(clients: Clients, org_id: Optional[str] = None, slug: Optional[str] =
     "--label", required=True, help="Organization ID, defaults to first value in token if not specified"
 )
 @click.pass_obj
-def data(clients: Clients, source_id: str, label: str, org_id: Optional[str] = None, slug: Optional[str] = None) -> None:
+def data(
+    clients: Clients,
+    source_id: str,
+    label: str,
+    org_id: Optional[str] = None,
+    slug: Optional[str] = None,
+) -> None:
     """Get facilities"""
     facilities = clients.nionic.get_metric_data(label, source_id, org_id, slug).nodes
     print(Serializer.to_table(facilities))
