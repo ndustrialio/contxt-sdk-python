@@ -14,18 +14,20 @@ def facilities() -> None:
 
 @facilities.command()
 @click.option("--org-id", help="Organization ID, defaults to first value in token if not specified")
+@click.option("--slug", help="Organization slug, overrides org-id if both are set")
 @click.pass_obj
-def get(clients: Clients, org_id: Optional[str] = None) -> None:
+def get(clients: Clients, org_id: Optional[str] = None, slug: Optional[str] = None) -> None:
     """Get facilities"""
-    facilities = clients.nionic.get_facilities(org_id).nodes
+    facilities = clients.nionic.get_facilities(org_id, slug).nodes
     print(Serializer.to_table(facilities))
 
 
 @facilities.command()
-@click.option("--org-id", required=True, help="Organization ID")
+@click.option("--org-id", help="Organization ID, defaults to first value in token if none specified")
+@click.option("--slug", help="Organization slug, overrides org-id if set")
 @click.option("--input", required=True, type=click.File(), help="CSV of facilities to create")
 @click.pass_obj
-def create(clients: Clients, org_id: str, input: IO[str]) -> None:
+def create(clients: Clients, input: IO[str], org_id: Optional[str] = None, slug: Optional[str] = None) -> None:
     """Create facilities from a CSV file, containing the columns:
 
     \b
@@ -47,4 +49,4 @@ def create(clients: Clients, org_id: str, input: IO[str]) -> None:
         item_show_func=lambda f: f"Facility {f['name']}" if f else "",
     ) as facilities_:
         for f in facilities_:
-            clients.nionic.create_facility(data=f, organization_id=org_id)
+            clients.nionic.create_facility(data=f, organization_id=org_id, slug = slug)
