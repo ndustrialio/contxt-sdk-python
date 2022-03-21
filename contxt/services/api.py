@@ -188,6 +188,13 @@ class BaseGraphService(ConfiguredApi):
         super().__init__(env, auth, **kwargs)
         self.endpoint = RequestsEndpoint(f"{self.base_url}/graphql", session=self.session)
 
+    def query(self, query: str, variables: Optional[Any] = None) -> Dict:
+        """Send a GraphQL query"""
+        resp = self.post("graphql", json={"query": query, "variables": variables})
+        if "errors" in resp:
+            raise Exception(resp["errors"][0]["message"])
+        return resp["data"]
+
     def run(self, op: Operation) -> Any:
         data = self.endpoint(op)
         if "errors" in data:
