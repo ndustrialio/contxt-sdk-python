@@ -1,5 +1,5 @@
 from csv import DictReader
-from typing import IO, Optional
+from typing import IO
 
 import click
 
@@ -13,16 +13,14 @@ def facilities() -> None:
 
 
 @facilities.command()
-@click.option("--org-id", help="Organization ID, defaults to first value in token if not specified")
 @click.pass_obj
-def get(clients: Clients, org_id: Optional[str] = None) -> None:
+def get(clients: Clients) -> None:
     """Get facilities"""
-    facilities = clients.nionic.get_facilities(org_id).nodes
+    facilities = clients.nionic.get_facilities()
     print(Serializer.to_table(facilities))
 
 
 @facilities.command()
-@click.option("--org-id", required=True, help="Organization ID")
 @click.option("--input", required=True, type=click.File(), help="CSV of facilities to create")
 @click.pass_obj
 def create(clients: Clients, org_id: str, input: IO[str]) -> None:
@@ -47,4 +45,4 @@ def create(clients: Clients, org_id: str, input: IO[str]) -> None:
         item_show_func=lambda f: f"Facility {f['name']}" if f else "",
     ) as facilities_:
         for f in facilities_:
-            clients.nionic.create_facility(data=f, organization_id=org_id)
+            clients.nionic.create_facility(data=f)

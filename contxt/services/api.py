@@ -1,12 +1,14 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Dict, FrozenSet, Optional, Tuple
+from typing import Any, Dict, FrozenSet, Optional, Tuple
 
 import requests
 from requests import PreparedRequest, Response, Session
 from requests.adapters import HTTPAdapter
 from requests.auth import AuthBase
 from requests.exceptions import HTTPError
+from sgqlc.endpoint.requests import RequestsEndpoint
+from sgqlc.operation import Operation
 from urllib3.util.retry import Retry
 
 from ..auth import Auth, TokenProvider
@@ -179,3 +181,15 @@ class ConfiguredApi(Api, ABC):
     def _envs(cls) -> Tuple[ApiEnvironment, ...]:
         """Lists available environments."""
         pass
+
+
+class BaseGraphService(ConfiguredApi):
+    def __init__(self, auth: Auth, env: str, **kwargs) -> None:
+        super().__init__(env, auth, **kwargs)
+        self.endpoint = RequestsEndpoint(f"{self.base_url}/graphql", session=self.session)
+
+    def run(self, op: Operation) -> Any:
+        data = self.endpoint(op)
+        if "errors" in data:
+            raise Exception(data["errors"][0]["message"])
+        return data

@@ -2,7 +2,6 @@
 
 # flake8: noqa
 from .auth import AuthService
-from .base_graph_service import BaseGraphService
 from .bus import MessageBusService
 from .contxt import ContxtService
 from .contxt_deployments import ContxtDeploymentService
