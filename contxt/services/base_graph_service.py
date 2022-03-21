@@ -1,5 +1,3 @@
-from typing import Optional
-
 from sgqlc.endpoint.http import HTTPEndpoint
 from sgqlc.operation import Operation
 
@@ -34,19 +32,15 @@ class BaseGraphService(ConfiguredApi):
         self.token_provider = auth.get_token_provider(self.client_id)
         self.url = self.base_url
 
-    def _get_endpoint(self, org_id: Optional[str] = None):
-        org_slug = self.org_id_slugs.get(org_id, None)  # type: ignore
-        if org_slug is None:
+    def _get_endpoint(self, org_id_or_slug: str):
+        slug = self.org_id_slugs.get(org_id_or_slug) or org_id_or_slug
+        if slug is None:
             raise Exception("No valid mapping of Organization ID to Nionic tenant")
-        split = self.url.split("ndustrial.api")
-        self.url = (split[0] + org_slug + ".api" + split[1]).rstrip("/")
+        self.url = self.url.replace("ndustrial.api", f"{slug}.api").rstrip("/")
         return HTTPEndpoint(self.url, {"Authorization": f"Bearer {self.token_provider.access_token}"})
 
-    def run(self, op: Operation, org_id: Optional[str] = None):
+    def run(self, op: Operation, org_id: str):
         data = self._get_endpoint(org_id)(op)
-
         if "errors" in data:
-            print(data)
             raise Exception(data["errors"][0]["message"])
-
         return data
