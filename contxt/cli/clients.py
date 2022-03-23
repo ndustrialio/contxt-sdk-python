@@ -5,14 +5,12 @@ import click
 
 from contxt.auth.cli import CliAuth
 from contxt.services import (
-    AssetsService,
     ContxtDeploymentService,
     ContxtService,
     EmsService,
     EventsService,
-    FacilitiesService,
-    HealthService,
     IotService,
+    NionicService,
     SisService,
 )
 from contxt.utils import cachedproperty
@@ -44,10 +42,6 @@ class Clients:
         return CliAuth(env=self.env)
 
     @cachedproperty
-    def assets(self) -> AssetsService:
-        return AssetsService(auth=self.auth, env=self.env)
-
-    @cachedproperty
     def contxt(self) -> ContxtService:
         return ContxtService(auth=self.auth, env=self.env)
 
@@ -64,12 +58,8 @@ class Clients:
         return EventsService(auth=self.auth, env=self.env)
 
     @cachedproperty
-    def facilities(self) -> FacilitiesService:
-        return FacilitiesService(auth=self.auth, env=self.env)
-
-    @cachedproperty
-    def health(self) -> HealthService:
-        return HealthService(auth=self.auth, env=self.env)
+    def nionic(self) -> NionicService:
+        return NionicService(auth=self.auth, env=self.env, org_id=self.org_id)
 
     @cachedproperty
     def iot(self) -> IotService:

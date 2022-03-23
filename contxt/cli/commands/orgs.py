@@ -4,7 +4,7 @@ import click
 
 from contxt.cli.clients import Clients
 from contxt.cli.utils import fields_option, print_table, sort_option
-from contxt.models.facilities import Organization
+from contxt.models.contxt import Organization
 
 
 @click.group()

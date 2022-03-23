@@ -37,25 +37,6 @@ def timed(func: Optional[Callable] = None, *, printer: Callable[[str], None] = p
     return wrapper
 
 
-# FIXME: does not handle nested dictionaries
-def dict_diff(d1: Dict, d2: Dict) -> Dict:
-    """Compute the set difference `d1` - `d2`"""
-
-    def flatten(obj):
-        if isinstance(obj, (list, tuple)):
-            return tuple([flatten(o) for o in obj])
-        elif isinstance(obj, dict):
-            return tuple([(flatten(k), flatten(v)) for k, v in sorted(obj.items())])
-        return obj
-
-    def expand(obj):
-        if isinstance(obj, (set, tuple)):
-            return {k: expand(v) for k, v in obj}
-        return obj
-
-    return expand(set(flatten(d1)) - set(flatten(d2)))
-
-
 # Source: https://boltons.readthedocs.io/en/latest/_modules/boltons/cacheutils.html#cachedproperty
 class cachedproperty(object):
     """The ``cachedproperty`` is used similar to :class:`property`, except

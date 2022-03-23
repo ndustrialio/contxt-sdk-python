@@ -2,17 +2,9 @@ from datetime import date, datetime, timedelta, timezone
 from typing import Iterable, List, Optional
 
 from ..auth import Auth
-from ..models.ems import (
-    Facility,
-    MainService,
-    MetricValue,
-    ResourceType,
-    UtilityContract,
-    UtilitySpend,
-    UtilityUsage,
-)
+from ..models.ems import Facility, MainService, ResourceType, UtilityContract, UtilitySpend, UtilityUsage
 from .api import ApiEnvironment, ConfiguredApi
-from .pagination import PagedRecords, PageOptions
+from .pagination import PagedRecords
 
 
 class EmsService(ConfiguredApi):
@@ -36,24 +28,6 @@ class EmsService(ConfiguredApi):
 
     def get_facility(self, id: int) -> Facility:
         return Facility.from_api(self.get(f"facilities/{id}"))
-
-    def get_metric_values(
-        self,
-        asset_id: str,
-        metric_label: Optional[str] = None,
-        params: Optional[dict] = None,
-        page_options: Optional[PageOptions] = None,
-    ) -> Iterable[MetricValue]:
-        assert (
-            params is None
-            or sum([key not in ["effective_end_date", "effective_start_date"] for key in params]) == 0
-        ), f"Unrecognized query parameters: {params}"
-        resp = self.get(
-            "assets/metrics/values",
-            params={"asset_ids": asset_id, "metric_labels": metric_label, **(params or {})},
-        )
-        metric_values = resp[asset_id][metric_label]
-        return [MetricValue.from_api(value) for value in metric_values]
 
     def get_main_services(
         self, facility_id: int, resource_type: Optional[ResourceType] = None

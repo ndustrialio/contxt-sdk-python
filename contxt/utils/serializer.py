@@ -69,9 +69,6 @@ class Serializer:
         elif hasattr(obj, "_ast"):
             # Abstract syntax tree
             return Serializer.to_dict(obj._ast())
-        elif hasattr(obj, "__iter__") and not isinstance(obj, str):
-            # Iterables (except strings)
-            return [Serializer.to_dict(v, cls_key) for v in obj]
         elif hasattr(obj, "__dict__"):
             # General object
             d = {
@@ -82,6 +79,9 @@ class Serializer:
             if cls_key is not None and hasattr(obj, "__class__"):
                 d[cls_key] = obj.__class__.__name__
             return d
+        elif hasattr(obj, "__iter__") and not isinstance(obj, str):
+            # Iterables (except strings)
+            return [Serializer.to_dict(v, cls_key) for v in obj]
         else:
             # Fallback to self
             return obj
