@@ -142,3 +142,6 @@ class DlqConsumer:
                     if self.acknowledge:
                         logger.debug(f"acknowledging DLQ message {queue_message['id']}")
                         mb.acknowledge(queue_message["result"]["id"])
+
+            if self.acknowledge:
+                mb.resolveAcks(subscription_id)

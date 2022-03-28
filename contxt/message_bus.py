@@ -86,7 +86,7 @@ class MessageBus:
             )
         )
 
-    def recv(self, subscription_id):
+    def recv(self, subscription_id, acks_only=False):
         receipt = json.loads(self.ws.recv())
         while "id" in receipt and receipt["id"] != subscription_id:
             if uuid.UUID(receipt["id"]) in self.acks:
@@ -96,7 +96,24 @@ class MessageBus:
                         f"Error received from acknowledgement of message {self.acks[receipt['id']]}",
                         receipt["error"],
                     )
-                self.acks.remove(receipt["id"])
+                del self.acks[uuid.UUID(receipt["id"])]
+                if acks_only and len(self.acks) == 0:
+                    return receipt
             receipt = json.loads(self.ws.recv())
 
         return receipt
+
+    def resolveAcks(self, subscription_id):
+        total = len(self.acks)
+        if total == 0:
+            return
+        logger.info(f"waiting for {total} ack receipts...")
+        try:
+            while len(self.acks) > 0:
+                percentage = ((total - len(self.acks)) / total) * 100
+                print(f"{percentage:.0f}%", end="\r")
+                self.recv(subscription_id, acks_only=True)
+            logger.info("done")
+        except websocket.WebSocketTimeoutException:
+            percentage = ((total - len(self.acks)) / total) * 100
+            logger.warn(f"{percentage:.0f}% with timeout")
