@@ -23,20 +23,20 @@ def get(clients: Clients) -> None:
 @facilities.command()
 @click.option("--input", required=True, type=click.File(), help="CSV of facilities to create")
 @click.pass_obj
-def create(clients: Clients, org_id: str, input: IO[str]) -> None:
+def create(clients: Clients, input: IO[str]) -> None:
     """Create facilities from a CSV file, containing the columns:
 
     \b
     - name: string
-    - timezone: IANA timezone database name (ex: America/New_York)
+    - timezone_name: IANA timezone database name (ex: America/New_York)
     """
     # Parse file
     try:
         facilities = [
-            dict(name=r["name"], slug=r["slug"], timezone=r["timezone"]) for r in DictReader(input)
+            dict(name=r["name"], slug=r["slug"], timezone_name=r["timezone_name"]) for r in DictReader(input)
         ]
     except KeyError:
-        raise click.ClickException("The following columns are required: name, slug, timezone")
+        raise click.ClickException("The following columns are required: name, slug, timezone_name")
 
     # Create facilities
     with click.progressbar(
