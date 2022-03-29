@@ -33,7 +33,8 @@ def create(clients: Clients, input: IO[str]) -> None:
     # Parse file
     try:
         facilities = [
-            dict(name=r["name"], slug=r["slug"], timezone_name=r["timezone_name"]) for r in DictReader(input)
+            dict(name=r["name"], slug=r["slug"], timezone_name=r["timezone_name"])
+            for r in DictReader(input)
         ]
     except KeyError:
         raise click.ClickException("The following columns are required: name, slug, timezone_name")

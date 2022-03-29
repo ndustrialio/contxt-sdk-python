@@ -1,15 +1,16 @@
-from sgqlc.types import String, Int, Arg, Enum, Field, Input, Type, list_of, non_null
+from sgqlc.types import Arg, Enum, Field, Input, Int, String, Type, list_of, non_null
 from sgqlc.types.relay import Node
 
+
 class Facility(Type, Node):
-    id = Field(non_null(Int), graphql_name='id')
-    name = Field(non_null(String), graphql_name='name')
-    slug = Field(non_null(String), graphql_name='slug')
-    address = Field(String, graphql_name='address')
-    city = Field(String, graphql_name='city')
-    state = Field(String, graphql_name='state')
-    zip = Field(String, graphql_name='zip')
-    timezone_name = Field(String, graphql_name='timezoneName')
+    id = Field(non_null(Int), graphql_name="id")
+    name = Field(non_null(String), graphql_name="name")
+    slug = Field(non_null(String), graphql_name="slug")
+    address = Field(String, graphql_name="address")
+    city = Field(String, graphql_name="city")
+    state = Field(String, graphql_name="state")
+    zip = Field(String, graphql_name="zip")
+    timezone_name = Field(String, graphql_name="timezoneName")
 
 
 class FacilitiesConnection(Type, Node):
