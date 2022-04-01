@@ -55,5 +55,5 @@ def create(clients: Clients, project_id: str, slug: str, type: str, deployment_s
 @click.argument("id")
 @click.pass_obj
 def delete(clients: Clients, id: str) -> None:
-    """Create service"""
+    """Delete service"""
     clients.contxt_deployments.delete(f"{clients.org_id}/services/{id}")

@@ -33,7 +33,7 @@ def get(clients: Clients, fields: List[str], sort: str, cluster_slug: Optional[s
 @click.argument("slug")
 @click.pass_obj
 def login(clients: Clients, slug: str) -> None:
-    """Get clusters"""
+    """Get cluster config"""
     try:
         clusters = clients.contxt_deployments.get_clusters(clients.org_id)
         cluster_host = next((cluster.host for cluster in clusters if cluster.slug == slug), None)
