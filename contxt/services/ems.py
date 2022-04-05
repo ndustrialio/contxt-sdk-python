@@ -110,5 +110,7 @@ class EmsService(ConfiguredApi):
 
     def get_utility_contracts_for_facility(self, facility_id: int) -> Iterable[UtilityContract]:
         return PagedRecords(
-            api=self, url=f"{self.org_id}/facilities/{facility_id}/contracts", record_parser=UtilityContract.from_api
+            api=self,
+            url=f"{self.org_id}/facilities/{facility_id}/contracts",
+            record_parser=UtilityContract.from_api,
         )
