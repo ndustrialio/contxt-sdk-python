@@ -23,11 +23,12 @@ class EmsService(ConfiguredApi):
         ),
     )
 
-    def __init__(self, auth: Auth, env: str = "production", **kwargs) -> None:
+    def __init__(self, auth: Auth, org_id: str, env: str = "production", **kwargs) -> None:
         super().__init__(env=env, auth=auth, **kwargs)
+        self.org_id = org_id
 
     def get_facility(self, id: int) -> Facility:
-        return Facility.from_api(self.get(f"facilities/{id}"))
+        return Facility.from_api(self.get(f"{self.org_id}/facilities/{id}"))
 
     def get_main_services(
         self, facility_id: int, resource_type: Optional[ResourceType] = None
@@ -54,7 +55,7 @@ class EmsService(ConfiguredApi):
         Note `start_date` defaults to 10 years ago (the API's maximum limit) and
         `end_date` defaults to today."""
         resp = self.get(
-            f"facilities/{facility_id}/utility/spend/monthly",
+            f"{self.org_id}/facilities/{facility_id}/utility/spend/monthly",
             params={
                 "type": resource_type.value,
                 "date_start": start_date.strftime("%Y-%m"),
@@ -78,7 +79,7 @@ class EmsService(ConfiguredApi):
         Note `start_date` defaults to 10 years ago (the API's maximum limit) and
         `end_date` defaults to today."""
         resp = self.get(
-            f"facilities/{facility_id}/utility/usage/monthly",
+            f"{self.org_id}/facilities/{facility_id}/utility/usage/monthly",
             params={
                 "type": resource_type.value,
                 "date_start": start_date.strftime("%Y-%m"),
@@ -98,7 +99,7 @@ class EmsService(ConfiguredApi):
     ) -> UtilityUsage:
         """Get utility usage for facility `facility_id` and resource `resource_type`"""
         resp = self.get(
-            f"facilities/{facility_id}/usage/{interval}",
+            f"{self.org_id}/facilities/{facility_id}/usage/{interval}",
             params={
                 "type": resource_type.value,
                 "time_start": int(start.timestamp()),
@@ -109,5 +110,5 @@ class EmsService(ConfiguredApi):
 
     def get_utility_contracts_for_facility(self, facility_id: int) -> Iterable[UtilityContract]:
         return PagedRecords(
-            api=self, url=f"facilities/{facility_id}/contracts", record_parser=UtilityContract.from_api
+            api=self, url=f"{self.org_id}/facilities/{facility_id}/contracts", record_parser=UtilityContract.from_api
         )

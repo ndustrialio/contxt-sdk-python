@@ -37,7 +37,7 @@ def data() -> None:
 
 
 @iot.command()
-@fields_option(default=["id", "key", "facility_id"], obj=Feed)
+@fields_option(default="id, key, facility_id", obj=Feed)
 @sort_option(default="id")
 @click.option(
     "--facility_id",
@@ -54,7 +54,7 @@ def feeds(clients: Clients, fields: List[str], sort: str, facility_id: Optional[
 
 @fields.command()
 @click.argument("feed_key", type=str)
-@fields_option(default=["id", "feed_key", "name", "field_human_name"], obj=Field)
+@fields_option(default="id, feed_key, name, field_human_name", obj=Field)
 @sort_option(default="id")
 @click.pass_obj
 def get(clients: Clients, feed_key: str, fields: List[str], sort: str) -> None:
@@ -69,7 +69,7 @@ def get(clients: Clients, feed_key: str, fields: List[str], sort: str) -> None:
 
 @groupings.command("get")
 @click.argument("facility_id", type=int)
-@fields_option(default=["id", "label", "slug", "description"], obj=FieldGrouping)
+@fields_option(default="id, label, slug, description", obj=FieldGrouping)
 @sort_option(default="id")
 @click.pass_obj
 def groupings_get(clients: Clients, facility_id: int, fields: List[str], sort: str) -> None:

@@ -16,7 +16,7 @@ def clusters() -> None:
 
 @clusters.command()
 @click.argument("cluster_slug", required=False)
-@fields_option(default=["id", "host", "slug"], obj=Cluster)
+@fields_option(default="id, host, slug", obj=Cluster)
 @sort_option(default="id")
 @click.pass_obj
 def get(clients: Clients, fields: List[str], sort: str, cluster_slug: Optional[str]) -> None:
