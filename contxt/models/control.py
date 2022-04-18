@@ -28,7 +28,7 @@ class Suggestion:
     end_time: datetime
     summary: str
     components: List[ControllableComponent]
-    start_control_upon_approval: Optional[bool] = False
+    start_control_upon_approval: Optional[bool] = None
     approval_deadline_time: Optional[datetime] = None
     control_start_deadline_time: Optional[datetime] = None
     metadata: Optional[Dict[AnyStr, Any]] = None

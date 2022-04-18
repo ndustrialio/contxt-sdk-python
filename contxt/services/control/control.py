@@ -334,7 +334,8 @@ class ControlService(BaseGraphService):
                                   project_id=suggestion.project_id,
                                   metadata=suggestion.metadata,
                                   control_start_deadline_time=suggestion.control_start_deadline_time,
-                                  approval_deadline_time=suggestion.approval_deadline_time)
+                                  approval_deadline_time=suggestion.approval_deadline_time,
+                                  start_control_upon_approval=suggestion.start_control_upon_approval)
 
     def adjust_proposal_end(self, proposal_id: str, new_end_time: datetime) -> schema.EventProposal:
         op = Operation(schema.Mutation)
@@ -378,8 +379,8 @@ class ControlService(BaseGraphService):
     def propose_event(self, facility_id: int, project_id: str, start_time: datetime,
                       end_time: datetime, components: List[ComponentToControlInputRecordInput],
                       summary: str, control_start_deadline_time: Optional[datetime] = None,
-                      approval_deadline_time: Optional[datetime] = None, metadata: Dict[AnyStr, Any] = None
-                      ) -> schema.EventProposal:
+                      approval_deadline_time: Optional[datetime] = None, metadata: Dict[AnyStr, Any] = None,
+                      start_control_upon_approval: Optional[bool] = None) -> schema.EventProposal:
 
         op = Operation(schema.Mutation)
 
@@ -388,6 +389,8 @@ class ControlService(BaseGraphService):
         event_proposal.projectid = project_id
         event_proposal.starttime = str(start_time.astimezone(pytz.utc))
         event_proposal.endtime = str(end_time.astimezone(pytz.utc))
+        if start_control_upon_approval:
+            event_proposal.startcontroluponapproval = start_control_upon_approval
         if control_start_deadline_time:
             event_proposal.controlstartdeadlinetime = str(control_start_deadline_time)
         if approval_deadline_time:
