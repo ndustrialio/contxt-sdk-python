@@ -15,7 +15,7 @@ def edge_nodes() -> None:
 @edge_nodes.command()
 @click.argument("org_id")
 @click.argument("project_id")
-@fields_option(default=["id", "name", "stack_id", "description"], obj=EdgeNode)
+@fields_option(default="id, name, stack_id, description", obj=EdgeNode)
 @sort_option(default="id")
 @click.pass_obj
 def get(clients: Clients, org_id: str, project_id: int, fields: List[str], sort: str) -> None:

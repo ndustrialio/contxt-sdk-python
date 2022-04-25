@@ -15,7 +15,7 @@ def services() -> None:
 @services.command()
 @click.argument("id", default="")  # HACK: make an optional argument
 @click.pass_obj
-@fields_option(default=["id", "slug", "project_id", "description"], obj=Service)
+@fields_option(default="id, slug, project_id, description", obj=Service)
 @sort_option(default="slug")
 def get(clients: Clients, id: str, fields: List[str], sort: str) -> None:
     """Get service(s)"""
