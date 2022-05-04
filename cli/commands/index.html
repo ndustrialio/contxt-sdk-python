@@ -56,14 +56,6 @@
                     </li>
                     <li class="toctree-l1 current"><a class="reference internal current" href="./">Commands</a>
     <ul class="current">
-    <li class="toctree-l2"><a class="reference internal" href="#assets">assets</a>
-        <ul>
-    <li class="toctree-l3"><a class="reference internal" href="#get">get</a>
-    </li>
-    <li class="toctree-l3"><a class="reference internal" href="#types">types</a>
-    </li>
-        </ul>
-    </li>
     <li class="toctree-l2"><a class="reference internal" href="#auth">auth</a>
         <ul>
     <li class="toctree-l3"><a class="reference internal" href="#login">login</a>
@@ -76,7 +68,7 @@
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#clusters">clusters</a>
         <ul>
-    <li class="toctree-l3"><a class="reference internal" href="#get_1">get</a>
+    <li class="toctree-l3"><a class="reference internal" href="#get">get</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#login_1">login</a>
     </li>
@@ -88,7 +80,7 @@
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#edge-nodes">edge-nodes</a>
         <ul>
-    <li class="toctree-l3"><a class="reference internal" href="#get_2">get</a>
+    <li class="toctree-l3"><a class="reference internal" href="#get_1">get</a>
     </li>
         </ul>
     </li>
@@ -112,7 +104,7 @@
         <ul>
     <li class="toctree-l3"><a class="reference internal" href="#create">create</a>
     </li>
-    <li class="toctree-l3"><a class="reference internal" href="#get_3">get</a>
+    <li class="toctree-l3"><a class="reference internal" href="#get_2">get</a>
     </li>
         </ul>
     </li>
@@ -122,7 +114,7 @@
         <ul>
     <li class="toctree-l4"><a class="reference internal" href="#delete">delete</a>
     </li>
-    <li class="toctree-l4"><a class="reference internal" href="#get_4">get</a>
+    <li class="toctree-l4"><a class="reference internal" href="#get_3">get</a>
     </li>
         </ul>
     </li>
@@ -134,7 +126,7 @@
     </li>
     <li class="toctree-l4"><a class="reference internal" href="#delete_1">delete</a>
     </li>
-    <li class="toctree-l4"><a class="reference internal" href="#get_5">get</a>
+    <li class="toctree-l4"><a class="reference internal" href="#get_4">get</a>
     </li>
     <li class="toctree-l4"><a class="reference internal" href="#unprovisioned">unprovisioned</a>
     </li>
@@ -146,15 +138,23 @@
     </li>
     <li class="toctree-l4"><a class="reference internal" href="#create_2">create</a>
     </li>
-    <li class="toctree-l4"><a class="reference internal" href="#get_6">get</a>
+    <li class="toctree-l4"><a class="reference internal" href="#get_5">get</a>
     </li>
         </ul>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#metrics">metrics</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#data_1">data</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#labels">labels</a>
     </li>
         </ul>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#orgs">orgs</a>
         <ul>
-    <li class="toctree-l3"><a class="reference internal" href="#get_7">get</a>
+    <li class="toctree-l3"><a class="reference internal" href="#get_6">get</a>
     </li>
         </ul>
     </li>
@@ -164,7 +164,7 @@
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#delete_2">delete</a>
     </li>
-    <li class="toctree-l3"><a class="reference internal" href="#get_8">get</a>
+    <li class="toctree-l3"><a class="reference internal" href="#get_7">get</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#update_1">update</a>
     </li>
@@ -176,7 +176,7 @@
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#delete_3">delete</a>
     </li>
-    <li class="toctree-l3"><a class="reference internal" href="#get_9">get</a>
+    <li class="toctree-l3"><a class="reference internal" href="#get_8">get</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#update_2">update</a>
     </li>
@@ -188,7 +188,7 @@
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#delete_4">delete</a>
     </li>
-    <li class="toctree-l3"><a class="reference internal" href="#get_10">get</a>
+    <li class="toctree-l3"><a class="reference internal" href="#get_9">get</a>
     </li>
         </ul>
     </li>
@@ -198,7 +198,7 @@
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#delete_5">delete</a>
     </li>
-    <li class="toctree-l3"><a class="reference internal" href="#get_11">get</a>
+    <li class="toctree-l3"><a class="reference internal" href="#get_10">get</a>
     </li>
         </ul>
     </li>
@@ -262,34 +262,6 @@
   -V, --version               Show the version and exit.
   --help                      Show this message and exit.
 </code></pre>
-<h2 id="assets">assets<a class="headerlink" href="#assets" title="Permanent link">&para;</a></h2>
-<p>Assets.</p>
-<p><strong>Usage:</strong></p>
-<pre><code>contxt assets [OPTIONS] COMMAND [ARGS]...
-</code></pre>
-<p><strong>Options:</strong></p>
-<pre><code>  --help  Show this message and exit.
-</code></pre>
-<h3 id="get">get<a class="headerlink" href="#get" title="Permanent link">&para;</a></h3>
-<p>Get assets</p>
-<p><strong>Usage:</strong></p>
-<pre><code>contxt assets get [OPTIONS] TYPE
-</code></pre>
-<p><strong>Options:</strong></p>
-<pre><code>  --fields TEXT  Comma-delimited list of fields to return
-  --sort TEXT    Field to sort by
-  --help         Show this message and exit.
-</code></pre>
-<h3 id="types">types<a class="headerlink" href="#types" title="Permanent link">&para;</a></h3>
-<p>Get asset types</p>
-<p><strong>Usage:</strong></p>
-<pre><code>contxt assets types [OPTIONS]
-</code></pre>
-<p><strong>Options:</strong></p>
-<pre><code>  --fields TEXT  Comma-delimited list of fields to return
-  --sort TEXT    Field to sort by
-  --help         Show this message and exit.
-</code></pre>
 <h2 id="auth">auth<a class="headerlink" href="#auth" title="Permanent link">&para;</a></h2>
 <p>Authenticate with Contxt.</p>
 <p><strong>Usage:</strong></p>
@@ -330,7 +302,7 @@
 <p><strong>Options:</strong></p>
 <pre><code>  --help  Show this message and exit.
 </code></pre>
-<h3 id="get_1">get<a class="headerlink" href="#get_1" title="Permanent link">&para;</a></h3>
+<h3 id="get">get<a class="headerlink" href="#get" title="Permanent link">&para;</a></h3>
 <p>Get clusters</p>
 <p><strong>Usage:</strong></p>
 <pre><code>contxt clusters get [OPTIONS] [CLUSTER_SLUG]
@@ -341,7 +313,7 @@
   --help         Show this message and exit.
 </code></pre>
 <h3 id="login_1">login<a class="headerlink" href="#login_1" title="Permanent link">&para;</a></h3>
-<p>Get clusters</p>
+<p>Get cluster config</p>
 <p><strong>Usage:</strong></p>
 <pre><code>contxt clusters login [OPTIONS] SLUG
 </code></pre>
@@ -358,14 +330,11 @@
                                   this cluster. You will need to reference
                                   this in other commands so it's ideal to make
                                   this value easy to remember
-
   --description TEXT              Information about what this cluster is for
                                   and what environment it belongs to
-
   --environment-type [production|nonproduction|blended]
   --certificate-authority TEXT    Base64 encoded certificate authority (CA)
                                   for the cluster
-
   --help                          Show this message and exit.
 </code></pre>
 <h3 id="update">update<a class="headerlink" href="#update" title="Permanent link">&para;</a></h3>
@@ -377,7 +346,6 @@
 <pre><code>  --host TEXT
   --description TEXT              Information about what this cluster is for
                                   and what environment it belongs to
-
   --environment-type [production|nonproduction|blended]
   --certificate-authority TEXT
   --help                          Show this message and exit.
@@ -390,7 +358,7 @@
 <p><strong>Options:</strong></p>
 <pre><code>  --help  Show this message and exit.
 </code></pre>
-<h3 id="get_2">get<a class="headerlink" href="#get_2" title="Permanent link">&para;</a></h3>
+<h3 id="get_1">get<a class="headerlink" href="#get_1" title="Permanent link">&para;</a></h3>
 <p>Get edge nodes for a project</p>
 <p><strong>Usage:</strong></p>
 <pre><code>contxt edge-nodes get [OPTIONS] ORG_ID PROJECT_ID
@@ -498,24 +466,22 @@
 <p>Create facilities from a CSV file, containing the columns:</p>
 <ul>
 <li>name: string</li>
-<li>timezone: IANA timezone database name (ex: America/New_York)</li>
+<li>timezone_name: IANA timezone database name (ex: America/New_York)</li>
 </ul>
 <p><strong>Usage:</strong></p>
-<pre><code>contxt facilities create [OPTIONS] ORG_ID
+<pre><code>contxt facilities create [OPTIONS]
 </code></pre>
 <p><strong>Options:</strong></p>
 <pre><code>  --input FILENAME  CSV of facilities to create  [required]
   --help            Show this message and exit.
 </code></pre>
-<h3 id="get_3">get<a class="headerlink" href="#get_3" title="Permanent link">&para;</a></h3>
+<h3 id="get_2">get<a class="headerlink" href="#get_2" title="Permanent link">&para;</a></h3>
 <p>Get facilities</p>
 <p><strong>Usage:</strong></p>
 <pre><code>contxt facilities get [OPTIONS]
 </code></pre>
 <p><strong>Options:</strong></p>
-<pre><code>  --fields TEXT  Comma-delimited list of fields to return
-  --sort TEXT    Field to sort by
-  --help         Show this message and exit.
+<pre><code>  --help  Show this message and exit.
 </code></pre>
 <h2 id="iot">iot<a class="headerlink" href="#iot" title="Permanent link">&para;</a></h2>
 <p>Internet-of-Things.</p>
@@ -542,15 +508,13 @@
 <pre><code>  --output-id INTEGER             Output ID to delete from  [required]
   --field-human-name TEXT         The field to delete from. Ex: power.demand,
                                   power.usage  [required]
-
   --interval [0|60|900|3600]      Time interval  [required]
   --time [%Y-%m-%d|%Y-%m-%dT%H:%M:%S|%Y-%m-%d %H:%M:%S]
                                   The timestamp of the datapoint. Ex:
                                   2020-07-21T05:31:00Z  [required]
-
   --help                          Show this message and exit.
 </code></pre>
-<h4 id="get_4">get<a class="headerlink" href="#get_4" title="Permanent link">&para;</a></h4>
+<h4 id="get_3">get<a class="headerlink" href="#get_3" title="Permanent link">&para;</a></h4>
 <p>Get field data</p>
 <p><strong>Usage:</strong></p>
 <pre><code>contxt iot data get [OPTIONS] FEED_ID
@@ -600,7 +564,7 @@
 <p><strong>Options:</strong></p>
 <pre><code>  --help  Show this message and exit.
 </code></pre>
-<h4 id="get_5">get<a class="headerlink" href="#get_5" title="Permanent link">&para;</a></h4>
+<h4 id="get_4">get<a class="headerlink" href="#get_4" title="Permanent link">&para;</a></h4>
 <p>Get fields</p>
 <p><strong>Usage:</strong></p>
 <pre><code>contxt iot fields get [OPTIONS] FEED_KEY
@@ -647,7 +611,7 @@
   --field-category-id TEXT  [required]
   --help                    Show this message and exit.
 </code></pre>
-<h4 id="get_6">get<a class="headerlink" href="#get_6" title="Permanent link">&para;</a></h4>
+<h4 id="get_5">get<a class="headerlink" href="#get_5" title="Permanent link">&para;</a></h4>
 <p>Get field groupings</p>
 <p><strong>Usage:</strong></p>
 <pre><code>contxt iot groupings get [OPTIONS] FACILITY_ID
@@ -657,6 +621,34 @@
   --sort TEXT    Field to sort by
   --help         Show this message and exit.
 </code></pre>
+<h2 id="metrics">metrics<a class="headerlink" href="#metrics" title="Permanent link">&para;</a></h2>
+<p>Metrics.</p>
+<p><strong>Usage:</strong></p>
+<pre><code>contxt metrics [OPTIONS] COMMAND [ARGS]...
+</code></pre>
+<p><strong>Options:</strong></p>
+<pre><code>  --help  Show this message and exit.
+</code></pre>
+<h3 id="data_1">data<a class="headerlink" href="#data_1" title="Permanent link">&para;</a></h3>
+<p>Get facilities</p>
+<p><strong>Usage:</strong></p>
+<pre><code>contxt metrics data [OPTIONS]
+</code></pre>
+<p><strong>Options:</strong></p>
+<pre><code>  --source-id TEXT  Organization ID, defaults to first value in token if not
+                    specified  [required]
+  --label TEXT      Organization ID, defaults to first value in token if not
+                    specified  [required]
+  --help            Show this message and exit.
+</code></pre>
+<h3 id="labels">labels<a class="headerlink" href="#labels" title="Permanent link">&para;</a></h3>
+<p>Get Metric Labels</p>
+<p><strong>Usage:</strong></p>
+<pre><code>contxt metrics labels [OPTIONS]
+</code></pre>
+<p><strong>Options:</strong></p>
+<pre><code>  --help  Show this message and exit.
+</code></pre>
 <h2 id="orgs">orgs<a class="headerlink" href="#orgs" title="Permanent link">&para;</a></h2>
 <p>Organizations.</p>
 <p><strong>Usage:</strong></p>
@@ -665,7 +657,7 @@
 <p><strong>Options:</strong></p>
 <pre><code>  --help  Show this message and exit.
 </code></pre>
-<h3 id="get_7">get<a class="headerlink" href="#get_7" title="Permanent link">&para;</a></h3>
+<h3 id="get_6">get<a class="headerlink" href="#get_6" title="Permanent link">&para;</a></h3>
 <p>Get organizations</p>
 <p><strong>Usage:</strong></p>
 <pre><code>contxt orgs get [OPTIONS]
@@ -706,7 +698,7 @@
 <p><strong>Options:</strong></p>
 <pre><code>  --help  Show this message and exit.
 </code></pre>
-<h3 id="get_8">get<a class="headerlink" href="#get_8" title="Permanent link">&para;</a></h3>
+<h3 id="get_7">get<a class="headerlink" href="#get_7" title="Permanent link">&para;</a></h3>
 <p>Get project environment(s)</p>
 <p><strong>Usage:</strong></p>
 <pre><code>contxt project-envs get [OPTIONS] PROJECT_SLUG
@@ -759,7 +751,7 @@
 <p><strong>Options:</strong></p>
 <pre><code>  --help  Show this message and exit.
 </code></pre>
-<h3 id="get_9">get<a class="headerlink" href="#get_9" title="Permanent link">&para;</a></h3>
+<h3 id="get_8">get<a class="headerlink" href="#get_8" title="Permanent link">&para;</a></h3>
 <p>Get project(s)</p>
 <p><strong>Usage:</strong></p>
 <pre><code>contxt projects get [OPTIONS] [SLUG]
@@ -811,7 +803,7 @@
 <p><strong>Options:</strong></p>
 <pre><code>  --help  Show this message and exit.
 </code></pre>
-<h3 id="get_10">get<a class="headerlink" href="#get_10" title="Permanent link">&para;</a></h3>
+<h3 id="get_9">get<a class="headerlink" href="#get_9" title="Permanent link">&para;</a></h3>
 <p>Get service instance(s)</p>
 <p><strong>Usage:</strong></p>
 <pre><code>contxt service-instances get [OPTIONS]
@@ -843,14 +835,14 @@
   --help                          Show this message and exit.
 </code></pre>
 <h3 id="delete_5">delete<a class="headerlink" href="#delete_5" title="Permanent link">&para;</a></h3>
-<p>Create service</p>
+<p>Delete service</p>
 <p><strong>Usage:</strong></p>
 <pre><code>contxt services delete [OPTIONS] ID
 </code></pre>
 <p><strong>Options:</strong></p>
 <pre><code>  --help  Show this message and exit.
 </code></pre>
-<h3 id="get_11">get<a class="headerlink" href="#get_11" title="Permanent link">&para;</a></h3>
+<h3 id="get_10">get<a class="headerlink" href="#get_10" title="Permanent link">&para;</a></h3>
 <p>Get service(s)</p>
 <p><strong>Usage:</strong></p>
 <pre><code>contxt services get [OPTIONS] [ID]
