@@ -131,8 +131,7 @@ def bills(
     clients: Clients, facility_id: int, start: datetime, end: datetime, fields: List[str], sort: str
 ) -> None:
     """Get utility bills"""
-    facility = clients.facilities.get_facility_with_id(facility_id)
-    items = clients.sis.get_statements(facility_id=facility.id, start=start, end=end)
+    items = clients.sis.get_statements(facility_id=facility_id, start=start, end=end)
     print_table(items=items, keys=fields, sort_by=sort)
 
 
@@ -160,8 +159,9 @@ def export(
     with click.progressbar(
         facility_ids, label="Downloading data", item_show_func=lambda f: f"Facility {f}" if f else ""
     ) as facility_ids_:
-        for id in facility_ids_:
-            facility = clients.facilities.get_facility_with_id(id)
+        for facility in clients.nionic.get_facilities():
+            if facility.id not in facility_ids_:
+                continue
             fpath = output / facility.slug
 
             # Utility bills
