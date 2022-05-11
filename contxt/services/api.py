@@ -185,8 +185,12 @@ class ConfiguredGraphApi(Api, ABC):
 class AuthService(Api):
     """Auth API client"""
 
-    def __init__(self, contxt_env: ContxtEnvironmentConfig) -> None:
-        super().__init__(f'https://{contxt_env.apiEnvironment.authProvider}')
+    def __init__(self, contxt_env: ContxtEnvironmentConfig = None) -> None:
+        if not contxt_env:
+            base_auth_url = 'https://contxtauth.com/v1'
+        else:
+            base_auth_url = f'https://{contxt_env.apiEnvironment.authProvider}'
+        super().__init__(base_auth_url)
         self.service_env = contxt_env
         self.token_cache = StoredTokenCache()
 

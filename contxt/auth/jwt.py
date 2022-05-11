@@ -4,7 +4,7 @@ from typing import Any, Dict, List, Union
 
 from jwt import PyJWTError, algorithms, decode, get_unverified_header
 
-from ..services import AuthService
+from ..services.api import AuthService
 from ..utils import make_logger
 
 logger = make_logger(__name__)
