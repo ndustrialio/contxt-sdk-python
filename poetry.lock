@@ -686,7 +686,7 @@ python-versions = "*"
 
 [[package]]
 name = "types-requests"
-version = "2.27.14"
+version = "2.27.25"
 description = "Typing stubs for requests"
 category = "dev"
 optional = false
@@ -780,7 +780,7 @@ crypto = ["cryptography"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "99ff334be8f7c8ee22fa388b801a4d4e83a0f071b7eebfdb5ed3d87209570b2e"
+content-hash = "4ac3ca21fbf56025b33191e42a9922f07544a339ab216a11efb92d11270a26f1"
 
 [metadata.files]
 atomicwrites = [
@@ -1223,8 +1223,8 @@ types-pyyaml = [
     {file = "types_PyYAML-6.0.5-py3-none-any.whl", hash = "sha256:2fd21310870addfd51db621ad9f3b373f33ee3cbb81681d70ef578760bd22d35"},
 ]
 types-requests = [
-    {file = "types-requests-2.27.14.tar.gz", hash = "sha256:04579ee164f7c2659be46950e3c2f8d51a081ad252ef1b01d4b12faba5c3810b"},
-    {file = "types_requests-2.27.14-py3-none-any.whl", hash = "sha256:c01838abfe3e8a83ba68346cd373afff97594c19c15c922ddee4a0e80ba7e329"},
+    {file = "types-requests-2.27.25.tar.gz", hash = "sha256:805ae7e38fd9d157153066dc4381cf585fd34dfa212f2fc1fece248c05aac571"},
+    {file = "types_requests-2.27.25-py3-none-any.whl", hash = "sha256:2444905c89731dbcb6bbcd6d873a04252445df7623917c640e463b2b28d2a708"},
 ]
 types-tabulate = [
     {file = "types-tabulate-0.8.6.tar.gz", hash = "sha256:3f4dfb795449c2178ed5c214ec5114c044b1eedd71ad0a1003bc670f09d8710a"},
