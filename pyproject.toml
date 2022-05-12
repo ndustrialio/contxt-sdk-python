@@ -20,7 +20,7 @@ tabulate = "*"
 sgqlc = "^15.0"
 
 [tool.poetry.dev-dependencies]
-black = "^22.1.0"
+black = "^22.3.0"
 flake8 = "^4"
 isort = "^5"
 mkdocs = "^1.2.3"
