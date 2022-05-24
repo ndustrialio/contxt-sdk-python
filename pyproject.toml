@@ -1,12 +1,17 @@
 [tool.poetry]
 name = "contxt-sdk"
-version = "3.0.0-beta.16"
+version = "3.0.0-beta.18"
 description = "Contxt SDK from ndustrial"
 authors = ["ndustrial <dev@ndustrial.io>"]
 license = "ISC"
 readme = "README.md"
 repository = "https://github.com/ndustrialio/contxt-sdk-python"
 packages = [ { include = "contxt" } ]
+
+[[tool.poetry.source]]
+name = "nd-foundry"
+url = "https://ndustrialio.jfrog.io/artifactory/api/pypi/ndustrial-foundry/simple"
+secondary = true
 
 [tool.poetry.dependencies]
 python = "^3.8"

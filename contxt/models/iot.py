@@ -30,12 +30,30 @@ class MetricWindow(Enum):
     QUARTER_HOURLY = '15min'
     HALF_HOURLY = '30min'
     HOURLY = '1hr'
+    RAW = None
 
 
 @dataclass
 class MetricField:
     label: str
     sourceId: str
+    alias: Optional[str] = None
+
+
+@dataclass
+class IOTRequest:
+    startTime: datetime
+    endTime: datetime
+    field: MetricField
+    alias: str
+    window: Optional[MetricWindow] = MetricWindow.MINUTELY
+    aggregation: str = 'AVG'
+
+
+@dataclass
+class FacilityMetricField:
+    facilityId: int
+    label: str
     alias: Optional[str] = None
 
 
