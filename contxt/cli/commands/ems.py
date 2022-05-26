@@ -30,7 +30,7 @@ def ems() -> None:
 @ems.command()
 @click.argument("facility_id")
 @click.option("--resource-type", type=ResourceType, default="electric", help="Resource type")
-@fields_option(default=["id", "name", "resource_type"], obj=MainService)
+@fields_option(default="id, name, resource_type", obj=MainService)
 @sort_option(default="id")
 @click.pass_obj
 def mains(
@@ -124,15 +124,14 @@ def usage(
 @click.argument("facility_id")
 @click.option("--start", type=Date(), help="Start date")
 @click.option("--end", type=Date(), help="End date")
-@fields_option(default=["id", "interval_start", "interval_end"], obj=UtilityStatement)
+@fields_option(default="id, interval_start, interval_end", obj=UtilityStatement)
 @sort_option(default="interval_start")
 @click.pass_obj
 def bills(
     clients: Clients, facility_id: int, start: datetime, end: datetime, fields: List[str], sort: str
 ) -> None:
     """Get utility bills"""
-    facility = clients.facilities.get_facility_with_id(facility_id)
-    items = clients.sis.get_statements(facility_id=facility.id, start=start, end=end)
+    items = clients.sis.get_statements(facility_id=facility_id, start=start, end=end)
     print_table(items=items, keys=fields, sort_by=sort)
 
 
@@ -160,8 +159,9 @@ def export(
     with click.progressbar(
         facility_ids, label="Downloading data", item_show_func=lambda f: f"Facility {f}" if f else ""
     ) as facility_ids_:
-        for id in facility_ids_:
-            facility = clients.facilities.get_facility_with_id(id)
+        for facility in clients.nionic.get_facilities():
+            if facility.id not in facility_ids_:
+                continue
             fpath = output / facility.slug
 
             # Utility bills

@@ -15,7 +15,7 @@ def project_envs() -> None:
 @project_envs.command()
 @click.argument("project_slug")
 @click.pass_obj
-@fields_option(default=["id", "slug", "name", "type", "description"], obj=ProjectEnvironment)
+@fields_option(default="id, slug, name, type, description", obj=ProjectEnvironment)
 @sort_option(default="id")
 def get(clients: Clients, project_slug: str, fields: List[str], sort: str) -> None:
     """Get project environment(s)"""

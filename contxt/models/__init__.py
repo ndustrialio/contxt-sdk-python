@@ -24,7 +24,7 @@ class Parsers:
 
     @staticmethod
     def date(datestamp: str) -> _date:
-        return _date.fromisoformat(datestamp)
+        return _date.fromisoformat(datestamp[:10])
 
     @staticmethod
     def datetime(timestamp: str) -> _datetime:
@@ -156,8 +156,11 @@ class ApiObject(ABC):
         clean_dict = {}
         for field in cls._api_fields:  # type: ignore
             if field.api_key not in api_dict and not field.optional:
+                m = cls.__module__
+                n = cls.__name__
                 raise KeyError(
-                    f"Required API field '{field.api_key}' is missing from" f" response: {api_dict}"
+                    f"{m}.{n} : Required API field '{field.api_key}' is missing from"
+                    f" response: {api_dict}"
                 )
             clean_dict[field.attr_key] = cls.clean_api_value(
                 field=field, value=api_dict.pop(field.api_key, None)

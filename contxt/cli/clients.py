@@ -51,7 +51,7 @@ class Clients:
 
     @cachedproperty
     def ems(self) -> EmsService:
-        return EmsService(auth=self.auth, env=self.env)
+        return EmsService(auth=self.auth, env=self.env, org_id=self.org_id)
 
     @cachedproperty
     def events(self) -> EventsService:

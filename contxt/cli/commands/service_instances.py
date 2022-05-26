@@ -15,7 +15,7 @@ def service_instances() -> None:
 @service_instances.command()
 @click.option("--service-id")
 @click.pass_obj
-@fields_option(default=["id", "slug", "service_id", "description"], obj=ServiceInstance)
+@fields_option(default="id, slug, service_id, description", obj=ServiceInstance)
 @sort_option(default="slug")
 def get(clients: Clients, service_id: Optional[str], fields: List[str], sort: str) -> None:
     """Get service instance(s)"""

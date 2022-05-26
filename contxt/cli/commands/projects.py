@@ -15,7 +15,7 @@ def projects() -> None:
 @projects.command()
 @click.argument("slug", default="")
 @click.pass_obj
-@fields_option(default=["id", "slug", "name", "type", "description"], obj=Project)
+@fields_option(default="id, slug, name, type, description", obj=Project)
 @sort_option(default="slug")
 def get(clients: Clients, slug: Optional[str], fields: List[str], sort: str) -> None:
     """Get project(s)"""

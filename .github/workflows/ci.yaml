@@ -59,8 +59,7 @@ jobs:
   release:
     needs: test
     runs-on: ubuntu-latest
-    if: "false"
-    # if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2

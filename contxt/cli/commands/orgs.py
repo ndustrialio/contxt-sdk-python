@@ -13,7 +13,7 @@ def orgs() -> None:
 
 
 @orgs.command()
-@fields_option(default=["id", "name", "slug"], obj=Organization)
+@fields_option(default="id, name, slug", obj=Organization)
 @sort_option(default="id")
 @click.pass_obj
 def get(clients: Clients, fields: List[str], sort: str) -> None:
