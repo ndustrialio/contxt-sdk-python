@@ -47,7 +47,6 @@ class Facility(ApiObject):
     _api_fields: ClassVar = (
         ApiField("id", data_type=int),
         ApiField("name"),
-        ApiField("asset_id"),
         ApiField("organization_id"),
         ApiField("baseline", data_type=dict),
         ApiField("main_services", data_type=MainService),
@@ -57,7 +56,6 @@ class Facility(ApiObject):
 
     id: int
     name: str
-    asset_id: str
     organization_id: str
     baseline: dict
     main_services: List[MainService]
