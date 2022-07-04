@@ -423,11 +423,11 @@ testing = ["pytest", "pytest-benchmark"]
 
 [[package]]
 name = "poethepoet"
-version = "0.13.1"
+version = "0.15.0"
 description = "A task runner that works well with poetry."
 category = "dev"
 optional = false
-python-versions = ">=3.6.2"
+python-versions = ">=3.7"
 
 [package.dependencies]
 pastel = ">=0.2.1,<0.3.0"
@@ -1076,8 +1076,8 @@ pluggy = [
     {file = "pluggy-1.0.0.tar.gz", hash = "sha256:4224373bacce55f955a878bf9cfa763c1e360858e330072059e10bad68531159"},
 ]
 poethepoet = [
-    {file = "poethepoet-0.13.1-py3-none-any.whl", hash = "sha256:47e7b38c8b5412f840447f7612a9330697e8633e7500a7340b6734f50e26e380"},
-    {file = "poethepoet-0.13.1.tar.gz", hash = "sha256:4f6962f17f5d5a453fd7fa66e3e7897e9191d4289148433efe441c81f2451a46"},
+    {file = "poethepoet-0.15.0-py3-none-any.whl", hash = "sha256:8ca49d8a9928a3ce1753315d6df0866888557eccb0fe37a8c88fea47454cfe12"},
+    {file = "poethepoet-0.15.0.tar.gz", hash = "sha256:5843260c9074b6c42bf2e51f21107efe37e230cf75da3dd3f4b43904f365b26c"},
 ]
 pre-commit = [
     {file = "pre_commit-2.19.0-py2.py3-none-any.whl", hash = "sha256:10c62741aa5704faea2ad69cb550ca78082efe5697d6f04e5710c3c229afdd10"},
