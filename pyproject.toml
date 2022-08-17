@@ -21,7 +21,7 @@ sgqlc = "^15.0"
 
 [tool.poetry.dev-dependencies]
 black = "^22.3.0"
-flake8 = "^4"
+flake8 = "^5"
 isort = "^5"
 mkdocs = "^1.2.4"
 mkdocs-click = "^0.5.0"
