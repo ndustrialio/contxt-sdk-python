@@ -38,7 +38,7 @@ def timed(func: Optional[Callable] = None, *, printer: Callable[[str], None] = p
 
 
 # Source: https://boltons.readthedocs.io/en/latest/_modules/boltons/cacheutils.html#cachedproperty
-class cachedproperty(object):
+class cachedproperty:
     """The ``cachedproperty`` is used similar to :class:`property`, except
     that the wrapped method is only called once. This is commonly used
     to implement lazy attributes.

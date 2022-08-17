@@ -13,16 +13,12 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
+      - uses: actions/checkout@v3
+      - run: pipx install poetry
+      - uses: actions/setup-python@v4
         with:
-          python-version: 3.9
-      - run: pip install poetry
-      - name: Set up cache
-        uses: actions/cache@v2
-        with:
-          path: .venv
-          key: ${{ runner.os }}-venv-py3.9-${{ hashFiles('**/poetry.lock') }}
+          python-version: "3.10"
+          cache: poetry
       - name: Install package
         run: poetry install
       - name: Run linters
@@ -34,23 +30,19 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        python: [3.7, 3.8, 3.9]
+        python: ["3.7", "3.8", "3.9", "3.10"]
         include:
           - os: macos-latest
-            python: 3.9
+            python: "3.10"
           - os: windows-latest
-            python: 3.9
+            python: "3.10"
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
+      - uses: actions/checkout@v3
+      - run: pipx install poetry
+      - uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python }}
-      - run: pip install poetry
-      - name: Set up cache
-        uses: actions/cache@v2
-        with:
-          path: .venv
-          key: ${{ runner.os }}-venv-py${{ matrix.python }}-${{ hashFiles('**/poetry.lock') }}
+          cache: poetry
       - name: Install package
         run: poetry install -E crypto
       - name: Run tests
@@ -66,9 +58,11 @@ jobs:
         with:
           fetch-depth: 0
           token: ${{ secrets.NIO_BOT_TOKEN }}
-      - uses: actions/setup-python@v2
+      - run: pipx install poetry
+      - uses: actions/setup-python@v4
         with:
-          python-version: 3.9
+          python-version: "3.10"
+          cache: poetry
       - name: Bump version
         uses: TriPSs/conventional-changelog-action@v3
         id: version
@@ -98,6 +92,4 @@ jobs:
           # https://github.com/python-poetry/poetry/issues/2359
           POETRY_HTTP_BASIC_PYPI_USERNAME: __token__
           POETRY_HTTP_BASIC_PYPI_PASSWORD: ${{ secrets.PYPI_TOKEN }}
-        run: |
-          pip install poetry
-          poetry publish --build --no-interaction
+        run: poetry publish --build --no-interaction

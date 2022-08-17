@@ -228,7 +228,7 @@ class IotService(ConfiguredApi):
                     queue.append((name, requests[name]))
 
             if not any_success:
-                raise IOError(f"All {len(requests)} batched requests to IOT API failed")
+                raise OSError(f"All {len(requests)} batched requests to IOT API failed")
 
         fields_by_name = {f.field_human_name: f for f in fields}
         return [
