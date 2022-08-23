@@ -584,7 +584,7 @@ use_chardet_on_py3 = ["chardet (>=3.0.2,<6)"]
 
 [[package]]
 name = "sgqlc"
-version = "15.0"
+version = "16.0"
 description = "Simple GraphQL Client"
 category = "main"
 optional = false
@@ -779,7 +779,7 @@ crypto = ["cryptography"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "eb561a7a3fe0a903aeac7504a887612068e9e21c979d077bbb7a3714efec4c21"
+content-hash = "9276ff892b9d1e38d92ecec6b95b6412ca0bd9998a3f5904c808a17271dea2d3"
 
 [metadata.files]
 atomicwrites = [
@@ -1171,9 +1171,9 @@ requests = [
     {file = "requests-2.28.1.tar.gz", hash = "sha256:7c5599b102feddaa661c826c56ab4fee28bfd17f5abca1ebbe3e7f19d7c97983"},
 ]
 sgqlc = [
-    {file = "sgqlc-15.0-py3-none-any.whl", hash = "sha256:6705ed48683cd48b3c3252ca737be67abb7bc790ac5749c0d806c3f36320f720"},
-    {file = "sgqlc-15.0-py3.7.egg", hash = "sha256:103f6df9e5669648ed091c29d66e0cfe9ae7ae3f1efa5138b369cbe04ef6196b"},
-    {file = "sgqlc-15.0.tar.gz", hash = "sha256:c74c9e657ee7409486aaccbffddf369c048b8b262e15b3516d96c51b86bde176"},
+    {file = "sgqlc-16.0-py3-none-any.whl", hash = "sha256:fd55d808e17c96392bcc9058b31433ef9ae6376ca36a6352d4bd602b968193a2"},
+    {file = "sgqlc-16.0-py3.9.egg", hash = "sha256:e65022b7f9d6842e23153a419ddcd4690b2760a11c196ad44b9c71deac937ab5"},
+    {file = "sgqlc-16.0.tar.gz", hash = "sha256:e8de916cc8fab5470803c01c06e0fc0a0aad6ecef2b6cdb48e5143a6e2cd7e0a"},
 ]
 six = [
     {file = "six-1.16.0-py2.py3-none-any.whl", hash = "sha256:8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254"},
