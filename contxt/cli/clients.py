@@ -11,7 +11,6 @@ from contxt.services import (
     EventsService,
     IotService,
     NionicService,
-    SisService,
 )
 from contxt.utils import cachedproperty
 
@@ -64,7 +63,3 @@ class Clients:
     @cachedproperty
     def iot(self) -> IotService:
         return IotService(auth=self.auth, env=self.env)
-
-    @cachedproperty
-    def sis(self) -> SisService:
-        return SisService(auth=self.auth, env=self.env)

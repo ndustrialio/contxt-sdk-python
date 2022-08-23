@@ -10,4 +10,3 @@ from .events import EventsService
 from .iot import IotDataService, IotService
 from .ngest import NgestService
 from .nionic import NionicService
-from .sis import SisService
