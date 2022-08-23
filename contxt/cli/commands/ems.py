@@ -10,14 +10,12 @@ from contxt.cli.utils import (
     LAST_WEEK,
     NOW,
     ClickPath,
-    Date,
     csv_callback,
     fields_option,
     print_table,
     sort_option,
-    warn,
 )
-from contxt.models.ems import MainService, ResourceType, UtilityStatement
+from contxt.models.ems import MainService, ResourceType
 from contxt.models.iot import Window
 from contxt.utils.serializer import Serializer
 
@@ -121,26 +119,11 @@ def usage(
 
 
 @ems.command()
-@click.argument("facility_id")
-@click.option("--start", type=Date(), help="Start date")
-@click.option("--end", type=Date(), help="End date")
-@fields_option(default="id, interval_start, interval_end", obj=UtilityStatement)
-@sort_option(default="interval_start")
-@click.pass_obj
-def bills(
-    clients: Clients, facility_id: int, start: datetime, end: datetime, fields: List[str], sort: str
-) -> None:
-    """Get utility bills"""
-    items = clients.sis.get_statements(facility_id=facility_id, start=start, end=end)
-    print_table(items=items, keys=fields, sort_by=sort)
-
-
-@ems.command()
 @click.argument("facility_ids", nargs=-1)
 @click.option(
     "--include",
     default="all",
-    callback=csv_callback(options=["bills", "spend", "usage"]),
+    callback=csv_callback(options=["spend", "usage"]),
     help="Data to export",
 )
 @click.option("--start", type=click.DateTime(), default=LAST_WEEK.isoformat(), help="Start time")
@@ -163,15 +146,6 @@ def export(
             if facility.id not in facility_ids_:
                 continue
             fpath = output / facility.slug
-
-            # Utility bills
-            if "bills" in include:
-                statements = clients.sis.get_statements(
-                    facility_id=facility.id, start=start.date(), end=end.date()
-                )
-                _download_bills(
-                    sis_api=clients.sis, facility_id=facility.id, bills=statements, output=fpath
-                )
 
             # Utility usage
             if "usage" in include:
@@ -196,41 +170,3 @@ def export(
                 Serializer.to_csv(data, fpath / "ems" / "main_service_usage.csv")
 
     print(f"Wrote data to {output}")
-
-
-def _download_bills(sis_api, facility_id, bills, output):
-    # Build csv
-    data = []
-    accounts = {a.id: a for a in sis_api.get_accounts(facility_id)}
-    meters = {m.id: m for m in sis_api.get_meters(facility_id)}
-    for i, bill in enumerate(bills):
-        # Build row
-        row = {
-            "account_number": accounts[meters[bill.utility_meter_id].utility_account_id].label,
-            "meter_number": meters[bill.utility_meter_id].label,
-            "service_type": meters[bill.utility_meter_id].service_type,
-            "interval_start": bill.interval_start,
-            "interval_end": bill.interval_end,
-            "assigned_month": f"{bill.statement_year}-{bill.statement_month}-1",
-            **{
-                f"{row['node_label'].lower()} ({row['units']})": row["value"]
-                for row in sis_api.get_statement_data(bill.id)
-            },
-            "pdf": "",
-        }
-
-        # Download pdf
-        if bill.file_id:
-            try:
-                pdf = sis_api.request_read_file(bill.file_id)
-                path = output / "pdfs" / f"{bill.id}.pdf"
-                pdf.download(path)
-                row["pdf"] = path
-            except Exception as e:
-                warn(e)
-
-        # Add row
-        data.append(row)
-
-    # Dump
-    Serializer.to_csv(data, path=output / "summary.csv")
