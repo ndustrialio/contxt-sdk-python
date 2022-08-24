@@ -3,7 +3,14 @@ from typing import List
 from requests.exceptions import HTTPError
 
 from ..auth import Auth
-from ..models.contxt import Cluster
+from ..models.contxt import (
+    Cluster,
+    EdgeNode,
+    ServiceInstance,
+    ServiceInstanceGrant,
+    ServiceInstanceGrantScope,
+    ServiceInstanceScope,
+)
 from .api import ApiEnvironment, ConfiguredApi
 
 
@@ -41,3 +48,64 @@ class ContxtDeploymentService(ConfiguredApi):
         except HTTPError:
             pass
             return
+
+    """
+    Edge Nodes
+    """
+
+    def get_edge_nodes(self, organization_id: str) -> List[EdgeNode]:
+        resp = self.get(f"{organization_id}/edgenodes")
+        return [EdgeNode.from_api(row) for row in resp]
+
+    """
+    Service Instances
+    """
+
+    def get_service_instance(self, organization_id: str, service_instance_id: int) -> ServiceInstance:
+        resp = self.get(f"{organization_id}/service_instances/{service_instance_id}")
+        return ServiceInstance.from_api(resp)
+
+    def get_service_instances(self, organization_id: str) -> List[ServiceInstance]:
+        resp = self.get(f"{organization_id}/service_instances")
+        return [ServiceInstance.from_api(row) for row in resp]
+
+    """
+    Scopes
+    """
+
+    def get_service_instance_scopes(
+        self, organization_id: str, service_instance_id: int
+    ) -> List[ServiceInstanceScope]:
+        resp = self.get(f"{organization_id}/service_instances/{service_instance_id}/scopes")
+        return [ServiceInstanceScope.from_api(rec) for rec in resp]
+
+    def add_service_instance_scope(
+        self, service_grant: ServiceInstanceGrant, service_scope: ServiceInstanceScope
+    ) -> ServiceInstanceGrantScope:
+        resp = self.post(f"grants/{service_grant.id}/scopes/{service_scope.id}")
+        return ServiceInstanceGrantScope.from_api(resp)
+
+    def remove_service_instance_scope(
+        self, service_grant: ServiceInstanceGrant, service_scope: ServiceInstanceScope
+    ):
+        resp = self.delete(f"grants/{service_grant.id}/scopes/{service_scope.id}")
+        return resp
+
+    """
+    Dependencies
+    """
+
+    def get_service_instance_dependencies(
+        self, organization_id: str, service_instance_id: int
+    ) -> List[ServiceInstanceGrant]:
+        resp = self.get(f"{organization_id}/service_instances/{service_instance_id}/grants")
+        return [ServiceInstanceGrant.from_api(rec) for rec in resp]
+
+    def create_service_dependency(
+        self, organization_id: str, service_grant: ServiceInstanceGrant
+    ) -> ServiceInstanceGrant:
+        resp = self.post(
+            f"{organization_id}/service_instances/{service_grant.from_service_instance_id}/grants",
+            json=service_grant.post(),
+        )
+        return ServiceInstanceGrant.from_api(resp)

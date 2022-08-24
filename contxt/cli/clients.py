@@ -23,6 +23,10 @@ class Clients:
     org_slug: Optional[str]
 
     @cachedproperty
+    def accessible_orgs(self) -> str:
+        return self.contxt.get("organizations")
+
+    @cachedproperty
     def org_id(self) -> str:
         if not self.org_slug:
             # Check if user only has access to a single org

@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from datetime import datetime
 from json import loads
-from typing import ClassVar, List, Optional
+from typing import Any, ClassVar, List, Optional
 
 from . import ApiField, ApiObject, Parsers
 
@@ -282,38 +282,40 @@ class Service(ApiObject):
 @dataclass
 class ServiceInstance(ApiObject):
     _api_fields: ClassVar = (
-        ApiField("id", data_type=int),
+        ApiField("id", data_type=int, optional=True),
         ApiField("name"),
-        ApiField("slug"),
-        ApiField("description"),
-        ApiField("descriptor"),
-        ApiField("service_id", data_type=int),
-        ApiField("project_environment_id"),
+        ApiField("organization_id"),
+        ApiField("slug", optional=True),
+        ApiField("description", optional=True),
+        ApiField("descriptor", optional=True),
+        ApiField("service_id", data_type=int, optional=True),
+        ApiField("project_environment_id", optional=True),
         ApiField("client_id"),
-        ApiField("command"),
-        ApiField("arguments"),
-        ApiField("last_deployed_at"),
-        ApiField("last_configured_at"),
+        ApiField("command", optional=True),
+        ApiField("arguments", optional=True),
+        ApiField("last_deployed_at", optional=True),
+        ApiField("last_configured_at", optional=True),
         ApiField("service_env_variables", data_type=ServiceEnvironmentVariable, optional=True),
         ApiField("frontend", data_type=Frontend, optional=True),
         ApiField("image", data_type=Image, optional=True),
-        ApiField("service_type"),
-        ApiField("created_at", data_type=Parsers.datetime),
+        ApiField("service_type", optional=True),
+        ApiField("created_at", data_type=Parsers.datetime, optional=True),
     )
 
-    id: int
     name: str
-    slug: str
-    description: str
-    descriptor: str
-    service_id: int
-    project_environment_id: str
     client_id: str
-    command: str
-    arguments: str
-    last_deployed_at: Optional[datetime]
-    last_configured_at: Optional[datetime]
-    service_type: str
+    organization_id: str
+    id: Optional[int] = None
+    slug: Optional[str] = None
+    description: Optional[str] = None
+    descriptor: Optional[str] = None
+    service_id: Optional[int] = None
+    project_environment_id: Optional[str] = None
+    command: Optional[str] = None
+    arguments: Optional[str] = None
+    last_deployed_at: Optional[datetime] = None
+    last_configured_at: Optional[datetime] = None
+    service_type: Optional[str] = None
     service_env_variables: Optional[List[ServiceEnvironmentVariable]] = None
     frontend: Optional[Frontend] = None
     image: Optional[Image] = None
@@ -372,18 +374,18 @@ class ProjectEnvironment(ApiObject):
 @dataclass
 class EdgeNode(ApiObject):
     _api_fields: ClassVar = (
-        ApiField("id", data_type=int),
+        ApiField("id", data_type=str),
         ApiField("name"),
-        ApiField("stack_id"),
+        ApiField("project_id"),
         ApiField("organization_id"),
         ApiField("description"),
         ApiField("client_id"),
         ApiField("created_at", data_type=Parsers.datetime),
     )
 
-    id: int
+    id: str
     name: str
-    stack_id: int
+    project_id: int
     organization_id: str
     description: str
     client_id: str
@@ -415,5 +417,64 @@ class Cluster(ApiObject):
     host: Optional[str] = None
     id: Optional[str] = None
     certificate_authority: Optional[str] = None
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+
+
+@dataclass
+class ServiceInstanceScope(ApiObject):
+    _api_fields: ClassVar = (
+        ApiField("id"),
+        ApiField("service_instance_id"),
+        ApiField("label"),
+        ApiField("service_instance_grant_scopes"),
+        ApiField("description"),
+        ApiField("created_at"),
+        ApiField("updated_at"),
+    )
+
+    id: str
+    service_instance_id: int
+    label: str
+    description: str
+    service_instance_grant_scopes: Optional[Any] = None
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+
+
+@dataclass
+class ServiceInstanceGrant(ApiObject):
+    _api_fields: ClassVar = (
+        ApiField("id"),
+        ApiField("from_service_instance_id", creatable=True),
+        ApiField("to_service_instance_id", creatable=True),
+        ApiField("auth0_id"),
+        ApiField("ServiceInstanceScopes", data_type=ServiceInstanceScope, optional=True),
+        ApiField("created_at", data_type=Parsers.datetime),
+        ApiField("updated_at", data_type=Parsers.datetime),
+    )
+
+    from_service_instance_id: int
+    to_service_instance_id: int
+    auth0_id: Optional[str] = None
+    id: Optional[str] = None
+    ServiceInstanceScopes: Optional[List[ServiceInstanceScope]] = None
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+
+
+@dataclass
+class ServiceInstanceGrantScope(ApiObject):
+    _api_fields: ClassVar = (
+        ApiField("id"),
+        ApiField("service_instance_grant_id"),
+        ApiField("service_instance_scope_id"),
+        ApiField("created_at", data_type=Parsers.datetime),
+        ApiField("updated_at", data_type=Parsers.datetime),
+    )
+
+    id: str
+    service_instance_grant_id: str
+    service_instance_scope_id: str
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
