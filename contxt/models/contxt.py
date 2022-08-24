@@ -427,7 +427,7 @@ class ServiceInstanceScope(ApiObject):
         ApiField("id"),
         ApiField("service_instance_id"),
         ApiField("label"),
-        ApiField("service_instance_grant_scopes"),
+        ApiField("service_instance_grant_scopes", optional=True),
         ApiField("description"),
         ApiField("created_at"),
         ApiField("updated_at"),

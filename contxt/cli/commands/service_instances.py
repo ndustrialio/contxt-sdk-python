@@ -1,3 +1,4 @@
+import sys
 from typing import List, Optional
 
 import click
@@ -137,8 +138,8 @@ def get_dependencies(clients: Clients, service_instance_id: str) -> None:
 @click.option("--from-id", help="From Service ID", required=True)
 @click.option("--to-id", help="To Service ID", required=True)
 @click.pass_obj
-def add(clients: Clients, from_id: int, to_id: int) -> None:
-
+def add_dep(clients: Clients, from_id: int, to_id: int) -> None:
+    """Add a new dependency to a service instance"""
     from_service = clients.contxt_deployments.get_service_instance(clients.org_id, from_id)
     to_service = clients.contxt_deployments.get_service_instance(clients.org_id, to_id)
 
@@ -148,3 +149,30 @@ def add(clients: Clients, from_id: int, to_id: int) -> None:
     )
     dep = clients.contxt_deployments.create_service_dependency(clients.org_id, grant)
     print(dep)
+
+
+@service_instances.command("rm-dep")
+@click.option("--from-id", help="From Service ID", required=True)
+@click.option("--to-id", help="To Service ID", required=True)
+@click.pass_obj
+def remove_dep(clients: Clients, from_id: int, to_id: int) -> None:
+    """Remove an existing dependency from a service instance"""
+    from_service = clients.contxt_deployments.get_service_instance(clients.org_id, from_id)
+    existing_deps = clients.contxt_deployments.get_service_instance_dependencies(clients.org_id, from_id)
+
+    target_dep = None
+    for dep in existing_deps:
+        print(dep)
+        if dep.to_service_instance_id == to_id:
+            target_dep = dep
+            break
+
+    if not target_dep:
+        print(
+            f"Service Instance with ID {to_id} is not currently a dependency "
+            f"of the service with ID {from_id} ({from_service.name})"
+        )
+        sys.exit(0)
+
+    clients.contxt_deployments.remove_service_dependency(clients.org_id, from_id, to_id)
+    print("Successfully removed dependency")

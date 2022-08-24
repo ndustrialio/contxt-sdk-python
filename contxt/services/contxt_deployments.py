@@ -109,3 +109,12 @@ class ContxtDeploymentService(ConfiguredApi):
             json=service_grant.post(),
         )
         return ServiceInstanceGrant.from_api(resp)
+
+    def remove_service_dependency(
+        self, organization_id: str, from_service_instance_id: int, dependent_service_id: int
+    ) -> bool:
+        self.delete(
+            f"{organization_id}/service_instances/{from_service_instance_id}/"
+            f"dependencies/{dependent_service_id}"
+        )
+        return True
