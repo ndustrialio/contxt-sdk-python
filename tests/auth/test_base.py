@@ -26,9 +26,9 @@ def test_token_provider():
     # Test first token is set
     token0 = token_provider.access_token
     assert token0
-    assert token_provider.decoded_access_token == jwt.decode(token0, verify=False)
+    assert token_provider.decoded_access_token == jwt.decode(token0, options={"verify_signature": False})
     # Test token is refreshed and different than before
     token1 = token_provider.access_token
     assert token1
-    assert token_provider.decoded_access_token == jwt.decode(token1, verify=False)
+    assert token_provider.decoded_access_token == jwt.decode(token1, options={"verify_signature": False})
     assert token0 != token1
