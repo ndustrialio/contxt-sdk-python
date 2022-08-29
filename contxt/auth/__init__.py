@@ -40,7 +40,7 @@ class TokenProvider(ABC):
     def access_token(self, value: Token) -> None:
         """Sets both the access token and the decoded access token"""
         self._access_token = value
-        self._access_token_decoded = decode(self._access_token, verify=False)
+        self._access_token_decoded = decode(self._access_token, options={"verify_signature": False})
 
     @property
     def decoded_access_token(self) -> DecodedToken:
