@@ -11,6 +11,8 @@ from sgqlc.endpoint.requests import RequestsEndpoint
 from sgqlc.operation import Operation
 from urllib3.util.retry import Retry
 
+from contxt import __version__
+
 from ..auth import Auth, TokenProvider
 from ..utils import make_logger
 
@@ -73,6 +75,7 @@ class Api:
         self.session = Session()
         self.session.auth = BearerTokenAuth(token_provider) if token_provider else None
         self.session.headers.update({"Cache-Control": "no-cache"})
+        self.session.headers.update({"User-Agent": f"contxt-sdk-python/{__version__}"})
         self.session.hooks = {"response": self._log_response}  # type: ignore
 
         # Attach retry adapter
