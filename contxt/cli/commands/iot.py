@@ -232,10 +232,10 @@ def create(clients: Clients, feed_key: str, input: IO[str]) -> None:
     new_groups = {g: c for f, g, c in fields}
     with click.progressbar(new_groups, label="Adding groupings to categories") as _groups:
         for group in _groups:
+            grouping_id = groupings[slugify(cast(str, group))].id
+            category_id = categories[new_groups[group]].id if new_groups[group] != "" else None
             try:
-                clients.iot.add_grouping_to_category(
-                    groupings[slugify(cast(str, group))].id, categories[new_groups[group]].id
-                )
+                clients.iot.add_grouping_to_category(grouping_id, category_id)
             except HTTPError as e:
                 logging.debug(e)
 
