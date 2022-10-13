@@ -11,10 +11,10 @@ from slugify import slugify
 
 from contxt.cli.clients import Clients
 from contxt.cli.utils import LAST_WEEK, NOW, ClickPath, fields_option, print_table, sort_option
-from contxt.models.iot import Feed, Field, FieldGrouping, FieldValueType, Window
+from contxt.models.iot import Feed, Field, FieldCategory, FieldGrouping, FieldValueType, Window
 from contxt.utils.serializer import Serializer
 
-NEW_FIELD_ATTRS = ["field_descriptor", "label", "value_type", "units", "grouping"]
+NEW_FIELD_ATTRS = ["field_descriptor", "label", "value_type", "units", "grouping", "category"]
 
 
 @click.group()
@@ -30,6 +30,11 @@ def fields() -> None:
 @iot.group()
 def groupings() -> None:
     """IoT Field Groupings"""
+
+
+@iot.group()
+def categories() -> None:
+    """IoT Grouping Categories"""
 
 
 @iot.group()
@@ -76,6 +81,17 @@ def get(clients: Clients, feed_key: str, fields: List[str], sort: str) -> None:
 def groupings_get(clients: Clients, facility_id: int, fields: List[str], sort: str) -> None:
     """Get field groupings"""
     items = clients.iot.get_field_groupings_for_facility(facility_id)
+    print_table(items=items, keys=fields, sort_by=sort)
+
+
+@categories.command("get")
+@click.argument("facility_id", type=int)
+@fields_option(default="id, name, description, parent_category_id", obj=FieldCategory)
+@sort_option(default="name")
+@click.pass_obj
+def categories_get(clients: Clients, facility_id: int, fields: List[str], sort: str) -> None:
+    """Get categories for facility"""
+    items = clients.iot.get_categories_for_facility(facility_id)
     print_table(items=items, keys=fields, sort_by=sort)
 
 
@@ -168,6 +184,7 @@ def create(clients: Clients, feed_key: str, input: IO[str]) -> None:
                     is_hidden=False,
                 ),
                 r["grouping"],
+                r["category"],
             ]
             for r in DictReader(input)
         ]
@@ -189,7 +206,7 @@ def create(clients: Clients, feed_key: str, input: IO[str]) -> None:
     # Add fields to grouping
     groupings = {g.slug: g for g in clients.iot.get_field_groupings_for_facility(feed.facility_id)}
     with click.progressbar(fields, label="Adding fields to groupings") as fields_:
-        for field, grouping_label in fields_:
+        for field, grouping_label, category in fields_:
             grouping_slug = slugify(cast(str, grouping_label))
             field = cast(Field, field)
             if grouping_slug not in groupings:
@@ -207,6 +224,18 @@ def create(clients: Clients, feed_key: str, input: IO[str]) -> None:
                 grouping = groupings[grouping_slug]
             try:
                 clients.iot.add_field_to_grouping(grouping.id, field.id)
+            except HTTPError as e:
+                logging.debug(e)
+
+    # Add groupings to categories
+    categories = {c.name: c for c in clients.iot.get_categories_for_facility(feed.facility_id)}
+    new_groups = {g: c for f, g, c in fields}
+    with click.progressbar(new_groups, label="Adding groupings to categories") as _groups:
+        for group in _groups:
+            try:
+                clients.iot.add_grouping_to_category(
+                    groupings[slugify(cast(str, group))].id, categories[new_groups[group]].id
+                )
             except HTTPError as e:
                 logging.debug(e)
 
@@ -269,3 +298,12 @@ def fields_delete(clients: Clients, field_id: List[str]):
     """Delete (unprovision) fields"""
     for id in field_id:
         clients.iot.unprovision_field(id)
+
+
+@groupings.command("delete")
+@click.argument("grouping_id", nargs=-1)
+@click.pass_obj
+def groupings_delete(clients: Clients, grouping_id: List[str]):
+    """Delete field groupings (does not delete fields within grouping)"""
+    for id in grouping_id:
+        clients.iot.delete_field_grouping(id)

@@ -80,6 +80,18 @@ class FieldCategory(ApiObject):
         ApiField("parent_category_id"),
         ApiField("created_at", data_type=Parsers.datetime),
         ApiField("updated_at", data_type=Parsers.datetime),
+        ApiField(
+            "FieldGroupings",
+            attr_key="field_groupings",
+            data_type=lambda v: FieldGrouping.from_api(v),
+            optional=True,
+        ),
+        ApiField(
+            "Subcategories",
+            attr_key="subcategories",
+            data_type=lambda v: FieldCategory.from_api(v),
+            optional=True,
+        ),
     )
 
     id: str
@@ -89,6 +101,8 @@ class FieldCategory(ApiObject):
     parent_category_id: str
     created_at: datetime
     updated_at: datetime
+    field_groupings: Optional[list["FieldGrouping"]] = None
+    subcategories: Optional[list["FieldCategory"]] = None
 
 
 @dataclass

@@ -13,6 +13,7 @@ from ..models.iot import (
     BatchResponses,
     Feed,
     Field,
+    FieldCategory,
     FieldGrouping,
     FieldTimeSeries,
     UnprovisionedField,
@@ -80,6 +81,9 @@ class IotService(ConfiguredApi):
 
     def unprovision_field(self, field_id: int):
         return self.delete(uri=f"fields/{field_id}")
+
+    def delete_field_grouping(self, grouping_id: str):
+        return self.delete(uri=f"groupings/{grouping_id}")
 
     def delete_time_series_point(
         self, output_id: int, field: str, interval: Window, time: datetime
@@ -264,6 +268,24 @@ class IotService(ConfiguredApi):
     def get_field_grouping(self, id: str) -> FieldGrouping:
         """Get field grouping with id `id`"""
         return FieldGrouping.from_api(self.get(f"groupings/{id}"))
+
+    def get_categories_for_facility(self, facility_id: int) -> List[FieldCategory]:
+        """Get categories for facility with id `facility_id`"""
+        res = [FieldCategory.from_api(rec) for rec in self.get(f"facilities/{facility_id}/categories")]
+        categories = []
+        for cat in res:
+            categories.append(cat)
+            for sub in cat.subcategories:
+                categories.append(sub)
+        return categories
+
+    def add_grouping_to_category(self, grouping_id: str, field_category_id: str):
+        return self.put(
+            f"groupings/{grouping_id}",
+            json={
+                "field_category_id": field_category_id,
+            },
+        )
 
     def get_field_groupings_for_facility(
         self, facility_id: int, page_options: Optional[PageOptions] = None
