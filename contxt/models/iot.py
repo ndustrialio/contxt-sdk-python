@@ -101,8 +101,8 @@ class FieldCategory(ApiObject):
     parent_category_id: str
     created_at: datetime
     updated_at: datetime
-    field_groupings: Optional[list["FieldGrouping"]] = None
-    subcategories: Optional[list["FieldCategory"]] = None
+    field_groupings: Optional[List["FieldGrouping"]] = None
+    subcategories: Optional[List["FieldCategory"]] = None
 
 
 @dataclass
