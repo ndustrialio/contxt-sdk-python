@@ -1,1 +1,4 @@
 * @ndustrialio/paas-team
+# Exclude dependabot PR's
+pyproject.toml
+poetry.lock
