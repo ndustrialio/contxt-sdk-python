@@ -25,7 +25,7 @@ class Env:
 
 environments = {
     "staging": Env(
-        cli_client_id="yJw7FCGBKg7nTT4CJ4n05QaVzhTIgtAf",
+        cli_client_id="DMsTIUJINAobrEvgXCpN1koWOGLvdzw6",
         auth0_tenant_base_url="contxt-staging.us.auth0.com",
     ),
     "production": Env(
