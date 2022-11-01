@@ -182,7 +182,7 @@ class ConfiguredApi(Api, ABC):
             raise KeyError(f"Invalid environment '{name}'. Choose from {list(envs.keys())}.")
         return envs[name]
 
-    @property
+    @property  # type: ignore
     @classmethod
     @abstractmethod
     def _envs(cls) -> Tuple[ApiEnvironment, ...]:

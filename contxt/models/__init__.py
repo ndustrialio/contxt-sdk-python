@@ -125,7 +125,7 @@ class ApiObject(ABC):
     def __str__(self) -> str:
         return Serializer.to_table(self)
 
-    @property
+    @property  # type: ignore
     @classmethod
     @abstractmethod
     def _api_fields(cls) -> Tuple[ApiField, ...]:
