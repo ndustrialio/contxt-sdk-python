@@ -43,7 +43,7 @@ class IotService(ConfiguredApi):
         ),
         ApiEnvironment(
             name="staging",
-            base_url="https://feeds-staging.api.ndustrial.io/v1",
+            base_url="https://feeds.api.staging.ndustrial.io/v1",
             client_id="m35AEcxD8hf65sq04ZU7yFxqpqVkKzES",
         ),
     )
