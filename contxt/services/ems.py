@@ -3,6 +3,7 @@ from typing import Iterable, List, Optional
 
 from ..auth import Auth
 from ..models.ems import Facility, MainService, ResourceType, UtilityContract, UtilitySpend, UtilityUsage
+from ..utils.orgs import get_slug_or_org_id
 from .api import ApiEnvironment, ConfiguredApi
 from .pagination import PagedRecords
 
@@ -13,12 +14,12 @@ class EmsService(ConfiguredApi):
     _envs = (
         ApiEnvironment(
             name="production",
-            base_url="https://ems.api.ndustrial.io/v1",
+            base_url="https://{tenant}.api.ndustrial.io/rest/ems/v1",
             client_id="e2IT0Zm9RgGlDBkLa2ruEcN9Iop6dJAS",
         ),
         ApiEnvironment(
             name="staging",
-            base_url="https://ems.staging.api.ndustrial.io/v1",
+            base_url="https://{tenant}.api.staging.ndustrial.io/rest/ems/v1",
             client_id="vMV67yaRFgjBB1JFbT3vXBOlohFdG1I4",
         ),
     )
@@ -26,6 +27,8 @@ class EmsService(ConfiguredApi):
     def __init__(self, auth: Auth, org_id: str, env: str = "production", **kwargs) -> None:
         super().__init__(env=env, auth=auth, **kwargs)
         self.org_id = org_id
+        tenant = get_slug_or_org_id(org_id)
+        self.base_url = self.base_url.format(tenant=tenant)
 
     def get_facility(self, id: int) -> Facility:
         return Facility.from_api(self.get(f"{self.org_id}/facilities/{id}"))

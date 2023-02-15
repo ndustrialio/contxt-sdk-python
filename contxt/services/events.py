@@ -2,6 +2,7 @@ from typing import Iterable, List, Optional
 
 from ..auth import Auth
 from ..models.events import Event, EventDefinition, EventType, TriggeredEvent
+from ..utils.orgs import get_slug_or_org_id
 from .api import ApiEnvironment, ConfiguredApi
 from .pagination import PagedRecords, PageOptions
 
@@ -12,18 +13,20 @@ class EventsService(ConfiguredApi):
     _envs = (
         ApiEnvironment(
             name="production",
-            base_url="https://events.api.ndustrial.io/v1",
+            base_url="https://{tenant}.api.ndustrial.io/rest/events/v1",
             client_id="7jzwfE20O2XZ4aq3cO1wmk63G9GzNc8j",
         ),
         ApiEnvironment(
             name="staging",
-            base_url="https://events.api.staging.ndustrial.io/v1",
+            base_url="https://{tenant}.api.staging.ndustrial.io/rest/events/v1",
             client_id="dn4MaocJFdKtsBy9sFFaTeuJWL1nt5xu",
         ),
     )
 
-    def __init__(self, auth: Auth, env: str = "production", **kwargs) -> None:
+    def __init__(self, auth: Auth, org_id: str, env: str = "production", **kwargs) -> None:
         super().__init__(env=env, auth=auth, **kwargs)
+        tenant = get_slug_or_org_id(org_id)
+        self.base_url = self.base_url.format(tenant=tenant)
 
     def set_human_readable_parameters(self, event_definition: EventDefinition) -> None:
         statement = ""
