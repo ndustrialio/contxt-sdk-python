@@ -7,6 +7,7 @@ from contxt.models.facilities import Facility, MetricData, MetricLabel, Mutation
 from contxt.services.api import ApiEnvironment, BaseGraphService
 
 from ..auth import Auth
+from ..utils.orgs import get_slug_or_org_id
 
 
 class NionicService(BaseGraphService):
@@ -15,27 +16,20 @@ class NionicService(BaseGraphService):
     _envs = (
         ApiEnvironment(
             name="production",
-            base_url="https://<tenant>.api.ndustrial.io",
+            base_url="https://{tenant}.api.ndustrial.io",
             client_id="vtiZlMRo4apDvThTRiH7kLifQXWUdi9j",
         ),
         ApiEnvironment(
             name="staging",
-            base_url="https://<tenant>.api.staging.ndustrial.io",
+            base_url="https://{tenant}.api.staging.ndustrial.io",
             client_id="vhGxildn8hRRWZj49y18BGtbjTkFHcTG",
         ),
     )
 
-    org_id_slugs = {
-        "18d8b68e-3e59-418e-9f23-47b7cd6bdd6b": "genan",
-        "02efa741-a96f-4124-a463-ae13a704b8fc": "lineage",
-        "2fe29680-fc3d-4888-9e9b-44be1e59c22c": "sfnt",
-        "5209751f-ea46-4b3e-a5dd-b8d03311b791": "ndustrial",
-    }
-
     def __init__(self, auth: Auth, org_id: str, env: str = "production", **kwargs) -> None:
         super().__init__(env=env, auth=auth, **kwargs)
-        slug = self.org_id_slugs.get(org_id) or org_id
-        self.base_url = self.base_url.replace("<tenant>", slug)
+        tenant = get_slug_or_org_id(org_id)
+        self.base_url = self.base_url.format(tenant=tenant)
         self.endpoint = RequestsEndpoint(self.base_url.rstrip("/") + "/graphql", session=self.session)
 
     def get_facilities(self) -> List[Facility]:
