@@ -54,7 +54,7 @@ class Clients:
 
     @cachedproperty
     def events(self) -> EventsService:
-        return EventsService(auth=self.auth, env=self.env)
+        return EventsService(auth=self.auth, env=self.env, org_id=self.org_id)
 
     @cachedproperty
     def nionic(self) -> NionicService:
@@ -62,4 +62,4 @@ class Clients:
 
     @cachedproperty
     def iot(self) -> IotService:
-        return IotService(auth=self.auth, env=self.env)
+        return IotService(auth=self.auth, env=self.env, org_id=self.org_id)
