@@ -100,7 +100,6 @@ class Facility(ApiObject):
         ApiField("id", data_type=int),
         ApiField("name"),
         ApiField("organization_id"),
-        ApiField("baseline", data_type=dict),
         ApiField("main_services", data_type=MainService),
         ApiField("created_at", data_type=Parsers.datetime),
         ApiField("updated_at", data_type=Parsers.datetime),
@@ -109,7 +108,6 @@ class Facility(ApiObject):
     id: int
     name: str
     organization_id: str
-    baseline: dict
     main_services: List[MainService]
     created_at: datetime
     updated_at: datetime
