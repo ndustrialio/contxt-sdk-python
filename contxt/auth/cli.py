@@ -63,7 +63,6 @@ class Auth0DeviceProvider(Api):
         return self.post("oauth/device/code", data)
 
     def get_access_token(self, code_info):
-
         data = {
             "grant_type": "urn:ietf:params:oauth:grant-type:device_code",
             "device_code": code_info["device_code"],
