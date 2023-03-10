@@ -110,7 +110,6 @@ class Serializer:
 
     @staticmethod
     def to_pretty_cli(obj: Any, **kwargs):
-
         d = Serializer.to_dict(obj)
 
         nested_sections = {}

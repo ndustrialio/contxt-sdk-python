@@ -132,7 +132,7 @@ def data_get(
         item_show_func=lambda f: f"Field {f.field_human_name}" if f else "",
     ) as fields_:
         for field in fields_:
-            for (t, v) in clients.iot.get_time_series_for_field(
+            for t, v in clients.iot.get_time_series_for_field(
                 field=field, start_time=start, end_time=end, window=interval
             ):
                 data[t][field.field_human_name] = v
@@ -188,7 +188,7 @@ def create(clients: Clients, feed_key: str, input: IO[str]) -> None:
     # Add fields to grouping
     groupings = {g.slug: g for g in clients.iot.get_field_groupings_for_facility(feed.facility_id)}
     with click.progressbar(fields, label="Adding fields to groupings") as fields_:
-        for (field, grouping_label) in fields_:
+        for field, grouping_label in fields_:
             grouping_slug = cast(str, grouping_label).lower().replace(" ", "-")
             field = cast(Field, field)
             if grouping_slug not in groupings:

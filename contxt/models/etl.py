@@ -46,7 +46,6 @@ class ChangeTrackingRecord:
         tuple=dict(),
         headers=CTRHeader(),
     ):
-
         errors = ""
         if type(topic) is not str:
             errors += "\nTopic parameter must be a string"

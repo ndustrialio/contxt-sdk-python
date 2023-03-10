@@ -57,7 +57,7 @@ def main_data(
         item_show_func=lambda s: f"Service {s.name}" if s else "",
     ) as services_:
         for service in services_:
-            for (t, v) in clients.iot.get_time_series_for_field(
+            for t, v in clients.iot.get_time_series_for_field(
                 field=service.usage_field,
                 start_time=start,
                 end_time=end,
@@ -159,7 +159,7 @@ def export(
                 data: Dict[datetime, Dict[str, Any]] = defaultdict(dict)
                 services = clients.ems.get_main_services(facility_id=facility.id)
                 for service in services:
-                    for (t, v) in clients.iot.get_time_series_for_field(
+                    for t, v in clients.iot.get_time_series_for_field(
                         field=service.usage_field,
                         start_time=start,
                         end_time=end,
