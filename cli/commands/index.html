@@ -108,11 +108,17 @@
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#iot">iot</a>
         <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#categories">categories</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#get_3">get</a>
+    </li>
+        </ul>
+    </li>
     <li class="toctree-l3"><a class="reference internal" href="#data">data</a>
         <ul>
     <li class="toctree-l4"><a class="reference internal" href="#delete">delete</a>
     </li>
-    <li class="toctree-l4"><a class="reference internal" href="#get_3">get</a>
+    <li class="toctree-l4"><a class="reference internal" href="#get_4">get</a>
     </li>
         </ul>
     </li>
@@ -124,7 +130,7 @@
     </li>
     <li class="toctree-l4"><a class="reference internal" href="#delete_1">delete</a>
     </li>
-    <li class="toctree-l4"><a class="reference internal" href="#get_4">get</a>
+    <li class="toctree-l4"><a class="reference internal" href="#get_5">get</a>
     </li>
     <li class="toctree-l4"><a class="reference internal" href="#unprovisioned">unprovisioned</a>
     </li>
@@ -136,7 +142,9 @@
     </li>
     <li class="toctree-l4"><a class="reference internal" href="#create_2">create</a>
     </li>
-    <li class="toctree-l4"><a class="reference internal" href="#get_5">get</a>
+    <li class="toctree-l4"><a class="reference internal" href="#delete_2">delete</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#get_6">get</a>
     </li>
         </ul>
     </li>
@@ -152,7 +160,7 @@
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#orgs">orgs</a>
         <ul>
-    <li class="toctree-l3"><a class="reference internal" href="#get_6">get</a>
+    <li class="toctree-l3"><a class="reference internal" href="#get_7">get</a>
     </li>
         </ul>
     </li>
@@ -160,9 +168,9 @@
         <ul>
     <li class="toctree-l3"><a class="reference internal" href="#create_3">create</a>
     </li>
-    <li class="toctree-l3"><a class="reference internal" href="#delete_2">delete</a>
+    <li class="toctree-l3"><a class="reference internal" href="#delete_3">delete</a>
     </li>
-    <li class="toctree-l3"><a class="reference internal" href="#get_7">get</a>
+    <li class="toctree-l3"><a class="reference internal" href="#get_8">get</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#update_1">update</a>
     </li>
@@ -172,9 +180,9 @@
         <ul>
     <li class="toctree-l3"><a class="reference internal" href="#create_4">create</a>
     </li>
-    <li class="toctree-l3"><a class="reference internal" href="#delete_3">delete</a>
+    <li class="toctree-l3"><a class="reference internal" href="#delete_4">delete</a>
     </li>
-    <li class="toctree-l3"><a class="reference internal" href="#get_8">get</a>
+    <li class="toctree-l3"><a class="reference internal" href="#get_9">get</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#update_2">update</a>
     </li>
@@ -184,9 +192,9 @@
         <ul>
     <li class="toctree-l3"><a class="reference internal" href="#create_5">create</a>
     </li>
-    <li class="toctree-l3"><a class="reference internal" href="#delete_4">delete</a>
+    <li class="toctree-l3"><a class="reference internal" href="#delete_5">delete</a>
     </li>
-    <li class="toctree-l3"><a class="reference internal" href="#get_9">get</a>
+    <li class="toctree-l3"><a class="reference internal" href="#get_10">get</a>
     </li>
         </ul>
     </li>
@@ -194,9 +202,9 @@
         <ul>
     <li class="toctree-l3"><a class="reference internal" href="#create_6">create</a>
     </li>
-    <li class="toctree-l3"><a class="reference internal" href="#delete_5">delete</a>
+    <li class="toctree-l3"><a class="reference internal" href="#delete_6">delete</a>
     </li>
-    <li class="toctree-l3"><a class="reference internal" href="#get_10">get</a>
+    <li class="toctree-l3"><a class="reference internal" href="#get_11">get</a>
     </li>
         </ul>
     </li>
@@ -477,6 +485,24 @@
 <p><strong>Options:</strong></p>
 <pre><code>  --help  Show this message and exit.
 </code></pre>
+<h3 id="categories">categories<a class="headerlink" href="#categories" title="Permanent link">&para;</a></h3>
+<p>IoT Grouping Categories</p>
+<p><strong>Usage:</strong></p>
+<pre><code>contxt iot categories [OPTIONS] COMMAND [ARGS]...
+</code></pre>
+<p><strong>Options:</strong></p>
+<pre><code>  --help  Show this message and exit.
+</code></pre>
+<h4 id="get_3">get<a class="headerlink" href="#get_3" title="Permanent link">&para;</a></h4>
+<p>Get categories for facility</p>
+<p><strong>Usage:</strong></p>
+<pre><code>contxt iot categories get [OPTIONS] FACILITY_ID
+</code></pre>
+<p><strong>Options:</strong></p>
+<pre><code>  --fields TEXT  Comma-delimited list of fields to return
+  --sort TEXT    Field to sort by
+  --help         Show this message and exit.
+</code></pre>
 <h3 id="data">data<a class="headerlink" href="#data" title="Permanent link">&para;</a></h3>
 <p>IoT Field Data</p>
 <p><strong>Usage:</strong></p>
@@ -500,7 +526,7 @@
                                   2020-07-21T05:31:00Z  [required]
   --help                          Show this message and exit.
 </code></pre>
-<h4 id="get_3">get<a class="headerlink" href="#get_3" title="Permanent link">&para;</a></h4>
+<h4 id="get_4">get<a class="headerlink" href="#get_4" title="Permanent link">&para;</a></h4>
 <p>Get field data</p>
 <p><strong>Usage:</strong></p>
 <pre><code>contxt iot data get [OPTIONS] FEED_ID
@@ -550,7 +576,7 @@
 <p><strong>Options:</strong></p>
 <pre><code>  --help  Show this message and exit.
 </code></pre>
-<h4 id="get_4">get<a class="headerlink" href="#get_4" title="Permanent link">&para;</a></h4>
+<h4 id="get_5">get<a class="headerlink" href="#get_5" title="Permanent link">&para;</a></h4>
 <p>Get fields</p>
 <p><strong>Usage:</strong></p>
 <pre><code>contxt iot fields get [OPTIONS] FEED_KEY
@@ -597,7 +623,15 @@
   --field-category-id TEXT  [required]
   --help                    Show this message and exit.
 </code></pre>
-<h4 id="get_5">get<a class="headerlink" href="#get_5" title="Permanent link">&para;</a></h4>
+<h4 id="delete_2">delete<a class="headerlink" href="#delete_2" title="Permanent link">&para;</a></h4>
+<p>Delete field groupings (does not delete fields within grouping)</p>
+<p><strong>Usage:</strong></p>
+<pre><code>contxt iot groupings delete [OPTIONS] [GROUPING_ID]...
+</code></pre>
+<p><strong>Options:</strong></p>
+<pre><code>  --help  Show this message and exit.
+</code></pre>
+<h4 id="get_6">get<a class="headerlink" href="#get_6" title="Permanent link">&para;</a></h4>
 <p>Get field groupings</p>
 <p><strong>Usage:</strong></p>
 <pre><code>contxt iot groupings get [OPTIONS] FACILITY_ID
@@ -643,7 +677,7 @@
 <p><strong>Options:</strong></p>
 <pre><code>  --help  Show this message and exit.
 </code></pre>
-<h3 id="get_6">get<a class="headerlink" href="#get_6" title="Permanent link">&para;</a></h3>
+<h3 id="get_7">get<a class="headerlink" href="#get_7" title="Permanent link">&para;</a></h3>
 <p>Get organizations</p>
 <p><strong>Usage:</strong></p>
 <pre><code>contxt orgs get [OPTIONS]
@@ -676,7 +710,7 @@
   --deployment-strategy [contxt-managed|self-managed]
   --help                          Show this message and exit.
 </code></pre>
-<h3 id="delete_2">delete<a class="headerlink" href="#delete_2" title="Permanent link">&para;</a></h3>
+<h3 id="delete_3">delete<a class="headerlink" href="#delete_3" title="Permanent link">&para;</a></h3>
 <p>Delete a project environment</p>
 <p><strong>Usage:</strong></p>
 <pre><code>contxt project-envs delete [OPTIONS] PROJECT_SLUG SLUG
@@ -684,7 +718,7 @@
 <p><strong>Options:</strong></p>
 <pre><code>  --help  Show this message and exit.
 </code></pre>
-<h3 id="get_7">get<a class="headerlink" href="#get_7" title="Permanent link">&para;</a></h3>
+<h3 id="get_8">get<a class="headerlink" href="#get_8" title="Permanent link">&para;</a></h3>
 <p>Get project environment(s)</p>
 <p><strong>Usage:</strong></p>
 <pre><code>contxt project-envs get [OPTIONS] PROJECT_SLUG
@@ -729,7 +763,7 @@
   --owner-role-id TEXT
   --help                Show this message and exit.
 </code></pre>
-<h3 id="delete_3">delete<a class="headerlink" href="#delete_3" title="Permanent link">&para;</a></h3>
+<h3 id="delete_4">delete<a class="headerlink" href="#delete_4" title="Permanent link">&para;</a></h3>
 <p>Delete a project</p>
 <p><strong>Usage:</strong></p>
 <pre><code>contxt projects delete [OPTIONS] [SLUG]
@@ -737,7 +771,7 @@
 <p><strong>Options:</strong></p>
 <pre><code>  --help  Show this message and exit.
 </code></pre>
-<h3 id="get_8">get<a class="headerlink" href="#get_8" title="Permanent link">&para;</a></h3>
+<h3 id="get_9">get<a class="headerlink" href="#get_9" title="Permanent link">&para;</a></h3>
 <p>Get project(s)</p>
 <p><strong>Usage:</strong></p>
 <pre><code>contxt projects get [OPTIONS] [SLUG]
@@ -781,7 +815,7 @@
   --service-type [API|Application|Worker]
   --help                          Show this message and exit.
 </code></pre>
-<h3 id="delete_4">delete<a class="headerlink" href="#delete_4" title="Permanent link">&para;</a></h3>
+<h3 id="delete_5">delete<a class="headerlink" href="#delete_5" title="Permanent link">&para;</a></h3>
 <p>Delete service instance</p>
 <p><strong>Usage:</strong></p>
 <pre><code>contxt service-instances delete [OPTIONS] ID
@@ -789,7 +823,7 @@
 <p><strong>Options:</strong></p>
 <pre><code>  --help  Show this message and exit.
 </code></pre>
-<h3 id="get_9">get<a class="headerlink" href="#get_9" title="Permanent link">&para;</a></h3>
+<h3 id="get_10">get<a class="headerlink" href="#get_10" title="Permanent link">&para;</a></h3>
 <p>Get service instance(s)</p>
 <p><strong>Usage:</strong></p>
 <pre><code>contxt service-instances get [OPTIONS]
@@ -820,7 +854,7 @@
   --deployment-strategy [self-managed|contxt-managed|unmanaged]
   --help                          Show this message and exit.
 </code></pre>
-<h3 id="delete_5">delete<a class="headerlink" href="#delete_5" title="Permanent link">&para;</a></h3>
+<h3 id="delete_6">delete<a class="headerlink" href="#delete_6" title="Permanent link">&para;</a></h3>
 <p>Delete service</p>
 <p><strong>Usage:</strong></p>
 <pre><code>contxt services delete [OPTIONS] ID
@@ -828,7 +862,7 @@
 <p><strong>Options:</strong></p>
 <pre><code>  --help  Show this message and exit.
 </code></pre>
-<h3 id="get_10">get<a class="headerlink" href="#get_10" title="Permanent link">&para;</a></h3>
+<h3 id="get_11">get<a class="headerlink" href="#get_11" title="Permanent link">&para;</a></h3>
 <p>Get service(s)</p>
 <p><strong>Usage:</strong></p>
 <pre><code>contxt services get [OPTIONS] [ID]
