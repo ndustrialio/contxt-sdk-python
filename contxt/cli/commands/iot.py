@@ -198,7 +198,11 @@ def create(clients: Clients, feed_key: str, input: IO[str]) -> None:
             field = cast(Field, field)
             if field.field_descriptor not in curr_fields:
                 # New field, create it
-                fields[i][0] = clients.iot.provision_field_for_feed(feed.id, field)
+                try:
+                    fields[i][0] = clients.iot.provision_field_for_feed(feed.id, field)
+                except HTTPError as e:
+                    logging.error(f"Error provisioning field: {field.field_descriptor}")
+                    raise e
             else:
                 # Existing field, ignore it
                 fields[i][0] = curr_fields[field.field_descriptor]
