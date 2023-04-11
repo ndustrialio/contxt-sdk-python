@@ -48,8 +48,14 @@ jobs:
       - name: Run tests
         run: poetry run poe test
 
-  release:
+  tests-passing:
     needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "This job wraps all OS x python-verions tests as a single branch protection check."
+
+  release:
+    needs: tests-passing
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     steps:
