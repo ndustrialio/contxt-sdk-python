@@ -193,18 +193,31 @@ def create(clients: Clients, feed_key: str, input: IO[str]) -> None:
 
     # Provision fields
     curr_fields = {f.field_descriptor: f for f in clients.iot.get_fields_for_feed(feed.id)}
+    failures = []
     with click.progressbar([t[0] for t in fields], label="Provisioning fields") as _fields:
         for i, field in enumerate(_fields):
             field = cast(Field, field)
             if field.field_descriptor not in curr_fields:
                 # New field, create it
-                fields[i][0] = clients.iot.provision_field_for_feed(feed.id, field)
+                try:
+                    fields[i][0] = clients.iot.provision_field_for_feed(feed.id, field)
+                except HTTPError as e:
+                    logging.debug(e)
+                    failures.append(
+                        {"field_descriptor": field.field_descriptor, "error_message": e.response.text}
+                    )
             else:
                 # Existing field, ignore it
                 fields[i][0] = curr_fields[field.field_descriptor]
 
+    print_provisioning_failures(
+        message="Some fields could not be provisioned - resolve errors and rerun.",
+        failures=failures,
+    )
+
     # Add fields to grouping
     groupings = {g.slug: g for g in clients.iot.get_field_groupings_for_facility(feed.facility_id)}
+    failures.clear()
     with click.progressbar(fields, label="Adding fields to groupings") as fields_:
         for field, grouping_label, category in fields_:
             grouping_slug = slugify(cast(str, grouping_label))
@@ -226,10 +239,36 @@ def create(clients: Clients, feed_key: str, input: IO[str]) -> None:
                 clients.iot.add_field_to_grouping(grouping.id, field.id)
             except HTTPError as e:
                 logging.debug(e)
+                if e.response.text != '{"code":400,"message":"Field is already part of this grouping"}':
+                    failures.append(
+                        {
+                            "field_id": field.id,
+                            "field_descriptor": field.field_descriptor,
+                            "grouping_slug": grouping.slug,
+                            "error_message": e.response.text,
+                        }
+                    )
+
+    print_provisioning_failures(
+        message="Some fields could not be added to groupings - resolve errors and rerun.",
+        failures=failures,
+    )
 
     # Add groupings to categories
     categories = {c.name: c for c in clients.iot.get_categories_for_facility(feed.facility_id)}
     new_groups = {g: c for f, g, c in fields}
+
+    # Verify that all categories exist
+    new_categories = list(set(v for v in new_groups.values()))
+    missing_categories = [{"category": c} for c in new_categories if c not in categories]
+    print_provisioning_failures(
+        message=(
+            f"Some categories were not found for facility {feed.facility_id} - resolve errors and rerun."
+        ),
+        failures=missing_categories,
+    )
+
+    failures.clear()
     with click.progressbar(new_groups, label="Adding groupings to categories") as _groups:
         for group in _groups:
             grouping_id = groupings[slugify(cast(str, group))].id
@@ -238,6 +277,24 @@ def create(clients: Clients, feed_key: str, input: IO[str]) -> None:
                 clients.iot.add_grouping_to_category(grouping_id, category_id)
             except HTTPError as e:
                 logging.debug(e)
+                failures.append(
+                    {
+                        "grouping_id": grouping_id,
+                        "category_id": category_id,
+                        "error_message": e.response.text,
+                    }
+                )
+
+    print_provisioning_failures(
+        message="Some groupings could not be added to categories - resolve errors and rerun.",
+        failures=failures,
+    )
+
+
+def print_provisioning_failures(message: str, failures: List[Dict[str, Any]]) -> None:
+    if len(failures) > 0:
+        print_table(items=failures)
+        raise click.ClickException(message)
 
 
 @fields.command()
