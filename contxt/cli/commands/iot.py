@@ -210,12 +210,10 @@ def create(clients: Clients, feed_key: str, input: IO[str]) -> None:
                 # Existing field, ignore it
                 fields[i][0] = curr_fields[field.field_descriptor]
 
-    if len(failures) > 0:
-        printProvisioningFailures(
-            message="The following fields could not be provisioned - resolve errors and rerun.",
-            failures=failures,
-        )
-        return
+    print_provisioning_failures(
+        message="Some fields could not be provisioned - resolve errors and rerun.",
+        failures=failures,
+    )
 
     # Add fields to grouping
     groupings = {g.slug: g for g in clients.iot.get_field_groupings_for_facility(feed.facility_id)}
@@ -251,12 +249,10 @@ def create(clients: Clients, feed_key: str, input: IO[str]) -> None:
                         }
                     )
 
-    if len(failures) > 0:
-        printProvisioningFailures(
-            message="The following fields could not be added to groupings - resolve errors and rerun.",
-            failures=failures,
-        )
-        return
+    print_provisioning_failures(
+        message="Some fields could not be added to groupings - resolve errors and rerun.",
+        failures=failures,
+    )
 
     # Add groupings to categories
     categories = {c.name: c for c in clients.iot.get_categories_for_facility(feed.facility_id)}
@@ -265,13 +261,12 @@ def create(clients: Clients, feed_key: str, input: IO[str]) -> None:
     # Verify that all categories exist
     new_categories = list(set(v for v in new_groups.values()))
     missing_categories = [{"category": c} for c in new_categories if c not in categories]
-    if len(missing_categories) > 0:
-        printProvisioningFailures(
-            message=f"The following categories were not found for facility {feed.facility_id} - \
-                resolve errors and rerun.",
-            failures=failures,
-        )
-        return
+    print_provisioning_failures(
+        message=(
+            f"Some categories were not found for facility {feed.facility_id} - resolve errors and rerun."
+        ),
+        failures=missing_categories,
+    )
 
     failures.clear()
     with click.progressbar(new_groups, label="Adding groupings to categories") as _groups:
@@ -289,18 +284,17 @@ def create(clients: Clients, feed_key: str, input: IO[str]) -> None:
                         "error_message": e.response.text,
                     }
                 )
+
+    print_provisioning_failures(
+        message="Some groupings could not be added to categories - resolve errors and rerun.",
+        failures=failures,
+    )
+
+
+def print_provisioning_failures(message: str, failures: List[Dict[str, Any]]) -> None:
     if len(failures) > 0:
-        printProvisioningFailures(
-            message="The following groupings could not be added to categories - \
-                resolve errors and rerun.",
-            failures=failures,
-        )
-        return
-
-
-def printProvisioningFailures(message: str, failures: List[Dict[str, str]]) -> None:
-    logging.error(message)
-    print_table(items=failures)
+        print_table(items=failures)
+        raise click.ClickException(message)
 
 
 @fields.command()
