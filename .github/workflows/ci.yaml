@@ -48,8 +48,17 @@ jobs:
       - name: Run tests
         run: poetry run poe test
 
+  tests-passing:
+    if: always()
+    needs: [test]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: re-actors/alls-green@release/v1
+        with:
+          jobs: ${{ toJSON(needs) }}
+
   release:
-    needs: test
+    needs: tests-passing
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     steps:
