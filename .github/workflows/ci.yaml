@@ -37,9 +37,6 @@ jobs:
           - os: windows-latest
             python: "3.10"
     steps:
-      - run: |
-          echo "This should fail"
-          exit 1
       - uses: actions/checkout@v3
       - run: pipx install poetry
       - uses: actions/setup-python@v4
@@ -52,10 +49,13 @@ jobs:
         run: poetry run poe test
 
   tests-passing:
-    needs: test
+    if: always()
+    needs: [test]
     runs-on: ubuntu-latest
     steps:
-      - run: echo "This job wraps all OS x python-verions tests as a single branch protection check."
+      - uses: re-actors/alls-green@release/v1
+        with:
+          jobs: ${{ toJSON(needs) }}
 
   release:
     needs: tests-passing
