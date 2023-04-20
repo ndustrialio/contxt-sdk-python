@@ -49,3 +49,8 @@ class MessageBusService(ConfiguredApi):
     def get_stats_for_channel_and_service(self, channel_id: str, service_id: str) -> ChannelStats:
         resp = self.get(f"{self._channels_url(service_id)}/{channel_id}/statistics")
         return ChannelStats.from_api(resp)
+
+    def peek_messages_for_subscription_and_channel_and_service(
+        self, subscription: str, channel_id: str, service_id: str
+    ) -> Dict:
+        return self.get(f"{self._channels_url(service_id)}/{channel_id}/peek/{subscription}")
