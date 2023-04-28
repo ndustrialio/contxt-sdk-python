@@ -2,7 +2,6 @@
 
 import logging
 from pathlib import Path
-from typing import Optional
 
 import click
 from requests import RequestException
@@ -51,7 +50,7 @@ class Cli(click.MultiCommand):
 @click.option("-v", "--verbose", count=True, help="Increase verbosity")
 @click.version_option(__version__, "-V", "--version")
 @click.pass_context
-def cli(ctx: click.Context, env: str, org: Optional[str], verbose: int) -> None:
+def cli(ctx: click.Context, env: str, org: str, verbose: int) -> None:
     """Contxt CLI"""
     init_logger(verbose)
     ctx.obj = Clients(env=env, org_slug=org)

@@ -20,7 +20,7 @@ class Clients:
     """Holds a user and all client API's"""
 
     env: str
-    org_slug: Optional[str]
+    org_slug: str
 
     @cachedproperty
     def org_id(self) -> str:
@@ -50,16 +50,16 @@ class Clients:
 
     @cachedproperty
     def ems(self) -> EmsService:
-        return EmsService(auth=self.auth, env=self.env, org_id=self.org_id)
+        return EmsService(auth=self.auth, env=self.env, org_id=self.org_id, org_slug=self.org_slug)
 
     @cachedproperty
     def events(self) -> EventsService:
-        return EventsService(auth=self.auth, env=self.env, org_id=self.org_id)
+        return EventsService(auth=self.auth, env=self.env, org_slug=self.org_slug)
 
     @cachedproperty
     def nionic(self) -> NionicService:
-        return NionicService(auth=self.auth, env=self.env, org_id=self.org_id)
+        return NionicService(auth=self.auth, env=self.env, org_slug=self.org_slug)
 
     @cachedproperty
     def iot(self) -> IotService:
-        return IotService(auth=self.auth, env=self.env, org_id=self.org_id)
+        return IotService(auth=self.auth, env=self.env, org_slug=self.org_slug)

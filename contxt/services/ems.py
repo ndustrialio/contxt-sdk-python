@@ -3,7 +3,6 @@ from typing import Iterable, List, Optional
 
 from ..auth import Auth
 from ..models.ems import Facility, MainService, ResourceType, UtilityContract, UtilitySpend, UtilityUsage
-from ..utils.orgs import get_slug_or_org_id
 from .api import ApiEnvironment, ConfiguredApi
 from .pagination import PagedRecords
 
@@ -24,11 +23,12 @@ class EmsService(ConfiguredApi):
         ),
     )
 
-    def __init__(self, auth: Auth, org_id: str, env: str = "production", **kwargs) -> None:
+    def __init__(
+        self, auth: Auth, org_id: str, org_slug: str, env: str = "production", **kwargs
+    ) -> None:
         super().__init__(env=env, auth=auth, **kwargs)
         self.org_id = org_id
-        tenant = get_slug_or_org_id(org_id)
-        self.base_url = self.base_url.format(tenant=tenant)
+        self.base_url = self.base_url.format(tenant=org_slug)
 
     def get_facility(self, id: int) -> Facility:
         return Facility.from_api(self.get(f"{self.org_id}/facilities/{id}"))
