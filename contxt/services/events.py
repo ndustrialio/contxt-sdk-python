@@ -2,7 +2,6 @@ from typing import Iterable, List, Optional
 
 from ..auth import Auth
 from ..models.events import Event, EventDefinition, EventType, TriggeredEvent
-from ..utils.orgs import get_slug_or_org_id
 from .api import ApiEnvironment, ConfiguredApi
 from .pagination import PagedRecords, PageOptions
 
@@ -23,10 +22,9 @@ class EventsService(ConfiguredApi):
         ),
     )
 
-    def __init__(self, auth: Auth, org_id: str, env: str = "production", **kwargs) -> None:
+    def __init__(self, auth: Auth, org_slug: str, env: str = "production", **kwargs) -> None:
         super().__init__(env=env, auth=auth, **kwargs)
-        tenant = get_slug_or_org_id(org_id)
-        self.base_url = self.base_url.format(tenant=tenant)
+        self.base_url = self.base_url.format(tenant=org_slug)
 
     def set_human_readable_parameters(self, event_definition: EventDefinition) -> None:
         statement = ""

@@ -7,7 +7,6 @@ from contxt.models.facilities import Facility, MetricData, MetricLabel, Mutation
 from contxt.services.api import ApiEnvironment, BaseGraphService
 
 from ..auth import Auth
-from ..utils.orgs import get_slug_or_org_id
 
 
 class NionicService(BaseGraphService):
@@ -26,10 +25,9 @@ class NionicService(BaseGraphService):
         ),
     )
 
-    def __init__(self, auth: Auth, org_id: str, env: str = "production", **kwargs) -> None:
+    def __init__(self, auth: Auth, org_slug: str, env: str = "production", **kwargs) -> None:
         super().__init__(env=env, auth=auth, **kwargs)
-        tenant = get_slug_or_org_id(org_id)
-        self.base_url = self.base_url.format(tenant=tenant)
+        self.base_url = self.base_url.format(tenant=org_slug)
         self.endpoint = RequestsEndpoint(self.base_url.rstrip("/") + "/graphql", session=self.session)
 
     def get_facilities(self) -> List[Facility]:

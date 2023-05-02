@@ -21,7 +21,6 @@ from ..models.iot import (
 )
 from ..utils import is_datetime_aware, make_logger
 from ..utils.object_mapper import ObjectMapper
-from ..utils.orgs import get_slug_or_org_id
 from .api import ApiEnvironment, ConfiguredApi
 from .pagination import DataPoint, PagedRecords, PagedTimeSeries, PageOptions
 
@@ -50,10 +49,9 @@ class IotService(ConfiguredApi):
         ),
     )
 
-    def __init__(self, auth: Auth, org_id: str, env: str = "production", **kwargs) -> None:
+    def __init__(self, auth: Auth, org_slug: str, env: str = "production", **kwargs) -> None:
         super().__init__(env=env, auth=auth, **kwargs)
-        tenant = get_slug_or_org_id(org_id)
-        self.base_url = self.base_url.format(tenant=tenant)
+        self.base_url = self.base_url.format(tenant=org_slug)
 
     def provision_field_for_feed(self, feed_id: int, field: Field) -> Field:
         resp = self.post(f"feeds/{feed_id}/fields", data=field.post())

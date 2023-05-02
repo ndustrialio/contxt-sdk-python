@@ -3,7 +3,6 @@ from datetime import datetime, timezone
 from typing import Dict, List
 
 from ..utils import is_datetime_aware, make_logger
-from ..utils.orgs import get_slug_or_org_id
 from .api import ApiEnvironment, ConfiguredApi
 
 logger = make_logger(__name__)
@@ -20,17 +19,18 @@ class NgestService(ConfiguredApi):
         ),
     )
 
-    def __init__(self, org_id: str, env: str = "production", **kwargs) -> None:
+    def __init__(self, org_slug: str, env: str = "production", **kwargs) -> None:
         self.env = env
         super().__init__(env=env, **kwargs)
-        tenant = get_slug_or_org_id(org_id)
-        self.base_url = self.base_url.format(tenant=tenant)
+        self.base_url = self.base_url.format(tenant=org_slug)
 
     @staticmethod
     def specialize(
-        feed_key: str, feed_token: str, org_id: str, env: str = "production"
+        feed_key: str, feed_token: str, org_slug: str, env: str = "production"
     ) -> "SpecializedNgestService":
-        return SpecializedNgestService(env=env, feed_key=feed_key, feed_token=feed_token, org_id=org_id)
+        return SpecializedNgestService(
+            env=env, feed_key=feed_key, feed_token=feed_token, org_slug=org_slug
+        )
 
     def _format_time_series(self, feed_key: str, time_series: Dict[str, Dict[datetime, float]]) -> Dict:
         # Enforce all datetimes are tz-aware
@@ -95,8 +95,8 @@ class NgestService(ConfiguredApi):
 
 
 class SpecializedNgestService(NgestService):
-    def __init__(self, feed_key: str, feed_token: str, org_id: str, env: str = "production") -> None:
-        super().__init__(env=env, org_id=org_id)
+    def __init__(self, feed_key: str, feed_token: str, org_slug: str, env: str = "production") -> None:
+        super().__init__(env=env, org_slug=org_slug)
         self.feed_key = feed_key
         self.feed_token = feed_token
 
