@@ -45,8 +45,17 @@ jobs:
           cache: poetry
       - name: Install package
         run: poetry install -E crypto
+      - name: Start integration services
+        run: |
+          timeout 120s ./scripts/start-docker.sh
       - name: Run tests
         run: poetry run poe test
+      - name: Stop integration services
+        if: always()
+        run: |
+          docker compose ps --all
+          echo 'docker compose logs nionic'
+          docker compose down
 
   tests-passing:
     if: always()
