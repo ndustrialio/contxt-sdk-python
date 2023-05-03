@@ -24,13 +24,11 @@ jobs:
       - name: Run linters
         run: poetry run poe lint
 
-  test:
+  test-build-only:
     needs: lint
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest]
-        python: ["3.8", "3.9", "3.10", "3.11"]
         include:
           - os: macos-latest
             python: "3.10"
@@ -45,12 +43,38 @@ jobs:
           cache: poetry
       - name: Install package
         run: poetry install -E crypto
+  
+  test:
+    needs: lint
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        python: ["3.8", "3.9", "3.10", "3.11"]
+    steps:
+      - uses: actions/checkout@v3
+      - run: pipx install poetry
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python }}
+          cache: poetry
+      - name: Install package
+        run: poetry install -E crypto
+      - name: Start integration services
+        run: |
+          timeout 120s ./scripts/start-docker.sh
       - name: Run tests
         run: poetry run poe test
+      - name: Stop integration services
+        if: always()
+        run: |
+          docker compose ps --all
+          echo 'docker compose logs nionic'
+          docker compose down
 
   tests-passing:
     if: always()
-    needs: [test]
+    needs: [test,test-build-only]
     runs-on: ubuntu-latest
     steps:
       - uses: re-actors/alls-green@release/v1

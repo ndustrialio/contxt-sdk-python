@@ -16,6 +16,14 @@ pip install contxt-sdk
 contxt --help
 ```
 
+## Tests
+
+```sh
+docker compose up -d --wait
+poetry run poe test
+docker compose down
+```
+
 ## Documentation
 
 Please refer to <https://ndustrialio.github.io/contxt-sdk-python>.
