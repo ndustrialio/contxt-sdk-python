@@ -988,14 +988,14 @@ testing-integration = ["build[virtualenv]", "filelock (>=3.4.0)", "jaraco.envs (
 
 [[package]]
 name = "sgqlc"
-version = "16.0"
+version = "16.1"
 description = "Simple GraphQL Client"
 category = "main"
 optional = false
 python-versions = ">=3.6"
 files = [
-    {file = "sgqlc-16.0-py3-none-any.whl", hash = "sha256:fd55d808e17c96392bcc9058b31433ef9ae6376ca36a6352d4bd602b968193a2"},
-    {file = "sgqlc-16.0.tar.gz", hash = "sha256:e8de916cc8fab5470803c01c06e0fc0a0aad6ecef2b6cdb48e5143a6e2cd7e0a"},
+    {file = "sgqlc-16.1-py3-none-any.whl", hash = "sha256:d472f25101e40b05dab30193e3fc4ecc36bd671f7a9b04a49954a98d121f0fdb"},
+    {file = "sgqlc-16.1.tar.gz", hash = "sha256:21591009345b116b43a7a7d3995edc25dc2d14092273028205b86d07843a19ac"},
 ]
 
 [package.dependencies]
