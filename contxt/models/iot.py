@@ -229,3 +229,10 @@ class BatchResponse:
 
 
 BatchResponses = Dict[str, BatchResponse]
+
+
+@dataclass
+class FieldWithGrouping:
+    field: Field
+    grouping: str
+    category: str

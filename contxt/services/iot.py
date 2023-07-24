@@ -1,9 +1,12 @@
 from collections import defaultdict
 from copy import deepcopy
+from csv import DictReader
 from datetime import datetime, timedelta, timezone
-from typing import Any, Dict, Iterable, List, Optional, Tuple
+from typing import IO, Any, Dict, Iterable, List, Optional, Tuple
 
 from requests import Request
+
+from contxt.models.iot import FieldWithGrouping
 
 from ..auth import Auth
 from ..models import Parsers
@@ -16,6 +19,7 @@ from ..models.iot import (
     FieldCategory,
     FieldGrouping,
     FieldTimeSeries,
+    FieldValueType,
     UnprovisionedField,
     Window,
 )
@@ -25,6 +29,8 @@ from .api import ApiEnvironment, ConfiguredApi
 from .pagination import DataPoint, PagedRecords, PagedTimeSeries, PageOptions
 
 logger = make_logger(__name__)
+
+NEW_FIELD_ATTRS = ["field_descriptor", "label", "value_type", "units", "grouping", "category"]
 
 
 class IotService(ConfiguredApi):
@@ -459,3 +465,35 @@ class IotDataService(ConfiguredApi):
         if epoch:
             return datetime.fromtimestamp(epoch, tz=timezone.utc)
         return None
+
+
+class FileFormatException(Exception):
+    pass
+
+
+def load_fields_from_file(feed_key: str, input: IO[str]):
+    """
+    Loads fields for provisioning from a file.
+    """
+
+    fields: List[FieldWithGrouping] = list()
+    try:
+        fields = [
+            FieldWithGrouping(
+                Field(
+                    feed_key=feed_key,
+                    field_descriptor=r["field_descriptor"],
+                    label=r["label"],
+                    units=r["units"],
+                    value_type=FieldValueType(r["value_type"].lower()),
+                    is_hidden=False,
+                ),
+                r["grouping"],
+                r["category"],
+            )
+            for r in DictReader(input)
+        ]
+    except KeyError:
+        return FileFormatException(f"The following columns are required: {NEW_FIELD_ATTRS}")
+
+    return fields

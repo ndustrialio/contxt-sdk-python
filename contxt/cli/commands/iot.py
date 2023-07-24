@@ -12,9 +12,8 @@ from slugify import slugify
 from contxt.cli.clients import Clients
 from contxt.cli.utils import LAST_WEEK, NOW, ClickPath, fields_option, print_table, sort_option
 from contxt.models.iot import Feed, Field, FieldCategory, FieldGrouping, FieldValueType, Window
+from contxt.services.iot import NEW_FIELD_ATTRS, FileFormatException, load_fields_from_file
 from contxt.utils.serializer import Serializer
-
-NEW_FIELD_ATTRS = ["field_descriptor", "label", "value_type", "units", "grouping", "category"]
 
 
 @click.group()
@@ -25,6 +24,11 @@ def iot() -> None:
 @iot.group()
 def fields() -> None:
     """IoT Fields"""
+
+
+@iot.group()
+def calculated_fields() -> None:
+    """IoT Calculated Fields"""
 
 
 @iot.group()
@@ -310,6 +314,123 @@ def unprovisioned(clients: Clients, feed_key: str, output: Optional[IO[str]]) ->
         writer = DictWriter(output, fieldnames=NEW_FIELD_ATTRS)
         writer.writeheader()
         writer.writerows([{"field_descriptor": f.field_descriptor} for f in items])
+
+
+@calculated_fields.command()
+@click.argument("feed_key")
+@click.option("--input", required=True, type=click.File(), help="CSV of calculated fields to provision")
+@click.pass_obj
+def provision(clients: Clients, feed_key: str, input: IO[str]) -> None:
+    """
+    Provision calculated fields.
+    """
+
+    feed = clients.iot.get_feed_with_key(feed_key)
+    if not feed:
+        raise click.ClickException(f"Feed with key {feed_key} does not exist.")
+
+    fields = load_fields_from_file(feed_key, input)
+    if isinstance(fields, FileFormatException):
+        raise fields
+
+    curr_fields = {f.field_descriptor: f for f in clients.iot.get_fields_for_feed(feed.id)}
+    failures = []
+    with click.progressbar([t.field for t in fields], label="Provisioning calculated fields") as _fields:
+        for i, field in enumerate(_fields):
+            field = cast(Field, field)
+            if field.field_descriptor in curr_fields:
+                # Existing field, ignore it
+                fields[i].field = curr_fields[field.field_descriptor]
+                continue
+
+            # New field, create it
+            try:
+                fields[i].field = clients.iot.provision_field_for_feed(feed.id, field)
+            except HTTPError as e:
+                logging.debug(e)
+                failures.append(
+                    {"field_descriptor": field.field_descriptor, "error_message": e.response.text}
+                )
+
+    print_provisioning_failures(
+        message="Some fields could not be provisioned - resolve errors and rerun.",
+        failures=failures,
+    )
+
+    # Add fields to grouping
+    groupings = {g.slug: g for g in clients.iot.get_field_groupings_for_facility(feed.facility_id)}
+    failures.clear()
+    with click.progressbar(fields, label="Adding fields to groupings") as fields_:
+        for field, grouping_label, category in fields_:
+            grouping_slug = slugify(cast(str, grouping_label))
+            field = cast(Field, field)
+            if grouping_slug not in groupings:
+                # New grouping, create it
+                grouping = clients.iot.create_grouping(
+                    facility_id=feed.facility_id,
+                    label=grouping_label,
+                    description=grouping_label,
+                    is_public=True,
+                    field_category_id=[],
+                )
+                groupings[grouping.slug] = grouping
+            else:
+                # Existing grouping, grab it
+                grouping = groupings[grouping_slug]
+            try:
+                clients.iot.add_field_to_grouping(grouping.id, field.id)
+            except HTTPError as e:
+                logging.debug(e)
+                if e.response.text != '{"code":400,"message":"Field is already part of this grouping"}':
+                    failures.append(
+                        {
+                            "field_id": field.id,
+                            "field_descriptor": field.field_descriptor,
+                            "grouping_slug": grouping.slug,
+                            "error_message": e.response.text,
+                        }
+                    )
+
+    print_provisioning_failures(
+        message="Some fields could not be added to groupings - resolve errors and rerun.",
+        failures=failures,
+    )
+
+    # Add groupings to categories
+    categories = {c.name: c for c in clients.iot.get_categories_for_facility(feed.facility_id)}
+    new_groups = {g: c for f, g, c in fields}
+
+    # Verify that all categories exist
+    new_categories = list(set(v for v in new_groups.values()))
+    missing_categories = [{"category": c} for c in new_categories if c not in categories]
+    print_provisioning_failures(
+        message=(
+            f"Some categories were not found for facility {feed.facility_id} - resolve errors and rerun."
+        ),
+        failures=missing_categories,
+    )
+
+    failures.clear()
+    with click.progressbar(new_groups, label="Adding groupings to categories") as _groups:
+        for group in _groups:
+            grouping_id = groupings[slugify(cast(str, group))].id
+            category_id = categories[new_groups[group]].id if new_groups[group] != "" else None
+            try:
+                clients.iot.add_grouping_to_category(grouping_id, category_id)
+            except HTTPError as e:
+                logging.debug(e)
+                failures.append(
+                    {
+                        "grouping_id": grouping_id,
+                        "category_id": category_id,
+                        "error_message": e.response.text,
+                    }
+                )
+
+    print_provisioning_failures(
+        message="Some groupings could not be added to categories - resolve errors and rerun.",
+        failures=failures,
+    )
 
 
 @groupings.command("create")
