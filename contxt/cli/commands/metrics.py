@@ -19,15 +19,14 @@ def labels(clients: Clients) -> None:
 
 @metrics.command()
 @click.option(
-    "--source-id",
+    "--facility-id",
     required=True,
-    help="Organization ID, defaults to first value in token if not specified",
+    help="Facility ID",
 )
-@click.option(
-    "--label", required=True, help="Organization ID, defaults to first value in token if not specified"
-)
+@click.option("--label", required=True, help="Facility ID")
+@click.option("--start", required=True)
 @click.pass_obj
-def data(clients: Clients, source_id: str, label: str) -> None:
-    """Get facilities"""
-    facilities = clients.nionic.get_metric_data(label, source_id)
-    print(Serializer.to_table(facilities))
+def data(clients: Clients, facility_id: int, label: str, start: str) -> None:
+    """Get metric data"""
+    results = clients.nionic.get_metric_data(label, facility_id, start)
+    print(Serializer.to_table(results))

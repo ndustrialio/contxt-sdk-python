@@ -11,11 +11,11 @@ from contxt.cli.utils import (
     NOW,
     ClickPath,
     csv_callback,
-    fields_option,
+    #fields_option,
     print_table,
-    sort_option,
+    #sort_option,
 )
-from contxt.models.ems import MainService, ResourceType
+from contxt.models.ems import ResourceType
 from contxt.models.iot import Window
 from contxt.utils.serializer import Serializer
 
@@ -28,43 +28,43 @@ def ems() -> None:
 @ems.command()
 @click.argument("facility_id")
 @click.option("--resource-type", type=ResourceType, default="electric", help="Resource type")
-@fields_option(default="id, name, resource_type", obj=MainService)
-@sort_option(default="id")
+# TODO fix field selection and sorting
+# @fields_option(default="id, name, resource_type", obj=MainService)
+# @sort_option(default="id")
 @click.pass_obj
-def mains(
-    clients: Clients, facility_id: int, resource_type: ResourceType, fields: List[str], sort: str
-) -> None:
+def mains(clients: Clients, facility_id: int, resource_type: ResourceType) -> None:
     """Get main services"""
-    items = clients.ems.get_main_services(facility_id=facility_id, resource_type=resource_type)
-    print_table(items=items, keys=fields, sort_by=sort)
+    items = clients.nionic.get_main_services(facility_id=facility_id, resource_type=resource_type)
+    print(Serializer.to_table(items))
 
 
 @ems.command()
 @click.argument("facility_id")
 @click.option("--resource-type", type=ResourceType, default="electric", help="Resource type")
-@click.option("--start", type=click.DateTime(), help="Start time")
-@click.option("--end", type=click.DateTime(), help="End time")
+@click.option("--start", type=click.DateTime(), help="Start time", required=True)
+@click.option("--end", type=click.DateTime(), help="End time", required=True)
 @click.pass_obj
 def main_data(
     clients: Clients, facility_id: int, resource_type: ResourceType, start: datetime, end: datetime
 ) -> None:
     """Get main service data"""
     data: Dict[datetime, Dict[str, Any]] = defaultdict(dict)
-    services = clients.ems.get_main_services(facility_id=facility_id, resource_type=resource_type)
+    services = clients.nionic.get_main_services(facility_id=facility_id, resource_type=resource_type)
     with click.progressbar(
         services,
         label="Downloading main service data",
         item_show_func=lambda s: f"Service {s.name}" if s else "",
     ) as services_:
         for service in services_:
-            for t, v in clients.iot.get_time_series_for_field(
-                field=service.usage_field,
-                start_time=start,
-                end_time=end,
+            for t, v in clients.nionic.get_data_point_data(
+                data_source_name=service.usage.data_source_name,
+                name=service.usage.name,
+                start=start.isoformat(),
+                end=end.isoformat(),
                 window=Window.MINUTELY,
                 per_page=5000,
             ):
-                data[t][service.usage_field.field_human_name] = v
+                data[t][service.usage.alias] = v
 
     # Dump
     print_table(items=data)
@@ -157,16 +157,17 @@ def export(
             # Main service data
             if "mains" in include:
                 data: Dict[datetime, Dict[str, Any]] = defaultdict(dict)
-                services = clients.ems.get_main_services(facility_id=facility.id)
+                services = clients.nionic.get_main_services(facility_id=facility.id)
                 for service in services:
-                    for t, v in clients.iot.get_time_series_for_field(
-                        field=service.usage_field,
-                        start_time=start,
-                        end_time=end,
+                    for t, v in clients.nionic.get_data_point_data(
+                        data_source_name=service.usage.data_source_name,
+                        name=service.usage.name,
+                        start=start.isoformat(),
+                        end=end.isoformat(),
                         window=Window.MINUTELY,
                         per_page=5000,
                     ):
-                        data[t][service.usage_field.field_human_name] = v
+                        data[t][service.usage.alias] = v
                 Serializer.to_csv(data, fpath / "ems" / "main_service_usage.csv")
 
     print(f"Wrote data to {output}")

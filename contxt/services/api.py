@@ -202,8 +202,8 @@ class BaseGraphService(ConfiguredApi):
             raise Exception(resp["errors"][0]["message"])
         return resp["data"]
 
-    def run(self, op: Operation) -> Any:
-        data = self.endpoint(op)
+    def run(self, op: Operation, variables: Optional[Any] = None) -> Any:
+        data = self.endpoint(op, variables)
         if "errors" in data:
             raise Exception(data["errors"][0]["message"])
         return data

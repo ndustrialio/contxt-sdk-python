@@ -41,6 +41,19 @@ Our [CI pipeline](.github/workflows/ci.yaml) will run these tools on each commit
 poetry run pre-commit install
 ```
 
+### Updating the Nionic Graphql artifacts
+
+
+```sh
+poetry shell
+
+python3 -m sgqlc.introspection --exclude-deprecated --exclude-description http://localhost:3000/graphql graphql/nionic_schema.json
+
+sgqlc-codegen schema graphql/nionic_schema.json nionic_schema.py
+
+sgqlc-codegen operation --schema graphql/nionic_schema.json nionic_schema nionic_queries.py graphql/nionic_queries.graphql
+```
+
 ### Create Release
 
 On a commit to main, our [CI pipeline](.github/workflows/ci.yaml) will bump the version (determined by [conventional commits](https://www.conventionalcommits.org/)) and publish a new release to PyPI.
