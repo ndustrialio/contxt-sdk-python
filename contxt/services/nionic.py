@@ -49,7 +49,7 @@ class NionicService(BaseGraphService):
         query = """
         query metricData($facilityId: Int!, $label: String!, $from: String!) {
             facility(id: $facilityId) {
-                metricData(label: $label, from: $from, orderBy: TIME_ASC, window: "1 day") {
+                metricData(label: $label, from: $from) {
                     nodes {
                         time
                         data
