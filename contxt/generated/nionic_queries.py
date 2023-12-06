@@ -1,6 +1,6 @@
 import sgqlc.types
 import sgqlc.operation
-import nionic_schema
+from . import nionic_schema
 
 _schema = nionic_schema
 _schema_root = _schema.nionic_schema

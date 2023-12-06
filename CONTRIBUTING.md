@@ -51,7 +51,7 @@ python3 -m sgqlc.introspection --exclude-deprecated --exclude-description http:/
 
 sgqlc-codegen schema graphql/nionic_schema.json contxt/generated/nionic_schema.py
 
-sgqlc-codegen operation --schema graphql/nionic_schema.json nionic_schema contxt/generated/nionic_queries.py graphql/nionic_queries.graphql
+sgqlc-codegen operation --schema graphql/nionic_schema.json .nionic_schema contxt/generated/nionic_queries.py graphql/nionic_queries.graphql
 ```
 
 ### Create Release
