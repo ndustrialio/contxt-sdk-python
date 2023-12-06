@@ -64,7 +64,10 @@ def main_data(
                 window=Window.MINUTELY,
                 per_page=5000,
             ):
-                data[t][service.usage.alias] = v
+                if t in data and service.usage.alias in data[t]:
+                    data[t][service.usage.alias] = (v + data[t][service.usage.alias])
+                else:
+                    data[t][service.usage.alias] = v
 
     # Dump
     print_table(items=data)
@@ -167,7 +170,10 @@ def export(
                         window=Window.MINUTELY,
                         per_page=5000,
                     ):
-                        data[t][service.usage.alias] = v
+                        if t in data and service.usage.alias in data[t]:
+                            data[t][service.usage.alias] = (v + data[t][service.usage.alias])
+                        else:
+                            data[t][service.usage.alias] = v
                 Serializer.to_csv(data, fpath / "ems" / "main_service_usage.csv")
 
     print(f"Wrote data to {output}")
