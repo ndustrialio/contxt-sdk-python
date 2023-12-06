@@ -59,8 +59,8 @@ def main_data(
             for t, v in clients.nionic.get_data_point_data(
                 data_source_name=service.usage.data_source_name,
                 name=service.usage.name,
-                start=start.isoformat(),
-                end=end.isoformat(),
+                start=start.astimezone().isoformat(),
+                end=end.astimezone().isoformat(),
                 window=Window.MINUTELY,
                 per_page=5000,
             ):
@@ -165,8 +165,8 @@ def export(
                     for t, v in clients.nionic.get_data_point_data(
                         data_source_name=service.usage.data_source_name,
                         name=service.usage.name,
-                        start=start.isoformat(),
-                        end=end.isoformat(),
+                        start=start.astimezone().isoformat(),
+                        end=end.astimezone().isoformat(),
                         window=Window.MINUTELY,
                         per_page=5000,
                     ):
