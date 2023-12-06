@@ -199,3 +199,76 @@ class PagedTimeSeries:
     @property
     def per_page(self) -> int:
         return self.params["limit"]
+
+
+@dataclass
+class GQLTimeSeriesPageMetadata:
+    hasNextPage: bool
+    endCursor: str
+
+
+@dataclass
+class GQLTimeSeriesPage:
+    nodes: List[Record]
+    pageInfo: GQLTimeSeriesPageMetadata
+
+    def __len__(self) -> int:
+        return len(self.nodes)
+
+    def __iter__(self) -> Iterator[Record]:
+        yield from self.nodes
+
+    def __getitem__(self, index: Union[int, slice]) -> Union[Record, List[Record]]:
+        return self.nodes[index]
+
+
+class PagedGQLTimeSeries:
+    def __init__(self, api: Api, query: str, params: Optional[Dict] = None, per_page: int = 1000):
+        self.api = api
+        self.query = query
+        self.params = params or {}
+        self.params.setdefault("limit", per_page)
+
+        # Fetch first page
+        self.page_index = 0
+        self.page = self._get_page()
+
+    def __iter__(self):
+        # HACK: Reset to first page
+        if self.page_index != 0:
+            self.page_index = 0
+            self.page = self._get_page()
+        yield from self.page
+        while self.next_page_cursor:
+            yield from self.get_next_page()
+
+    def _get_page(self, cursor: Optional[str] = None) -> GQLTimeSeriesPage:
+        params = self.params
+        if cursor is not None:
+            params = dict(self.params)
+            params["after"] = cursor
+        resp = self.api.query(self.query, variables=params)
+        page = ObjectMapper.tree_to_object(resp["dataPoint"]["data"], GQLTimeSeriesPage)
+        # NOTE: this post processing is not ideal, but works for now
+        page.nodes = [self._record_parser(rec) for rec in page.nodes]  # type: ignore
+        return page
+
+    def _record_parser(self, record: Dict) -> DataPoint:
+        return Parsers.datetime(record["time"]), Parsers.unknown(record["data"])
+
+    def get_next_page(self) -> GQLTimeSeriesPage:
+        if not self.next_page_cursor:
+            raise IndexError("No next page")
+        self.page_index += 1
+        self.page = self._get_page(cursor=self.next_page_cursor)
+        return self.page
+
+    @property
+    def next_page_cursor(self) -> Optional[str]:
+        if not self.page.pageInfo.hasNextPage:
+            return None
+        return self.page.pageInfo.endCursor
+
+    @property
+    def per_page(self) -> int:
+        return self.params["limit"]

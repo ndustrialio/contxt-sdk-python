@@ -8,6 +8,7 @@ from contxt.services.api import ApiEnvironment, BaseGraphService
 from nionic_schema import Facility, MainService, MetricLabel
 
 from ..auth import Auth
+from .pagination import DataPoint, PagedGQLTimeSeries
 
 
 class NionicService(BaseGraphService):
@@ -70,28 +71,32 @@ class NionicService(BaseGraphService):
 
     def get_data_point_data(
         self, name: str, data_source_name: str, start: str, end: str, window: Window, per_page: int
-    ) -> List[Any]:
-        query = """
-        query dataPointData($dataSourceName: String!, $name: String!,
-          $from: String!, $to: String!, $window: String!) {
-            dataPoint(dataSourceName: $dataSourceName, name: $name) {
-                data(from: $from, to: $to, orderBy: TIME_ASC, window: $window) {
-                    nodes {
-                        time
-                        data
+    ) -> List[DataPoint]:
+        return PagedGQLTimeSeries(
+            api=self,
+            query="""
+            query dataPointData($dataSourceName: String!, $name: String!,
+            $from: String!, $to: String!, $window: String!, $limit: Int!, $after: Cursor) {
+                dataPoint(dataSourceName: $dataSourceName, name: $name) {
+                    data(from: $from, to: $to, orderBy: TIME_ASC, window: $window, first: $limit, after: $after) {
+                        nodes {
+                            time
+                            data
+                        }
+                        pageInfo {
+                            hasNextPage
+                            endCursor
+                        }
                     }
                 }
             }
-        }
-        """
-        resp = self.query(
-            query,
-            {
+            """,
+            params={
                 "dataSourceName": data_source_name,
                 "name": name,
                 "from": start,
                 "to": end,
                 "window": f"{window.value} minutes",
             },
+            per_page=per_page,
         )
-        return resp["dataPoint"]["data"]["nodes"]
