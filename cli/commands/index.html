@@ -383,9 +383,9 @@
 <p><strong>Options:</strong></p>
 <pre><code>  --resource-type RESOURCETYPE    Resource type
   --start [%Y-%m-%d|%Y-%m-%dT%H:%M:%S|%Y-%m-%d %H:%M:%S]
-                                  Start time
+                                  Start time  [required]
   --end [%Y-%m-%d|%Y-%m-%dT%H:%M:%S|%Y-%m-%d %H:%M:%S]
-                                  End time
+                                  End time  [required]
   --help                          Show this message and exit.
 </code></pre>
 <h3 id="mains">mains<a class="headerlink" href="#mains" title="Permanent link">&para;</a></h3>
@@ -629,16 +629,16 @@
 <pre><code>  --help  Show this message and exit.
 </code></pre>
 <h3 id="data_1">data<a class="headerlink" href="#data_1" title="Permanent link">&para;</a></h3>
-<p>Get facilities</p>
+<p>Get metric data</p>
 <p><strong>Usage:</strong></p>
 <pre><code>contxt metrics data [OPTIONS]
 </code></pre>
 <p><strong>Options:</strong></p>
-<pre><code>  --source-id TEXT  Organization ID, defaults to first value in token if not
-                    specified  [required]
-  --label TEXT      Organization ID, defaults to first value in token if not
-                    specified  [required]
-  --help            Show this message and exit.
+<pre><code>  --facility-id TEXT              Facility ID  [required]
+  --label TEXT                    Facility ID  [required]
+  --start [%Y-%m-%d|%Y-%m-%dT%H:%M:%S|%Y-%m-%d %H:%M:%S]
+                                  [required]
+  --help                          Show this message and exit.
 </code></pre>
 <h3 id="labels">labels<a class="headerlink" href="#labels" title="Permanent link">&para;</a></h3>
 <p>Get Metric Labels</p>
