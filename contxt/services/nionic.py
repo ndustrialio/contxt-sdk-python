@@ -2,10 +2,10 @@ from typing import Any, Iterable, List
 
 from sgqlc.endpoint.requests import RequestsEndpoint
 
-import nionic_queries
+from contxt.generated.nionic_queries import Operations as nionic_operations
+from contxt.generated.nionic_schema import Facility, MainService, MetricLabel
 from contxt.models.iot import Window
 from contxt.services.api import ApiEnvironment, BaseGraphService
-from nionic_schema import Facility, MainService, MetricLabel
 
 from ..auth import Auth
 from .pagination import DataPoint, PagedGQLTimeSeries
@@ -33,15 +33,15 @@ class NionicService(BaseGraphService):
         self.endpoint = RequestsEndpoint(self.base_url.rstrip("/") + "/graphql", session=self.session)
 
     def get_facilities(self) -> List[Facility]:
-        op = nionic_queries.Operations.query.facilities
+        op = nionic_operations.query.facilities
         return (op + self.run(op)).facilities.nodes
 
     def create_facility(self, data: dict) -> Facility:
-        op = nionic_queries.Operations.mutation.create_facility
+        op = nionic_operations.mutation.create_facility
         return self.run(op, data)["data"]["createFacility"]["facility"]
 
     def get_metric_labels(self) -> List[MetricLabel]:
-        op = nionic_queries.Operations.query.metric_labels
+        op = nionic_operations.query.metric_labels
         return self.run(op).get("data").get("metricLabels")
 
     def get_metric_data(self, label: str, facility_id: int, start: str) -> List[Any]:
@@ -61,7 +61,7 @@ class NionicService(BaseGraphService):
         return resp["facility"]["metricData"]["nodes"]
 
     def get_main_services(self, facility_id: int, resource_type) -> List[MainService]:
-        op = nionic_queries.Operations.query.main_services
+        op = nionic_operations.query.main_services
         filterValues = {"facilityId": int(facility_id)}
         return [
             x

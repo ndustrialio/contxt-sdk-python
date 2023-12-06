@@ -3,25 +3,25 @@ repos:
     hooks:
       - id: isort
         name: isort
-        exclude: ^(nionic_schema\.py|nionic_queries\.py)
+        exclude: ^(contxt/generated)
         entry: poetry run isort
         language: system
         types: [python]
       - id: black
         name: black
-        exclude: ^(nionic_schema\.py|nionic_queries\.py)
+        exclude: ^(contxt/generated)
         entry: poetry run black
         language: system
         types: [python]
       - id: flake8
         name: flake8
-        exclude: ^(graphql/|nionic_schema\.py|nionic_queries\.py)
+        exclude: ^(graphql/|contxt/generated)
         entry: poetry run flake8
         language: system
         types: [python]
       - id: mypy
         name: mypy
-        exclude: ^(nionic_schema\.py|nionic_queries\.py)
+        exclude: ^(contxt/generated)
         entry: poetry run mypy --ignore-missing-imports
         language: system
         require_serial: true
