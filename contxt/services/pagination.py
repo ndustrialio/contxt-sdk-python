@@ -3,6 +3,8 @@ from datetime import datetime
 from math import ceil
 from typing import Any, Callable, Dict, Generic, Iterator, List, Optional, Tuple, TypeVar, Union
 
+from contxt.services.api import BaseGraphService
+
 from ..models import Parsers
 from ..utils.object_mapper import ObjectMapper
 from .api import Api
@@ -223,7 +225,9 @@ class GQLTimeSeriesPage:
 
 
 class PagedGQLTimeSeries:
-    def __init__(self, api: Api, query: str, params: Optional[Dict] = None, per_page: int = 1000):
+    def __init__(
+        self, api: BaseGraphService, query: str, params: Optional[Dict] = None, per_page: int = 1000
+    ):
         self.api = api
         self.query = query
         self.params = params or {}
