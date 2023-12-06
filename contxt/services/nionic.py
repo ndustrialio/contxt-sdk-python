@@ -78,7 +78,7 @@ class NionicService(BaseGraphService):
             query dataPointData($dataSourceName: String!, $name: String!,
             $from: String!, $to: String!, $window: String!, $limit: Int!, $after: Cursor) {
                 dataPoint(dataSourceName: $dataSourceName, name: $name) {
-                    data(from: $from, to: $to, orderBy: TIME_ASC, window: $window
+                    data(from: $from, to: $to, orderBy: TIME_DESC, window: $window
                     , first: $limit, after: $after) {
                         nodes {
                             time
@@ -97,7 +97,7 @@ class NionicService(BaseGraphService):
                 "name": name,
                 "from": start,
                 "to": end,
-                "window": f"{window.value} minutes",
+                "window": f"{window.value} seconds",
             },
             per_page=per_page,
         )
