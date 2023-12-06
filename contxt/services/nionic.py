@@ -78,10 +78,12 @@ class NionicService(BaseGraphService):
         return PagedGQLTimeSeries(
             api=self,
             query="""
-            query dataPointData($dataSourceName: String!, $name: String!,
-            $from: String!, $to: String!, $window: String!, $limit: Int!, $after: Cursor) {
+            query dataPointData($dataSourceName: String!, $name: String!
+                , $from: String!, $to: String!, $window: String!, $samplingWindow: String!
+                , $limit: Int!, $after: Cursor) {
                 dataPoint(dataSourceName: $dataSourceName, name: $name) {
-                    data(from: $from, to: $to, orderBy: TIME_DESC, window: $window
+                    data(from: $from, to: $to, orderBy: TIME_DESC
+                    , window: $window, samplingWindow: $samplingWindow
                     , first: $limit, after: $after) {
                         nodes {
                             time
@@ -101,6 +103,8 @@ class NionicService(BaseGraphService):
                 "from": start,
                 "to": end,
                 "window": f"{window.value} seconds",
+                # limit to 1 day if window is greater than 1 day
+                "samplingWindow": f"{min(window.value, 86400)} seconds",
             },
             per_page=per_page,
         )
