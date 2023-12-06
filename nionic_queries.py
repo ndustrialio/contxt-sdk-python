@@ -47,6 +47,8 @@ def query_main_services():
     _op = sgqlc.operation.Operation(_schema_root.query_type, name='mainServices', variables=dict(facilityId=sgqlc.types.Arg(sgqlc.types.non_null(_schema.Int))))
     _op_main_services = _op.main_services(filter={'facilityId': {'equalTo': sgqlc.types.Variable('facilityId')}})
     _op_main_services_nodes = _op_main_services.nodes()
+    _op_main_services_nodes.id()
+    _op_main_services_nodes.facility_id()
     _op_main_services_nodes.name()
     _op_main_services_nodes.type()
     _op_main_services_nodes_usage = _op_main_services_nodes.data_point_by_usage(__alias__='usage')
@@ -61,6 +63,8 @@ def query_main_services():
     _op_main_services_nodes_demand.name()
     _op_main_services_nodes_demand.alias()
     _op_main_services_nodes_demand.data_type()
+    _op_main_services_nodes.created_at()
+    _op_main_services_nodes.updated_at()
     return _op
 
 

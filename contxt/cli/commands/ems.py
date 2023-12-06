@@ -11,11 +11,11 @@ from contxt.cli.utils import (
     NOW,
     ClickPath,
     csv_callback,
-    #fields_option,
+    fields_option,
     print_table,
-    #sort_option,
+    sort_option,
 )
-from contxt.models.ems import ResourceType
+from contxt.models.ems import MainService, ResourceType
 from contxt.models.iot import Window
 from contxt.utils.serializer import Serializer
 
@@ -28,14 +28,21 @@ def ems() -> None:
 @ems.command()
 @click.argument("facility_id")
 @click.option("--resource-type", type=ResourceType, default="electric", help="Resource type")
-# TODO fix field selection and sorting
-# @fields_option(default="id, name, resource_type", obj=MainService)
-# @sort_option(default="id")
+@fields_option(default="id, name, resource_type", obj=MainService)
+@sort_option(default="id")
 @click.pass_obj
-def mains(clients: Clients, facility_id: int, resource_type: ResourceType) -> None:
+def mains(
+    clients: Clients, facility_id: int, resource_type: ResourceType, fields: List[str], sort: str
+) -> None:
     """Get main services"""
-    items = clients.nionic.get_main_services(facility_id=facility_id, resource_type=resource_type)
-    print(Serializer.to_table(items))
+    results = clients.nionic.get_main_services(facility_id=facility_id, resource_type=resource_type)
+    items = [
+        MainService(
+            x.id, x.facility_id, x.name, x.type, x.demand.id, x.usage.id, x.created_at, x.updated_at
+        )
+        for x in results
+    ]
+    print_table(items=items, keys=fields, sort_by=sort)
 
 
 @ems.command()
@@ -65,7 +72,7 @@ def main_data(
                 per_page=5000,
             ):
                 if t in data and service.usage.alias in data[t]:
-                    data[t][service.usage.alias] = (v + data[t][service.usage.alias])
+                    data[t][service.usage.alias] = v + data[t][service.usage.alias]
                 else:
                     data[t][service.usage.alias] = v
 
@@ -171,7 +178,7 @@ def export(
                         per_page=5000,
                     ):
                         if t in data and service.usage.alias in data[t]:
-                            data[t][service.usage.alias] = (v + data[t][service.usage.alias])
+                            data[t][service.usage.alias] = v + data[t][service.usage.alias]
                         else:
                             data[t][service.usage.alias] = v
                 Serializer.to_csv(data, fpath / "ems" / "main_service_usage.csv")

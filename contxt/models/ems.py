@@ -15,6 +15,29 @@ class ResourceType(Enum):
 
 
 @dataclass
+class MainService(ApiObject):
+    _api_fields: ClassVar = (
+        ApiField("id", data_type=int),
+        ApiField("facility_id", data_type=int),
+        ApiField("name"),
+        ApiField("type", attr_key="resource_type", data_type=ResourceType),
+        ApiField("demand_datapoint_id", data_type=int),
+        ApiField("usage_datapointid", data_type=int),
+        ApiField("created_at", data_type=Parsers.datetime),
+        ApiField("updated_at", data_type=Parsers.datetime),
+    )
+
+    id: int
+    facility_id: int
+    name: str
+    resource_type: ResourceType
+    demand_datapoint_id: int
+    usage_datapoint_id: int
+    created_at: datetime
+    updated_at: datetime
+
+
+@dataclass
 class Metric(ApiObject):
     _api_fields: ClassVar = (
         ApiField("id"),
