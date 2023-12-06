@@ -13,7 +13,7 @@ repos:
         types: [python]
       - id: flake8
         name: flake8
-        entry: poetry run flake8
+        entry: poetry run flake8 --exclude graphql,nionic_schema.py,nionic_queries.py
         language: system
         types: [python]
       - id: mypy

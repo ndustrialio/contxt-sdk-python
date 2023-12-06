@@ -1,4 +1,4 @@
-from typing import Any, List
+from typing import Any, Iterable, List
 
 from sgqlc.endpoint.requests import RequestsEndpoint
 
@@ -71,14 +71,15 @@ class NionicService(BaseGraphService):
 
     def get_data_point_data(
         self, name: str, data_source_name: str, start: str, end: str, window: Window, per_page: int
-    ) -> List[DataPoint]:
+    ) -> Iterable[DataPoint]:
         return PagedGQLTimeSeries(
             api=self,
             query="""
             query dataPointData($dataSourceName: String!, $name: String!,
             $from: String!, $to: String!, $window: String!, $limit: Int!, $after: Cursor) {
                 dataPoint(dataSourceName: $dataSourceName, name: $name) {
-                    data(from: $from, to: $to, orderBy: TIME_ASC, window: $window, first: $limit, after: $after) {
+                    data(from: $from, to: $to, orderBy: TIME_ASC, window: $window
+                    , first: $limit, after: $after) {
                         nodes {
                             time
                             data
