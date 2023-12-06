@@ -129,11 +129,11 @@ def usage(
 
 
 @ems.command()
-@click.argument("facility_ids", nargs=-1)
+@click.argument("facility_ids", nargs=-1, type=click.INT)
 @click.option(
     "--include",
     default="all",
-    callback=csv_callback(options=["spend", "usage"]),
+    callback=csv_callback(options=["mains", "usage"]),
     help="Data to export",
 )
 @click.option("--start", type=click.DateTime(), default=LAST_WEEK.isoformat(), help="Start time")
@@ -151,9 +151,9 @@ def export(
     """Export data for facilities"""
     with click.progressbar(
         facility_ids, label="Downloading data", item_show_func=lambda f: f"Facility {f}" if f else ""
-    ) as facility_ids_:
+    ):
         for facility in clients.nionic.get_facilities():
-            if facility.id not in facility_ids_:
+            if facility.id not in facility_ids:
                 continue
             fpath = output / facility.slug
 

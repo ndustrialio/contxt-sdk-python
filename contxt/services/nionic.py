@@ -1,9 +1,10 @@
-from typing import Any, Iterable, List
+from typing import Any, Iterable, List, Optional
 
 from sgqlc.endpoint.requests import RequestsEndpoint
 
 from contxt.generated.nionic_queries import Operations as nionic_operations
 from contxt.generated.nionic_schema import Facility, MainService, MetricLabel
+from contxt.models.ems import ResourceType
 from contxt.models.iot import Window
 from contxt.services.api import ApiEnvironment, BaseGraphService
 
@@ -60,7 +61,9 @@ class NionicService(BaseGraphService):
         resp = self.query(query, {"facilityId": int(facility_id), "label": label, "from": start})
         return resp["facility"]["metricData"]["nodes"]
 
-    def get_main_services(self, facility_id: int, resource_type) -> List[MainService]:
+    def get_main_services(
+        self, facility_id: int, resource_type: Optional[ResourceType] = None
+    ) -> List[MainService]:
         op = nionic_operations.query.main_services
         filterValues = {"facilityId": int(facility_id)}
         return [
