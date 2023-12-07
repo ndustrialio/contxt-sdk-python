@@ -215,7 +215,7 @@ class MachineUsersOrderBy(sgqlc.types.Enum):
 
 class MainServicesOrderBy(sgqlc.types.Enum):
     __schema__ = nionic_schema
-    __choices__ = ('CREATED_AT_ASC', 'CREATED_AT_DESC', 'DEMAND_ASC', 'DEMAND_DESC', 'FACILITY_ID_ASC', 'FACILITY_ID_DESC', 'ID_ASC', 'ID_DESC', 'NAME_ASC', 'NAME_DESC', 'NATURAL', 'ORIGINAL_ID_ASC', 'ORIGINAL_ID_DESC', 'PRIMARY_KEY_ASC', 'PRIMARY_KEY_DESC', 'TYPE_ASC', 'TYPE_DESC', 'UPDATED_AT_ASC', 'UPDATED_AT_DESC', 'USAGE_ASC', 'USAGE_DESC')
+    __choices__ = ('CREATED_AT_ASC', 'CREATED_AT_DESC', 'DEMAND_DATA_POINT_ID_ASC', 'DEMAND_DATA_POINT_ID_DESC', 'FACILITY_ID_ASC', 'FACILITY_ID_DESC', 'ID_ASC', 'ID_DESC', 'NAME_ASC', 'NAME_DESC', 'NATURAL', 'ORIGINAL_ID_ASC', 'ORIGINAL_ID_DESC', 'PRIMARY_KEY_ASC', 'PRIMARY_KEY_DESC', 'TYPE_ASC', 'TYPE_DESC', 'UPDATED_AT_ASC', 'UPDATED_AT_DESC', 'USAGE_DATA_POINT_ID_ASC', 'USAGE_DATA_POINT_ID_DESC')
 
 
 class MeterChargesOrderBy(sgqlc.types.Enum):
@@ -2849,13 +2849,13 @@ class MachineUserPatch(sgqlc.types.Input):
 
 class MainServiceCondition(sgqlc.types.Input):
     __schema__ = nionic_schema
-    __field_names__ = ('id', 'type', 'facility_id', 'name', 'usage', 'demand', 'created_at', 'updated_at', 'original_id')
+    __field_names__ = ('id', 'type', 'facility_id', 'name', 'usage_data_point_id', 'demand_data_point_id', 'created_at', 'updated_at', 'original_id')
     id = sgqlc.types.Field(Int, graphql_name='id')
     type = sgqlc.types.Field(EnumMainServicesType, graphql_name='type')
     facility_id = sgqlc.types.Field(Int, graphql_name='facilityId')
     name = sgqlc.types.Field(String, graphql_name='name')
-    usage = sgqlc.types.Field(Int, graphql_name='usage')
-    demand = sgqlc.types.Field(Int, graphql_name='demand')
+    usage_data_point_id = sgqlc.types.Field(Int, graphql_name='usageDataPointId')
+    demand_data_point_id = sgqlc.types.Field(Int, graphql_name='demandDataPointId')
     created_at = sgqlc.types.Field(Datetime, graphql_name='createdAt')
     updated_at = sgqlc.types.Field(Datetime, graphql_name='updatedAt')
     original_id = sgqlc.types.Field(Int, graphql_name='originalId')
@@ -2863,13 +2863,13 @@ class MainServiceCondition(sgqlc.types.Input):
 
 class MainServiceFilter(sgqlc.types.Input):
     __schema__ = nionic_schema
-    __field_names__ = ('id', 'type', 'facility_id', 'name', 'usage', 'demand', 'created_at', 'updated_at', 'original_id', 'and_', 'or_', 'not_')
+    __field_names__ = ('id', 'type', 'facility_id', 'name', 'usage_data_point_id', 'demand_data_point_id', 'created_at', 'updated_at', 'original_id', 'and_', 'or_', 'not_')
     id = sgqlc.types.Field(IntFilter, graphql_name='id')
     type = sgqlc.types.Field(EnumMainServicesTypeFilter, graphql_name='type')
     facility_id = sgqlc.types.Field(IntFilter, graphql_name='facilityId')
     name = sgqlc.types.Field('StringFilter', graphql_name='name')
-    usage = sgqlc.types.Field(IntFilter, graphql_name='usage')
-    demand = sgqlc.types.Field(IntFilter, graphql_name='demand')
+    usage_data_point_id = sgqlc.types.Field(IntFilter, graphql_name='usageDataPointId')
+    demand_data_point_id = sgqlc.types.Field(IntFilter, graphql_name='demandDataPointId')
     created_at = sgqlc.types.Field(DatetimeFilter, graphql_name='createdAt')
     updated_at = sgqlc.types.Field(DatetimeFilter, graphql_name='updatedAt')
     original_id = sgqlc.types.Field(IntFilter, graphql_name='originalId')
@@ -15195,19 +15195,19 @@ class MachineUser(sgqlc.types.Type, Node):
 
 class MainService(sgqlc.types.Type, Node):
     __schema__ = nionic_schema
-    __field_names__ = ('id', 'type', 'facility_id', 'name', 'usage', 'demand', 'created_at', 'updated_at', 'original_id', 'facility', 'data_point_by_usage', 'data_point_by_demand')
+    __field_names__ = ('id', 'type', 'facility_id', 'name', 'usage_data_point_id', 'demand_data_point_id', 'created_at', 'updated_at', 'original_id', 'facility', 'usage', 'demand')
     id = sgqlc.types.Field(sgqlc.types.non_null(Int), graphql_name='id')
     type = sgqlc.types.Field(sgqlc.types.non_null(EnumMainServicesType), graphql_name='type')
     facility_id = sgqlc.types.Field(sgqlc.types.non_null(Int), graphql_name='facilityId')
     name = sgqlc.types.Field(sgqlc.types.non_null(String), graphql_name='name')
-    usage = sgqlc.types.Field(Int, graphql_name='usage')
-    demand = sgqlc.types.Field(Int, graphql_name='demand')
+    usage_data_point_id = sgqlc.types.Field(Int, graphql_name='usageDataPointId')
+    demand_data_point_id = sgqlc.types.Field(Int, graphql_name='demandDataPointId')
     created_at = sgqlc.types.Field(sgqlc.types.non_null(Datetime), graphql_name='createdAt')
     updated_at = sgqlc.types.Field(sgqlc.types.non_null(Datetime), graphql_name='updatedAt')
     original_id = sgqlc.types.Field(sgqlc.types.non_null(Int), graphql_name='originalId')
     facility = sgqlc.types.Field(Facility, graphql_name='facility')
-    data_point_by_usage = sgqlc.types.Field(DataPoint, graphql_name='dataPointByUsage')
-    data_point_by_demand = sgqlc.types.Field(DataPoint, graphql_name='dataPointByDemand')
+    usage = sgqlc.types.Field(DataPoint, graphql_name='usage')
+    demand = sgqlc.types.Field(DataPoint, graphql_name='demand')
 
 
 class MeterCharge(sgqlc.types.Type, Node):
@@ -15729,7 +15729,7 @@ class ProjectWatcher(sgqlc.types.Type, Node):
 
 class Query(sgqlc.types.Type, Node):
     __schema__ = nionic_schema
-    __field_names__ = ('query', 'node', 'account_charges', 'account_statement_histories', 'account_statements', 'balancing_authorities', 'building_area_types', 'building_areas', 'components', 'control_events', 'data_points', 'data_sources', 'dependencies', 'facilities', 'facility_communications', 'facility_data_sources', 'facility_groups', 'facility_groups_linkers', 'field_groups', 'machine_users', 'main_services', 'meter_charges', 'meter_statement_histories', 'meter_statements', 'meter_usages', 'metric_metadata', 'platform_access_tokens', 'programs', 'project_fields', 'project_types', 'project_watchers', 'projects', 'report_executions', 'report_queries', 'reports', 'savings_events', 'suggestion_activity_logs', 'suggestions', 'timezones', 'unit_dimensions', 'unit_group_dimensions', 'unit_groups', 'users', 'utility_account_statement_rollups', 'utility_account_statements', 'utility_accounts', 'utility_meter_statement_rollups', 'utility_meter_statements', 'utility_meters', 'utility_providers', 'vendor_users', 'virtual_point_intervals', 'account_charge', 'account_statement', 'balancing_authority', 'building_area_type', 'building_area', 'building_area_by_facility_id_and_label', 'component', 'control_event_log', 'control_event', 'data_point_by_id', 'data_point', 'data_source', 'dependency', 'dependency_by_path', 'event_handler_metadatum', 'event_handler', 'event_type', 'event', 'facility', 'facility_by_slug', 'facility_communication', 'facility_data_source', 'facility_group', 'facility_groups_linker', 'field_group', 'machine_user', 'main_service', 'main_service_by_facility_id_and_name', 'main_service_by_facility_id_and_usage_and_demand', 'main_service_by_original_id', 'meter_charge', 'meter_statement', 'meter_usage', 'metric_metadatum', 'program', 'program_by_project_type_id_and_name', 'project_component', 'project_field_by_project_id_and_field_id', 'project_field', 'project_type', 'project_type_by_name', 'project_watcher', 'project', 'report_execution', 'report_query', 'report_query_by_report_id_and_label', 'report', 'report_by_label', 'savings_event', 'savings_event_by_project_id_and_start_time_and_end_time', 'suggestion_control_event', 'suggestion_control_event_by_control_event_id', 'suggestion', 'timezone', 'unit_dimension', 'unit_group_dimension', 'unit_group', 'user', 'utility_account_statement_rollup', 'utility_account_statement', 'utility_account', 'utility_meter_statement_rollup', 'utility_meter_statement', 'utility_meter', 'utility_provider', 'utility_provider_by_name', 'vendor_user_machine_user', 'vendor_user_machine_user_by_machine_user_id', 'vendor_user', 'vendor_user_by_email', 'virtual_point_interval', 'derive_statement_date', 'groupings', 'groupings_with_facilities', 'profile', 'account_charge_by_node_id', 'account_statement_by_node_id', 'balancing_authority_by_node_id', 'building_area_type_by_node_id', 'building_area_by_node_id', 'component_by_node_id', 'control_event_log_by_node_id', 'control_event_state_by_node_id', 'control_event_by_node_id', 'data_point_by_node_id', 'data_source_by_node_id', 'dependency_by_node_id', 'event_handler_metadatum_by_node_id', 'event_handler_by_node_id', 'event_type_by_node_id', 'event_by_node_id', 'facility_by_node_id', 'facility_communication_by_node_id', 'facility_data_source_by_node_id', 'facility_group_by_node_id', 'facility_groups_linker_by_node_id', 'field_group_by_node_id', 'machine_user_by_node_id', 'main_service_by_node_id', 'meter_charge_by_node_id', 'meter_statement_by_node_id', 'meter_usage_by_node_id', 'metric_metadatum_by_node_id', 'program_by_node_id', 'project_component_by_node_id', 'project_field_by_node_id', 'project_type_by_node_id', 'project_watcher_by_node_id', 'project_by_node_id', 'report_execution_by_node_id', 'report_query_by_node_id', 'report_by_node_id', 'savings_event_by_node_id', 'suggestion_control_event_by_node_id', 'suggestion_by_node_id', 'timezone_by_node_id', 'unit_dimension_by_node_id', 'unit_group_dimension_by_node_id', 'unit_group_by_node_id', 'user_by_node_id', 'utility_account_statement_rollup_by_node_id', 'utility_account_statement_by_node_id', 'utility_account_by_node_id', 'utility_meter_statement_rollup_by_node_id', 'utility_meter_statement_by_node_id', 'utility_meter_by_node_id', 'utility_provider_by_node_id', 'vendor_user_machine_user_by_node_id', 'vendor_user_by_node_id', 'virtual_point_interval_by_node_id', 'platform_errors', 'source_data', 'source_labels', 'current_identity')
+    __field_names__ = ('query', 'node', 'account_charges', 'account_statement_histories', 'account_statements', 'balancing_authorities', 'building_area_types', 'building_areas', 'components', 'control_events', 'data_points', 'data_sources', 'dependencies', 'facilities', 'facility_communications', 'facility_data_sources', 'facility_groups', 'facility_groups_linkers', 'field_groups', 'machine_users', 'main_services', 'meter_charges', 'meter_statement_histories', 'meter_statements', 'meter_usages', 'metric_metadata', 'platform_access_tokens', 'programs', 'project_fields', 'project_types', 'project_watchers', 'projects', 'report_executions', 'report_queries', 'reports', 'savings_events', 'suggestion_activity_logs', 'suggestions', 'timezones', 'unit_dimensions', 'unit_group_dimensions', 'unit_groups', 'users', 'utility_account_statement_rollups', 'utility_account_statements', 'utility_accounts', 'utility_meter_statement_rollups', 'utility_meter_statements', 'utility_meters', 'utility_providers', 'vendor_users', 'virtual_point_intervals', 'account_charge', 'account_statement', 'balancing_authority', 'building_area_type', 'building_area', 'building_area_by_facility_id_and_label', 'component', 'control_event_log', 'control_event', 'data_point_by_id', 'data_point', 'data_source', 'dependency', 'dependency_by_path', 'event_handler_metadatum', 'event_handler', 'event_type', 'event', 'facility', 'facility_by_slug', 'facility_communication', 'facility_data_source', 'facility_group', 'facility_groups_linker', 'field_group', 'machine_user', 'main_service', 'main_service_by_facility_id_and_name', 'main_service_by_facility_id_and_usage_data_point_id_and_demand_data_point_id', 'main_service_by_original_id', 'meter_charge', 'meter_statement', 'meter_usage', 'metric_metadatum', 'program', 'program_by_project_type_id_and_name', 'project_component', 'project_field_by_project_id_and_field_id', 'project_field', 'project_type', 'project_type_by_name', 'project_watcher', 'project', 'report_execution', 'report_query', 'report_query_by_report_id_and_label', 'report', 'report_by_label', 'savings_event', 'savings_event_by_project_id_and_start_time_and_end_time', 'suggestion_control_event', 'suggestion_control_event_by_control_event_id', 'suggestion', 'timezone', 'unit_dimension', 'unit_group_dimension', 'unit_group', 'user', 'utility_account_statement_rollup', 'utility_account_statement', 'utility_account', 'utility_meter_statement_rollup', 'utility_meter_statement', 'utility_meter', 'utility_provider', 'utility_provider_by_name', 'vendor_user_machine_user', 'vendor_user_machine_user_by_machine_user_id', 'vendor_user', 'vendor_user_by_email', 'virtual_point_interval', 'derive_statement_date', 'groupings', 'groupings_with_facilities', 'profile', 'account_charge_by_node_id', 'account_statement_by_node_id', 'balancing_authority_by_node_id', 'building_area_type_by_node_id', 'building_area_by_node_id', 'component_by_node_id', 'control_event_log_by_node_id', 'control_event_state_by_node_id', 'control_event_by_node_id', 'data_point_by_node_id', 'data_source_by_node_id', 'dependency_by_node_id', 'event_handler_metadatum_by_node_id', 'event_handler_by_node_id', 'event_type_by_node_id', 'event_by_node_id', 'facility_by_node_id', 'facility_communication_by_node_id', 'facility_data_source_by_node_id', 'facility_group_by_node_id', 'facility_groups_linker_by_node_id', 'field_group_by_node_id', 'machine_user_by_node_id', 'main_service_by_node_id', 'meter_charge_by_node_id', 'meter_statement_by_node_id', 'meter_usage_by_node_id', 'metric_metadatum_by_node_id', 'program_by_node_id', 'project_component_by_node_id', 'project_field_by_node_id', 'project_type_by_node_id', 'project_watcher_by_node_id', 'project_by_node_id', 'report_execution_by_node_id', 'report_query_by_node_id', 'report_by_node_id', 'savings_event_by_node_id', 'suggestion_control_event_by_node_id', 'suggestion_by_node_id', 'timezone_by_node_id', 'unit_dimension_by_node_id', 'unit_group_dimension_by_node_id', 'unit_group_by_node_id', 'user_by_node_id', 'utility_account_statement_rollup_by_node_id', 'utility_account_statement_by_node_id', 'utility_account_by_node_id', 'utility_meter_statement_rollup_by_node_id', 'utility_meter_statement_by_node_id', 'utility_meter_by_node_id', 'utility_provider_by_node_id', 'vendor_user_machine_user_by_node_id', 'vendor_user_by_node_id', 'virtual_point_interval_by_node_id', 'platform_errors', 'source_data', 'source_labels', 'current_identity')
     query = sgqlc.types.Field(sgqlc.types.non_null('Query'), graphql_name='query')
     node = sgqlc.types.Field(Node, graphql_name='node', args=sgqlc.types.ArgDict((
         ('node_id', sgqlc.types.Arg(sgqlc.types.non_null(ID), graphql_name='nodeId', default=None)),
@@ -16403,10 +16403,10 @@ class Query(sgqlc.types.Type, Node):
         ('name', sgqlc.types.Arg(sgqlc.types.non_null(String), graphql_name='name', default=None)),
 ))
     )
-    main_service_by_facility_id_and_usage_and_demand = sgqlc.types.Field(MainService, graphql_name='mainServiceByFacilityIdAndUsageAndDemand', args=sgqlc.types.ArgDict((
+    main_service_by_facility_id_and_usage_data_point_id_and_demand_data_point_id = sgqlc.types.Field(MainService, graphql_name='mainServiceByFacilityIdAndUsageDataPointIdAndDemandDataPointId', args=sgqlc.types.ArgDict((
         ('facility_id', sgqlc.types.Arg(sgqlc.types.non_null(Int), graphql_name='facilityId', default=None)),
-        ('usage', sgqlc.types.Arg(sgqlc.types.non_null(Int), graphql_name='usage', default=None)),
-        ('demand', sgqlc.types.Arg(sgqlc.types.non_null(Int), graphql_name='demand', default=None)),
+        ('usage_data_point_id', sgqlc.types.Arg(sgqlc.types.non_null(Int), graphql_name='usageDataPointId', default=None)),
+        ('demand_data_point_id', sgqlc.types.Arg(sgqlc.types.non_null(Int), graphql_name='demandDataPointId', default=None)),
 ))
     )
     main_service_by_original_id = sgqlc.types.Field(MainService, graphql_name='mainServiceByOriginalId', args=sgqlc.types.ArgDict((

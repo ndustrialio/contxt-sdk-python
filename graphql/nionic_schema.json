@@ -7656,7 +7656,7 @@
                 },
                 {
                   "defaultValue": null,
-                  "name": "usage",
+                  "name": "usageDataPointId",
                   "type": {
                     "kind": "NON_NULL",
                     "name": null,
@@ -7669,7 +7669,7 @@
                 },
                 {
                   "defaultValue": null,
-                  "name": "demand",
+                  "name": "demandDataPointId",
                   "type": {
                     "kind": "NON_NULL",
                     "name": null,
@@ -7681,7 +7681,7 @@
                   }
                 }
               ],
-              "name": "mainServiceByFacilityIdAndUsageAndDemand",
+              "name": "mainServiceByFacilityIdAndUsageDataPointIdAndDemandDataPointId",
               "type": {
                 "kind": "OBJECT",
                 "name": "MainService",
@@ -72518,7 +72518,7 @@
             },
             {
               "args": [],
-              "name": "usage",
+              "name": "usageDataPointId",
               "type": {
                 "kind": "SCALAR",
                 "name": "Int",
@@ -72527,7 +72527,7 @@
             },
             {
               "args": [],
-              "name": "demand",
+              "name": "demandDataPointId",
               "type": {
                 "kind": "SCALAR",
                 "name": "Int",
@@ -72584,7 +72584,7 @@
             },
             {
               "args": [],
-              "name": "dataPointByUsage",
+              "name": "usage",
               "type": {
                 "kind": "OBJECT",
                 "name": "DataPoint",
@@ -72593,7 +72593,7 @@
             },
             {
               "args": [],
-              "name": "dataPointByDemand",
+              "name": "demand",
               "type": {
                 "kind": "OBJECT",
                 "name": "DataPoint",
@@ -72706,16 +72706,16 @@
               "name": "NAME_DESC"
             },
             {
-              "name": "USAGE_ASC"
+              "name": "USAGE_DATA_POINT_ID_ASC"
             },
             {
-              "name": "USAGE_DESC"
+              "name": "USAGE_DATA_POINT_ID_DESC"
             },
             {
-              "name": "DEMAND_ASC"
+              "name": "DEMAND_DATA_POINT_ID_ASC"
             },
             {
-              "name": "DEMAND_DESC"
+              "name": "DEMAND_DATA_POINT_ID_DESC"
             },
             {
               "name": "CREATED_AT_ASC"
@@ -72791,7 +72791,7 @@
             },
             {
               "defaultValue": null,
-              "name": "usage",
+              "name": "usageDataPointId",
               "type": {
                 "kind": "SCALAR",
                 "name": "Int",
@@ -72800,7 +72800,7 @@
             },
             {
               "defaultValue": null,
-              "name": "demand",
+              "name": "demandDataPointId",
               "type": {
                 "kind": "SCALAR",
                 "name": "Int",
@@ -72882,7 +72882,7 @@
             },
             {
               "defaultValue": null,
-              "name": "usage",
+              "name": "usageDataPointId",
               "type": {
                 "kind": "INPUT_OBJECT",
                 "name": "IntFilter",
@@ -72891,7 +72891,7 @@
             },
             {
               "defaultValue": null,
-              "name": "demand",
+              "name": "demandDataPointId",
               "type": {
                 "kind": "INPUT_OBJECT",
                 "name": "IntFilter",
