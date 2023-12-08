@@ -47,14 +47,14 @@ query mainServices($facilityId: Int!) {
       facilityId
       name
       type
-      usage: dataPointByUsage {
+      usage {
         id
         dataSourceName
         name
         alias
         dataType
       }
-      demand: dataPointByDemand {
+      demand {
         id
         dataSourceName
         name
