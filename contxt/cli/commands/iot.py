@@ -14,7 +14,7 @@ from contxt.cli.utils import LAST_WEEK, NOW, ClickPath, fields_option, print_tab
 from contxt.models.iot import Feed, Field, FieldCategory, FieldGrouping, FieldValueType, Window
 from contxt.utils.serializer import Serializer
 
-NEW_FIELD_ATTRS = ["field_descriptor", "label", "value_type", "units", "grouping", "category"]
+NEW_FIELD_ATTRS = ["field_descriptor", "label", "value_type", "units", "is_totalizer", "grouping", "category"]
 
 
 @click.group()
@@ -182,6 +182,7 @@ def create(clients: Clients, feed_key: str, input: IO[str]) -> None:
                     units=r["units"],
                     value_type=FieldValueType(r["value_type"].lower()),
                     is_hidden=False,
+                    is_totalizer=r["is_totalizer"],
                 ),
                 r["grouping"],
                 r["category"],
