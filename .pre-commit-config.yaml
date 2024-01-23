@@ -7,6 +7,7 @@ repos:
         entry: poetry run isort
         language: system
         types: [python]
+        args: ["--profile", "black", "--filter-files"]
       - id: black
         name: black
         exclude: ^(contxt/generated)
