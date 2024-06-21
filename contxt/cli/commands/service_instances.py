@@ -27,7 +27,6 @@ def get(clients: Clients, service_id: Optional[str], fields: List[str], sort: st
     print_table(items, keys=fields, sort_by=sort)
 
 
-# project-environment is now optional
 @service_instances.command()
 @click.option("--service-id", prompt=True)
 @click.option("--project-environment-id", required=False)
