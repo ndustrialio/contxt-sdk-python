@@ -29,7 +29,7 @@ def get(clients: Clients, service_id: Optional[str], fields: List[str], sort: st
 
 @service_instances.command()
 @click.option("--service-id", prompt=True)
-@click.option("--project-environment-id", **OPTIONAL_PROMPT_KWARGS)
+@click.option("--project-environment-id", required=False)
 @click.option("--name", prompt=True)
 @click.option("--slug", prompt=True)
 @click.option("--descriptor", prompt=True)
