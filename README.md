@@ -31,4 +31,3 @@ Please refer to <https://ndustrialio.github.io/contxt-sdk-python>.
 ## Contributing
 
 Please refer to [CONTRIBUTING.md](CONTRIBUTING.md).
-
