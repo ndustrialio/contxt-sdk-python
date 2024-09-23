@@ -104,3 +104,12 @@ class Date(click.DateTime):
 
     def convert(self, *args, **kwargs) -> Any:
         return super().convert(*args, **kwargs).date()
+
+
+def str_to_bool(s):
+    if s.lower() in ("true", "t", "1"):
+        return True
+    elif s.lower() in ("false", "f", "0"):
+        return False
+    else:
+        raise ValueError("Cannot covert {} to a bool".format(s))
