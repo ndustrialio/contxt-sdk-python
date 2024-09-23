@@ -5,7 +5,6 @@ from typing import ClassVar, List, Optional
 
 from . import ApiField, ApiObject, Formatters, Parsers
 from .events import Event
-from .iot import Field
 
 
 class ResourceType(Enum):
@@ -22,10 +21,8 @@ class MainService(ApiObject):
         ApiField("facility_id", data_type=int),
         ApiField("name"),
         ApiField("type", attr_key="resource_type", data_type=ResourceType),
-        ApiField("demand_field_id", data_type=int),
-        ApiField("usage_field_id", data_type=int),
-        ApiField("demand_field", data_type=Field),
-        ApiField("usage_field", data_type=Field),
+        ApiField("demand_datapoint_id", data_type=int),
+        ApiField("usage_datapointid", data_type=int),
         ApiField("created_at", data_type=Parsers.datetime),
         ApiField("updated_at", data_type=Parsers.datetime),
     )
@@ -34,10 +31,8 @@ class MainService(ApiObject):
     facility_id: int
     name: str
     resource_type: ResourceType
-    demand_field_id: int
-    usage_field_id: int
-    demand_field: Field
-    usage_field: Field
+    demand_datapoint_id: int
+    usage_datapoint_id: int
     created_at: datetime
     updated_at: datetime
 
@@ -92,25 +87,6 @@ class MetricValue(ApiObject):
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
     is_estimated: Optional[bool] = None
-
-
-@dataclass
-class Facility(ApiObject):
-    _api_fields: ClassVar = (
-        ApiField("id", data_type=int),
-        ApiField("name"),
-        ApiField("organization_id"),
-        ApiField("main_services", data_type=MainService),
-        ApiField("created_at", data_type=Parsers.datetime),
-        ApiField("updated_at", data_type=Parsers.datetime),
-    )
-
-    id: int
-    name: str
-    organization_id: str
-    main_services: List[MainService]
-    created_at: datetime
-    updated_at: datetime
 
 
 @dataclass

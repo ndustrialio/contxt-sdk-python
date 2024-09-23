@@ -3,7 +3,7 @@ from typing import List, Optional
 import click
 
 from contxt.cli.clients import Clients
-from contxt.cli.utils import OPTIONAL_PROMPT_KWARGS, fields_option, print_item, print_table, sort_option
+from contxt.cli.utils import fields_option, print_item, print_table, sort_option
 from contxt.models.contxt import ServiceInstance
 
 
@@ -29,7 +29,7 @@ def get(clients: Clients, service_id: Optional[str], fields: List[str], sort: st
 
 @service_instances.command()
 @click.option("--service-id", prompt=True)
-@click.option("--project-environment-id", **OPTIONAL_PROMPT_KWARGS)
+@click.option("--project-environment-id", required=False)
 @click.option("--name", prompt=True)
 @click.option("--slug", prompt=True)
 @click.option("--descriptor", prompt=True)

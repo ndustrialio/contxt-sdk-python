@@ -35,36 +35,46 @@ def mains(
     clients: Clients, facility_id: int, resource_type: ResourceType, fields: List[str], sort: str
 ) -> None:
     """Get main services"""
-    items = clients.ems.get_main_services(facility_id=facility_id, resource_type=resource_type)
+    results = clients.nionic.get_main_services(facility_id=facility_id, resource_type=resource_type)
+    items = [
+        MainService(
+            x.id, x.facility_id, x.name, x.type, x.demand.id, x.usage.id, x.created_at, x.updated_at
+        )
+        for x in results
+    ]
     print_table(items=items, keys=fields, sort_by=sort)
 
 
 @ems.command()
 @click.argument("facility_id")
 @click.option("--resource-type", type=ResourceType, default="electric", help="Resource type")
-@click.option("--start", type=click.DateTime(), help="Start time")
-@click.option("--end", type=click.DateTime(), help="End time")
+@click.option("--start", type=click.DateTime(), help="Start time", required=True)
+@click.option("--end", type=click.DateTime(), help="End time", required=True)
 @click.pass_obj
 def main_data(
     clients: Clients, facility_id: int, resource_type: ResourceType, start: datetime, end: datetime
 ) -> None:
     """Get main service data"""
     data: Dict[datetime, Dict[str, Any]] = defaultdict(dict)
-    services = clients.ems.get_main_services(facility_id=facility_id, resource_type=resource_type)
+    services = clients.nionic.get_main_services(facility_id=facility_id, resource_type=resource_type)
     with click.progressbar(
         services,
         label="Downloading main service data",
         item_show_func=lambda s: f"Service {s.name}" if s else "",
     ) as services_:
         for service in services_:
-            for t, v in clients.iot.get_time_series_for_field(
-                field=service.usage_field,
-                start_time=start,
-                end_time=end,
+            for t, v in clients.nionic.get_data_point_data(
+                data_source_name=service.usage.data_source_name,
+                name=service.usage.name,
+                start=start.astimezone().isoformat(),
+                end=end.astimezone().isoformat(),
                 window=Window.MINUTELY,
                 per_page=5000,
             ):
-                data[t][service.usage_field.field_human_name] = v
+                if t in data and service.usage.name in data[t]:
+                    data[t][service.usage.name] = v + data[t][service.usage.name]
+                else:
+                    data[t][service.usage.name] = v
 
     # Dump
     print_table(items=data)
@@ -119,11 +129,11 @@ def usage(
 
 
 @ems.command()
-@click.argument("facility_ids", nargs=-1)
+@click.argument("facility_ids", nargs=-1, type=click.INT)
 @click.option(
     "--include",
     default="all",
-    callback=csv_callback(options=["spend", "usage"]),
+    callback=csv_callback(options=["mains", "usage"]),
     help="Data to export",
 )
 @click.option("--start", type=click.DateTime(), default=LAST_WEEK.isoformat(), help="Start time")
@@ -141,9 +151,9 @@ def export(
     """Export data for facilities"""
     with click.progressbar(
         facility_ids, label="Downloading data", item_show_func=lambda f: f"Facility {f}" if f else ""
-    ) as facility_ids_:
+    ):
         for facility in clients.nionic.get_facilities():
-            if facility.id not in facility_ids_:
+            if facility.id not in facility_ids:
                 continue
             fpath = output / facility.slug
 
@@ -157,16 +167,20 @@ def export(
             # Main service data
             if "mains" in include:
                 data: Dict[datetime, Dict[str, Any]] = defaultdict(dict)
-                services = clients.ems.get_main_services(facility_id=facility.id)
+                services = clients.nionic.get_main_services(facility_id=facility.id)
                 for service in services:
-                    for t, v in clients.iot.get_time_series_for_field(
-                        field=service.usage_field,
-                        start_time=start,
-                        end_time=end,
+                    for t, v in clients.nionic.get_data_point_data(
+                        data_source_name=service.usage.data_source_name,
+                        name=service.usage.name,
+                        start=start.astimezone().isoformat(),
+                        end=end.astimezone().isoformat(),
                         window=Window.MINUTELY,
                         per_page=5000,
                     ):
-                        data[t][service.usage_field.field_human_name] = v
+                        if t in data and service.usage.name in data[t]:
+                            data[t][service.usage.name] = v + data[t][service.usage.name]
+                        else:
+                            data[t][service.usage.name] = v
                 Serializer.to_csv(data, fpath / "ems" / "main_service_usage.csv")
 
     print(f"Wrote data to {output}")
