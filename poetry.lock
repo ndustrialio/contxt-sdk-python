@@ -943,21 +943,20 @@ testing-integration = ["build[virtualenv]", "filelock (>=3.4.0)", "jaraco.envs (
 
 [[package]]
 name = "sgqlc"
-version = "16.1"
+version = "16.3"
 description = "Simple GraphQL Client"
 optional = false
-python-versions = ">=3.6"
+python-versions = ">=3.7,<4.0"
 files = [
-    {file = "sgqlc-16.1-py3-none-any.whl", hash = "sha256:d472f25101e40b05dab30193e3fc4ecc36bd671f7a9b04a49954a98d121f0fdb"},
-    {file = "sgqlc-16.1.tar.gz", hash = "sha256:21591009345b116b43a7a7d3995edc25dc2d14092273028205b86d07843a19ac"},
+    {file = "sgqlc-16.3-py3-none-any.whl", hash = "sha256:89d468386a4ba4b5ade991623228b6fb0a25bea1f25643ccac130fb3ef565b72"},
+    {file = "sgqlc-16.3.tar.gz", hash = "sha256:be08857775aa3e65ef7b2c1f0cdcc65dd5794907b162b393c189187fee664558"},
 ]
 
 [package.dependencies]
-graphql-core = "*"
+graphql-core = ">=3.1.7,<4.0.0"
 
 [package.extras]
 requests = ["requests"]
-sphinx = ["sphinx", "sphinx-argparse"]
 websocket = ["websocket-client"]
 
 [[package]]

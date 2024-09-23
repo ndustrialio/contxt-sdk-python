@@ -1,0 +1,88 @@
+query facilities {
+  facilities {
+    nodes {
+      id
+      name
+      slug
+      address
+      city
+      state
+      zip
+      timezoneName
+    }
+  }
+}
+
+mutation createFacility($name: String!, $slug: String!, $timezoneName: String!) {
+  createFacility(input: {facility: {name: $name, slug: $slug, timezoneName: $timezoneName}}) {
+    facility {
+      id
+    }
+  }
+}
+
+query metricLabels {
+  sourceLabels {
+    sourceId
+    label
+  }
+}
+
+# the sgqlc code generator complains that orderBy is not specified
+#query metricData($facilityId: Int!, $label: String!, $from: String!, $window: String!) {
+#  facility(id: $facilityId) {
+#    metricData(label: $label, from: $from, orderBy: TIME_ASC, window: $window) {
+#      nodes {
+#        time
+#        data
+#      }
+#    }
+#  }
+#}
+
+query mainServices($facilityId: Int!) {
+  mainServices(filter: {facilityId: {equalTo: $facilityId}}) {
+    nodes {
+      id
+      facilityId
+      name
+      type
+      usage {
+        id
+        dataSourceName
+        name
+        alias
+        dataType
+      }
+      demand {
+        id
+        dataSourceName
+        name
+        alias
+        dataType
+      }
+      createdAt
+      updatedAt
+    }
+  }
+}
+
+# the sgqlc code generator complains that orderBy is not specified
+#query dataPointData($dataSourceName: String!, $name: String!
+#    , $from: String!, $to: String!, $window: String!, $samplingWindow: String!
+#    , $limit: Int!, $after: Cursor) {
+#    dataPoint(dataSourceName: $dataSourceName, name: $name) {
+#        data(from: $from, to: $to, orderBy: TIME_DESC
+#        , window: $window, samplingWindow: $samplingWindow
+#        , first: $limit, after: $after) {
+#            nodes {
+#                time
+#                data
+#            }
+#            pageInfo {
+#                hasNextPage
+#                endCursor
+#            }
+#        }
+#    }
+#}
