@@ -1,8 +1,8 @@
 from datetime import date, datetime, timedelta, timezone
-from typing import Iterable, List, Optional
+from typing import Iterable
 
 from ..auth import Auth
-from ..models.ems import Facility, MainService, ResourceType, UtilityContract, UtilitySpend, UtilityUsage
+from ..models.ems import ResourceType, UtilityContract, UtilitySpend, UtilityUsage
 from .api import ApiEnvironment, ConfiguredApi
 from .pagination import PagedRecords
 
@@ -29,20 +29,6 @@ class EmsService(ConfiguredApi):
         super().__init__(env=env, auth=auth, **kwargs)
         self.org_id = org_id
         self.base_url = self.base_url.format(tenant=org_slug)
-
-    def get_facility(self, id: int) -> Facility:
-        return Facility.from_api(self.get(f"{self.org_id}/facilities/{id}"))
-
-    def get_main_services(
-        self, facility_id: int, resource_type: Optional[ResourceType] = None
-    ) -> List[MainService]:
-        facility = self.get_facility(facility_id)
-        main_services = facility.main_services
-
-        # Manually filter on resource type
-        if resource_type:
-            main_services = [s for s in main_services if s.resource_type == resource_type]
-        return main_services
 
     def get_monthly_utility_spend(
         self,
