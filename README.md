@@ -1,5 +1,7 @@
 # Contxt Python SDK
 
+_the Python SDK for Contxt_
+
 [![CI](https://github.com/ndustrialio/contxt-sdk-python/workflows/CI/badge.svg)](https://github.com/ndustrialio/contxt-sdk-python/actions?query=workflow%3ACI)
 [![pypi version](https://img.shields.io/pypi/v/contxt-sdk.svg)](https://pypi.org/project/contxt-sdk/)
 ![python](https://img.shields.io/badge/python-3.8+-blue.svg)
