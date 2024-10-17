@@ -1241,5 +1241,5 @@ crypto = ["cryptography"]
 
 [metadata]
 lock-version = "2.0"
-python-versions = "^3.8"
-content-hash = "5ad9415e8f7f1150a313e5d3f1c4520a10953640a42e92aba921ccdfc52d1978"
+python-versions = "^3.9"
+content-hash = "329369dd005d2d1ceb07e9d853e708f8d0b428ea98577efd30f42765f9245dc0"
