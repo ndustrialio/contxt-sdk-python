@@ -14,7 +14,7 @@ auth0-python = "^3"
 click = ">=7,<9"
 cryptography = { version = ">=42.0.4", optional = true } # enable pyjwt to en/decode jwt via RSA
 pyjwt = "^2"
-pyyaml = ">=5,<7"
+pyyaml = "^6.0.2"
 requests = "^2"
 tabulate = "*"
 sgqlc = ">=15,<17"
