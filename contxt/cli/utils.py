@@ -11,7 +11,7 @@ NOW = datetime.now().replace(microsecond=0)
 LAST_WEEK = NOW - timedelta(days=7)
 
 # FIXME
-OPTIONAL_PROMPT_KWARGS = {
+OPTIONAL_PROMPT_KWARGS: Any = {
     "prompt": True,
     "default": "<none>",
     "callback": lambda ctx, param, value: value if value != "<none>" else None,
@@ -23,14 +23,14 @@ def warn(msg: str):
 
 
 def print_table(
-    items: List[Any], keys: Optional[List[str]] = None, sort_by: Optional[str] = None, count: bool = True
+    items: Any, keys: Optional[List[str]] = None, sort_by: Optional[str] = None, count: bool = True
 ) -> None:
     if keys:
         items = pluck(keys=keys, items=items)
         sort_by = sort_by if sort_by in keys else None
     if items:
         print(Serializer.to_table(items, sort_by=sort_by))
-    if count:
+    if count and isinstance(items, list):
         print(f"Count: {len(items)}")
 
 

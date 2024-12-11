@@ -21,7 +21,7 @@ class Serializer:
             return []
 
     @staticmethod
-    def to_dict(obj: Any, cls_key: str = None, key_filter: Callable = None):
+    def to_dict(obj: Any, cls_key: str | None = None, key_filter: Callable | None = None):
         """Serializes `obj` to a `dict`. To use a custom format, overload
         `obj.to_dict()`.
 

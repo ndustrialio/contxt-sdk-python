@@ -100,7 +100,7 @@ class ContxtService(ConfiguredApi):
         resp = self.get(f"stacks/{project_id}")
         return Project.from_api(resp)
 
-    def get_services(self, project_id: int = None) -> List[Service]:
+    def get_services(self, project_id: int | None = None) -> List[Service]:
         if project_id:
             resp = self.get(f"stacks/{project_id}")
             return [Service.from_api(rec) for rec in resp["Services"]]
