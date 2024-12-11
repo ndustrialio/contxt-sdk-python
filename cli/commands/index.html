@@ -5,24 +5,23 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <link rel="shortcut icon" href="../../img/favicon.ico" />
-    <title>Commands - Contxt SDK</title>
+    <title>contxt - Contxt SDK</title>
     <link rel="stylesheet" href="../../css/theme.css" />
     <link rel="stylesheet" href="../../css/theme_extra.css" />
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
     
       <script>
         // Current page data
-        var mkdocs_page_name = "Commands";
+        var mkdocs_page_name = "contxt";
         var mkdocs_page_input_path = "cli/commands.md";
         var mkdocs_page_url = null;
       </script>
     
-    <script src="../../js/jquery-3.6.0.min.js" defer></script>
     <!--[if lt IE 9]>
       <script src="../../js/html5shiv.min.js"></script>
     <![endif]-->
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
-      <script>hljs.initHighlightingOnLoad();</script> 
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
 </head>
 
 <body class="wy-body-for-nav" role="document">
@@ -34,7 +33,7 @@
           <a href="../.." class="icon icon-home"> Contxt SDK
         </a><div role="search">
   <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
-      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
   </form>
 </div>
       </div>
@@ -48,7 +47,7 @@
               <ul class="current">
                   <li class="toctree-l1"><a class="reference internal" href="../">Quickstart</a>
                   </li>
-                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Commands</a>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">contxt</a>
     <ul class="current">
     <li class="toctree-l2"><a class="reference internal" href="#auth">auth</a>
         <ul>
@@ -223,9 +222,9 @@
       <div class="wy-nav-content">
         <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="../.." class="icon icon-home" alt="Docs"></a> &raquo;</li>
-          <li>Cli &raquo;</li>
-      <li>Commands</li>
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Cli</li>
+      <li class="breadcrumb-item active">contxt</li>
     <li class="wy-breadcrumbs-aside">
           <a href="https://github.com/ndustrialio/contxt-sdk-python/edit/master/docs/cli/commands.md" class="icon icon-github"> Edit on GitHub</a>
     </li>
@@ -238,10 +237,10 @@
                 <h1 id="contxt">contxt<a class="headerlink" href="#contxt" title="Permanent link">&para;</a></h1>
 <p>Contxt CLI</p>
 <p><strong>Usage:</strong></p>
-<pre><code>contxt [OPTIONS] COMMAND [ARGS]...
+<pre><code class="language-text">contxt [OPTIONS] COMMAND [ARGS]...
 </code></pre>
 <p><strong>Options:</strong></p>
-<pre><code>  --env [production|staging]  Environment for all API's
+<pre><code class="language-text">  --env [production|staging]  Environment for all API's
   --org TEXT                  Organization slug
   -v, --verbose               Increase verbosity
   -V, --version               Show the version and exit.
@@ -250,67 +249,67 @@
 <h2 id="auth">auth<a class="headerlink" href="#auth" title="Permanent link">&para;</a></h2>
 <p>Authenticate with Contxt.</p>
 <p><strong>Usage:</strong></p>
-<pre><code>contxt auth [OPTIONS] COMMAND [ARGS]...
+<pre><code class="language-text">contxt auth [OPTIONS] COMMAND [ARGS]...
 </code></pre>
 <p><strong>Options:</strong></p>
-<pre><code>  --help  Show this message and exit.
+<pre><code class="language-text">  --help  Show this message and exit.
 </code></pre>
 <h3 id="login">login<a class="headerlink" href="#login" title="Permanent link">&para;</a></h3>
 <p>Login to Contxt.</p>
 <p><strong>Usage:</strong></p>
-<pre><code>contxt auth login [OPTIONS]
+<pre><code class="language-text">contxt auth login [OPTIONS]
 </code></pre>
 <p><strong>Options:</strong></p>
-<pre><code>  --help  Show this message and exit.
+<pre><code class="language-text">  --help  Show this message and exit.
 </code></pre>
 <h3 id="logout">logout<a class="headerlink" href="#logout" title="Permanent link">&para;</a></h3>
 <p>Logout of Contxt.</p>
 <p><strong>Usage:</strong></p>
-<pre><code>contxt auth logout [OPTIONS]
+<pre><code class="language-text">contxt auth logout [OPTIONS]
 </code></pre>
 <p><strong>Options:</strong></p>
-<pre><code>  --help  Show this message and exit.
+<pre><code class="language-text">  --help  Show this message and exit.
 </code></pre>
 <h3 id="token">token<a class="headerlink" href="#token" title="Permanent link">&para;</a></h3>
 <p>Fetch an access token for an API.</p>
 <p><strong>Usage:</strong></p>
-<pre><code>contxt auth token [OPTIONS] AUDIENCE
+<pre><code class="language-text">contxt auth token [OPTIONS] AUDIENCE
 </code></pre>
 <p><strong>Options:</strong></p>
-<pre><code>  --help  Show this message and exit.
+<pre><code class="language-text">  --help  Show this message and exit.
 </code></pre>
 <h2 id="clusters">clusters<a class="headerlink" href="#clusters" title="Permanent link">&para;</a></h2>
 <p>Clusters</p>
 <p><strong>Usage:</strong></p>
-<pre><code>contxt clusters [OPTIONS] COMMAND [ARGS]...
+<pre><code class="language-text">contxt clusters [OPTIONS] COMMAND [ARGS]...
 </code></pre>
 <p><strong>Options:</strong></p>
-<pre><code>  --help  Show this message and exit.
+<pre><code class="language-text">  --help  Show this message and exit.
 </code></pre>
 <h3 id="get">get<a class="headerlink" href="#get" title="Permanent link">&para;</a></h3>
 <p>Get clusters</p>
 <p><strong>Usage:</strong></p>
-<pre><code>contxt clusters get [OPTIONS] [CLUSTER_SLUG]
+<pre><code class="language-text">contxt clusters get [OPTIONS] [CLUSTER_SLUG]
 </code></pre>
 <p><strong>Options:</strong></p>
-<pre><code>  --fields TEXT  Comma-delimited list of fields to return
+<pre><code class="language-text">  --fields TEXT  Comma-delimited list of fields to return
   --sort TEXT    Field to sort by
   --help         Show this message and exit.
 </code></pre>
 <h3 id="login_1">login<a class="headerlink" href="#login_1" title="Permanent link">&para;</a></h3>
 <p>Get cluster config</p>
 <p><strong>Usage:</strong></p>
-<pre><code>contxt clusters login [OPTIONS] SLUG
+<pre><code class="language-text">contxt clusters login [OPTIONS] SLUG
 </code></pre>
 <p><strong>Options:</strong></p>
-<pre><code>  --help  Show this message and exit.
+<pre><code class="language-text">  --help  Show this message and exit.
 </code></pre>
 <h3 id="register">register<a class="headerlink" href="#register" title="Permanent link">&para;</a></h3>
 <p><strong>Usage:</strong></p>
-<pre><code>contxt clusters register [OPTIONS]
+<pre><code class="language-text">contxt clusters register [OPTIONS]
 </code></pre>
 <p><strong>Options:</strong></p>
-<pre><code>  --host TEXT
+<pre><code class="language-text">  --host TEXT
   --slug TEXT                     The slugified name you would like to use for
                                   this cluster. You will need to reference
                                   this in other commands so it's ideal to make
@@ -325,10 +324,10 @@
 <h3 id="update">update<a class="headerlink" href="#update" title="Permanent link">&para;</a></h3>
 <p>Update a cluster</p>
 <p><strong>Usage:</strong></p>
-<pre><code>contxt clusters update [OPTIONS] SLUG
+<pre><code class="language-text">contxt clusters update [OPTIONS] SLUG
 </code></pre>
 <p><strong>Options:</strong></p>
-<pre><code>  --host TEXT
+<pre><code class="language-text">  --host TEXT
   --description TEXT              Information about what this cluster is for
                                   and what environment it belongs to
   --environment-type [production|nonproduction|blended]
@@ -338,36 +337,36 @@
 <h2 id="edge-nodes">edge-nodes<a class="headerlink" href="#edge-nodes" title="Permanent link">&para;</a></h2>
 <p>Edge Nodes.</p>
 <p><strong>Usage:</strong></p>
-<pre><code>contxt edge-nodes [OPTIONS] COMMAND [ARGS]...
+<pre><code class="language-text">contxt edge-nodes [OPTIONS] COMMAND [ARGS]...
 </code></pre>
 <p><strong>Options:</strong></p>
-<pre><code>  --help  Show this message and exit.
+<pre><code class="language-text">  --help  Show this message and exit.
 </code></pre>
 <h3 id="get_1">get<a class="headerlink" href="#get_1" title="Permanent link">&para;</a></h3>
 <p>Get edge nodes for a project</p>
 <p><strong>Usage:</strong></p>
-<pre><code>contxt edge-nodes get [OPTIONS] ORG_ID PROJECT_ID
+<pre><code class="language-text">contxt edge-nodes get [OPTIONS] ORG_ID PROJECT_ID
 </code></pre>
 <p><strong>Options:</strong></p>
-<pre><code>  --fields TEXT  Comma-delimited list of fields to return
+<pre><code class="language-text">  --fields TEXT  Comma-delimited list of fields to return
   --sort TEXT    Field to sort by
   --help         Show this message and exit.
 </code></pre>
 <h2 id="ems">ems<a class="headerlink" href="#ems" title="Permanent link">&para;</a></h2>
 <p>Energy Management System.</p>
 <p><strong>Usage:</strong></p>
-<pre><code>contxt ems [OPTIONS] COMMAND [ARGS]...
+<pre><code class="language-text">contxt ems [OPTIONS] COMMAND [ARGS]...
 </code></pre>
 <p><strong>Options:</strong></p>
-<pre><code>  --help  Show this message and exit.
+<pre><code class="language-text">  --help  Show this message and exit.
 </code></pre>
 <h3 id="export">export<a class="headerlink" href="#export" title="Permanent link">&para;</a></h3>
 <p>Export data for facilities</p>
 <p><strong>Usage:</strong></p>
-<pre><code>contxt ems export [OPTIONS] [FACILITY_IDS]...
+<pre><code class="language-text">contxt ems export [OPTIONS] [FACILITY_IDS]...
 </code></pre>
 <p><strong>Options:</strong></p>
-<pre><code>  --include TEXT                  Data to export
+<pre><code class="language-text">  --include TEXT                  Data to export
   --start [%Y-%m-%d|%Y-%m-%dT%H:%M:%S|%Y-%m-%d %H:%M:%S]
                                   Start time
   --end [%Y-%m-%d|%Y-%m-%dT%H:%M:%S|%Y-%m-%d %H:%M:%S]
@@ -378,10 +377,10 @@
 <h3 id="main-data">main-data<a class="headerlink" href="#main-data" title="Permanent link">&para;</a></h3>
 <p>Get main service data</p>
 <p><strong>Usage:</strong></p>
-<pre><code>contxt ems main-data [OPTIONS] FACILITY_ID
+<pre><code class="language-text">contxt ems main-data [OPTIONS] FACILITY_ID
 </code></pre>
 <p><strong>Options:</strong></p>
-<pre><code>  --resource-type RESOURCETYPE    Resource type
+<pre><code class="language-text">  --resource-type RESOURCETYPE    Resource type
   --start [%Y-%m-%d|%Y-%m-%dT%H:%M:%S|%Y-%m-%d %H:%M:%S]
                                   Start time  [required]
   --end [%Y-%m-%d|%Y-%m-%dT%H:%M:%S|%Y-%m-%d %H:%M:%S]
@@ -391,10 +390,10 @@
 <h3 id="mains">mains<a class="headerlink" href="#mains" title="Permanent link">&para;</a></h3>
 <p>Get main services</p>
 <p><strong>Usage:</strong></p>
-<pre><code>contxt ems mains [OPTIONS] FACILITY_ID
+<pre><code class="language-text">contxt ems mains [OPTIONS] FACILITY_ID
 </code></pre>
 <p><strong>Options:</strong></p>
-<pre><code>  --resource-type RESOURCETYPE  Resource type
+<pre><code class="language-text">  --resource-type RESOURCETYPE  Resource type
   --fields TEXT                 Comma-delimited list of fields to return
   --sort TEXT                   Field to sort by
   --help                        Show this message and exit.
@@ -402,10 +401,10 @@
 <h3 id="spend">spend<a class="headerlink" href="#spend" title="Permanent link">&para;</a></h3>
 <p>Get utility spend</p>
 <p><strong>Usage:</strong></p>
-<pre><code>contxt ems spend [OPTIONS] FACILITY_ID
+<pre><code class="language-text">contxt ems spend [OPTIONS] FACILITY_ID
 </code></pre>
 <p><strong>Options:</strong></p>
-<pre><code>  --resource-type RESOURCETYPE    Resource type
+<pre><code class="language-text">  --resource-type RESOURCETYPE    Resource type
   --start [%Y-%m-%d|%Y-%m-%dT%H:%M:%S|%Y-%m-%d %H:%M:%S]
                                   Start time
   --end [%Y-%m-%d|%Y-%m-%dT%H:%M:%S|%Y-%m-%d %H:%M:%S]
@@ -416,10 +415,10 @@
 <h3 id="usage">usage<a class="headerlink" href="#usage" title="Permanent link">&para;</a></h3>
 <p>Get utility usage</p>
 <p><strong>Usage:</strong></p>
-<pre><code>contxt ems usage [OPTIONS] FACILITY_ID
+<pre><code class="language-text">contxt ems usage [OPTIONS] FACILITY_ID
 </code></pre>
 <p><strong>Options:</strong></p>
-<pre><code>  --resource-type RESOURCETYPE    Resource type
+<pre><code class="language-text">  --resource-type RESOURCETYPE    Resource type
   --start [%Y-%m-%d|%Y-%m-%dT%H:%M:%S|%Y-%m-%d %H:%M:%S]
                                   Start time
   --end [%Y-%m-%d|%Y-%m-%dT%H:%M:%S|%Y-%m-%d %H:%M:%S]
@@ -430,10 +429,10 @@
 <h2 id="facilities">facilities<a class="headerlink" href="#facilities" title="Permanent link">&para;</a></h2>
 <p>Facilities.</p>
 <p><strong>Usage:</strong></p>
-<pre><code>contxt facilities [OPTIONS] COMMAND [ARGS]...
+<pre><code class="language-text">contxt facilities [OPTIONS] COMMAND [ARGS]...
 </code></pre>
 <p><strong>Options:</strong></p>
-<pre><code>  --help  Show this message and exit.
+<pre><code class="language-text">  --help  Show this message and exit.
 </code></pre>
 <h3 id="create">create<a class="headerlink" href="#create" title="Permanent link">&para;</a></h3>
 <p>Create facilities from a CSV file, containing the columns:</p>
@@ -442,61 +441,61 @@
 <li>timezone_name: IANA timezone database name (ex: America/New_York)</li>
 </ul>
 <p><strong>Usage:</strong></p>
-<pre><code>contxt facilities create [OPTIONS]
+<pre><code class="language-text">contxt facilities create [OPTIONS]
 </code></pre>
 <p><strong>Options:</strong></p>
-<pre><code>  --input FILENAME  CSV of facilities to create  [required]
+<pre><code class="language-text">  --input FILENAME  CSV of facilities to create  [required]
   --help            Show this message and exit.
 </code></pre>
 <h3 id="get_2">get<a class="headerlink" href="#get_2" title="Permanent link">&para;</a></h3>
 <p>Get facilities</p>
 <p><strong>Usage:</strong></p>
-<pre><code>contxt facilities get [OPTIONS]
+<pre><code class="language-text">contxt facilities get [OPTIONS]
 </code></pre>
 <p><strong>Options:</strong></p>
-<pre><code>  --help  Show this message and exit.
+<pre><code class="language-text">  --help  Show this message and exit.
 </code></pre>
 <h2 id="iot">iot<a class="headerlink" href="#iot" title="Permanent link">&para;</a></h2>
 <p>Internet-of-Things.</p>
 <p><strong>Usage:</strong></p>
-<pre><code>contxt iot [OPTIONS] COMMAND [ARGS]...
+<pre><code class="language-text">contxt iot [OPTIONS] COMMAND [ARGS]...
 </code></pre>
 <p><strong>Options:</strong></p>
-<pre><code>  --help  Show this message and exit.
+<pre><code class="language-text">  --help  Show this message and exit.
 </code></pre>
 <h3 id="categories">categories<a class="headerlink" href="#categories" title="Permanent link">&para;</a></h3>
 <p>IoT Grouping Categories</p>
 <p><strong>Usage:</strong></p>
-<pre><code>contxt iot categories [OPTIONS] COMMAND [ARGS]...
+<pre><code class="language-text">contxt iot categories [OPTIONS] COMMAND [ARGS]...
 </code></pre>
 <p><strong>Options:</strong></p>
-<pre><code>  --help  Show this message and exit.
+<pre><code class="language-text">  --help  Show this message and exit.
 </code></pre>
 <h4 id="get_3">get<a class="headerlink" href="#get_3" title="Permanent link">&para;</a></h4>
 <p>Get categories for facility</p>
 <p><strong>Usage:</strong></p>
-<pre><code>contxt iot categories get [OPTIONS] FACILITY_ID
+<pre><code class="language-text">contxt iot categories get [OPTIONS] FACILITY_ID
 </code></pre>
 <p><strong>Options:</strong></p>
-<pre><code>  --fields TEXT  Comma-delimited list of fields to return
+<pre><code class="language-text">  --fields TEXT  Comma-delimited list of fields to return
   --sort TEXT    Field to sort by
   --help         Show this message and exit.
 </code></pre>
 <h3 id="data">data<a class="headerlink" href="#data" title="Permanent link">&para;</a></h3>
 <p>IoT Field Data</p>
 <p><strong>Usage:</strong></p>
-<pre><code>contxt iot data [OPTIONS] COMMAND [ARGS]...
+<pre><code class="language-text">contxt iot data [OPTIONS] COMMAND [ARGS]...
 </code></pre>
 <p><strong>Options:</strong></p>
-<pre><code>  --help  Show this message and exit.
+<pre><code class="language-text">  --help  Show this message and exit.
 </code></pre>
 <h4 id="delete">delete<a class="headerlink" href="#delete" title="Permanent link">&para;</a></h4>
 <p>Delete a data point</p>
 <p><strong>Usage:</strong></p>
-<pre><code>contxt iot data delete [OPTIONS]
+<pre><code class="language-text">contxt iot data delete [OPTIONS]
 </code></pre>
 <p><strong>Options:</strong></p>
-<pre><code>  --output-id INTEGER             Output ID to delete from  [required]
+<pre><code class="language-text">  --output-id INTEGER             Output ID to delete from  [required]
   --field-human-name TEXT         The field to delete from. Ex: power.demand,
                                   power.usage  [required]
   --interval [0|60|900|3600]      Time interval  [required]
@@ -508,10 +507,10 @@
 <h4 id="get_4">get<a class="headerlink" href="#get_4" title="Permanent link">&para;</a></h4>
 <p>Get field data</p>
 <p><strong>Usage:</strong></p>
-<pre><code>contxt iot data get [OPTIONS] FEED_ID
+<pre><code class="language-text">contxt iot data get [OPTIONS] FEED_ID
 </code></pre>
 <p><strong>Options:</strong></p>
-<pre><code>  --start [%Y-%m-%d|%Y-%m-%dT%H:%M:%S|%Y-%m-%d %H:%M:%S]
+<pre><code class="language-text">  --start [%Y-%m-%d|%Y-%m-%dT%H:%M:%S|%Y-%m-%d %H:%M:%S]
                                   Start time
   --end [%Y-%m-%d|%Y-%m-%dT%H:%M:%S|%Y-%m-%d %H:%M:%S]
                                   End time
@@ -522,10 +521,10 @@
 <h3 id="feeds">feeds<a class="headerlink" href="#feeds" title="Permanent link">&para;</a></h3>
 <p>Get feeds</p>
 <p><strong>Usage:</strong></p>
-<pre><code>contxt iot feeds [OPTIONS]
+<pre><code class="language-text">contxt iot feeds [OPTIONS]
 </code></pre>
 <p><strong>Options:</strong></p>
-<pre><code>  --fields TEXT          Comma-delimited list of fields to return
+<pre><code class="language-text">  --fields TEXT          Comma-delimited list of fields to return
   --sort TEXT            Field to sort by
   --facility_id INTEGER  Filter on Facility ID
   --help                 Show this message and exit.
@@ -533,70 +532,70 @@
 <h3 id="fields">fields<a class="headerlink" href="#fields" title="Permanent link">&para;</a></h3>
 <p>IoT Fields</p>
 <p><strong>Usage:</strong></p>
-<pre><code>contxt iot fields [OPTIONS] COMMAND [ARGS]...
+<pre><code class="language-text">contxt iot fields [OPTIONS] COMMAND [ARGS]...
 </code></pre>
 <p><strong>Options:</strong></p>
-<pre><code>  --help  Show this message and exit.
+<pre><code class="language-text">  --help  Show this message and exit.
 </code></pre>
 <h4 id="create_1">create<a class="headerlink" href="#create_1" title="Permanent link">&para;</a></h4>
 <p>Create (provision) fields</p>
 <p><strong>Usage:</strong></p>
-<pre><code>contxt iot fields create [OPTIONS] FEED_KEY
+<pre><code class="language-text">contxt iot fields create [OPTIONS] FEED_KEY
 </code></pre>
 <p><strong>Options:</strong></p>
-<pre><code>  --input FILENAME  CSV of fields to create  [required]
+<pre><code class="language-text">  --input FILENAME  CSV of fields to create  [required]
   --help            Show this message and exit.
 </code></pre>
 <h4 id="delete_1">delete<a class="headerlink" href="#delete_1" title="Permanent link">&para;</a></h4>
 <p>Delete (unprovision) fields</p>
 <p><strong>Usage:</strong></p>
-<pre><code>contxt iot fields delete [OPTIONS] [FIELD_ID]...
+<pre><code class="language-text">contxt iot fields delete [OPTIONS] [FIELD_ID]...
 </code></pre>
 <p><strong>Options:</strong></p>
-<pre><code>  --help  Show this message and exit.
+<pre><code class="language-text">  --help  Show this message and exit.
 </code></pre>
 <h4 id="get_5">get<a class="headerlink" href="#get_5" title="Permanent link">&para;</a></h4>
 <p>Get fields</p>
 <p><strong>Usage:</strong></p>
-<pre><code>contxt iot fields get [OPTIONS] FEED_KEY
+<pre><code class="language-text">contxt iot fields get [OPTIONS] FEED_KEY
 </code></pre>
 <p><strong>Options:</strong></p>
-<pre><code>  --fields TEXT  Comma-delimited list of fields to return
+<pre><code class="language-text">  --fields TEXT  Comma-delimited list of fields to return
   --sort TEXT    Field to sort by
   --help         Show this message and exit.
 </code></pre>
 <h4 id="unprovisioned">unprovisioned<a class="headerlink" href="#unprovisioned" title="Permanent link">&para;</a></h4>
 <p>Get unprovisioned fields</p>
 <p><strong>Usage:</strong></p>
-<pre><code>contxt iot fields unprovisioned [OPTIONS] FEED_KEY
+<pre><code class="language-text">contxt iot fields unprovisioned [OPTIONS] FEED_KEY
 </code></pre>
 <p><strong>Options:</strong></p>
-<pre><code>  --output FILENAME  Path for output
+<pre><code class="language-text">  --output FILENAME  Path for output
   --help             Show this message and exit.
 </code></pre>
 <h3 id="groupings">groupings<a class="headerlink" href="#groupings" title="Permanent link">&para;</a></h3>
 <p>IoT Field Groupings</p>
 <p><strong>Usage:</strong></p>
-<pre><code>contxt iot groupings [OPTIONS] COMMAND [ARGS]...
+<pre><code class="language-text">contxt iot groupings [OPTIONS] COMMAND [ARGS]...
 </code></pre>
 <p><strong>Options:</strong></p>
-<pre><code>  --help  Show this message and exit.
+<pre><code class="language-text">  --help  Show this message and exit.
 </code></pre>
 <h4 id="add-field">add-field<a class="headerlink" href="#add-field" title="Permanent link">&para;</a></h4>
 <p>Add field to grouping</p>
 <p><strong>Usage:</strong></p>
-<pre><code>contxt iot groupings add-field [OPTIONS] GROUPING_ID FIELD_ID
+<pre><code class="language-text">contxt iot groupings add-field [OPTIONS] GROUPING_ID FIELD_ID
 </code></pre>
 <p><strong>Options:</strong></p>
-<pre><code>  --help  Show this message and exit.
+<pre><code class="language-text">  --help  Show this message and exit.
 </code></pre>
 <h4 id="create_2">create<a class="headerlink" href="#create_2" title="Permanent link">&para;</a></h4>
 <p>Create a new grouping</p>
 <p><strong>Usage:</strong></p>
-<pre><code>contxt iot groupings create [OPTIONS] FACILITY_ID
+<pre><code class="language-text">contxt iot groupings create [OPTIONS] FACILITY_ID
 </code></pre>
 <p><strong>Options:</strong></p>
-<pre><code>  --label TEXT              [required]
+<pre><code class="language-text">  --label TEXT              [required]
   --description TEXT        [required]
   --is-public BOOLEAN       [required]
   --field-category-id TEXT  [required]
@@ -605,36 +604,36 @@
 <h4 id="delete_2">delete<a class="headerlink" href="#delete_2" title="Permanent link">&para;</a></h4>
 <p>Delete field groupings (does not delete fields within grouping)</p>
 <p><strong>Usage:</strong></p>
-<pre><code>contxt iot groupings delete [OPTIONS] [GROUPING_ID]...
+<pre><code class="language-text">contxt iot groupings delete [OPTIONS] [GROUPING_ID]...
 </code></pre>
 <p><strong>Options:</strong></p>
-<pre><code>  --help  Show this message and exit.
+<pre><code class="language-text">  --help  Show this message and exit.
 </code></pre>
 <h4 id="get_6">get<a class="headerlink" href="#get_6" title="Permanent link">&para;</a></h4>
 <p>Get field groupings</p>
 <p><strong>Usage:</strong></p>
-<pre><code>contxt iot groupings get [OPTIONS] FACILITY_ID
+<pre><code class="language-text">contxt iot groupings get [OPTIONS] FACILITY_ID
 </code></pre>
 <p><strong>Options:</strong></p>
-<pre><code>  --fields TEXT  Comma-delimited list of fields to return
+<pre><code class="language-text">  --fields TEXT  Comma-delimited list of fields to return
   --sort TEXT    Field to sort by
   --help         Show this message and exit.
 </code></pre>
 <h2 id="metrics">metrics<a class="headerlink" href="#metrics" title="Permanent link">&para;</a></h2>
 <p>Metrics.</p>
 <p><strong>Usage:</strong></p>
-<pre><code>contxt metrics [OPTIONS] COMMAND [ARGS]...
+<pre><code class="language-text">contxt metrics [OPTIONS] COMMAND [ARGS]...
 </code></pre>
 <p><strong>Options:</strong></p>
-<pre><code>  --help  Show this message and exit.
+<pre><code class="language-text">  --help  Show this message and exit.
 </code></pre>
 <h3 id="data_1">data<a class="headerlink" href="#data_1" title="Permanent link">&para;</a></h3>
 <p>Get metric data</p>
 <p><strong>Usage:</strong></p>
-<pre><code>contxt metrics data [OPTIONS]
+<pre><code class="language-text">contxt metrics data [OPTIONS]
 </code></pre>
 <p><strong>Options:</strong></p>
-<pre><code>  --facility-id TEXT              Facility ID  [required]
+<pre><code class="language-text">  --facility-id TEXT              Facility ID  [required]
   --label TEXT                    Facility ID  [required]
   --start [%Y-%m-%d|%Y-%m-%dT%H:%M:%S|%Y-%m-%d %H:%M:%S]
                                   [required]
@@ -643,44 +642,44 @@
 <h3 id="labels">labels<a class="headerlink" href="#labels" title="Permanent link">&para;</a></h3>
 <p>Get Metric Labels</p>
 <p><strong>Usage:</strong></p>
-<pre><code>contxt metrics labels [OPTIONS]
+<pre><code class="language-text">contxt metrics labels [OPTIONS]
 </code></pre>
 <p><strong>Options:</strong></p>
-<pre><code>  --help  Show this message and exit.
+<pre><code class="language-text">  --help  Show this message and exit.
 </code></pre>
 <h2 id="orgs">orgs<a class="headerlink" href="#orgs" title="Permanent link">&para;</a></h2>
 <p>Organizations.</p>
 <p><strong>Usage:</strong></p>
-<pre><code>contxt orgs [OPTIONS] COMMAND [ARGS]...
+<pre><code class="language-text">contxt orgs [OPTIONS] COMMAND [ARGS]...
 </code></pre>
 <p><strong>Options:</strong></p>
-<pre><code>  --help  Show this message and exit.
+<pre><code class="language-text">  --help  Show this message and exit.
 </code></pre>
 <h3 id="get_7">get<a class="headerlink" href="#get_7" title="Permanent link">&para;</a></h3>
 <p>Get organizations</p>
 <p><strong>Usage:</strong></p>
-<pre><code>contxt orgs get [OPTIONS]
+<pre><code class="language-text">contxt orgs get [OPTIONS]
 </code></pre>
 <p><strong>Options:</strong></p>
-<pre><code>  --fields TEXT  Comma-delimited list of fields to return
+<pre><code class="language-text">  --fields TEXT  Comma-delimited list of fields to return
   --sort TEXT    Field to sort by
   --help         Show this message and exit.
 </code></pre>
 <h2 id="project-envs">project-envs<a class="headerlink" href="#project-envs" title="Permanent link">&para;</a></h2>
 <p>Projects Environments.</p>
 <p><strong>Usage:</strong></p>
-<pre><code>contxt project-envs [OPTIONS] COMMAND [ARGS]...
+<pre><code class="language-text">contxt project-envs [OPTIONS] COMMAND [ARGS]...
 </code></pre>
 <p><strong>Options:</strong></p>
-<pre><code>  --help  Show this message and exit.
+<pre><code class="language-text">  --help  Show this message and exit.
 </code></pre>
 <h3 id="create_3">create<a class="headerlink" href="#create_3" title="Permanent link">&para;</a></h3>
 <p>Create a project environment</p>
 <p><strong>Usage:</strong></p>
-<pre><code>contxt project-envs create [OPTIONS]
+<pre><code class="language-text">contxt project-envs create [OPTIONS]
 </code></pre>
 <p><strong>Options:</strong></p>
-<pre><code>  --project-slug TEXT
+<pre><code class="language-text">  --project-slug TEXT
   --name TEXT
   --slug TEXT
   --description TEXT
@@ -692,28 +691,28 @@
 <h3 id="delete_3">delete<a class="headerlink" href="#delete_3" title="Permanent link">&para;</a></h3>
 <p>Delete a project environment</p>
 <p><strong>Usage:</strong></p>
-<pre><code>contxt project-envs delete [OPTIONS] PROJECT_SLUG SLUG
+<pre><code class="language-text">contxt project-envs delete [OPTIONS] PROJECT_SLUG SLUG
 </code></pre>
 <p><strong>Options:</strong></p>
-<pre><code>  --help  Show this message and exit.
+<pre><code class="language-text">  --help  Show this message and exit.
 </code></pre>
 <h3 id="get_8">get<a class="headerlink" href="#get_8" title="Permanent link">&para;</a></h3>
 <p>Get project environment(s)</p>
 <p><strong>Usage:</strong></p>
-<pre><code>contxt project-envs get [OPTIONS] PROJECT_SLUG
+<pre><code class="language-text">contxt project-envs get [OPTIONS] PROJECT_SLUG
 </code></pre>
 <p><strong>Options:</strong></p>
-<pre><code>  --fields TEXT  Comma-delimited list of fields to return
+<pre><code class="language-text">  --fields TEXT  Comma-delimited list of fields to return
   --sort TEXT    Field to sort by
   --help         Show this message and exit.
 </code></pre>
 <h3 id="update_1">update<a class="headerlink" href="#update_1" title="Permanent link">&para;</a></h3>
 <p>Update a project environment</p>
 <p><strong>Usage:</strong></p>
-<pre><code>contxt project-envs update [OPTIONS] PROJECT_SLUG SLUG
+<pre><code class="language-text">contxt project-envs update [OPTIONS] PROJECT_SLUG SLUG
 </code></pre>
 <p><strong>Options:</strong></p>
-<pre><code>  --name TEXT
+<pre><code class="language-text">  --name TEXT
   --slug TEXT
   --type TEXT
   --cluster-id TEXT
@@ -724,18 +723,18 @@
 <h2 id="projects">projects<a class="headerlink" href="#projects" title="Permanent link">&para;</a></h2>
 <p>Projects.</p>
 <p><strong>Usage:</strong></p>
-<pre><code>contxt projects [OPTIONS] COMMAND [ARGS]...
+<pre><code class="language-text">contxt projects [OPTIONS] COMMAND [ARGS]...
 </code></pre>
 <p><strong>Options:</strong></p>
-<pre><code>  --help  Show this message and exit.
+<pre><code class="language-text">  --help  Show this message and exit.
 </code></pre>
 <h3 id="create_4">create<a class="headerlink" href="#create_4" title="Permanent link">&para;</a></h3>
 <p>Create a project</p>
 <p><strong>Usage:</strong></p>
-<pre><code>contxt projects create [OPTIONS]
+<pre><code class="language-text">contxt projects create [OPTIONS]
 </code></pre>
 <p><strong>Options:</strong></p>
-<pre><code>  --name TEXT
+<pre><code class="language-text">  --name TEXT
   --slug TEXT
   --type [Core|Custom]
   --description TEXT
@@ -745,28 +744,28 @@
 <h3 id="delete_4">delete<a class="headerlink" href="#delete_4" title="Permanent link">&para;</a></h3>
 <p>Delete a project</p>
 <p><strong>Usage:</strong></p>
-<pre><code>contxt projects delete [OPTIONS] [SLUG]
+<pre><code class="language-text">contxt projects delete [OPTIONS] [SLUG]
 </code></pre>
 <p><strong>Options:</strong></p>
-<pre><code>  --help  Show this message and exit.
+<pre><code class="language-text">  --help  Show this message and exit.
 </code></pre>
 <h3 id="get_9">get<a class="headerlink" href="#get_9" title="Permanent link">&para;</a></h3>
 <p>Get project(s)</p>
 <p><strong>Usage:</strong></p>
-<pre><code>contxt projects get [OPTIONS] [SLUG]
+<pre><code class="language-text">contxt projects get [OPTIONS] [SLUG]
 </code></pre>
 <p><strong>Options:</strong></p>
-<pre><code>  --fields TEXT  Comma-delimited list of fields to return
+<pre><code class="language-text">  --fields TEXT  Comma-delimited list of fields to return
   --sort TEXT    Field to sort by
   --help         Show this message and exit.
 </code></pre>
 <h3 id="update_2">update<a class="headerlink" href="#update_2" title="Permanent link">&para;</a></h3>
 <p>Update a project</p>
 <p><strong>Usage:</strong></p>
-<pre><code>contxt projects update [OPTIONS] SLUG
+<pre><code class="language-text">contxt projects update [OPTIONS] SLUG
 </code></pre>
 <p><strong>Options:</strong></p>
-<pre><code>  --name TEXT
+<pre><code class="language-text">  --name TEXT
   --slug TEXT
   --type TEXT
   --description TEXT
@@ -775,18 +774,18 @@
 <h2 id="service-instances">service-instances<a class="headerlink" href="#service-instances" title="Permanent link">&para;</a></h2>
 <p>Service Instances.</p>
 <p><strong>Usage:</strong></p>
-<pre><code>contxt service-instances [OPTIONS] COMMAND [ARGS]...
+<pre><code class="language-text">contxt service-instances [OPTIONS] COMMAND [ARGS]...
 </code></pre>
 <p><strong>Options:</strong></p>
-<pre><code>  --help  Show this message and exit.
+<pre><code class="language-text">  --help  Show this message and exit.
 </code></pre>
 <h3 id="create_5">create<a class="headerlink" href="#create_5" title="Permanent link">&para;</a></h3>
 <p>Create service instances</p>
 <p><strong>Usage:</strong></p>
-<pre><code>contxt service-instances create [OPTIONS]
+<pre><code class="language-text">contxt service-instances create [OPTIONS]
 </code></pre>
 <p><strong>Options:</strong></p>
-<pre><code>  --service-id TEXT
+<pre><code class="language-text">  --service-id TEXT
   --project-environment-id TEXT
   --name TEXT
   --slug TEXT
@@ -797,18 +796,18 @@
 <h3 id="delete_5">delete<a class="headerlink" href="#delete_5" title="Permanent link">&para;</a></h3>
 <p>Delete service instance</p>
 <p><strong>Usage:</strong></p>
-<pre><code>contxt service-instances delete [OPTIONS] ID
+<pre><code class="language-text">contxt service-instances delete [OPTIONS] ID
 </code></pre>
 <p><strong>Options:</strong></p>
-<pre><code>  --help  Show this message and exit.
+<pre><code class="language-text">  --help  Show this message and exit.
 </code></pre>
 <h3 id="get_10">get<a class="headerlink" href="#get_10" title="Permanent link">&para;</a></h3>
 <p>Get service instance(s)</p>
 <p><strong>Usage:</strong></p>
-<pre><code>contxt service-instances get [OPTIONS]
+<pre><code class="language-text">contxt service-instances get [OPTIONS]
 </code></pre>
 <p><strong>Options:</strong></p>
-<pre><code>  --service-id TEXT
+<pre><code class="language-text">  --service-id TEXT
   --fields TEXT      Comma-delimited list of fields to return
   --sort TEXT        Field to sort by
   --help             Show this message and exit.
@@ -816,18 +815,18 @@
 <h2 id="services">services<a class="headerlink" href="#services" title="Permanent link">&para;</a></h2>
 <p>Services.</p>
 <p><strong>Usage:</strong></p>
-<pre><code>contxt services [OPTIONS] COMMAND [ARGS]...
+<pre><code class="language-text">contxt services [OPTIONS] COMMAND [ARGS]...
 </code></pre>
 <p><strong>Options:</strong></p>
-<pre><code>  --help  Show this message and exit.
+<pre><code class="language-text">  --help  Show this message and exit.
 </code></pre>
 <h3 id="create_6">create<a class="headerlink" href="#create_6" title="Permanent link">&para;</a></h3>
 <p>Create service</p>
 <p><strong>Usage:</strong></p>
-<pre><code>contxt services create [OPTIONS]
+<pre><code class="language-text">contxt services create [OPTIONS]
 </code></pre>
 <p><strong>Options:</strong></p>
-<pre><code>  --project-id TEXT
+<pre><code class="language-text">  --project-id TEXT
   --slug TEXT
   --type [API|Application|Worker]
   --deployment-strategy [self-managed|contxt-managed|unmanaged]
@@ -836,18 +835,18 @@
 <h3 id="delete_6">delete<a class="headerlink" href="#delete_6" title="Permanent link">&para;</a></h3>
 <p>Delete service</p>
 <p><strong>Usage:</strong></p>
-<pre><code>contxt services delete [OPTIONS] ID
+<pre><code class="language-text">contxt services delete [OPTIONS] ID
 </code></pre>
 <p><strong>Options:</strong></p>
-<pre><code>  --help  Show this message and exit.
+<pre><code class="language-text">  --help  Show this message and exit.
 </code></pre>
 <h3 id="get_11">get<a class="headerlink" href="#get_11" title="Permanent link">&para;</a></h3>
 <p>Get service(s)</p>
 <p><strong>Usage:</strong></p>
-<pre><code>contxt services get [OPTIONS] [ID]
+<pre><code class="language-text">contxt services get [OPTIONS] [ID]
 </code></pre>
 <p><strong>Options:</strong></p>
-<pre><code>  --fields TEXT  Comma-delimited list of fields to return
+<pre><code class="language-text">  --fields TEXT  Comma-delimited list of fields to return
   --sort TEXT    Field to sort by
   --help         Show this message and exit.
 </code></pre>
@@ -890,14 +889,15 @@
     
   </span>
 </div>
-    <script>var base_url = '../..';</script>
-    <script src="../../js/theme_extra.js" defer></script>
-    <script src="../../js/theme.js" defer></script>
-      <script src="../../search/main.js" defer></script>
-    <script defer>
-        window.onload = function () {
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
             SphinxRtdTheme.Navigation.enable(true);
-        };
+        });
     </script>
 
 </body>
