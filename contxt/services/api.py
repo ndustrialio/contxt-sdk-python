@@ -91,7 +91,7 @@ class Api:
         t = response.elapsed.total_seconds()
         logger.debug(
             f"Called {response.request.method} {response.url} with body"  # type: ignore
-            f" {response.request.body} ({t} s)"
+            f" {response.request.body!r} ({t} s)"
         )
 
     def _process_response(self, response: Response) -> Dict:

@@ -9,12 +9,12 @@ repository = "https://github.com/ndustrialio/contxt-sdk-python"
 packages = [ { include = "contxt" } ]
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.9"
 auth0-python = "^3"
 click = ">=7,<9"
 cryptography = { version = ">=42.0.4", optional = true } # enable pyjwt to en/decode jwt via RSA
 pyjwt = "^2"
-pyyaml = ">=5,<7"
+pyyaml = "^6.0.2"
 requests = "^2"
 tabulate = "*"
 sgqlc = ">=15,<17"
@@ -22,11 +22,11 @@ python-slugify = "^6.1.2"
 
 [tool.poetry.dev-dependencies]
 black = "^24"
-flake8 = "^5"
+flake8 = "^7.1.1"
 isort = "^5"
 mkdocs = "^1.4.2"
 mkdocs-click = "^0.8.0"
-mypy = "^0"
+mypy = "^1.13.0"
 poethepoet = "^0"
 pre-commit = "^3"
 pytest = "^7"
@@ -60,3 +60,6 @@ profile = "black"
 [build-system]
 requires = ["poetry-core>=1.0"]
 build-backend = "poetry.core.masonry.api"
+
+[mypy]
+exclude = "/contxt/generated/"

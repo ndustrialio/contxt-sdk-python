@@ -1,7 +1,7 @@
 from collections import defaultdict
 from copy import deepcopy
 from datetime import datetime, timedelta, timezone
-from typing import Any, Dict, Iterable, List, Optional, Tuple
+from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
 
 from requests import Request
 
@@ -148,7 +148,7 @@ class IotService(ConfiguredApi):
     def get_time_series_for_field(
         self,
         field: Field,
-        start_time: datetime = None,
+        start_time: Union[datetime, None] = None,
         window: Window = Window.RAW,
         end_time: Optional[datetime] = None,
         per_page: int = 1000,
@@ -174,7 +174,7 @@ class IotService(ConfiguredApi):
     def get_time_series_for_fields(
         self,
         fields: List[Field],
-        start_time: datetime = None,
+        start_time: Union[datetime, None] = None,
         window: Window = Window.RAW,
         end_time: Optional[datetime] = None,
     ) -> List[FieldTimeSeries]:
@@ -443,7 +443,9 @@ class IotDataService(ConfiguredApi):
 
         return responses
 
-    def get_source_field_cursor(self, source_key: str, field_name: str = None) -> Optional[datetime]:
+    def get_source_field_cursor(
+        self, source_key: str, field_name: Union[str, None] = None
+    ) -> Optional[datetime]:
         """Get the cursor for the given source and field"""
 
         url = f"org/{self.org_id}/sources/{source_key}"

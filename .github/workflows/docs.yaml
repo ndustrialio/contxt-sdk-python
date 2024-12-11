@@ -15,13 +15,13 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-python@v2
         with:
-          python-version: 3.8
+          python-version: 3.9
       - run: pip install poetry
       - name: Set up cache
         uses: actions/cache@v2
         with:
           path: .venv
-          key: ${{ runner.os }}-venv-py3.8-${{ hashFiles('**/poetry.lock') }}
+          key: ${{ runner.os }}-venv-py3.9-${{ hashFiles('**/poetry.lock') }}
       - name: Install package
         run: poetry install
       - name: Publish documentation

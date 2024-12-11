@@ -3,7 +3,7 @@ from datetime import date, datetime
 from enum import Enum
 from json import dump, dumps
 from pathlib import Path
-from typing import Any, Callable, Iterable, Optional
+from typing import Any, Callable, Iterable, Optional, Union
 
 from tabulate import tabulate
 
@@ -21,7 +21,7 @@ class Serializer:
             return []
 
     @staticmethod
-    def to_dict(obj: Any, cls_key: str = None, key_filter: Callable = None):
+    def to_dict(obj: Any, cls_key: Union[str, None] = None, key_filter: Union[Callable, None] = None):
         """Serializes `obj` to a `dict`. To use a custom format, overload
         `obj.to_dict()`.
 
