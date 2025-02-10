@@ -5,7 +5,7 @@ from json import dump, load
 from pathlib import Path
 from typing import Any, Dict, Optional
 
-from auth0.v3.authentication import GetToken
+from auth0.authentication import GetToken
 from requests.exceptions import HTTPError
 
 from contxt.services.api import Api
@@ -117,7 +117,9 @@ class UserIdentityProvider(TokenProvider):
         self.env = env
         self.client_id = client_id
         self.client_secret = client_secret
-        self.auth_service = GetToken(environments[env].auth0_tenant_base_url)
+        self.auth_service: GetToken = GetToken(
+            environments[env].auth0_tenant_base_url, client_id, client_secret=client_secret
+        )
         self._refresh_token: Optional[Token] = None
         self.device_provider = Auth0DeviceProvider(env)
 
@@ -153,9 +155,7 @@ class UserIdentityProvider(TokenProvider):
         elif self._token_expiring():
             # Token expiring soon, refresh it
             logger.debug(f"Refreshing access_token for {self.audience}")
-            token_info = self.auth_service.refresh_token(
-                self.client_id, self.client_secret, self.refresh_token
-            )
+            token_info = self.auth_service.refresh_token(self.refresh_token)
             self.access_token = token_info["access_token"]
             # Update cache
             self.update_cache()
