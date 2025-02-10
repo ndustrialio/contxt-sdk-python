@@ -1204,17 +1204,6 @@ files = [
 ]
 
 [[package]]
-name = "types-docutils"
-version = "0.21.0.20241128"
-description = "Typing stubs for docutils"
-optional = false
-python-versions = ">=3.8"
-files = [
-    {file = "types_docutils-0.21.0.20241128-py3-none-any.whl", hash = "sha256:e0409204009639e9b0bf4521eeabe58b5e574ce9c0db08421c2ac26c32be0039"},
-    {file = "types_docutils-0.21.0.20241128.tar.gz", hash = "sha256:4dd059805b83ac6ec5a223699195c4e9eeb0446a4f7f2aeff1759a4a7cc17473"},
-]
-
-[[package]]
 name = "types-jwt"
 version = "0.1.3"
 description = "Typing stubs for jwt"
@@ -1265,17 +1254,14 @@ urllib3 = ">=2"
 
 [[package]]
 name = "types-setuptools"
-version = "65.7.0.4"
+version = "75.8.0.20250210"
 description = "Typing stubs for setuptools"
 optional = false
-python-versions = "*"
+python-versions = ">=3.9"
 files = [
-    {file = "types-setuptools-65.7.0.4.tar.gz", hash = "sha256:147809433301fe7e0f4ef5c0782f9a0453788960575e1efb6da5fe8cb2493c9f"},
-    {file = "types_setuptools-65.7.0.4-py3-none-any.whl", hash = "sha256:522067dfd8e1771f8d7e047e451de2740dc4e0c9f48a22302a6cc96e6c964a13"},
+    {file = "types_setuptools-75.8.0.20250210-py3-none-any.whl", hash = "sha256:a217d7b4d59be04c29e23d142c959a0f85e71292fd3fc4313f016ca11f0b56dc"},
+    {file = "types_setuptools-75.8.0.20250210.tar.gz", hash = "sha256:c1547361b2441f07c94e25dce8a068e18c611593ad4b6fdd727b1a8f5d1fda33"},
 ]
-
-[package.dependencies]
-types-docutils = "*"
 
 [[package]]
 name = "types-tabulate"
@@ -1403,4 +1389,4 @@ crypto = ["cryptography"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "5c35f0294052f65d41dac3afae79f388254791241c8b2f20230186d16a429721"
+content-hash = "5a5e44f4e05b29d95ac501546624c04d630ca430c8fa55f557bdbfa87062fc8b"
