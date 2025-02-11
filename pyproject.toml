@@ -18,7 +18,7 @@ pyyaml = "^6.0.2"
 requests = "^2"
 tabulate = "*"
 sgqlc = ">=15,<17"
-python-slugify = "^6.1.2"
+python-slugify = ">=6.1.2,<9.0.0"
 
 [tool.poetry.dev-dependencies]
 black = "^24"
