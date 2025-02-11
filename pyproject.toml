@@ -10,7 +10,7 @@ packages = [ { include = "contxt" } ]
 
 [tool.poetry.dependencies]
 python = "^3.9"
-auth0-python = "^3"
+auth0-python = "^4"
 click = ">=7,<9"
 cryptography = { version = ">=42.0.4", optional = true } # enable pyjwt to en/decode jwt via RSA
 pyjwt = "^2"
