@@ -21,7 +21,7 @@ sgqlc = ">=15,<17"
 python-slugify = ">=6.1.2,<9.0.0"
 
 [tool.poetry.dev-dependencies]
-black = "^24"
+black = "^25"
 flake8 = "^7.1.1"
 isort = "^5"
 mkdocs = "^1.4.2"
