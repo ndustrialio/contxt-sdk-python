@@ -22,7 +22,7 @@ python-slugify = ">=6.1.2,<9.0.0"
 
 [tool.poetry.dev-dependencies]
 black = "^25"
-flake8 = "^7.1.1"
+flake8 = "^7.1.2"
 isort = "^6"
 mkdocs = "^1.4.2"
 mkdocs-click = "^0.8.0"
