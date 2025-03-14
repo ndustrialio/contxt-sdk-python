@@ -2029,4 +2029,4 @@ crypto = ["cryptography"]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.9.2"
-content-hash = "1a4649b096addf38276b11e6ebd3b445484eb6563480c835c8ceb47ecccd76fc"
+content-hash = "c008d9f7477dd865882080561b12267e674a2d1ca89473ed665ed69907bc618e"
