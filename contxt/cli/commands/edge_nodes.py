@@ -3,7 +3,7 @@ from typing import List
 import click
 
 from contxt.cli.clients import Clients
-from contxt.cli.utils import fields_option, print_table, print_item, sort_option
+from contxt.cli.utils import fields_option, print_item, print_table, sort_option
 from contxt.models.contxt import EdgeNode
 
 
