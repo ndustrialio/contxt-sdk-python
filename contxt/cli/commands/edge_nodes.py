@@ -30,5 +30,7 @@ def get(clients: Clients, org_id: str, project_id: int, fields: List[str], sort:
 @click.pass_obj
 def add_grant(clients: Clients, edge_node_id: str, target: int) -> None:
     """Add grant to edge node"""
-    result = clients.contxt.create_edge_node_grant(edge_node_id=edge_node_id, to_service_instance_id=target)
+    result = clients.contxt.create_edge_node_grant(
+        edge_node_id=edge_node_id, to_service_instance_id=target
+    )
     print_item(result)

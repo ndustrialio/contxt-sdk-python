@@ -73,8 +73,8 @@ def delete(clients: Clients, id: str) -> None:
 @click.pass_obj
 def add_grant(clients: Clients, service_instance_id: str, target: int) -> None:
     """Add grant to service instance"""
-    json = {
-        "to_service_instance_id": target
-    }
-    result = clients.contxt_deployments.post(f"{clients.org_id}/service_instances/{service_instance_id}/grants", json)
+    json = {"to_service_instance_id": target}
+    result = clients.contxt_deployments.post(
+        f"{clients.org_id}/service_instances/{service_instance_id}/grants", json
+    )
     print_item(result)
