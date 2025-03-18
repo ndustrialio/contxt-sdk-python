@@ -74,6 +74,21 @@ def feeds(clients: Clients, fields: List[str], sort: str, facility_id: Optional[
     print_table(items=items, keys=fields, sort_by=sort)
 
 
+@iot.command()
+@click.argument("feed_key")
+@click.argument("enabled", type=bool)
+@click.pass_obj
+def provisioning_mode(clients: Clients, feed_key: str, enabled: bool) -> None:
+    """Enable/Disable provisioning mode for a feed"""
+    feed = clients.iot.get_feed_with_key(key=feed_key)
+    if not feed:
+        raise click.ClickException(f"Feed with key {feed_key} does not exist.")
+
+    clients.iot.update_feed_provisioning_mode(feed.id, enabled)
+    newState = "enabled" if enabled else "disabled"
+    print(f"Provisioning mode is now {newState}")
+
+
 @fields.command()
 @click.argument("feed_key", type=str)
 @fields_option(default="id, feed_key, name, field_human_name", obj=Field)
