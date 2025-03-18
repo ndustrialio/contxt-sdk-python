@@ -105,6 +105,10 @@ class IotService(ConfiguredApi):
             return feeds[0]  # type: ignore
         raise KeyError(f"Expected singleton feed with key {key}, not {N}")
 
+    def update_feed_provisioning_mode(self, id: int, enabled: bool):
+        """Enable/Disable provisioning mode for a feed"""
+        return self.put(uri=f"feeds/{id}", json={"provisioning_mode": enabled})
+
     def get_feeds(
         self,
         facility_id: Optional[int] = None,
