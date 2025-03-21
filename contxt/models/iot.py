@@ -40,7 +40,7 @@ class Field(ApiObject):
         ApiField("FieldGroupingField", attr_key="field_grouping_field", data_type=dict, optional=True),
         ApiField("is_hidden", data_type=bool, creatable=True, updatable=True, optional=True),
         ApiField("is_default", data_type=bool, optional=True, creatable=True, updatable=True),
-        ApiField("is_totalizer", data_type=bool, optional=True),
+        ApiField("is_totalizer", data_type=bool, optional=True, creatable=True, updatable=True),
         ApiField("can_aggregate", data_type=bool, optional=True),
         ApiField("is_windowed", data_type=bool, optional=True),
         ApiField("status", optional=True),
