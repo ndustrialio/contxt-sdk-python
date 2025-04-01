@@ -73,6 +73,8 @@
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#edge-nodes">edge-nodes</a>
         <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#add-grant">add-grant</a>
+    </li>
     <li class="toctree-l3"><a class="reference internal" href="#get_1">get</a>
     </li>
         </ul>
@@ -185,6 +187,8 @@
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#service-instances">service-instances</a>
         <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#add-grant_1">add-grant</a>
+    </li>
     <li class="toctree-l3"><a class="reference internal" href="#create_5">create</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#delete_5">delete</a>
@@ -340,6 +344,14 @@
 <p>Edge Nodes.</p>
 <p><strong>Usage:</strong></p>
 <pre><code class="language-text">contxt edge-nodes [OPTIONS] COMMAND [ARGS]...
+</code></pre>
+<p><strong>Options:</strong></p>
+<pre><code class="language-text">  --help  Show this message and exit.
+</code></pre>
+<h3 id="add-grant">add-grant<a class="headerlink" href="#add-grant" title="Permanent link">&para;</a></h3>
+<p>Add grant to edge node</p>
+<p><strong>Usage:</strong></p>
+<pre><code class="language-text">contxt edge-nodes add-grant [OPTIONS] EDGE_NODE_ID TARGET
 </code></pre>
 <p><strong>Options:</strong></p>
 <pre><code class="language-text">  --help  Show this message and exit.
@@ -785,6 +797,14 @@
 <p>Service Instances.</p>
 <p><strong>Usage:</strong></p>
 <pre><code class="language-text">contxt service-instances [OPTIONS] COMMAND [ARGS]...
+</code></pre>
+<p><strong>Options:</strong></p>
+<pre><code class="language-text">  --help  Show this message and exit.
+</code></pre>
+<h3 id="add-grant_1">add-grant<a class="headerlink" href="#add-grant_1" title="Permanent link">&para;</a></h3>
+<p>Add grant to service instance</p>
+<p><strong>Usage:</strong></p>
+<pre><code class="language-text">contxt service-instances add-grant [OPTIONS] SERVICE_INSTANCE_ID TARGET
 </code></pre>
 <p><strong>Options:</strong></p>
 <pre><code class="language-text">  --help  Show this message and exit.
