@@ -4,7 +4,7 @@ import click
 
 from contxt.cli.clients import Clients
 from contxt.cli.utils import fields_option, print_item, print_table, sort_option
-from contxt.models.contxt import ServiceInstance
+from contxt.models.contxt import ServiceInstance, ServiceInstanceGrant
 
 
 @click.group()
@@ -78,3 +78,17 @@ def add_grant(clients: Clients, service_instance_id: str, target: int) -> None:
         f"{clients.org_id}/service_instances/{service_instance_id}/grants", json
     )
     print_item(result)
+
+
+@service_instances.command()
+@click.argument("service_instance_id")
+@fields_option(default="id, from_service_instance_id, to_service_instance_id", obj=ServiceInstanceGrant)
+@sort_option(default="id")
+@click.pass_obj
+def get_grants(clients: Clients, service_instance_id: str, fields: List[str], sort: str) -> None:
+    """Get all service instance grants"""
+    items = clients.contxt_deployments.get_service_instance_grants(
+        clients.org_id,
+        service_instance_id=service_instance_id
+    )
+    print_table(items=items, keys=fields, sort_by=sort)

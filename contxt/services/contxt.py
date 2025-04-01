@@ -108,10 +108,6 @@ class ContxtService(ConfiguredApi):
             resp = self.get("services")
             return [Service.from_api(rec) for rec in resp]
 
-    def get_edge_nodes(self, organization_id: str, project_id: int) -> List[EdgeNode]:
-        resp = self.get(f"organizations/{organization_id}/stacks/{project_id}/edgenodes")
-        return [EdgeNode.from_api(rec) for rec in resp]
-
     def create_edge_node_grant(self, edge_node_id: str, to_service_instance_id: int) -> Dict:
         return self.post(
             f"edgenodes/{edge_node_id}/grants", data={"to_service_instance_id": to_service_instance_id}
