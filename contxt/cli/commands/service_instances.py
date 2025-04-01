@@ -88,7 +88,6 @@ def add_grant(clients: Clients, service_instance_id: str, target: int) -> None:
 def get_grants(clients: Clients, service_instance_id: str, fields: List[str], sort: str) -> None:
     """Get all service instance grants"""
     items = clients.contxt_deployments.get_service_instance_grants(
-        clients.org_id,
-        service_instance_id=service_instance_id
+        clients.org_id, service_instance_id=service_instance_id
     )
     print_table(items=items, keys=fields, sort_by=sort)

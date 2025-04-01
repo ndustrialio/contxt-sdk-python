@@ -319,6 +319,7 @@ class ServiceInstance(ApiObject):
     image: Optional[Image] = None
     created_at: Optional[datetime] = None
 
+
 @dataclass
 class ServiceInstanceGrant(ApiObject):
     _api_fields: ClassVar = (
@@ -332,6 +333,7 @@ class ServiceInstanceGrant(ApiObject):
     from_service_instance_id: str
     to_service_instance_id: int
     created_at: Optional[datetime] = None
+
 
 @dataclass
 class Project(ApiObject):
@@ -402,6 +404,7 @@ class EdgeNode(ApiObject):
     client_id: str
     created_at: Optional[datetime] = None
 
+
 @dataclass
 class EdgeNodeGrant(ApiObject):
     _api_fields: ClassVar = (
@@ -415,6 +418,7 @@ class EdgeNodeGrant(ApiObject):
     from_edge_node_id: str
     to_service_instance_id: int
     created_at: Optional[datetime] = None
+
 
 @dataclass
 class Cluster(ApiObject):
