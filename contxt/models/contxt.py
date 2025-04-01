@@ -321,6 +321,21 @@ class ServiceInstance(ApiObject):
 
 
 @dataclass
+class ServiceInstanceGrant(ApiObject):
+    _api_fields: ClassVar = (
+        ApiField("id"),
+        ApiField("from_service_instance_id"),
+        ApiField("to_service_instance_id"),
+        ApiField("created_at", data_type=Parsers.datetime),
+    )
+
+    id: str
+    from_service_instance_id: str
+    to_service_instance_id: int
+    created_at: Optional[datetime] = None
+
+
+@dataclass
 class Project(ApiObject):
     _api_fields: ClassVar = (
         ApiField("id", data_type=int),
@@ -372,21 +387,36 @@ class ProjectEnvironment(ApiObject):
 @dataclass
 class EdgeNode(ApiObject):
     _api_fields: ClassVar = (
-        ApiField("id", data_type=int),
+        ApiField("id"),
         ApiField("name"),
-        ApiField("stack_id"),
+        ApiField("project_id"),
         ApiField("organization_id"),
         ApiField("description"),
         ApiField("client_id"),
         ApiField("created_at", data_type=Parsers.datetime),
     )
 
-    id: int
+    id: str
     name: str
-    stack_id: int
+    project_id: int
     organization_id: str
     description: str
     client_id: str
+    created_at: Optional[datetime] = None
+
+
+@dataclass
+class EdgeNodeGrant(ApiObject):
+    _api_fields: ClassVar = (
+        ApiField("id"),
+        ApiField("from_edge_node_id"),
+        ApiField("to_service_instance_id"),
+        ApiField("created_at", data_type=Parsers.datetime),
+    )
+
+    id: str
+    from_edge_node_id: str
+    to_service_instance_id: int
     created_at: Optional[datetime] = None
 
 
