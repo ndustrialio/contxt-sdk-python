@@ -19,8 +19,11 @@ def edge_nodes() -> None:
 @click.pass_obj
 def get(clients: Clients, project_slug: int, fields: List[str], sort: str) -> None:
     """Get edge nodes for a project"""
-    items = clients.contxt_deployments.get_edge_nodes(organization_id=clients.org_id, project_slug=project_slug)
+    items = clients.contxt_deployments.get_edge_nodes(
+        organization_id=clients.org_id, project_slug=project_slug
+    )
     print_table(items=items, keys=fields, sort_by=sort)
+
 
 @edge_nodes.command()
 @click.argument("edge_node_id")
@@ -33,6 +36,7 @@ def add_grant(clients: Clients, edge_node_id: str, target: int) -> None:
     )
     print_item(result)
 
+
 @edge_nodes.command()
 @click.argument("edge_node_id")
 @fields_option(default="id, from_edge_node_id, to_service_instance_id", obj=EdgeNodeGrant)
@@ -40,9 +44,6 @@ def add_grant(clients: Clients, edge_node_id: str, target: int) -> None:
 @click.pass_obj
 def get_grants(clients: Clients, edge_node_id: str, fields: List[str], sort: str) -> None:
     """Get all edge node grants"""
-    items = clients.contxt_deployments.get_edge_node_grants(
-        clients.org_id,
-        edge_node_id=edge_node_id
-    )
+    items = clients.contxt_deployments.get_edge_node_grants(clients.org_id, edge_node_id=edge_node_id)
 
     print_table(items=items, keys=fields, sort_by=sort)

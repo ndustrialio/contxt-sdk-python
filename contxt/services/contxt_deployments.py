@@ -45,12 +45,13 @@ class ContxtDeploymentService(ConfiguredApi):
     def get_edge_nodes(self, organization_id: str, project_slug: int) -> List[EdgeNode]:
         resp = self.get(f"{organization_id}/projects/{project_slug}/edgenodes")
         return [EdgeNode.from_api(rec) for rec in resp]
-    
+
     def get_edge_node_grants(self, organization_id: str, edge_node_id: int) -> List[EdgeNodeGrant]:
         resp = self.get(f"{organization_id}/edgenodes/{edge_node_id}/grants")
         return [EdgeNodeGrant.from_api(rec) for rec in resp]
-    
-    def get_service_instance_grants(self, organization_id: str, service_instance_id: int) -> List[ServiceInstanceGrant]:
+
+    def get_service_instance_grants(
+        self, organization_id: str, service_instance_id: int
+    ) -> List[ServiceInstanceGrant]:
         resp = self.get(f"{organization_id}/service_instances/{service_instance_id}/grants")
         return [ServiceInstanceGrant.from_api(rec) for rec in resp]
-    
