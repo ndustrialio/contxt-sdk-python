@@ -77,6 +77,8 @@
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#get_1">get</a>
     </li>
+    <li class="toctree-l3"><a class="reference internal" href="#get-grants">get-grants</a>
+    </li>
         </ul>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#ems">ems</a>
@@ -194,6 +196,8 @@
     <li class="toctree-l3"><a class="reference internal" href="#delete_5">delete</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#get_10">get</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#get-grants_1">get-grants</a>
     </li>
         </ul>
     </li>
@@ -359,7 +363,17 @@
 <h3 id="get_1">get<a class="headerlink" href="#get_1" title="Permanent link">&para;</a></h3>
 <p>Get edge nodes for a project</p>
 <p><strong>Usage:</strong></p>
-<pre><code class="language-text">contxt edge-nodes get [OPTIONS] ORG_ID PROJECT_ID
+<pre><code class="language-text">contxt edge-nodes get [OPTIONS] PROJECT_SLUG
+</code></pre>
+<p><strong>Options:</strong></p>
+<pre><code class="language-text">  --fields TEXT  Comma-delimited list of fields to return
+  --sort TEXT    Field to sort by
+  --help         Show this message and exit.
+</code></pre>
+<h3 id="get-grants">get-grants<a class="headerlink" href="#get-grants" title="Permanent link">&para;</a></h3>
+<p>Get all edge node grants</p>
+<p><strong>Usage:</strong></p>
+<pre><code class="language-text">contxt edge-nodes get-grants [OPTIONS] EDGE_NODE_ID
 </code></pre>
 <p><strong>Options:</strong></p>
 <pre><code class="language-text">  --fields TEXT  Comma-delimited list of fields to return
@@ -841,6 +855,16 @@
   --fields TEXT      Comma-delimited list of fields to return
   --sort TEXT        Field to sort by
   --help             Show this message and exit.
+</code></pre>
+<h3 id="get-grants_1">get-grants<a class="headerlink" href="#get-grants_1" title="Permanent link">&para;</a></h3>
+<p>Get all service instance grants</p>
+<p><strong>Usage:</strong></p>
+<pre><code class="language-text">contxt service-instances get-grants [OPTIONS] SERVICE_INSTANCE_ID
+</code></pre>
+<p><strong>Options:</strong></p>
+<pre><code class="language-text">  --fields TEXT  Comma-delimited list of fields to return
+  --sort TEXT    Field to sort by
+  --help         Show this message and exit.
 </code></pre>
 <h2 id="services">services<a class="headerlink" href="#services" title="Permanent link">&para;</a></h2>
 <p>Services.</p>
