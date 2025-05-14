@@ -26,6 +26,28 @@ def get(clients: Clients, project_slug: int, fields: List[str], sort: str) -> No
 
 
 @edge_nodes.command()
+@click.option("--project-slug", prompt=True)
+@click.option("--name", prompt=True)
+@click.option("--description", prompt=True)
+@click.pass_obj
+def create(
+    clients: Clients,
+    project_slug: str,
+    name: str,
+    description: str,
+) -> None:
+    """Create an edge node"""
+    result = clients.contxt_deployments.post(
+        f"{clients.org_id}/projects/{project_slug}/edgenodes",
+        {
+            "name": name,
+            "description": description,
+        },
+    )
+    print_item(result)
+
+
+@edge_nodes.command()
 @click.argument("edge_node_id")
 @click.argument("target")
 @click.pass_obj
