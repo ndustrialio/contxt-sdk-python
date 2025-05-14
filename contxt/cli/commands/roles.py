@@ -18,9 +18,7 @@ def roles() -> None:
 @click.pass_obj
 def get(clients: Clients, fields: List[str], sort: str) -> None:
     """Get roles for a project"""
-    items = clients.contxt_access.get_roles(
-        organization_id=clients.org_id
-    )
+    items = clients.contxt_access.get_roles(organization_id=clients.org_id)
     print_table(items=items, keys=fields, sort_by=sort)
 
 
@@ -39,7 +37,6 @@ def create(
         {
             "name": name,
             "description": description,
-
         },
     )
     print_item(result)
@@ -55,5 +52,3 @@ def add_application(clients: Clients, target_role: int, application_id: str) -> 
         organization_id=clients.org_id, target_role_id=target_role, application_id=application_id
     )
     print_item(result)
-
-

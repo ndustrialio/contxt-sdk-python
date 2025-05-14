@@ -98,46 +98,30 @@ def get_grants(clients: Clients, service_instance_id: str, fields: List[str], so
 @click.option("--label", prompt=True)
 @click.option("--description", prompt=True)
 @click.pass_obj
-def add_scope(
-    clients: Clients,
-    service_instance_id: int,
-    label: str,
-    description: str
-) -> None:
+def add_scope(clients: Clients, service_instance_id: int, label: str, description: str) -> None:
     """Create service instance scope"""
-    json = {
-        "label": label,
-        "description": description
-    }
+    json = {"label": label, "description": description}
     json = {k: v for k, v in json.items() if v is not None}
     result = clients.contxt_deployments.post(
         f"{clients.org_id}/service_instances/{service_instance_id}/scopes", json
     )
     print_item(result)
-    
+
 
 @service_instances.command()
 @click.option("--service_instance_id", prompt=True)
-@click.option("--url_type", type=click.Choice([
-    "allowed_clients", 
-    "allowed_logout_urls", 
-    "allowed_origins", 
-    'callbacks', 
-    'web_origins'
-]), prompt=True)
+@click.option(
+    "--url_type",
+    type=click.Choice(
+        ["allowed_clients", "allowed_logout_urls", "allowed_origins", "callbacks", "web_origins"]
+    ),
+    prompt=True,
+)
 @click.option("--url", prompt=True)
 @click.pass_obj
-def add_url(
-    clients: Clients,
-    service_instance_id: int,
-    url_type: str,
-    url: str
-) -> None:
+def add_url(clients: Clients, service_instance_id: int, url_type: str, url: str) -> None:
     """Add service instance url"""
-    json = {
-        "url_type": url_type,
-        "url": url
-    }
+    json = {"url_type": url_type, "url": url}
     json = {k: v for k, v in json.items() if v is not None}
     result = clients.contxt_deployments.post(
         f"{clients.org_id}/service_instances/{service_instance_id}/urls", json

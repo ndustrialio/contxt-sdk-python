@@ -1,6 +1,4 @@
-from typing import List, Dict
-
-from requests.exceptions import HTTPError
+from typing import Dict, List
 
 from ..auth import Auth
 from ..models.contxt import Role
@@ -28,10 +26,8 @@ class ContxtAccessService(ConfiguredApi):
 
     def get_roles(self, organization_id: str) -> List[Role]:
         return [Role.from_api(rec) for rec in self.get(f"{organization_id}/roles")]
-    
-    def add_role_application(self, organization_id: str, target_role_id: str, application_id: int) -> Dict:
-        return self.post(
-            f"{organization_id}/roles/{target_role_id}/applications/{application_id}"
-        )
 
-
+    def add_role_application(
+        self, organization_id: str, target_role_id: str, application_id: int
+    ) -> Dict:
+        return self.post(f"{organization_id}/roles/{target_role_id}/applications/{application_id}")
