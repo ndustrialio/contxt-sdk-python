@@ -4,6 +4,7 @@ import click
 
 from contxt.auth.cli import CliAuth
 from contxt.services import (
+    ContxtAccessService,
     ContxtDeploymentService,
     ContxtService,
     EmsService,
@@ -46,6 +47,10 @@ class Clients:
     @cachedproperty
     def contxt_deployments(self) -> ContxtDeploymentService:
         return ContxtDeploymentService(auth=self.auth, env=self.env)
+
+    @cachedproperty
+    def contxt_access(self) -> ContxtAccessService:
+        return ContxtAccessService(auth=self.auth, env=self.env)
 
     @cachedproperty
     def ems(self) -> EmsService:

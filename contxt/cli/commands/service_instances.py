@@ -68,14 +68,14 @@ def delete(clients: Clients, id: str) -> None:
 
 
 @service_instances.command()
-@click.argument("service_instance_id")
-@click.argument("target")
+@click.argument("from_service_instance_id")
+@click.argument("to_service_instance_id")
 @click.pass_obj
-def add_grant(clients: Clients, service_instance_id: str, target: int) -> None:
+def add_grant(clients: Clients, from_service_instance_id: int, to_service_instance_id: int) -> None:
     """Add grant to service instance"""
-    json = {"to_service_instance_id": target}
+    json = {"to_service_instance_id": to_service_instance_id}
     result = clients.contxt_deployments.post(
-        f"{clients.org_id}/service_instances/{service_instance_id}/grants", json
+        f"{clients.org_id}/service_instances/{from_service_instance_id}/grants", json
     )
     print_item(result)
 
@@ -91,3 +91,39 @@ def get_grants(clients: Clients, service_instance_id: str, fields: List[str], so
         clients.org_id, service_instance_id=service_instance_id
     )
     print_table(items=items, keys=fields, sort_by=sort)
+
+
+@service_instances.command()
+@click.option("--service_instance_id", prompt=True)
+@click.option("--label", prompt=True)
+@click.option("--description", prompt=True)
+@click.pass_obj
+def add_scope(clients: Clients, service_instance_id: int, label: str, description: str) -> None:
+    """Create service instance scope"""
+    json = {"label": label, "description": description}
+    json = {k: v for k, v in json.items() if v is not None}
+    result = clients.contxt_deployments.post(
+        f"{clients.org_id}/service_instances/{service_instance_id}/scopes", json
+    )
+    print_item(result)
+
+
+@service_instances.command()
+@click.option("--service_instance_id", prompt=True)
+@click.option(
+    "--url_type",
+    type=click.Choice(
+        ["allowed_clients", "allowed_logout_urls", "allowed_origins", "callbacks", "web_origins"]
+    ),
+    prompt=True,
+)
+@click.option("--url", prompt=True)
+@click.pass_obj
+def add_url(clients: Clients, service_instance_id: int, url_type: str, url: str) -> None:
+    """Add service instance url"""
+    json = {"url_type": url_type, "url": url}
+    json = {k: v for k, v in json.items() if v is not None}
+    result = clients.contxt_deployments.post(
+        f"{clients.org_id}/service_instances/{service_instance_id}/urls", json
+    )
+    print_item(result)
