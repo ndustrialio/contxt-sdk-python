@@ -75,6 +75,8 @@
         <ul>
     <li class="toctree-l3"><a class="reference internal" href="#add-grant">add-grant</a>
     </li>
+    <li class="toctree-l3"><a class="reference internal" href="#create">create</a>
+    </li>
     <li class="toctree-l3"><a class="reference internal" href="#get_1">get</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#get-grants">get-grants</a>
@@ -97,7 +99,7 @@
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#facilities">facilities</a>
         <ul>
-    <li class="toctree-l3"><a class="reference internal" href="#create">create</a>
+    <li class="toctree-l3"><a class="reference internal" href="#create_1">create</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#get_2">get</a>
     </li>
@@ -123,7 +125,7 @@
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#fields">fields</a>
         <ul>
-    <li class="toctree-l4"><a class="reference internal" href="#create_1">create</a>
+    <li class="toctree-l4"><a class="reference internal" href="#create_2">create</a>
     </li>
     <li class="toctree-l4"><a class="reference internal" href="#delete_1">delete</a>
     </li>
@@ -137,7 +139,7 @@
         <ul>
     <li class="toctree-l4"><a class="reference internal" href="#add-field">add-field</a>
     </li>
-    <li class="toctree-l4"><a class="reference internal" href="#create_2">create</a>
+    <li class="toctree-l4"><a class="reference internal" href="#create_3">create</a>
     </li>
     <li class="toctree-l4"><a class="reference internal" href="#delete_2">delete</a>
     </li>
@@ -165,7 +167,7 @@
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#project-envs">project-envs</a>
         <ul>
-    <li class="toctree-l3"><a class="reference internal" href="#create_3">create</a>
+    <li class="toctree-l3"><a class="reference internal" href="#create_4">create</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#delete_3">delete</a>
     </li>
@@ -177,7 +179,7 @@
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#projects">projects</a>
         <ul>
-    <li class="toctree-l3"><a class="reference internal" href="#create_4">create</a>
+    <li class="toctree-l3"><a class="reference internal" href="#create_5">create</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#delete_4">delete</a>
     </li>
@@ -187,15 +189,29 @@
     </li>
         </ul>
     </li>
+    <li class="toctree-l2"><a class="reference internal" href="#roles">roles</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#add-application">add-application</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#create_6">create</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#get_10">get</a>
+    </li>
+        </ul>
+    </li>
     <li class="toctree-l2"><a class="reference internal" href="#service-instances">service-instances</a>
         <ul>
     <li class="toctree-l3"><a class="reference internal" href="#add-grant_1">add-grant</a>
     </li>
-    <li class="toctree-l3"><a class="reference internal" href="#create_5">create</a>
+    <li class="toctree-l3"><a class="reference internal" href="#add-scope">add-scope</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#add-url">add-url</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#create_7">create</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#delete_5">delete</a>
     </li>
-    <li class="toctree-l3"><a class="reference internal" href="#get_10">get</a>
+    <li class="toctree-l3"><a class="reference internal" href="#get_11">get</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#get-grants_1">get-grants</a>
     </li>
@@ -203,11 +219,11 @@
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#services">services</a>
         <ul>
-    <li class="toctree-l3"><a class="reference internal" href="#create_6">create</a>
+    <li class="toctree-l3"><a class="reference internal" href="#create_8">create</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#delete_6">delete</a>
     </li>
-    <li class="toctree-l3"><a class="reference internal" href="#get_11">get</a>
+    <li class="toctree-l3"><a class="reference internal" href="#get_12">get</a>
     </li>
         </ul>
     </li>
@@ -360,6 +376,17 @@
 <p><strong>Options:</strong></p>
 <pre><code class="language-text">  --help  Show this message and exit.
 </code></pre>
+<h3 id="create">create<a class="headerlink" href="#create" title="Permanent link">&para;</a></h3>
+<p>Create an edge node</p>
+<p><strong>Usage:</strong></p>
+<pre><code class="language-text">contxt edge-nodes create [OPTIONS]
+</code></pre>
+<p><strong>Options:</strong></p>
+<pre><code class="language-text">  --project-slug TEXT
+  --name TEXT
+  --description TEXT
+  --help               Show this message and exit.
+</code></pre>
 <h3 id="get_1">get<a class="headerlink" href="#get_1" title="Permanent link">&para;</a></h3>
 <p>Get edge nodes for a project</p>
 <p><strong>Usage:</strong></p>
@@ -462,7 +489,7 @@
 <p><strong>Options:</strong></p>
 <pre><code class="language-text">  --help  Show this message and exit.
 </code></pre>
-<h3 id="create">create<a class="headerlink" href="#create" title="Permanent link">&para;</a></h3>
+<h3 id="create_1">create<a class="headerlink" href="#create_1" title="Permanent link">&para;</a></h3>
 <p>Create facilities from a CSV file, containing the columns:</p>
 <ul>
 <li>name: string</li>
@@ -565,7 +592,7 @@
 <p><strong>Options:</strong></p>
 <pre><code class="language-text">  --help  Show this message and exit.
 </code></pre>
-<h4 id="create_1">create<a class="headerlink" href="#create_1" title="Permanent link">&para;</a></h4>
+<h4 id="create_2">create<a class="headerlink" href="#create_2" title="Permanent link">&para;</a></h4>
 <p>Create (provision) fields</p>
 <p><strong>Usage:</strong></p>
 <pre><code class="language-text">contxt iot fields create [OPTIONS] FEED_KEY
@@ -617,7 +644,7 @@
 <p><strong>Options:</strong></p>
 <pre><code class="language-text">  --help  Show this message and exit.
 </code></pre>
-<h4 id="create_2">create<a class="headerlink" href="#create_2" title="Permanent link">&para;</a></h4>
+<h4 id="create_3">create<a class="headerlink" href="#create_3" title="Permanent link">&para;</a></h4>
 <p>Create a new grouping</p>
 <p><strong>Usage:</strong></p>
 <pre><code class="language-text">contxt iot groupings create [OPTIONS] FACILITY_ID
@@ -709,7 +736,7 @@
 <p><strong>Options:</strong></p>
 <pre><code class="language-text">  --help  Show this message and exit.
 </code></pre>
-<h3 id="create_3">create<a class="headerlink" href="#create_3" title="Permanent link">&para;</a></h3>
+<h3 id="create_4">create<a class="headerlink" href="#create_4" title="Permanent link">&para;</a></h3>
 <p>Create a project environment</p>
 <p><strong>Usage:</strong></p>
 <pre><code class="language-text">contxt project-envs create [OPTIONS]
@@ -764,7 +791,7 @@
 <p><strong>Options:</strong></p>
 <pre><code class="language-text">  --help  Show this message and exit.
 </code></pre>
-<h3 id="create_4">create<a class="headerlink" href="#create_4" title="Permanent link">&para;</a></h3>
+<h3 id="create_5">create<a class="headerlink" href="#create_5" title="Permanent link">&para;</a></h3>
 <p>Create a project</p>
 <p><strong>Usage:</strong></p>
 <pre><code class="language-text">contxt projects create [OPTIONS]
@@ -807,6 +834,42 @@
   --description TEXT
   --help              Show this message and exit.
 </code></pre>
+<h2 id="roles">roles<a class="headerlink" href="#roles" title="Permanent link">&para;</a></h2>
+<p>Roles.</p>
+<p><strong>Usage:</strong></p>
+<pre><code class="language-text">contxt roles [OPTIONS] COMMAND [ARGS]...
+</code></pre>
+<p><strong>Options:</strong></p>
+<pre><code class="language-text">  --help  Show this message and exit.
+</code></pre>
+<h3 id="add-application">add-application<a class="headerlink" href="#add-application" title="Permanent link">&para;</a></h3>
+<p>Add application to role</p>
+<p><strong>Usage:</strong></p>
+<pre><code class="language-text">contxt roles add-application [OPTIONS] TARGET_ROLE APPLICATION_ID
+</code></pre>
+<p><strong>Options:</strong></p>
+<pre><code class="language-text">  --help  Show this message and exit.
+</code></pre>
+<h3 id="create_6">create<a class="headerlink" href="#create_6" title="Permanent link">&para;</a></h3>
+<p>Create a role</p>
+<p><strong>Usage:</strong></p>
+<pre><code class="language-text">contxt roles create [OPTIONS]
+</code></pre>
+<p><strong>Options:</strong></p>
+<pre><code class="language-text">  --name TEXT
+  --description TEXT
+  --help              Show this message and exit.
+</code></pre>
+<h3 id="get_10">get<a class="headerlink" href="#get_10" title="Permanent link">&para;</a></h3>
+<p>Get roles for a project</p>
+<p><strong>Usage:</strong></p>
+<pre><code class="language-text">contxt roles get [OPTIONS]
+</code></pre>
+<p><strong>Options:</strong></p>
+<pre><code class="language-text">  --fields TEXT  Comma-delimited list of fields to return
+  --sort TEXT    Field to sort by
+  --help         Show this message and exit.
+</code></pre>
 <h2 id="service-instances">service-instances<a class="headerlink" href="#service-instances" title="Permanent link">&para;</a></h2>
 <p>Service Instances.</p>
 <p><strong>Usage:</strong></p>
@@ -818,12 +881,35 @@
 <h3 id="add-grant_1">add-grant<a class="headerlink" href="#add-grant_1" title="Permanent link">&para;</a></h3>
 <p>Add grant to service instance</p>
 <p><strong>Usage:</strong></p>
-<pre><code class="language-text">contxt service-instances add-grant [OPTIONS] SERVICE_INSTANCE_ID TARGET
+<pre><code class="language-text">contxt service-instances add-grant [OPTIONS] FROM_SERVICE_INSTANCE_ID
+                                   TO_SERVICE_INSTANCE_ID
 </code></pre>
 <p><strong>Options:</strong></p>
 <pre><code class="language-text">  --help  Show this message and exit.
 </code></pre>
-<h3 id="create_5">create<a class="headerlink" href="#create_5" title="Permanent link">&para;</a></h3>
+<h3 id="add-scope">add-scope<a class="headerlink" href="#add-scope" title="Permanent link">&para;</a></h3>
+<p>Create service instance scope</p>
+<p><strong>Usage:</strong></p>
+<pre><code class="language-text">contxt service-instances add-scope [OPTIONS]
+</code></pre>
+<p><strong>Options:</strong></p>
+<pre><code class="language-text">  --service_instance_id TEXT
+  --label TEXT
+  --description TEXT
+  --help                      Show this message and exit.
+</code></pre>
+<h3 id="add-url">add-url<a class="headerlink" href="#add-url" title="Permanent link">&para;</a></h3>
+<p>Add service instance url</p>
+<p><strong>Usage:</strong></p>
+<pre><code class="language-text">contxt service-instances add-url [OPTIONS]
+</code></pre>
+<p><strong>Options:</strong></p>
+<pre><code class="language-text">  --service_instance_id TEXT
+  --url_type [allowed_clients|allowed_logout_urls|allowed_origins|callbacks|web_origins]
+  --url TEXT
+  --help                          Show this message and exit.
+</code></pre>
+<h3 id="create_7">create<a class="headerlink" href="#create_7" title="Permanent link">&para;</a></h3>
 <p>Create service instances</p>
 <p><strong>Usage:</strong></p>
 <pre><code class="language-text">contxt service-instances create [OPTIONS]
@@ -845,7 +931,7 @@
 <p><strong>Options:</strong></p>
 <pre><code class="language-text">  --help  Show this message and exit.
 </code></pre>
-<h3 id="get_10">get<a class="headerlink" href="#get_10" title="Permanent link">&para;</a></h3>
+<h3 id="get_11">get<a class="headerlink" href="#get_11" title="Permanent link">&para;</a></h3>
 <p>Get service instance(s)</p>
 <p><strong>Usage:</strong></p>
 <pre><code class="language-text">contxt service-instances get [OPTIONS]
@@ -874,7 +960,7 @@
 <p><strong>Options:</strong></p>
 <pre><code class="language-text">  --help  Show this message and exit.
 </code></pre>
-<h3 id="create_6">create<a class="headerlink" href="#create_6" title="Permanent link">&para;</a></h3>
+<h3 id="create_8">create<a class="headerlink" href="#create_8" title="Permanent link">&para;</a></h3>
 <p>Create service</p>
 <p><strong>Usage:</strong></p>
 <pre><code class="language-text">contxt services create [OPTIONS]
@@ -894,7 +980,7 @@
 <p><strong>Options:</strong></p>
 <pre><code class="language-text">  --help  Show this message and exit.
 </code></pre>
-<h3 id="get_11">get<a class="headerlink" href="#get_11" title="Permanent link">&para;</a></h3>
+<h3 id="get_12">get<a class="headerlink" href="#get_12" title="Permanent link">&para;</a></h3>
 <p>Get service(s)</p>
 <p><strong>Usage:</strong></p>
 <pre><code class="language-text">contxt services get [OPTIONS] [ID]
