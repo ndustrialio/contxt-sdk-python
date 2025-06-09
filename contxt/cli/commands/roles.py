@@ -69,7 +69,7 @@ def get_role_scopes(clients: Clients, role_id: str, fields: List[str], sort: str
 @click.argument("target_role_id")
 @click.argument("service_instance_scope_id")
 @click.pass_obj
-def add_scope(clients: Clients, target_role_id: int, service_instance_scope_id: id) -> None:
+def add_scope(clients: Clients, target_role_id: int, service_instance_scope_id: int) -> None:
     """Add service instance scope to role"""
     result = clients.contxt_access.add_role_service_instance_scope(
         organization_id=clients.org_id,
