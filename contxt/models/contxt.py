@@ -447,3 +447,22 @@ class Cluster(ApiObject):
     certificate_authority: Optional[str] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
+
+
+@dataclass
+class ServiceInstanceScope(ApiObject):
+    _api_fields: ClassVar = (
+        ApiField("id"),
+        ApiField("service_instance_id"),
+        ApiField("label"),
+        ApiField("description"),
+        ApiField("created_at", data_type=Parsers.datetime),
+        ApiField("updated_at", data_type=Parsers.datetime),
+    )
+
+    id: str
+    service_instance_id: int
+    label: str
+    description: str
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None

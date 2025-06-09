@@ -1,7 +1,7 @@
 from typing import Dict, List
 
 from ..auth import Auth
-from ..models.contxt import Role
+from ..models.contxt import Role, ServiceInstanceScope
 from .api import ApiEnvironment, ConfiguredApi
 
 
@@ -31,3 +31,14 @@ class ContxtAccessService(ConfiguredApi):
         self, organization_id: str, target_role_id: str, application_id: int
     ) -> Dict:
         return self.post(f"{organization_id}/roles/{target_role_id}/applications/{application_id}")
+
+    def get_role_scopes(self, organization_id: str, role_id: str) -> List[Role]:
+        return [
+            ServiceInstanceScope.from_api(rec)
+            for rec in self.get(f"{organization_id}/roles/{role_id}/scopes")
+        ]
+
+    def add_role_service_instance_scope(
+        self, organization_id: str, target_role_id: str, service_instance_scope_id: int
+    ) -> Dict:
+        return self.post(f"{organization_id}/roles/{target_role_id}/scopes/{service_instance_scope_id}")
