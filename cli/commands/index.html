@@ -193,9 +193,13 @@
         <ul>
     <li class="toctree-l3"><a class="reference internal" href="#add-application">add-application</a>
     </li>
+    <li class="toctree-l3"><a class="reference internal" href="#add-scope">add-scope</a>
+    </li>
     <li class="toctree-l3"><a class="reference internal" href="#create_6">create</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#get_10">get</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#get-role-scopes">get-role-scopes</a>
     </li>
         </ul>
     </li>
@@ -203,7 +207,7 @@
         <ul>
     <li class="toctree-l3"><a class="reference internal" href="#add-grant_1">add-grant</a>
     </li>
-    <li class="toctree-l3"><a class="reference internal" href="#add-scope">add-scope</a>
+    <li class="toctree-l3"><a class="reference internal" href="#add-scope_1">add-scope</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#add-url">add-url</a>
     </li>
@@ -214,6 +218,8 @@
     <li class="toctree-l3"><a class="reference internal" href="#get_11">get</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#get-grants_1">get-grants</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#get-scopes">get-scopes</a>
     </li>
         </ul>
     </li>
@@ -845,7 +851,15 @@
 <h3 id="add-application">add-application<a class="headerlink" href="#add-application" title="Permanent link">&para;</a></h3>
 <p>Add application to role</p>
 <p><strong>Usage:</strong></p>
-<pre><code class="language-text">contxt roles add-application [OPTIONS] TARGET_ROLE APPLICATION_ID
+<pre><code class="language-text">contxt roles add-application [OPTIONS] TARGET_ROLE_ID APPLICATION_ID
+</code></pre>
+<p><strong>Options:</strong></p>
+<pre><code class="language-text">  --help  Show this message and exit.
+</code></pre>
+<h3 id="add-scope">add-scope<a class="headerlink" href="#add-scope" title="Permanent link">&para;</a></h3>
+<p>Add service instance scope to role</p>
+<p><strong>Usage:</strong></p>
+<pre><code class="language-text">contxt roles add-scope [OPTIONS] TARGET_ROLE_ID SERVICE_INSTANCE_SCOPE_ID
 </code></pre>
 <p><strong>Options:</strong></p>
 <pre><code class="language-text">  --help  Show this message and exit.
@@ -870,6 +884,16 @@
   --sort TEXT    Field to sort by
   --help         Show this message and exit.
 </code></pre>
+<h3 id="get-role-scopes">get-role-scopes<a class="headerlink" href="#get-role-scopes" title="Permanent link">&para;</a></h3>
+<p>Get scopes for a role</p>
+<p><strong>Usage:</strong></p>
+<pre><code class="language-text">contxt roles get-role-scopes [OPTIONS] ROLE_ID
+</code></pre>
+<p><strong>Options:</strong></p>
+<pre><code class="language-text">  --fields TEXT  Comma-delimited list of fields to return
+  --sort TEXT    Field to sort by
+  --help         Show this message and exit.
+</code></pre>
 <h2 id="service-instances">service-instances<a class="headerlink" href="#service-instances" title="Permanent link">&para;</a></h2>
 <p>Service Instances.</p>
 <p><strong>Usage:</strong></p>
@@ -887,7 +911,7 @@
 <p><strong>Options:</strong></p>
 <pre><code class="language-text">  --help  Show this message and exit.
 </code></pre>
-<h3 id="add-scope">add-scope<a class="headerlink" href="#add-scope" title="Permanent link">&para;</a></h3>
+<h3 id="add-scope_1">add-scope<a class="headerlink" href="#add-scope_1" title="Permanent link">&para;</a></h3>
 <p>Create service instance scope</p>
 <p><strong>Usage:</strong></p>
 <pre><code class="language-text">contxt service-instances add-scope [OPTIONS]
@@ -946,6 +970,16 @@
 <p>Get all service instance grants</p>
 <p><strong>Usage:</strong></p>
 <pre><code class="language-text">contxt service-instances get-grants [OPTIONS] SERVICE_INSTANCE_ID
+</code></pre>
+<p><strong>Options:</strong></p>
+<pre><code class="language-text">  --fields TEXT  Comma-delimited list of fields to return
+  --sort TEXT    Field to sort by
+  --help         Show this message and exit.
+</code></pre>
+<h3 id="get-scopes">get-scopes<a class="headerlink" href="#get-scopes" title="Permanent link">&para;</a></h3>
+<p>Get all service instance scopes</p>
+<p><strong>Usage:</strong></p>
+<pre><code class="language-text">contxt service-instances get-scopes [OPTIONS] SERVICE_INSTANCE_ID
 </code></pre>
 <p><strong>Options:</strong></p>
 <pre><code class="language-text">  --fields TEXT  Comma-delimited list of fields to return
