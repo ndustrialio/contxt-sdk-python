@@ -3,7 +3,7 @@ from typing import List
 from requests.exceptions import HTTPError
 
 from ..auth import Auth
-from ..models.contxt import Cluster, EdgeNode, EdgeNodeGrant, ServiceInstanceGrant
+from ..models.contxt import Cluster, EdgeNode, EdgeNodeGrant, ServiceInstanceGrant, ServiceInstanceScope
 from .api import ApiEnvironment, ConfiguredApi
 
 
@@ -55,3 +55,9 @@ class ContxtDeploymentService(ConfiguredApi):
     ) -> List[ServiceInstanceGrant]:
         resp = self.get(f"{organization_id}/service_instances/{service_instance_id}/grants")
         return [ServiceInstanceGrant.from_api(rec) for rec in resp]
+
+    def get_service_instance_scopes(
+        self, organization_id: str, service_instance_id: int
+    ) -> List[ServiceInstanceScope]:
+        resp = self.get(f"{organization_id}/service_instances/{service_instance_id}/scopes")
+        return [ServiceInstanceScope.from_api(rec) for rec in resp]
