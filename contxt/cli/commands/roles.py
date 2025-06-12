@@ -77,3 +77,14 @@ def add_scope(clients: Clients, target_role_id: int, service_instance_scope_id: 
         service_instance_scope_id=service_instance_scope_id,
     )
     print_item(result)
+
+
+@roles.command()
+@click.argument("target_role_id")
+@click.argument("service_instance_scope_id")
+@click.pass_obj
+def delete_scope(clients: Clients, target_role_id: int, service_instance_scope_id: int) -> None:
+    """Remove service instance scope from role"""
+    clients.contxt_access.delete(
+        f"{clients.org_id}/roles/{target_role_id}/scopes/{service_instance_scope_id}"
+    )
