@@ -1,6 +1,6 @@
 try:
-    from pkg_resources import get_distribution  # implicit dependency on setuptools
+    from importlib.metadata import version
 
-    __version__ = get_distribution("contxt-sdk").version
+    __version__ = version("contxt-sdk")
 except Exception:
     __version__ = "unknown"
