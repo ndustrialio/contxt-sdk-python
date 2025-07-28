@@ -1618,18 +1618,18 @@ use-chardet-on-py3 = ["chardet (>=3.0.2,<6)"]
 
 [[package]]
 name = "sgqlc"
-version = "16.3"
+version = "16.5"
 description = "Simple GraphQL Client"
 optional = false
-python-versions = ">=3.7,<4.0"
+python-versions = "<4,>=3.8"
 groups = ["main"]
 files = [
-    {file = "sgqlc-16.3-py3-none-any.whl", hash = "sha256:89d468386a4ba4b5ade991623228b6fb0a25bea1f25643ccac130fb3ef565b72"},
-    {file = "sgqlc-16.3.tar.gz", hash = "sha256:be08857775aa3e65ef7b2c1f0cdcc65dd5794907b162b393c189187fee664558"},
+    {file = "sgqlc-16.5-py3-none-any.whl", hash = "sha256:56952622e3fcd771e079de290cf8a244dc014cbd9b65059d04f262ec8d8f0f44"},
+    {file = "sgqlc-16.5.tar.gz", hash = "sha256:93edcd29ee138f5305d13f211a2b2091bd77873c404c87b87ae16a4023c62d4a"},
 ]
 
 [package.dependencies]
-graphql-core = ">=3.1.7,<4.0.0"
+graphql-core = ">=3.2.4,<4.0.0"
 
 [package.extras]
 requests = ["requests"]
