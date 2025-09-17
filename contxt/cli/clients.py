@@ -1,7 +1,7 @@
+import os
 from dataclasses import dataclass
 
 import click
-import os
 
 from contxt.auth import Auth
 from contxt.auth.cli import CliAuth
