@@ -1,8 +1,11 @@
 from dataclasses import dataclass
 
 import click
+import os
 
+from contxt.auth import Auth
 from contxt.auth.cli import CliAuth
+from contxt.auth.machine import MachineAuth
 from contxt.services import (
     ContxtAccessService,
     ContxtDeploymentService,
@@ -37,8 +40,13 @@ class Clients:
         raise click.ClickException(f"Organization {self.org_slug!r} does not exist.")
 
     @cachedproperty
-    def auth(self) -> CliAuth:
-        return CliAuth(env=self.env)
+    def auth(self) -> Auth:
+        client_id = os.environ.get("CLIENT_ID")
+        client_secret = os.environ.get("CLIENT_SECRET")
+        if client_id and client_secret:
+            return MachineAuth(client_id=client_id, client_secret=client_secret)
+        else:
+            return CliAuth(env=self.env)
 
     @cachedproperty
     def contxt(self) -> ContxtService:
