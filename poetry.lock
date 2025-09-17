@@ -172,14 +172,14 @@ tests-mypy = ["mypy (>=1.11.1) ; platform_python_implementation == \"CPython\" a
 
 [[package]]
 name = "auth0-python"
-version = "4.9.0"
+version = "4.11.0"
 description = ""
 optional = false
 python-versions = ">=3.8"
 groups = ["main"]
 files = [
-    {file = "auth0_python-4.9.0-py3-none-any.whl", hash = "sha256:6440c7f74dfd669d9f5cdfe9bb44c4c3b230ce98a82353f55a387e90241fbf5b"},
-    {file = "auth0_python-4.9.0.tar.gz", hash = "sha256:f9b31ea9c906d0a123b9cdc6ccd7bbbb8156123f44789b08571c45947fb21238"},
+    {file = "auth0_python-4.11.0-py3-none-any.whl", hash = "sha256:53b1c5e11ab7d59dc566edb7068b2d8c65f855c0fc35f291e0362b2082f3ccf6"},
+    {file = "auth0_python-4.11.0.tar.gz", hash = "sha256:3c60a702256a24e55653907ce8c486f1f4cde8294869b417f713f0bc1d69de1a"},
 ]
 
 [package.dependencies]
