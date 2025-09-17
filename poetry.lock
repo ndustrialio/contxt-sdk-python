@@ -728,14 +728,14 @@ dev = ["flake8", "markdown", "twine", "wheel"]
 
 [[package]]
 name = "graphql-core"
-version = "3.2.5"
+version = "3.2.6"
 description = "GraphQL implementation for Python, a port of GraphQL.js, the JavaScript reference implementation for GraphQL."
 optional = false
 python-versions = "<4,>=3.6"
 groups = ["main"]
 files = [
-    {file = "graphql_core-3.2.5-py3-none-any.whl", hash = "sha256:2f150d5096448aa4f8ab26268567bbfeef823769893b39c1a2e1409590939c8a"},
-    {file = "graphql_core-3.2.5.tar.gz", hash = "sha256:e671b90ed653c808715645e3998b7ab67d382d55467b7e2978549111bbabf8d5"},
+    {file = "graphql_core-3.2.6-py3-none-any.whl", hash = "sha256:78b016718c161a6fb20a7d97bbf107f331cd1afe53e45566c59f776ed7f0b45f"},
+    {file = "graphql_core-3.2.6.tar.gz", hash = "sha256:c08eec22f9e40f0bd61d805907e3b3b1b9a320bc606e23dc145eebca07c8fbab"},
 ]
 
 [package.dependencies]
@@ -1618,20 +1618,21 @@ use-chardet-on-py3 = ["chardet (>=3.0.2,<6)"]
 
 [[package]]
 name = "sgqlc"
-version = "16.3"
+version = "17"
 description = "Simple GraphQL Client"
 optional = false
-python-versions = ">=3.7,<4.0"
+python-versions = "<4,>=3.8"
 groups = ["main"]
 files = [
-    {file = "sgqlc-16.3-py3-none-any.whl", hash = "sha256:89d468386a4ba4b5ade991623228b6fb0a25bea1f25643ccac130fb3ef565b72"},
-    {file = "sgqlc-16.3.tar.gz", hash = "sha256:be08857775aa3e65ef7b2c1f0cdcc65dd5794907b162b393c189187fee664558"},
+    {file = "sgqlc-17-py3-none-any.whl", hash = "sha256:99187c656fd0d5f9c81e7081d2ae569823b6c9a14a6e37eb00a39602808841f0"},
+    {file = "sgqlc-17.tar.gz", hash = "sha256:4febd6d00f001c0fe0dd571e27d87e6d5ae071e8d1f61c66fa772449910953fb"},
 ]
 
 [package.dependencies]
-graphql-core = ">=3.1.7,<4.0.0"
+graphql-core = ">=3.2.6,<3.3.0"
 
 [package.extras]
+httpx = ["httpx"]
 requests = ["requests"]
 websocket = ["websocket-client"]
 
@@ -2037,4 +2038,4 @@ crypto = ["cryptography"]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.9.2"
-content-hash = "2a6ee9d3ed7006dc6cac682a3b9e9facc956f23da816d21d53f644faa5eab6ed"
+content-hash = "c55faacda473cf1ac70f141ae6712e3b8cddbb8d01c5e881129dc705d469af57"
