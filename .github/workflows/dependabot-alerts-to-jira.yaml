@@ -2,7 +2,7 @@ name: Dependabot Alerts → Jira (scheduled)
 
 on:
   schedule:
-- cron: '23 9 * * 1-5'
+    - cron: '23 9 * * 1-5'
   workflow_dispatch: {}
 
 permissions:
