@@ -2,7 +2,6 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from contxt.generated.nionic_queries import Operations as nionic_operations
 from contxt.models.ems import ResourceType
 from contxt.services.nionic import NionicService
 
@@ -134,9 +133,7 @@ class TestGetMainServices:
     def test_filters_by_solar_type(self, nionic_service):
         response = _mock_run_response([ELECTRIC_SERVICE, SOLAR_SERVICE])
         with patch.object(nionic_service, "run", return_value=response):
-            results = nionic_service.get_main_services(
-                facility_id=100, resource_type=ResourceType.SOLAR
-            )
+            results = nionic_service.get_main_services(facility_id=100, resource_type=ResourceType.SOLAR)
 
         assert len(results) == 1
         assert results[0].name == "Main Solar"
