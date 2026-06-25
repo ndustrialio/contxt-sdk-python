@@ -8,9 +8,14 @@ from .events import Event
 
 
 class ResourceType(Enum):
+    AIRFLOW_ELECTRIC_HIGH = "airflow_electric_high"
+    AIRFLOW_ELECTRIC_LOW = "airflow_electric_low"
+    AIRFLOW_HIGH = "airflow_high"
+    AIRFLOW_LOW = "airflow_low"
     COMBINED = "combined"
     ELECTRIC = "electric"
     GAS = "gas"
+    SOLAR = "solar"
     WATER = "water"
 
 
