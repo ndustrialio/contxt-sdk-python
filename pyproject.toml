@@ -33,8 +33,6 @@ dependencies = [
   Repository = "https://github.com/ndustrialio/contxt-sdk-python"
 
 [tool.poetry]
-version = "0.1.0"
-
   [[tool.poetry.packages]]
   include = "contxt"
 
