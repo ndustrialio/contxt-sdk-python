@@ -104,7 +104,7 @@ jobs:
           git-user-name: "GitHub Actions"
           git-user-email: "action@github.com"
           version-file: pyproject.toml
-          version-path: tool.poetry.version
+          version-path: project.version
           preset: conventionalcommits
           output-file: false
       - name: Set new commit hash
