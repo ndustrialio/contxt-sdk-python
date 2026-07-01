@@ -1,6 +1,6 @@
 [project]
 name = "contxt-sdk"
-version = "6.9.0"
+version = "6.9.1"
 description = "Contxt SDK from ndustrial"
 readme = "README.md"
 requires-python = "^3.9.2"
