@@ -61,6 +61,34 @@ query mainServices($facilityId: Int!) {
         alias
         dataType
       }
+      meterUsage {
+        id
+        dataSourceName
+        name
+        alias
+        dataType
+      }
+      meterDemand {
+        id
+        dataSourceName
+        name
+        alias
+        dataType
+      }
+      gridUsage {
+        id
+        dataSourceName
+        name
+        alias
+        dataType
+      }
+      gridDemand {
+        id
+        dataSourceName
+        name
+        alias
+        dataType
+      }
       createdAt
       updatedAt
     }
