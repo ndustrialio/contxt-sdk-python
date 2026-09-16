@@ -24,7 +24,7 @@ dependencies = [
   email = "dev@ndustrial.io"
 
   [project.optional-dependencies]
-  crypto = [ "cryptography>=42.0.4" ]
+  crypto = [ "cryptography>=50.0.0" ]
 
   [project.scripts]
   contxt = "contxt.__main__:cli"
