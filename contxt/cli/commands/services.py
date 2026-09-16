@@ -33,7 +33,7 @@ def get(clients: Clients, id: str, fields: List[str], sort: str) -> None:
 @click.option("--type", type=click.Choice(["API", "Application", "Worker"]), prompt=True)
 @click.option(
     "--deployment-strategy",
-    type=click.Choice(["self-managed", "contxt-managed", "unmanaged"]),
+    type=click.Choice(["self-managed", "unmanaged"]),
     prompt=True,
 )
 @click.pass_obj
